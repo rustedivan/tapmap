@@ -10,5 +10,4 @@ target 'tapmap' do
   target 'tapmapTests' do
     inherit! :search_paths
   end
-
-end
+end	

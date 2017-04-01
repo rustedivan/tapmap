@@ -18,15 +18,15 @@ let UNIFORM_MODELVIEWPROJECTION_MATRIX = 0
 var uniforms = [GLint](repeating: 0, count: 2)
 
 class GameViewController: GLKViewController {
+	var geoWorld: GeoWorld!
+	var continentRenderers : [GeoContinentRenderer] = []
+	
 	var program: GLuint = 0
 	
 	var modelViewProjectionMatrix: GLKMatrix4 = GLKMatrix4Identity
 	
-	var vertexBuffer: GLuint = 0
-	var indexBuffer: GLuint = 1
-	
 	var context: EAGLContext? = nil
-	var loaded = false
+	
 	deinit {
 		self.tearDownGL()
 		
@@ -37,9 +37,9 @@ class GameViewController: GLKViewController {
 	
 	override func viewDidLoad() {
 		super.viewDidLoad()
-		
-		loadCrazyVertices()
-		
+
+		geoWorld = loadFeatureJson()
+
 		self.context = EAGLContext(api: .openGLES2)
 		
 		if !(self.context != nil) {
@@ -76,24 +76,13 @@ class GameViewController: GLKViewController {
 		}
 		
 		glEnable(GLenum(GL_DEPTH_TEST))
-		
-		glGenBuffers(1, &vertexBuffer)
-		glBindBuffer(GLenum(GL_ARRAY_BUFFER), vertexBuffer)
-		glBufferData(GLenum(GL_ARRAY_BUFFER), GLsizeiptr(MemoryLayout<GLfloat>.size * gBurkinaVertexData.count), &gBurkinaVertexData, GLenum(GL_STATIC_DRAW))
-		
-		glGenBuffers(1, &indexBuffer)
-		glBindBuffer(GLenum(GL_ELEMENT_ARRAY_BUFFER), indexBuffer)
-		glBufferData(GLenum(GL_ELEMENT_ARRAY_BUFFER), GLsizeiptr(MemoryLayout<GLint>.size * gBurkinaIndexData.count), &gBurkinaIndexData, GLenum(GL_STATIC_DRAW))
-		
-		glEnableVertexAttribArray(GLuint(GLKVertexAttrib.position.rawValue))
-		glVertexAttribPointer(GLuint(GLKVertexAttrib.position.rawValue), 2, GLenum(GL_FLOAT), GLboolean(GL_FALSE), 8, BUFFER_OFFSET(0))
+		for continent in geoWorld.continents {
+			continentRenderers.append(GeoContinentRenderer(continent: continent))
+		}
 	}
 	
 	func tearDownGL() {
 		EAGLContext.setCurrent(self.context)
-		
-		glDeleteBuffers(1, &vertexBuffer)
-		glDeleteBuffers(1, &indexBuffer)
 		
 		if program != 0 {
 			glDeleteProgram(program)
@@ -105,12 +94,10 @@ class GameViewController: GLKViewController {
 	
 	func update() {
 		let projectionMatrix = GLKMatrix4MakeOrtho(-180.0, 180.0, -80.0, 80.0, 0.1, 2.0)
-		//				let projectionMatrix = GLKMatrix4MakeOrtho(0.0, 90.0, 15.0, 60.0, 0.1, 2.0)
-		
 		let zoom = 5.0 + 4.0 * sin(timeSinceLastResume * 0.5)
 		let lat = 90.0 * cos(timeSinceLastResume * 0.37)
 		let lng = 25.0 * sin(timeSinceLastResume * 0.23)
-		
+
 		// Compute the model view matrix for the object rendered with GLKit
 		var modelViewMatrix = GLKMatrix4MakeScale(Float(zoom), Float(zoom), 1.0)
 		modelViewMatrix = GLKMatrix4Translate(modelViewMatrix, Float(lat), Float(lng), -1.5)
@@ -118,10 +105,8 @@ class GameViewController: GLKViewController {
 	}
 	
 	override func glkView(_ view: GLKView, drawIn rect: CGRect) {
-		glClearColor(0.65, 0.65, 0.65, 1.0)
+		glClearColor(0.0, 0.0, 0.0, 1.0)
 		glClear(GLbitfield(GL_COLOR_BUFFER_BIT) | GLbitfield(GL_DEPTH_BUFFER_BIT))
-		
-		if loaded == false { return }
 		
 		// Render the object again with ES2
 		glUseProgram(program)
@@ -131,11 +116,15 @@ class GameViewController: GLKViewController {
 				glUniformMatrix4fv(uniforms[UNIFORM_MODELVIEWPROJECTION_MATRIX], 1, 0, $0)
 			})
 		})
-		
-		glBindBuffer(GLenum(GL_ELEMENT_ARRAY_BUFFER), indexBuffer)
-		glBindBuffer(GLenum(GL_ARRAY_BUFFER), vertexBuffer)
-		for country in gCountryIndexData {
-			glDrawElements(GLenum(GL_LINE_LOOP), GLsizei(country.count), GLenum(GL_UNSIGNED_INT), BUFFER_OFFSET(country.start * 4))
+	
+		var i = 0
+		for continent in geoWorld.continents {
+			for region in continent.regions {
+				for feature in region.parts {
+					continentRenderers[i].renderFeature(feature)
+				}
+			}
+			i += 1
 		}
 	}
 	
@@ -265,38 +254,5 @@ class GameViewController: GLKViewController {
 		}
 		return returnVal
 	}
-	
-	func loadCrazyVertices() {
-		let path = Bundle.main.path(forResource: "features", ofType: "json")
-		let jsonData = NSData(contentsOfFile:path!)
-		let json = JSON(data: jsonData! as Data)
-		
-		var i: UInt32 = 0
-		for (contName, continent) in json.dictionaryValue {
-			print("Loading \(contName)...")
-			let regions = continent["regions"]
-			for (_, region) in regions.dictionaryValue {
-				let parts = region["coordinates"].arrayValue
-				for p in parts {
-					var range = (start: i, count: GLuint(0))
-					let coords = p.arrayValue
-					for c in coords {
-						let x = c["lng"].floatValue
-						let y = c["lat"].floatValue
-						gBurkinaVertexData.append(x)
-						gBurkinaVertexData.append(y)
-						gBurkinaIndexData.append(i)
-						range.count += 1
-						i += 1
-					}
-					gCountryIndexData.append(range)
-				}
-			}
-		}
-		loaded = true
-	}
 }
 
-var gCountryIndexData: [(start: GLuint, count: GLuint)] = []
-var gBurkinaIndexData: [GLuint] = []
-var gBurkinaVertexData: [GLfloat] = []

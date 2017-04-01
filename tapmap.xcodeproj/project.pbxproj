@@ -16,6 +16,11 @@
 		146A79151E8F912500E2EE20 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 146A79131E8F912500E2EE20 /* LaunchScreen.storyboard */; };
 		146A79201E8F912500E2EE20 /* tapmapTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 146A791F1E8F912500E2EE20 /* tapmapTests.swift */; };
 		146A792B1E8F931300E2EE20 /* features.json in Resources */ = {isa = PBXBuildFile; fileRef = 146A792A1E8F931300E2EE20 /* features.json */; };
+		14B74E5B1E8F9ACB00849BB5 /* FeatureLoader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14B74E5A1E8F9ACB00849BB5 /* FeatureLoader.swift */; };
+		14B74E5E1E8F9C1100849BB5 /* GeoRegion.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14B74E5D1E8F9C1100849BB5 /* GeoRegion.swift */; };
+		14B74E5F1E8FA6FD00849BB5 /* features.json in Resources */ = {isa = PBXBuildFile; fileRef = 146A792A1E8F931300E2EE20 /* features.json */; };
+		14B74E711E8FB15500849BB5 /* GeoRenderer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14B74E701E8FB15500849BB5 /* GeoRenderer.swift */; };
+		14B74E731E8FCF5E00849BB5 /* FeatureLoaderTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14B74E721E8FCF5E00849BB5 /* FeatureLoaderTests.swift */; };
 		681BDD4EA9CC2EF29B50E6C1 /* Pods_tapmap.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 128FFB8F786C71132FB1F443 /* Pods_tapmap.framework */; };
 		A3C7BECC3908C1F0109D0833 /* Pods_tapmapTests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3F3EF95914CC4EAAB2D8BAFC /* Pods_tapmapTests.framework */; };
 /* End PBXBuildFile section */
@@ -31,6 +36,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		090767E27ECB3B219935FC22 /* Pods-tapmap-loading.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-tapmap-loading.release.xcconfig"; path = "Pods/Target Support Files/Pods-tapmap-loading/Pods-tapmap-loading.release.xcconfig"; sourceTree = "<group>"; };
 		128FFB8F786C71132FB1F443 /* Pods_tapmap.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_tapmap.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		146A79031E8F912500E2EE20 /* tapmap.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = tapmap.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		146A79061E8F912500E2EE20 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
@@ -45,10 +51,16 @@
 		146A791F1E8F912500E2EE20 /* tapmapTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = tapmapTests.swift; sourceTree = "<group>"; };
 		146A79211E8F912500E2EE20 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		146A792A1E8F931300E2EE20 /* features.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; name = features.json; path = Raw/features.json; sourceTree = "<group>"; };
+		14B74E5A1E8F9ACB00849BB5 /* FeatureLoader.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = FeatureLoader.swift; path = Geography/FeatureLoader.swift; sourceTree = "<group>"; };
+		14B74E5D1E8F9C1100849BB5 /* GeoRegion.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = GeoRegion.swift; path = Geography/GeoRegion.swift; sourceTree = "<group>"; };
+		14B74E701E8FB15500849BB5 /* GeoRenderer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = GeoRenderer.swift; sourceTree = "<group>"; };
+		14B74E721E8FCF5E00849BB5 /* FeatureLoaderTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FeatureLoaderTests.swift; sourceTree = "<group>"; };
 		3DC5E5FA5F48ACD54B065BEA /* Pods-tapmap.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-tapmap.release.xcconfig"; path = "Pods/Target Support Files/Pods-tapmap/Pods-tapmap.release.xcconfig"; sourceTree = "<group>"; };
 		3F3EF95914CC4EAAB2D8BAFC /* Pods_tapmapTests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_tapmapTests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		52DCA782B4126180F0FBED92 /* Pods-tapmap.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-tapmap.debug.xcconfig"; path = "Pods/Target Support Files/Pods-tapmap/Pods-tapmap.debug.xcconfig"; sourceTree = "<group>"; };
+		6FE687A9A5E3C534DD662B4C /* Pods-tapmap-loading.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-tapmap-loading.debug.xcconfig"; path = "Pods/Target Support Files/Pods-tapmap-loading/Pods-tapmap-loading.debug.xcconfig"; sourceTree = "<group>"; };
 		72AC77BD73CAE3DA469470B7 /* Pods-tapmapTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-tapmapTests.release.xcconfig"; path = "Pods/Target Support Files/Pods-tapmapTests/Pods-tapmapTests.release.xcconfig"; sourceTree = "<group>"; };
+		96AFEA5C99E9F46AEB90766E /* Pods_tapmap_loading.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_tapmap_loading.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		B5EDA10E7FBDF4C49D54D44B /* Pods-tapmapTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-tapmapTests.debug.xcconfig"; path = "Pods/Target Support Files/Pods-tapmapTests/Pods-tapmapTests.debug.xcconfig"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -99,6 +111,8 @@
 				146A79081E8F912500E2EE20 /* Shader.fsh */,
 				146A790A1E8F912500E2EE20 /* Shader.vsh */,
 				146A790C1E8F912500E2EE20 /* GameViewController.swift */,
+				14B74E701E8FB15500849BB5 /* GeoRenderer.swift */,
+				14B74E5C1E8F9BE600849BB5 /* Geography */,
 				146A790E1E8F912500E2EE20 /* Main.storyboard */,
 				146A79111E8F912500E2EE20 /* Assets.xcassets */,
 				146A79131E8F912500E2EE20 /* LaunchScreen.storyboard */,
@@ -112,6 +126,7 @@
 			isa = PBXGroup;
 			children = (
 				146A791F1E8F912500E2EE20 /* tapmapTests.swift */,
+				14B74E721E8FCF5E00849BB5 /* FeatureLoaderTests.swift */,
 				146A79211E8F912500E2EE20 /* Info.plist */,
 			);
 			path = tapmapTests;
@@ -125,11 +140,21 @@
 			name = Raw;
 			sourceTree = "<group>";
 		};
+		14B74E5C1E8F9BE600849BB5 /* Geography */ = {
+			isa = PBXGroup;
+			children = (
+				14B74E5A1E8F9ACB00849BB5 /* FeatureLoader.swift */,
+				14B74E5D1E8F9C1100849BB5 /* GeoRegion.swift */,
+			);
+			name = Geography;
+			sourceTree = "<group>";
+		};
 		E5E262D1B4564A75A41C2544 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
 				128FFB8F786C71132FB1F443 /* Pods_tapmap.framework */,
 				3F3EF95914CC4EAAB2D8BAFC /* Pods_tapmapTests.framework */,
+				96AFEA5C99E9F46AEB90766E /* Pods_tapmap_loading.framework */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -141,6 +166,8 @@
 				3DC5E5FA5F48ACD54B065BEA /* Pods-tapmap.release.xcconfig */,
 				B5EDA10E7FBDF4C49D54D44B /* Pods-tapmapTests.debug.xcconfig */,
 				72AC77BD73CAE3DA469470B7 /* Pods-tapmapTests.release.xcconfig */,
+				6FE687A9A5E3C534DD662B4C /* Pods-tapmap-loading.debug.xcconfig */,
+				090767E27ECB3B219935FC22 /* Pods-tapmap-loading.release.xcconfig */,
 			);
 			name = Pods;
 			sourceTree = "<group>";
@@ -249,6 +276,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				14B74E5F1E8FA6FD00849BB5 /* features.json in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -352,7 +380,10 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				14B74E711E8FB15500849BB5 /* GeoRenderer.swift in Sources */,
 				146A790D1E8F912500E2EE20 /* GameViewController.swift in Sources */,
+				14B74E5E1E8F9C1100849BB5 /* GeoRegion.swift in Sources */,
+				14B74E5B1E8F9ACB00849BB5 /* FeatureLoader.swift in Sources */,
 				146A79071E8F912500E2EE20 /* AppDelegate.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -362,6 +393,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				146A79201E8F912500E2EE20 /* tapmapTests.swift in Sources */,
+				14B74E731E8FCF5E00849BB5 /* FeatureLoaderTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
