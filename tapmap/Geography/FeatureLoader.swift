@@ -21,6 +21,8 @@ func loadFeatureJson() -> GeoWorld {
 		var continentVertices: [Vertex] = []
 		
 		var loadedRegions: [GeoRegion] = []
+		let regionColors : [UIColor] = [.red, .blue, .yellow, .magenta, .brown, .cyan, .green, .orange, .purple]
+		var ci = 0
 		for regionJson in regions.dictionaryValue.values {
 			let features = regionJson["coordinates"].arrayValue
 			let regionName = regionJson["name"].stringValue
@@ -41,9 +43,10 @@ func loadFeatureJson() -> GeoWorld {
 			}
 			
 			let region = GeoRegion(name: regionName,
-			                       color: .black,
-			                       parts: loadedFeatures)
+			                       color: regionColors[ci % regionColors.count],
+			                       features: loadedFeatures)
 			loadedRegions.append(region)
+			ci += 1
 		}
 		
 		let loadedContinent = GeoContinent(name: continentName,

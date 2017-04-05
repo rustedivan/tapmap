@@ -15,6 +15,7 @@ func BUFFER_OFFSET(_ i: UInt32) -> UnsafeRawPointer? {
 }
 
 let UNIFORM_MODELVIEWPROJECTION_MATRIX = 0
+let UNIFORM_COLOR = 1
 var uniforms = [GLint](repeating: 0, count: 2)
 
 class GameViewController: GLKViewController {
@@ -119,11 +120,7 @@ class GameViewController: GLKViewController {
 	
 		var i = 0
 		for continent in geoWorld.continents {
-			for region in continent.regions {
-				for feature in region.parts {
-					continentRenderers[i].renderFeature(feature)
-				}
-			}
+			continentRenderers[i].render(regions: continent.regions)
 			i += 1
 		}
 	}
@@ -185,6 +182,7 @@ class GameViewController: GLKViewController {
 		
 		// Get uniform locations.
 		uniforms[UNIFORM_MODELVIEWPROJECTION_MATRIX] = glGetUniformLocation(program, "modelViewProjectionMatrix")
+		uniforms[UNIFORM_COLOR] = glGetUniformLocation(program, "regionColor")
 		
 		// Release vertex and fragment shaders.
 		if vertShader != 0 {

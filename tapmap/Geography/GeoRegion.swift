@@ -22,7 +22,7 @@ struct GeoFeature {
 struct GeoRegion {
 	let name: String
 	let color: UIColor
-	let parts: [GeoFeature]
+	let features: [GeoFeature]
 }
 
 struct GeoContinent {
