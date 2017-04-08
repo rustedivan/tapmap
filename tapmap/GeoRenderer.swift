@@ -47,8 +47,8 @@ class GeoContinentRenderer {
 		glVertexAttribPointer(GLuint(GLKVertexAttrib.position.rawValue), 2, GLenum(GL_FLOAT), GLboolean(GL_FALSE), 8, BUFFER_OFFSET(0))
 		
 		for r in regions {
-			var components : [CGFloat] = [0.0, 0.0, 0.0, 0.0]
-			r.color.getRed(&components[0], green: &components[1], blue: &components[2], alpha: &components[3])
+			let c = r.color
+			var components : [GLfloat] = [c.r, c.g, c.b, 1.0]
 			glUniform4f(uniforms[UNIFORM_COLOR], GLfloat(components[0]), GLfloat(components[1]), GLfloat(components[2]), GLfloat(components[3]))
 			for f in r.features {
 				renderFeature(f)

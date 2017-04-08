@@ -7,7 +7,19 @@
 //
 
 import Foundation
-import UIKit.UIColor
+
+typealias GeoColor = (r: Float, g: Float, b: Float)
+
+struct GeoColors {
+	
+	static func randomColor() -> GeoColor {
+		let r = Float(arc4random_uniform(100)) / 100.0
+		let g = Float(arc4random_uniform(100)) / 100.0
+		let b = Float(arc4random_uniform(100)) / 100.0
+		return GeoColor(r: r, g: g, b: b)
+	}
+}
+
 
 struct Vertex {
 	let v: (Float, Float)
@@ -21,7 +33,7 @@ struct GeoFeature {
 
 struct GeoRegion {
 	let name: String
-	let color: UIColor
+	let color: GeoColor
 	let features: [GeoFeature]
 }
 
