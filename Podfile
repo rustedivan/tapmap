@@ -11,3 +11,9 @@ target 'tapmap' do
     inherit! :search_paths
   end
 end	
+
+target 'geobakeui' do
+  use_frameworks!
+
+  pod 'SwiftyJSON'
+end

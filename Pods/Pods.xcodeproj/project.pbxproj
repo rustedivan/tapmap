@@ -7,69 +7,102 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		00D35A19526CAE632C8E0985C7E41363 /* Pods-tapmap-dummy.m in Sources */ = {isa = PBXBuildFile; fileRef = 67D56C281E36F936B18D54806CB94DAA /* Pods-tapmap-dummy.m */; };
-		15CA0BAC24C23B552B86538FDA9179B5 /* Pods-tapmap-umbrella.h in Headers */ = {isa = PBXBuildFile; fileRef = 6061672D5108D073B4B80DD2B52304EE /* Pods-tapmap-umbrella.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		1CB27BE86B5A8A7C84A71295BD854E13 /* SwiftyJSON.swift in Sources */ = {isa = PBXBuildFile; fileRef = BDE506ECE97701EBA44FDBFF401C1A04 /* SwiftyJSON.swift */; };
-		3E1FCA8146A9154F565AC0840D0559CC /* Pods-tapmapTests-umbrella.h in Headers */ = {isa = PBXBuildFile; fileRef = 2425A37CEE7C6988918AC767DD61823E /* Pods-tapmapTests-umbrella.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		5A8D6393F3AB7ABA12FA5809BE369185 /* Pods-tapmapTests-dummy.m in Sources */ = {isa = PBXBuildFile; fileRef = 92F5D143D9C0885E4CDBFA7EC79F1881 /* Pods-tapmapTests-dummy.m */; };
-		7E29C20C715AEC5969CE0AA8D84F2FA7 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6604A7D69453B4569E4E4827FB9155A9 /* Foundation.framework */; };
-		C8509892F78F7AE7B4EDDCC514634F51 /* SwiftyJSON-dummy.m in Sources */ = {isa = PBXBuildFile; fileRef = 32B9BBA8F5B33E56C38F5546432F66B7 /* SwiftyJSON-dummy.m */; };
-		FBAF9923E1A1C6C63A4627057390EE0C /* SwiftyJSON-umbrella.h in Headers */ = {isa = PBXBuildFile; fileRef = 05CA09B061E193906653AC21FD3A94F1 /* SwiftyJSON-umbrella.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		FD549905D952A544BB573876DE0B1D7B /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6604A7D69453B4569E4E4827FB9155A9 /* Foundation.framework */; };
-		FD8199AD527FF7509114943733B2A3FE /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6604A7D69453B4569E4E4827FB9155A9 /* Foundation.framework */; };
+		095F9DDD76CF978507597D1729CCF97B /* SwiftyJSON-iOS-dummy.m in Sources */ = {isa = PBXBuildFile; fileRef = 7BCB69D0F3FDAFC4FD7FFB741A7317B0 /* SwiftyJSON-iOS-dummy.m */; };
+		2902BA2DB0EDF2574FFA93EDBA2E6244 /* SwiftyJSON.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04AC92CD391A1ED06E6EEC2AB2778EF6 /* SwiftyJSON.swift */; };
+		2FF372C9BD472DF176DDE14E422117C9 /* Pods-geobakeui-umbrella.h in Headers */ = {isa = PBXBuildFile; fileRef = A1734804388C926C0203B6F2374348E1 /* Pods-geobakeui-umbrella.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		30409AA02994B812B403343F85DD0442 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DB8E2D632CADFEBE217900FD1D4F3ABF /* Foundation.framework */; };
+		3E1FCA8146A9154F565AC0840D0559CC /* Pods-tapmapTests-umbrella.h in Headers */ = {isa = PBXBuildFile; fileRef = 2045CC1D3B99ACF9013CF3FB9C74BBF4 /* Pods-tapmapTests-umbrella.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		5A8D6393F3AB7ABA12FA5809BE369185 /* Pods-tapmapTests-dummy.m in Sources */ = {isa = PBXBuildFile; fileRef = 012A4870C1217B23E10F5B4E04264FE0 /* Pods-tapmapTests-dummy.m */; };
+		6A90D996263E0E8A01F42216CE186959 /* SwiftyJSON-OSX-dummy.m in Sources */ = {isa = PBXBuildFile; fileRef = 8072F9ED7DF25653535967EA3EE8ACA5 /* SwiftyJSON-OSX-dummy.m */; };
+		840014FAD1B226D44EB02CF43755F721 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = CDDAA23DDA8E082FC77E38FA01601C8F /* Cocoa.framework */; };
+		8A56FDC9B3020B9F4EBFF8136D8AB4B1 /* Pods-tapmap-umbrella.h in Headers */ = {isa = PBXBuildFile; fileRef = 461FD7BBA6EC5D9789D6673E2C68AA25 /* Pods-tapmap-umbrella.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		910DBA254D0E1014217A15C8F970C2AC /* Pods-tapmap-dummy.m in Sources */ = {isa = PBXBuildFile; fileRef = BB59101F1294AE5DDB33AA55331ACFFB /* Pods-tapmap-dummy.m */; };
+		A4814004B66434E106E66D0721AB9EAF /* SwiftyJSON.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04AC92CD391A1ED06E6EEC2AB2778EF6 /* SwiftyJSON.swift */; };
+		C0F6969AE47C7D655B421F5DC1459363 /* SwiftyJSON-iOS-umbrella.h in Headers */ = {isa = PBXBuildFile; fileRef = 19F0FCEFCD0F63857FFE79E5C0A8D6B5 /* SwiftyJSON-iOS-umbrella.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		C0FA37855CF280E4CA5C39E32416704C /* SwiftyJSON-OSX-umbrella.h in Headers */ = {isa = PBXBuildFile; fileRef = 72B39015C680B00DD3141B1641C8324E /* SwiftyJSON-OSX-umbrella.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		C8D6810770C474D7B5EE94049410345D /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = CDDAA23DDA8E082FC77E38FA01601C8F /* Cocoa.framework */; };
+		D4A3E1365DCE92E89B721C0C6F2D485E /* Pods-geobakeui-dummy.m in Sources */ = {isa = PBXBuildFile; fileRef = E10A349B562FC0EEF56F5A2F142264B4 /* Pods-geobakeui-dummy.m */; };
+		FA1D07618FFA892E3F8BE7FF5A27EBC1 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DB8E2D632CADFEBE217900FD1D4F3ABF /* Foundation.framework */; };
+		FD8199AD527FF7509114943733B2A3FE /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DB8E2D632CADFEBE217900FD1D4F3ABF /* Foundation.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
-		63938D0A74D7DC02DA7205365B6CD165 /* PBXContainerItemProxy */ = {
+		1BED169E2C277C150AB9C0279255DFE9 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = D41D8CD98F00B204E9800998ECF8427E /* Project object */;
 			proxyType = 1;
-			remoteGlobalIDString = 4A0D10A69FBDFFD0205529F08162E8FD;
-			remoteInfo = SwiftyJSON;
+			remoteGlobalIDString = 6198439FD661D1E87EE2258006881B04;
+			remoteInfo = "SwiftyJSON-OSX";
+		};
+		27D1E55A208861004AECA7FE7681D09C /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = D41D8CD98F00B204E9800998ECF8427E /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 1EB4E2A06E91163CC25F33758BB5AAB1;
+			remoteInfo = "SwiftyJSON-iOS";
 		};
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
-		0391D88DDB00CB0EA72AE4F96775F745 /* Info.plist */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		05CA09B061E193906653AC21FD3A94F1 /* SwiftyJSON-umbrella.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = "SwiftyJSON-umbrella.h"; sourceTree = "<group>"; };
-		0B6E73880A119A22629E1992CEBA9A8E /* Pods-tapmap-resources.sh */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.script.sh; path = "Pods-tapmap-resources.sh"; sourceTree = "<group>"; };
-		23E443F0164FA2B5BBCCD6D7CA55FAF8 /* Pods-tapmapTests.modulemap */ = {isa = PBXFileReference; includeInIndex = 1; path = "Pods-tapmapTests.modulemap"; sourceTree = "<group>"; };
-		2425A37CEE7C6988918AC767DD61823E /* Pods-tapmapTests-umbrella.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = "Pods-tapmapTests-umbrella.h"; sourceTree = "<group>"; };
-		2B0D58721F3A00F9AD9C940D347D67D0 /* Pods-tapmap.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; path = "Pods-tapmap.release.xcconfig"; sourceTree = "<group>"; };
-		2E7F7C62EE34D2D271E6E1234A2002B2 /* SwiftyJSON.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; path = SwiftyJSON.xcconfig; sourceTree = "<group>"; };
-		32B9BBA8F5B33E56C38F5546432F66B7 /* SwiftyJSON-dummy.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; path = "SwiftyJSON-dummy.m"; sourceTree = "<group>"; };
-		32C7092CA1EB9C02AE967E6B6D5C2CB4 /* Pods-tapmap.modulemap */ = {isa = PBXFileReference; includeInIndex = 1; path = "Pods-tapmap.modulemap"; sourceTree = "<group>"; };
-		32EA657F3C0548165326E07018DC1F2E /* Pods-tapmapTests-frameworks.sh */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.script.sh; path = "Pods-tapmapTests-frameworks.sh"; sourceTree = "<group>"; };
-		3B74BB622F3C62B94D7FD4727E1C66DD /* Pods-tapmapTests-acknowledgements.markdown */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text; path = "Pods-tapmapTests-acknowledgements.markdown"; sourceTree = "<group>"; };
-		49014033C6CAD9D759543873B874B1A2 /* Info.plist */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		6061672D5108D073B4B80DD2B52304EE /* Pods-tapmap-umbrella.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = "Pods-tapmap-umbrella.h"; sourceTree = "<group>"; };
-		6604A7D69453B4569E4E4827FB9155A9 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS10.3.sdk/System/Library/Frameworks/Foundation.framework; sourceTree = DEVELOPER_DIR; };
-		67D56C281E36F936B18D54806CB94DAA /* Pods-tapmap-dummy.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; path = "Pods-tapmap-dummy.m"; sourceTree = "<group>"; };
-		7386AE57CE9288E69FA6A49D0F212E34 /* Pods_tapmap.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; name = Pods_tapmap.framework; path = "Pods-tapmap.framework"; sourceTree = BUILT_PRODUCTS_DIR; };
-		80846EF6857EF98A7F7EA3E68C31278A /* Pods-tapmapTests-acknowledgements.plist */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.xml; path = "Pods-tapmapTests-acknowledgements.plist"; sourceTree = "<group>"; };
-		8E469BF92533D1B0F463747AB794F5E6 /* Pods-tapmapTests-resources.sh */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.script.sh; path = "Pods-tapmapTests-resources.sh"; sourceTree = "<group>"; };
-		92F5D143D9C0885E4CDBFA7EC79F1881 /* Pods-tapmapTests-dummy.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; path = "Pods-tapmapTests-dummy.m"; sourceTree = "<group>"; };
+		012A4870C1217B23E10F5B4E04264FE0 /* Pods-tapmapTests-dummy.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; path = "Pods-tapmapTests-dummy.m"; sourceTree = "<group>"; };
+		04AC92CD391A1ED06E6EEC2AB2778EF6 /* SwiftyJSON.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = SwiftyJSON.swift; path = Source/SwiftyJSON.swift; sourceTree = "<group>"; };
+		068CF53CE01FB34CFBA32A1D92B9C21B /* Pods_tapmapTests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; name = Pods_tapmapTests.framework; path = "Pods-tapmapTests.framework"; sourceTree = BUILT_PRODUCTS_DIR; };
+		0F255DECDB37B9EBEA8404CDEBEE16C2 /* Pods-geobakeui.modulemap */ = {isa = PBXFileReference; includeInIndex = 1; path = "Pods-geobakeui.modulemap"; sourceTree = "<group>"; };
+		12E40E1176AD4F8109DE787BB9AE350F /* Pods-tapmap-acknowledgements.plist */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.xml; path = "Pods-tapmap-acknowledgements.plist"; sourceTree = "<group>"; };
+		19F0FCEFCD0F63857FFE79E5C0A8D6B5 /* SwiftyJSON-iOS-umbrella.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = "SwiftyJSON-iOS-umbrella.h"; path = "../SwiftyJSON-iOS/SwiftyJSON-iOS-umbrella.h"; sourceTree = "<group>"; };
+		1A68F876E50D6F5C9135BFE33B23D479 /* Pods-tapmap-resources.sh */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.script.sh; path = "Pods-tapmap-resources.sh"; sourceTree = "<group>"; };
+		1DFEF42D28A3DAE1A36223CC3BBFC590 /* Pods-tapmapTests-acknowledgements.plist */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.xml; path = "Pods-tapmapTests-acknowledgements.plist"; sourceTree = "<group>"; };
+		2045CC1D3B99ACF9013CF3FB9C74BBF4 /* Pods-tapmapTests-umbrella.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = "Pods-tapmapTests-umbrella.h"; sourceTree = "<group>"; };
+		3E9055E6824C643B972B1F4F40ED7D6D /* Pods-tapmapTests-resources.sh */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.script.sh; path = "Pods-tapmapTests-resources.sh"; sourceTree = "<group>"; };
+		461FD7BBA6EC5D9789D6673E2C68AA25 /* Pods-tapmap-umbrella.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = "Pods-tapmap-umbrella.h"; sourceTree = "<group>"; };
+		4AF4BC5D7A72F22D26E0D3467F752CB1 /* SwiftyJSON-iOS-prefix.pch */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = "SwiftyJSON-iOS-prefix.pch"; path = "../SwiftyJSON-iOS/SwiftyJSON-iOS-prefix.pch"; sourceTree = "<group>"; };
+		545662D2A7577D7E4151ADF18087AEAD /* Pods-tapmapTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; path = "Pods-tapmapTests.release.xcconfig"; sourceTree = "<group>"; };
+		55303459780A51AC0B1375AAA3F15CD5 /* Pods-tapmap.modulemap */ = {isa = PBXFileReference; includeInIndex = 1; path = "Pods-tapmap.modulemap"; sourceTree = "<group>"; };
+		566F776B9FCC577C8ED9DC97A6D5CA21 /* Pods-tapmapTests.modulemap */ = {isa = PBXFileReference; includeInIndex = 1; path = "Pods-tapmapTests.modulemap"; sourceTree = "<group>"; };
+		5A0A62F234C9CE8FE7DA2EAFFA43A8F3 /* Info.plist */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		5E217FA5309C5E9FF0A6030BB4A47D62 /* SwiftyJSON-OSX.modulemap */ = {isa = PBXFileReference; includeInIndex = 1; path = "SwiftyJSON-OSX.modulemap"; sourceTree = "<group>"; };
+		631216693AD7A33DF8992BA09C2EE50D /* Pods-geobakeui-acknowledgements.plist */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.xml; path = "Pods-geobakeui-acknowledgements.plist"; sourceTree = "<group>"; };
+		6481BDA1DB620930FA865C88C4DD70DF /* Pods_geobakeui.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; name = Pods_geobakeui.framework; path = "Pods-geobakeui.framework"; sourceTree = BUILT_PRODUCTS_DIR; };
+		6BCA8DE4A5E4771427A0EF9FC092A3CA /* Pods-geobakeui-resources.sh */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.script.sh; path = "Pods-geobakeui-resources.sh"; sourceTree = "<group>"; };
+		6E256E158DD86FD58A2F5027E43F19C9 /* SwiftyJSON.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; name = SwiftyJSON.framework; path = "SwiftyJSON-OSX.framework"; sourceTree = BUILT_PRODUCTS_DIR; };
+		72B39015C680B00DD3141B1641C8324E /* SwiftyJSON-OSX-umbrella.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = "SwiftyJSON-OSX-umbrella.h"; sourceTree = "<group>"; };
+		7BCB69D0F3FDAFC4FD7FFB741A7317B0 /* SwiftyJSON-iOS-dummy.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; name = "SwiftyJSON-iOS-dummy.m"; path = "../SwiftyJSON-iOS/SwiftyJSON-iOS-dummy.m"; sourceTree = "<group>"; };
+		7F3AAF32C9CC7D92CDC6062C33DC8108 /* Info.plist */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.xml; name = Info.plist; path = "../SwiftyJSON-iOS/Info.plist"; sourceTree = "<group>"; };
+		8072F9ED7DF25653535967EA3EE8ACA5 /* SwiftyJSON-OSX-dummy.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; path = "SwiftyJSON-OSX-dummy.m"; sourceTree = "<group>"; };
+		883C94D7BE41E8ECF447DC450E2B18D6 /* SwiftyJSON-iOS.modulemap */ = {isa = PBXFileReference; includeInIndex = 1; name = "SwiftyJSON-iOS.modulemap"; path = "../SwiftyJSON-iOS/SwiftyJSON-iOS.modulemap"; sourceTree = "<group>"; };
+		88E13BF0AC83DF013BBC0B35E399BDA8 /* Pods-tapmap-acknowledgements.markdown */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text; path = "Pods-tapmap-acknowledgements.markdown"; sourceTree = "<group>"; };
+		8DE58C92D104CEB67399CBD3CE334D11 /* Info.plist */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		93A4A3777CF96A4AAC1D13BA6DCCEA73 /* Podfile */ = {isa = PBXFileReference; explicitFileType = text.script.ruby; includeInIndex = 1; lastKnownFileType = text; name = Podfile; path = ../Podfile; sourceTree = SOURCE_ROOT; xcLanguageSpecificationIdentifier = xcode.lang.ruby; };
-		A4F4269FEBF48DE0342DF09155580013 /* Pods-tapmap-frameworks.sh */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.script.sh; path = "Pods-tapmap-frameworks.sh"; sourceTree = "<group>"; };
-		A9BF071564C2DB39891A2D72D7B699D0 /* Pods-tapmap.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; path = "Pods-tapmap.debug.xcconfig"; sourceTree = "<group>"; };
-		BBF610E40BDF6E542FA21FF7E5491205 /* SwiftyJSON-prefix.pch */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = "SwiftyJSON-prefix.pch"; sourceTree = "<group>"; };
-		BDE506ECE97701EBA44FDBFF401C1A04 /* SwiftyJSON.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = SwiftyJSON.swift; path = Source/SwiftyJSON.swift; sourceTree = "<group>"; };
-		C1BD17E2152CA2D321033B8D37F794D8 /* Pods_tapmapTests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; name = Pods_tapmapTests.framework; path = "Pods-tapmapTests.framework"; sourceTree = BUILT_PRODUCTS_DIR; };
-		C4A9A658C966F6BB111BEDBDEA1F874A /* Info.plist */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		C865F976C3E10855DBC538546C3CE1CF /* Pods-tapmapTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; path = "Pods-tapmapTests.release.xcconfig"; sourceTree = "<group>"; };
-		CDF88AA4EC5C69731F866CC3A51F1A74 /* Pods-tapmapTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; path = "Pods-tapmapTests.debug.xcconfig"; sourceTree = "<group>"; };
-		D032A29E584B77AE187E586922267CF5 /* SwiftyJSON.modulemap */ = {isa = PBXFileReference; includeInIndex = 1; path = SwiftyJSON.modulemap; sourceTree = "<group>"; };
-		D0CDB68BB1D0EECCDE0622214C1E9933 /* Pods-tapmap-acknowledgements.markdown */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text; path = "Pods-tapmap-acknowledgements.markdown"; sourceTree = "<group>"; };
-		D900F91C16B866A6E7A575839555F9A2 /* SwiftyJSON.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; name = SwiftyJSON.framework; path = SwiftyJSON.framework; sourceTree = BUILT_PRODUCTS_DIR; };
-		DA5897B95EE2BCCDF905D5C9117E8BFB /* Pods-tapmap-acknowledgements.plist */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.xml; path = "Pods-tapmap-acknowledgements.plist"; sourceTree = "<group>"; };
+		953A77C2984245C65124E2E70F1E297F /* Pods-geobakeui.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; path = "Pods-geobakeui.debug.xcconfig"; sourceTree = "<group>"; };
+		95B0E7D50E73EE000CD8B55F0D4A604A /* Pods-geobakeui-frameworks.sh */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.script.sh; path = "Pods-geobakeui-frameworks.sh"; sourceTree = "<group>"; };
+		A1734804388C926C0203B6F2374348E1 /* Pods-geobakeui-umbrella.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = "Pods-geobakeui-umbrella.h"; sourceTree = "<group>"; };
+		A2EE8F53506F37DDBC63147EC8C5CDBD /* SwiftyJSON-iOS.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "SwiftyJSON-iOS.xcconfig"; path = "../SwiftyJSON-iOS/SwiftyJSON-iOS.xcconfig"; sourceTree = "<group>"; };
+		A38E12ED5457ADCD8C10A70C1652C10F /* Pods-tapmap.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; path = "Pods-tapmap.release.xcconfig"; sourceTree = "<group>"; };
+		A719F8C854238A416779B718988D26DC /* Pods-geobakeui.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; path = "Pods-geobakeui.release.xcconfig"; sourceTree = "<group>"; };
+		A7D3851D5AC7BE4E6F1EFADBCE3F0DA4 /* Pods-geobakeui-acknowledgements.markdown */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text; path = "Pods-geobakeui-acknowledgements.markdown"; sourceTree = "<group>"; };
+		B0E9D0278C7A58314D75AE36289B6254 /* Pods-tapmapTests-acknowledgements.markdown */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text; path = "Pods-tapmapTests-acknowledgements.markdown"; sourceTree = "<group>"; };
+		BB59101F1294AE5DDB33AA55331ACFFB /* Pods-tapmap-dummy.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; path = "Pods-tapmap-dummy.m"; sourceTree = "<group>"; };
+		BBB50D99C57881732A4AEB8060B73C0B /* SwiftyJSON-OSX-prefix.pch */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = "SwiftyJSON-OSX-prefix.pch"; sourceTree = "<group>"; };
+		C512BABF987B3C4F9B8698BEAB982E66 /* Info.plist */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		CC3690870051F459F9ED143E24E6F025 /* SwiftyJSON.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; name = SwiftyJSON.framework; path = "SwiftyJSON-iOS.framework"; sourceTree = BUILT_PRODUCTS_DIR; };
+		CDDAA23DDA8E082FC77E38FA01601C8F /* Cocoa.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Cocoa.framework; path = Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.12.sdk/System/Library/Frameworks/Cocoa.framework; sourceTree = DEVELOPER_DIR; };
+		DB2D720A8B5B9B2867B9F117B08BCDED /* Pods-tapmapTests-frameworks.sh */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.script.sh; path = "Pods-tapmapTests-frameworks.sh"; sourceTree = "<group>"; };
+		DB8E2D632CADFEBE217900FD1D4F3ABF /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS10.3.sdk/System/Library/Frameworks/Foundation.framework; sourceTree = DEVELOPER_DIR; };
+		E10A349B562FC0EEF56F5A2F142264B4 /* Pods-geobakeui-dummy.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; path = "Pods-geobakeui-dummy.m"; sourceTree = "<group>"; };
+		E35701D076F0621506E163FC8DE9A124 /* Info.plist */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		E6168ED44D680087E0D3B1E9584389D9 /* Pods-tapmapTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; path = "Pods-tapmapTests.debug.xcconfig"; sourceTree = "<group>"; };
+		EA60B8B769AAD758C82014C0BBDD32E5 /* Pods-tapmap-frameworks.sh */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.script.sh; path = "Pods-tapmap-frameworks.sh"; sourceTree = "<group>"; };
+		EBF08DBE75A0EDFA91A8B82A85D348B6 /* Pods_tapmap.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; name = Pods_tapmap.framework; path = "Pods-tapmap.framework"; sourceTree = BUILT_PRODUCTS_DIR; };
+		F0F55CC21B9AE9FB30E8B009F7CB8B54 /* Pods-tapmap.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; path = "Pods-tapmap.debug.xcconfig"; sourceTree = "<group>"; };
+		F2DEE2563753FD6DD885DCB469FD3253 /* SwiftyJSON-OSX.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; path = "SwiftyJSON-OSX.xcconfig"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
-		74A51CAD1598DB4C3DEED8485E2E69A2 /* Frameworks */ = {
+		5AF2E1A6EF06AF9EC7BEAC5392757030 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				FD549905D952A544BB573876DE0B1D7B /* Foundation.framework in Frameworks */,
+				840014FAD1B226D44EB02CF43755F721 /* Cocoa.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -81,134 +114,210 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		DDEFEEC62EE73911B94C6D3FAB0C3BE5 /* Frameworks */ = {
+		CC98B39F7B312E4E6806DAA872F76783 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				7E29C20C715AEC5969CE0AA8D84F2FA7 /* Foundation.framework in Frameworks */,
+				30409AA02994B812B403343F85DD0442 /* Foundation.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		D37B556E6A5EC5986D2B822FDB61E142 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				FA1D07618FFA892E3F8BE7FF5A27EBC1 /* Foundation.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		FAAAE018C2B086EAEEEAFD550BD15D53 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				C8D6810770C474D7B5EE94049410345D /* Cocoa.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
-		18D1E2115525C97B3E8902A88344DE1A /* Products */ = {
+		086AF43D54627518A8F4D077CEF6D297 /* Pods-geobakeui */ = {
 			isa = PBXGroup;
 			children = (
-				7386AE57CE9288E69FA6A49D0F212E34 /* Pods_tapmap.framework */,
-				C1BD17E2152CA2D321033B8D37F794D8 /* Pods_tapmapTests.framework */,
-				D900F91C16B866A6E7A575839555F9A2 /* SwiftyJSON.framework */,
+				5A0A62F234C9CE8FE7DA2EAFFA43A8F3 /* Info.plist */,
+				0F255DECDB37B9EBEA8404CDEBEE16C2 /* Pods-geobakeui.modulemap */,
+				A7D3851D5AC7BE4E6F1EFADBCE3F0DA4 /* Pods-geobakeui-acknowledgements.markdown */,
+				631216693AD7A33DF8992BA09C2EE50D /* Pods-geobakeui-acknowledgements.plist */,
+				E10A349B562FC0EEF56F5A2F142264B4 /* Pods-geobakeui-dummy.m */,
+				95B0E7D50E73EE000CD8B55F0D4A604A /* Pods-geobakeui-frameworks.sh */,
+				6BCA8DE4A5E4771427A0EF9FC092A3CA /* Pods-geobakeui-resources.sh */,
+				A1734804388C926C0203B6F2374348E1 /* Pods-geobakeui-umbrella.h */,
+				953A77C2984245C65124E2E70F1E297F /* Pods-geobakeui.debug.xcconfig */,
+				A719F8C854238A416779B718988D26DC /* Pods-geobakeui.release.xcconfig */,
 			);
-			name = Products;
+			name = "Pods-geobakeui";
+			path = "Target Support Files/Pods-geobakeui";
 			sourceTree = "<group>";
 		};
-		1974C907604EE6C65A01A26099F29822 /* Targets Support Files */ = {
+		297FE13855C7E29FB83D30D07F47A319 /* Pods-tapmap */ = {
 			isa = PBXGroup;
 			children = (
-				3FC437AB4CA0B3828885029C19A5A09A /* Pods-tapmap */,
-				6987D42FBEEDB408628FEC404AA675C7 /* Pods-tapmapTests */,
-			);
-			name = "Targets Support Files";
-			sourceTree = "<group>";
-		};
-		3FC437AB4CA0B3828885029C19A5A09A /* Pods-tapmap */ = {
-			isa = PBXGroup;
-			children = (
-				49014033C6CAD9D759543873B874B1A2 /* Info.plist */,
-				32C7092CA1EB9C02AE967E6B6D5C2CB4 /* Pods-tapmap.modulemap */,
-				D0CDB68BB1D0EECCDE0622214C1E9933 /* Pods-tapmap-acknowledgements.markdown */,
-				DA5897B95EE2BCCDF905D5C9117E8BFB /* Pods-tapmap-acknowledgements.plist */,
-				67D56C281E36F936B18D54806CB94DAA /* Pods-tapmap-dummy.m */,
-				A4F4269FEBF48DE0342DF09155580013 /* Pods-tapmap-frameworks.sh */,
-				0B6E73880A119A22629E1992CEBA9A8E /* Pods-tapmap-resources.sh */,
-				6061672D5108D073B4B80DD2B52304EE /* Pods-tapmap-umbrella.h */,
-				A9BF071564C2DB39891A2D72D7B699D0 /* Pods-tapmap.debug.xcconfig */,
-				2B0D58721F3A00F9AD9C940D347D67D0 /* Pods-tapmap.release.xcconfig */,
+				E35701D076F0621506E163FC8DE9A124 /* Info.plist */,
+				55303459780A51AC0B1375AAA3F15CD5 /* Pods-tapmap.modulemap */,
+				88E13BF0AC83DF013BBC0B35E399BDA8 /* Pods-tapmap-acknowledgements.markdown */,
+				12E40E1176AD4F8109DE787BB9AE350F /* Pods-tapmap-acknowledgements.plist */,
+				BB59101F1294AE5DDB33AA55331ACFFB /* Pods-tapmap-dummy.m */,
+				EA60B8B769AAD758C82014C0BBDD32E5 /* Pods-tapmap-frameworks.sh */,
+				1A68F876E50D6F5C9135BFE33B23D479 /* Pods-tapmap-resources.sh */,
+				461FD7BBA6EC5D9789D6673E2C68AA25 /* Pods-tapmap-umbrella.h */,
+				F0F55CC21B9AE9FB30E8B009F7CB8B54 /* Pods-tapmap.debug.xcconfig */,
+				A38E12ED5457ADCD8C10A70C1652C10F /* Pods-tapmap.release.xcconfig */,
 			);
 			name = "Pods-tapmap";
 			path = "Target Support Files/Pods-tapmap";
 			sourceTree = "<group>";
 		};
-		6987D42FBEEDB408628FEC404AA675C7 /* Pods-tapmapTests */ = {
+		2EDFAB15A7E74F864EB353FCB5A57006 /* OS X */ = {
 			isa = PBXGroup;
 			children = (
-				0391D88DDB00CB0EA72AE4F96775F745 /* Info.plist */,
-				23E443F0164FA2B5BBCCD6D7CA55FAF8 /* Pods-tapmapTests.modulemap */,
-				3B74BB622F3C62B94D7FD4727E1C66DD /* Pods-tapmapTests-acknowledgements.markdown */,
-				80846EF6857EF98A7F7EA3E68C31278A /* Pods-tapmapTests-acknowledgements.plist */,
-				92F5D143D9C0885E4CDBFA7EC79F1881 /* Pods-tapmapTests-dummy.m */,
-				32EA657F3C0548165326E07018DC1F2E /* Pods-tapmapTests-frameworks.sh */,
-				8E469BF92533D1B0F463747AB794F5E6 /* Pods-tapmapTests-resources.sh */,
-				2425A37CEE7C6988918AC767DD61823E /* Pods-tapmapTests-umbrella.h */,
-				CDF88AA4EC5C69731F866CC3A51F1A74 /* Pods-tapmapTests.debug.xcconfig */,
-				C865F976C3E10855DBC538546C3CE1CF /* Pods-tapmapTests.release.xcconfig */,
+				CDDAA23DDA8E082FC77E38FA01601C8F /* Cocoa.framework */,
+			);
+			name = "OS X";
+			sourceTree = "<group>";
+		};
+		37577452435C5D7E9E52AB85E6FE260D /* SwiftyJSON */ = {
+			isa = PBXGroup;
+			children = (
+				04AC92CD391A1ED06E6EEC2AB2778EF6 /* SwiftyJSON.swift */,
+				7BF40821B78A26693DEC663641801B6F /* Support Files */,
+			);
+			name = SwiftyJSON;
+			path = SwiftyJSON;
+			sourceTree = "<group>";
+		};
+		3AEF7D761E8EA8419BB4A7000AB770CB /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				8C918DD0468B798DBE7EEDD4C9D4170B /* iOS */,
+				2EDFAB15A7E74F864EB353FCB5A57006 /* OS X */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		51E8CF27196D988AD690EE0907307700 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				6481BDA1DB620930FA865C88C4DD70DF /* Pods_geobakeui.framework */,
+				EBF08DBE75A0EDFA91A8B82A85D348B6 /* Pods_tapmap.framework */,
+				068CF53CE01FB34CFBA32A1D92B9C21B /* Pods_tapmapTests.framework */,
+				CC3690870051F459F9ED143E24E6F025 /* SwiftyJSON.framework */,
+				6E256E158DD86FD58A2F5027E43F19C9 /* SwiftyJSON.framework */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		58CD43EA64D5FC89B61E00BF854F5EE9 /* Pods-tapmapTests */ = {
+			isa = PBXGroup;
+			children = (
+				8DE58C92D104CEB67399CBD3CE334D11 /* Info.plist */,
+				566F776B9FCC577C8ED9DC97A6D5CA21 /* Pods-tapmapTests.modulemap */,
+				B0E9D0278C7A58314D75AE36289B6254 /* Pods-tapmapTests-acknowledgements.markdown */,
+				1DFEF42D28A3DAE1A36223CC3BBFC590 /* Pods-tapmapTests-acknowledgements.plist */,
+				012A4870C1217B23E10F5B4E04264FE0 /* Pods-tapmapTests-dummy.m */,
+				DB2D720A8B5B9B2867B9F117B08BCDED /* Pods-tapmapTests-frameworks.sh */,
+				3E9055E6824C643B972B1F4F40ED7D6D /* Pods-tapmapTests-resources.sh */,
+				2045CC1D3B99ACF9013CF3FB9C74BBF4 /* Pods-tapmapTests-umbrella.h */,
+				E6168ED44D680087E0D3B1E9584389D9 /* Pods-tapmapTests.debug.xcconfig */,
+				545662D2A7577D7E4151ADF18087AEAD /* Pods-tapmapTests.release.xcconfig */,
 			);
 			name = "Pods-tapmapTests";
 			path = "Target Support Files/Pods-tapmapTests";
 			sourceTree = "<group>";
 		};
-		70A8E4D3C62B6C203D238581DA091C21 /* SwiftyJSON */ = {
+		7BF40821B78A26693DEC663641801B6F /* Support Files */ = {
 			isa = PBXGroup;
 			children = (
-				BDE506ECE97701EBA44FDBFF401C1A04 /* SwiftyJSON.swift */,
-				8EC39E1DC11846207722B71AAFE40F98 /* Support Files */,
+				7F3AAF32C9CC7D92CDC6062C33DC8108 /* Info.plist */,
+				C512BABF987B3C4F9B8698BEAB982E66 /* Info.plist */,
+				883C94D7BE41E8ECF447DC450E2B18D6 /* SwiftyJSON-iOS.modulemap */,
+				A2EE8F53506F37DDBC63147EC8C5CDBD /* SwiftyJSON-iOS.xcconfig */,
+				7BCB69D0F3FDAFC4FD7FFB741A7317B0 /* SwiftyJSON-iOS-dummy.m */,
+				4AF4BC5D7A72F22D26E0D3467F752CB1 /* SwiftyJSON-iOS-prefix.pch */,
+				19F0FCEFCD0F63857FFE79E5C0A8D6B5 /* SwiftyJSON-iOS-umbrella.h */,
+				5E217FA5309C5E9FF0A6030BB4A47D62 /* SwiftyJSON-OSX.modulemap */,
+				F2DEE2563753FD6DD885DCB469FD3253 /* SwiftyJSON-OSX.xcconfig */,
+				8072F9ED7DF25653535967EA3EE8ACA5 /* SwiftyJSON-OSX-dummy.m */,
+				BBB50D99C57881732A4AEB8060B73C0B /* SwiftyJSON-OSX-prefix.pch */,
+				72B39015C680B00DD3141B1641C8324E /* SwiftyJSON-OSX-umbrella.h */,
 			);
-			name = SwiftyJSON;
-			path = SwiftyJSON;
+			name = "Support Files";
+			path = "../Target Support Files/SwiftyJSON-OSX";
 			sourceTree = "<group>";
 		};
 		7DB346D0F39D3F0E887471402A8071AB = {
 			isa = PBXGroup;
 			children = (
 				93A4A3777CF96A4AAC1D13BA6DCCEA73 /* Podfile */,
-				BC3CA7F9E30CC8F7E2DD044DD34432FC /* Frameworks */,
+				3AEF7D761E8EA8419BB4A7000AB770CB /* Frameworks */,
 				BD1E3C710F12F4B4C092FC8E2AD22110 /* Pods */,
-				18D1E2115525C97B3E8902A88344DE1A /* Products */,
-				1974C907604EE6C65A01A26099F29822 /* Targets Support Files */,
+				51E8CF27196D988AD690EE0907307700 /* Products */,
+				D864FC7B29069D7BA53EF171A6EFD608 /* Targets Support Files */,
 			);
 			sourceTree = "<group>";
 		};
-		8EC39E1DC11846207722B71AAFE40F98 /* Support Files */ = {
+		8C918DD0468B798DBE7EEDD4C9D4170B /* iOS */ = {
 			isa = PBXGroup;
 			children = (
-				C4A9A658C966F6BB111BEDBDEA1F874A /* Info.plist */,
-				D032A29E584B77AE187E586922267CF5 /* SwiftyJSON.modulemap */,
-				2E7F7C62EE34D2D271E6E1234A2002B2 /* SwiftyJSON.xcconfig */,
-				32B9BBA8F5B33E56C38F5546432F66B7 /* SwiftyJSON-dummy.m */,
-				BBF610E40BDF6E542FA21FF7E5491205 /* SwiftyJSON-prefix.pch */,
-				05CA09B061E193906653AC21FD3A94F1 /* SwiftyJSON-umbrella.h */,
+				DB8E2D632CADFEBE217900FD1D4F3ABF /* Foundation.framework */,
 			);
-			name = "Support Files";
-			path = "../Target Support Files/SwiftyJSON";
-			sourceTree = "<group>";
-		};
-		BC3CA7F9E30CC8F7E2DD044DD34432FC /* Frameworks */ = {
-			isa = PBXGroup;
-			children = (
-				D35AF013A5F0BAD4F32504907A52519E /* iOS */,
-			);
-			name = Frameworks;
+			name = iOS;
 			sourceTree = "<group>";
 		};
 		BD1E3C710F12F4B4C092FC8E2AD22110 /* Pods */ = {
 			isa = PBXGroup;
 			children = (
-				70A8E4D3C62B6C203D238581DA091C21 /* SwiftyJSON */,
+				37577452435C5D7E9E52AB85E6FE260D /* SwiftyJSON */,
 			);
 			name = Pods;
 			sourceTree = "<group>";
 		};
-		D35AF013A5F0BAD4F32504907A52519E /* iOS */ = {
+		D864FC7B29069D7BA53EF171A6EFD608 /* Targets Support Files */ = {
 			isa = PBXGroup;
 			children = (
-				6604A7D69453B4569E4E4827FB9155A9 /* Foundation.framework */,
+				086AF43D54627518A8F4D077CEF6D297 /* Pods-geobakeui */,
+				297FE13855C7E29FB83D30D07F47A319 /* Pods-tapmap */,
+				58CD43EA64D5FC89B61E00BF854F5EE9 /* Pods-tapmapTests */,
 			);
-			name = iOS;
+			name = "Targets Support Files";
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
 
 /* Begin PBXHeadersBuildPhase section */
+		1AC102D90FA9BA51F72EBD9A3BC83034 /* Headers */ = {
+			isa = PBXHeadersBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				C0FA37855CF280E4CA5C39E32416704C /* SwiftyJSON-OSX-umbrella.h in Headers */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		3DB950D0CC5D9A732BBA8F4CFEF08696 /* Headers */ = {
+			isa = PBXHeadersBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				8A56FDC9B3020B9F4EBFF8136D8AB4B1 /* Pods-tapmap-umbrella.h in Headers */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		531B120352B887E2711287107F18A3DA /* Headers */ = {
+			isa = PBXHeadersBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				2FF372C9BD472DF176DDE14E422117C9 /* Pods-geobakeui-umbrella.h in Headers */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		9061B7D561BBAB57EB9B1505B081F8F6 /* Headers */ = {
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
@@ -217,19 +326,11 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		DB720D0FCF2E6D2BF5D3C9A08D7482DA /* Headers */ = {
+		F3CFDD00F054DB73E61D45F90A2783CA /* Headers */ = {
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				FBAF9923E1A1C6C63A4627057390EE0C /* SwiftyJSON-umbrella.h in Headers */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		E4F91FB27D00B0AAA0B8A70B54F0B6FF /* Headers */ = {
-			isa = PBXHeadersBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				15CA0BAC24C23B552B86538FDA9179B5 /* Pods-tapmap-umbrella.h in Headers */,
+				C0F6969AE47C7D655B421F5DC1459363 /* SwiftyJSON-iOS-umbrella.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -250,42 +351,77 @@
 			);
 			name = "Pods-tapmapTests";
 			productName = "Pods-tapmapTests";
-			productReference = C1BD17E2152CA2D321033B8D37F794D8 /* Pods_tapmapTests.framework */;
+			productReference = 068CF53CE01FB34CFBA32A1D92B9C21B /* Pods_tapmapTests.framework */;
 			productType = "com.apple.product-type.framework";
 		};
-		4A0D10A69FBDFFD0205529F08162E8FD /* SwiftyJSON */ = {
+		1EB4E2A06E91163CC25F33758BB5AAB1 /* SwiftyJSON-iOS */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = AF205C04BD844349C76DF75FD6602BAF /* Build configuration list for PBXNativeTarget "SwiftyJSON" */;
+			buildConfigurationList = DA94B78F5C6813F112CBD62F758A824B /* Build configuration list for PBXNativeTarget "SwiftyJSON-iOS" */;
 			buildPhases = (
-				1C2CEDC94ADF8B8072A790677EBFAA7A /* Sources */,
-				DDEFEEC62EE73911B94C6D3FAB0C3BE5 /* Frameworks */,
-				DB720D0FCF2E6D2BF5D3C9A08D7482DA /* Headers */,
+				BC98F364084C4BAE96F34ED2E4516298 /* Sources */,
+				D37B556E6A5EC5986D2B822FDB61E142 /* Frameworks */,
+				F3CFDD00F054DB73E61D45F90A2783CA /* Headers */,
 			);
 			buildRules = (
 			);
 			dependencies = (
 			);
-			name = SwiftyJSON;
-			productName = SwiftyJSON;
-			productReference = D900F91C16B866A6E7A575839555F9A2 /* SwiftyJSON.framework */;
+			name = "SwiftyJSON-iOS";
+			productName = "SwiftyJSON-iOS";
+			productReference = CC3690870051F459F9ED143E24E6F025 /* SwiftyJSON.framework */;
 			productType = "com.apple.product-type.framework";
 		};
-		D43FF513CAB0CF6D59D22EE191932184 /* Pods-tapmap */ = {
+		6099BF7117AC7B0267B354EBC3E7B9B5 /* Pods-tapmap */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 9A2315083402283555100398506C9605 /* Build configuration list for PBXNativeTarget "Pods-tapmap" */;
+			buildConfigurationList = CCA3B0471CC9EE2977F17270000D90F6 /* Build configuration list for PBXNativeTarget "Pods-tapmap" */;
 			buildPhases = (
-				71B66B5CCE3F393688DFBC0558ECADD3 /* Sources */,
-				74A51CAD1598DB4C3DEED8485E2E69A2 /* Frameworks */,
-				E4F91FB27D00B0AAA0B8A70B54F0B6FF /* Headers */,
+				C8ED65D41B3AE96E56EDFA218B03B2F4 /* Sources */,
+				CC98B39F7B312E4E6806DAA872F76783 /* Frameworks */,
+				3DB950D0CC5D9A732BBA8F4CFEF08696 /* Headers */,
 			);
 			buildRules = (
 			);
 			dependencies = (
-				476066914C7644D7EF352B3AF917B595 /* PBXTargetDependency */,
+				129484DC9719F3480BC7598624CBB6F9 /* PBXTargetDependency */,
 			);
 			name = "Pods-tapmap";
 			productName = "Pods-tapmap";
-			productReference = 7386AE57CE9288E69FA6A49D0F212E34 /* Pods_tapmap.framework */;
+			productReference = EBF08DBE75A0EDFA91A8B82A85D348B6 /* Pods_tapmap.framework */;
+			productType = "com.apple.product-type.framework";
+		};
+		6198439FD661D1E87EE2258006881B04 /* SwiftyJSON-OSX */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = BA0DBA8B716541EAD25E515E8140FFE4 /* Build configuration list for PBXNativeTarget "SwiftyJSON-OSX" */;
+			buildPhases = (
+				1AD43CAA18BF87601A45A028731390AA /* Sources */,
+				FAAAE018C2B086EAEEEAFD550BD15D53 /* Frameworks */,
+				1AC102D90FA9BA51F72EBD9A3BC83034 /* Headers */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = "SwiftyJSON-OSX";
+			productName = "SwiftyJSON-OSX";
+			productReference = 6E256E158DD86FD58A2F5027E43F19C9 /* SwiftyJSON.framework */;
+			productType = "com.apple.product-type.framework";
+		};
+		A8457848BB3469631631F5EE18E716EB /* Pods-geobakeui */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 0365F99C788FE12746E56E503238D405 /* Build configuration list for PBXNativeTarget "Pods-geobakeui" */;
+			buildPhases = (
+				3B5ECFD7D9D961AD2B353B144C71443F /* Sources */,
+				5AF2E1A6EF06AF9EC7BEAC5392757030 /* Frameworks */,
+				531B120352B887E2711287107F18A3DA /* Headers */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				3392CD253FD656FC0E6B1A5F4A5E70E1 /* PBXTargetDependency */,
+			);
+			name = "Pods-geobakeui";
+			productName = "Pods-geobakeui";
+			productReference = 6481BDA1DB620930FA865C88C4DD70DF /* Pods_geobakeui.framework */;
 			productType = "com.apple.product-type.framework";
 		};
 /* End PBXNativeTarget section */
@@ -305,32 +441,51 @@
 				en,
 			);
 			mainGroup = 7DB346D0F39D3F0E887471402A8071AB;
-			productRefGroup = 18D1E2115525C97B3E8902A88344DE1A /* Products */;
+			productRefGroup = 51E8CF27196D988AD690EE0907307700 /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				D43FF513CAB0CF6D59D22EE191932184 /* Pods-tapmap */,
+				A8457848BB3469631631F5EE18E716EB /* Pods-geobakeui */,
+				6099BF7117AC7B0267B354EBC3E7B9B5 /* Pods-tapmap */,
 				183534F92D5A5C6FC3D8E644462CF9D1 /* Pods-tapmapTests */,
-				4A0D10A69FBDFFD0205529F08162E8FD /* SwiftyJSON */,
+				1EB4E2A06E91163CC25F33758BB5AAB1 /* SwiftyJSON-iOS */,
+				6198439FD661D1E87EE2258006881B04 /* SwiftyJSON-OSX */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXSourcesBuildPhase section */
-		1C2CEDC94ADF8B8072A790677EBFAA7A /* Sources */ = {
+		1AD43CAA18BF87601A45A028731390AA /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				C8509892F78F7AE7B4EDDCC514634F51 /* SwiftyJSON-dummy.m in Sources */,
-				1CB27BE86B5A8A7C84A71295BD854E13 /* SwiftyJSON.swift in Sources */,
+				6A90D996263E0E8A01F42216CE186959 /* SwiftyJSON-OSX-dummy.m in Sources */,
+				A4814004B66434E106E66D0721AB9EAF /* SwiftyJSON.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		71B66B5CCE3F393688DFBC0558ECADD3 /* Sources */ = {
+		3B5ECFD7D9D961AD2B353B144C71443F /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				00D35A19526CAE632C8E0985C7E41363 /* Pods-tapmap-dummy.m in Sources */,
+				D4A3E1365DCE92E89B721C0C6F2D485E /* Pods-geobakeui-dummy.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		BC98F364084C4BAE96F34ED2E4516298 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				095F9DDD76CF978507597D1729CCF97B /* SwiftyJSON-iOS-dummy.m in Sources */,
+				2902BA2DB0EDF2574FFA93EDBA2E6244 /* SwiftyJSON.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		C8ED65D41B3AE96E56EDFA218B03B2F4 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				910DBA254D0E1014217A15C8F970C2AC /* Pods-tapmap-dummy.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -345,16 +500,144 @@
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
-		476066914C7644D7EF352B3AF917B595 /* PBXTargetDependency */ = {
+		129484DC9719F3480BC7598624CBB6F9 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
-			name = SwiftyJSON;
-			target = 4A0D10A69FBDFFD0205529F08162E8FD /* SwiftyJSON */;
-			targetProxy = 63938D0A74D7DC02DA7205365B6CD165 /* PBXContainerItemProxy */;
+			name = "SwiftyJSON-iOS";
+			target = 1EB4E2A06E91163CC25F33758BB5AAB1 /* SwiftyJSON-iOS */;
+			targetProxy = 27D1E55A208861004AECA7FE7681D09C /* PBXContainerItemProxy */;
+		};
+		3392CD253FD656FC0E6B1A5F4A5E70E1 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			name = "SwiftyJSON-OSX";
+			target = 6198439FD661D1E87EE2258006881B04 /* SwiftyJSON-OSX */;
+			targetProxy = 1BED169E2C277C150AB9C0279255DFE9 /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
 
 /* Begin XCBuildConfiguration section */
-		166E2CAC58E8608AD59A6F0B71C9C3E0 /* Debug */ = {
+		1D21D2011CD18B49D5ADB3DCA40659E3 /* Release */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = A719F8C854238A416779B718988D26DC /* Pods-geobakeui.release.xcconfig */;
+			buildSettings = {
+				CODE_SIGN_IDENTITY = "-";
+				"CODE_SIGN_IDENTITY[sdk=appletvos*]" = "";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "";
+				"CODE_SIGN_IDENTITY[sdk=watchos*]" = "";
+				COMBINE_HIDPI_IMAGES = YES;
+				CURRENT_PROJECT_VERSION = 1;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				DEFINES_MODULE = YES;
+				DYLIB_COMPATIBILITY_VERSION = 1;
+				DYLIB_CURRENT_VERSION = 1;
+				DYLIB_INSTALL_NAME_BASE = "@rpath";
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				FRAMEWORK_VERSION = A;
+				GCC_NO_COMMON_BLOCKS = YES;
+				INFOPLIST_FILE = "Target Support Files/Pods-geobakeui/Info.plist";
+				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @loader_path/Frameworks";
+				MACH_O_TYPE = staticlib;
+				MACOSX_DEPLOYMENT_TARGET = 10.12;
+				MODULEMAP_FILE = "Target Support Files/Pods-geobakeui/Pods-geobakeui.modulemap";
+				MTL_ENABLE_DEBUG_INFO = NO;
+				OTHER_LDFLAGS = "";
+				OTHER_LIBTOOLFLAGS = "";
+				PODS_ROOT = "$(SRCROOT)";
+				PRODUCT_BUNDLE_IDENTIFIER = "org.cocoapods.${PRODUCT_NAME:rfc1034identifier}";
+				PRODUCT_NAME = Pods_geobakeui;
+				SDKROOT = macosx;
+				SKIP_INSTALL = YES;
+				SWIFT_OPTIMIZATION_LEVEL = "-Owholemodule";
+				SWIFT_VERSION = 3.0;
+				VERSIONING_SYSTEM = "apple-generic";
+				VERSION_INFO_PREFIX = "";
+			};
+			name = Release;
+		};
+		655EB392A269D54A5293942B00AD0750 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGNING_REQUIRED = NO;
+				COPY_PHASE_STRIP = YES;
+				ENABLE_NS_ASSERTIONS = NO;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"POD_CONFIGURATION_RELEASE=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 10.2;
+				MACOSX_DEPLOYMENT_TARGET = 10.12;
+				PROVISIONING_PROFILE_SPECIFIER = NO_SIGNING/;
+				STRIP_INSTALLED_PRODUCT = NO;
+				SYMROOT = "${SRCROOT}/../build";
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		67D4A7A68D87844E3E7B998A606B759B /* Release */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = A38E12ED5457ADCD8C10A70C1652C10F /* Pods-tapmap.release.xcconfig */;
+			buildSettings = {
+				CODE_SIGN_IDENTITY = "";
+				"CODE_SIGN_IDENTITY[sdk=appletvos*]" = "";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "";
+				"CODE_SIGN_IDENTITY[sdk=watchos*]" = "";
+				CURRENT_PROJECT_VERSION = 1;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				DEFINES_MODULE = YES;
+				DYLIB_COMPATIBILITY_VERSION = 1;
+				DYLIB_CURRENT_VERSION = 1;
+				DYLIB_INSTALL_NAME_BASE = "@rpath";
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_NO_COMMON_BLOCKS = YES;
+				INFOPLIST_FILE = "Target Support Files/Pods-tapmap/Info.plist";
+				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
+				IPHONEOS_DEPLOYMENT_TARGET = 10.2;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
+				MACH_O_TYPE = staticlib;
+				MODULEMAP_FILE = "Target Support Files/Pods-tapmap/Pods-tapmap.modulemap";
+				MTL_ENABLE_DEBUG_INFO = NO;
+				OTHER_LDFLAGS = "";
+				OTHER_LIBTOOLFLAGS = "";
+				PODS_ROOT = "$(SRCROOT)";
+				PRODUCT_BUNDLE_IDENTIFIER = "org.cocoapods.${PRODUCT_NAME:rfc1034identifier}";
+				PRODUCT_NAME = Pods_tapmap;
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+				SWIFT_OPTIMIZATION_LEVEL = "-Owholemodule";
+				SWIFT_VERSION = 3.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				VERSIONING_SYSTEM = "apple-generic";
+				VERSION_INFO_PREFIX = "";
+			};
+			name = Release;
+		};
+		80644909C6C62B3740B903494D862092 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
@@ -395,6 +678,7 @@
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 10.2;
+				MACOSX_DEPLOYMENT_TARGET = 10.12;
 				ONLY_ACTIVE_ARCH = YES;
 				PROVISIONING_PROFILE_SPECIFIER = NO_SIGNING/;
 				STRIP_INSTALLED_PRODUCT = NO;
@@ -402,81 +686,9 @@
 			};
 			name = Debug;
 		};
-		20E3EBA14B2CE3E613BAAA9347D6F650 /* Release */ = {
-			isa = XCBuildConfiguration;
-			baseConfigurationReference = 2B0D58721F3A00F9AD9C940D347D67D0 /* Pods-tapmap.release.xcconfig */;
-			buildSettings = {
-				CODE_SIGN_IDENTITY = "";
-				"CODE_SIGN_IDENTITY[sdk=appletvos*]" = "";
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "";
-				"CODE_SIGN_IDENTITY[sdk=watchos*]" = "";
-				CURRENT_PROJECT_VERSION = 1;
-				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
-				DEFINES_MODULE = YES;
-				DYLIB_COMPATIBILITY_VERSION = 1;
-				DYLIB_CURRENT_VERSION = 1;
-				DYLIB_INSTALL_NAME_BASE = "@rpath";
-				ENABLE_STRICT_OBJC_MSGSEND = YES;
-				GCC_NO_COMMON_BLOCKS = YES;
-				INFOPLIST_FILE = "Target Support Files/Pods-tapmap/Info.plist";
-				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
-				IPHONEOS_DEPLOYMENT_TARGET = 10.2;
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
-				MACH_O_TYPE = staticlib;
-				MODULEMAP_FILE = "Target Support Files/Pods-tapmap/Pods-tapmap.modulemap";
-				MTL_ENABLE_DEBUG_INFO = NO;
-				OTHER_LDFLAGS = "";
-				OTHER_LIBTOOLFLAGS = "";
-				PODS_ROOT = "$(SRCROOT)";
-				PRODUCT_BUNDLE_IDENTIFIER = "org.cocoapods.${PRODUCT_NAME:rfc1034identifier}";
-				PRODUCT_NAME = Pods_tapmap;
-				SDKROOT = iphoneos;
-				SKIP_INSTALL = YES;
-				SWIFT_OPTIMIZATION_LEVEL = "-Owholemodule";
-				SWIFT_VERSION = 3.0;
-				TARGETED_DEVICE_FAMILY = "1,2";
-				VERSIONING_SYSTEM = "apple-generic";
-				VERSION_INFO_PREFIX = "";
-			};
-			name = Release;
-		};
-		6C8F714E2CE4D6FAD1D93617BE49BCBF /* Release */ = {
-			isa = XCBuildConfiguration;
-			baseConfigurationReference = 2E7F7C62EE34D2D271E6E1234A2002B2 /* SwiftyJSON.xcconfig */;
-			buildSettings = {
-				CODE_SIGN_IDENTITY = "";
-				"CODE_SIGN_IDENTITY[sdk=appletvos*]" = "";
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "";
-				"CODE_SIGN_IDENTITY[sdk=watchos*]" = "";
-				CURRENT_PROJECT_VERSION = 1;
-				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
-				DEFINES_MODULE = YES;
-				DYLIB_COMPATIBILITY_VERSION = 1;
-				DYLIB_CURRENT_VERSION = 1;
-				DYLIB_INSTALL_NAME_BASE = "@rpath";
-				ENABLE_STRICT_OBJC_MSGSEND = YES;
-				GCC_NO_COMMON_BLOCKS = YES;
-				GCC_PREFIX_HEADER = "Target Support Files/SwiftyJSON/SwiftyJSON-prefix.pch";
-				INFOPLIST_FILE = "Target Support Files/SwiftyJSON/Info.plist";
-				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
-				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
-				MODULEMAP_FILE = "Target Support Files/SwiftyJSON/SwiftyJSON.modulemap";
-				MTL_ENABLE_DEBUG_INFO = NO;
-				PRODUCT_NAME = SwiftyJSON;
-				SDKROOT = iphoneos;
-				SKIP_INSTALL = YES;
-				SWIFT_OPTIMIZATION_LEVEL = "-Owholemodule";
-				SWIFT_VERSION = 3.0;
-				TARGETED_DEVICE_FAMILY = "1,2";
-				VERSIONING_SYSTEM = "apple-generic";
-				VERSION_INFO_PREFIX = "";
-			};
-			name = Release;
-		};
 		88A0FC023C0354EA016CD3BC718B182B /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = CDF88AA4EC5C69731F866CC3A51F1A74 /* Pods-tapmapTests.debug.xcconfig */;
+			baseConfigurationReference = E6168ED44D680087E0D3B1E9584389D9 /* Pods-tapmapTests.debug.xcconfig */;
 			buildSettings = {
 				CODE_SIGN_IDENTITY = "";
 				"CODE_SIGN_IDENTITY[sdk=appletvos*]" = "";
@@ -510,53 +722,78 @@
 			};
 			name = Debug;
 		};
-		AA0B5BDEB018901CD8F88AAD05F5B893 /* Release */ = {
+		8E05FA13501804B685F6F28CA9E0E05C /* Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = F2DEE2563753FD6DD885DCB469FD3253 /* SwiftyJSON-OSX.xcconfig */;
 			buildSettings = {
-				ALWAYS_SEARCH_USER_PATHS = NO;
-				CLANG_ANALYZER_NONNULL = YES;
-				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES;
-				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
-				CLANG_CXX_LIBRARY = "libc++";
-				CLANG_ENABLE_MODULES = YES;
-				CLANG_ENABLE_OBJC_ARC = YES;
-				CLANG_WARN_BOOL_CONVERSION = YES;
-				CLANG_WARN_CONSTANT_CONVERSION = YES;
-				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES;
-				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
-				CLANG_WARN_EMPTY_BODY = YES;
-				CLANG_WARN_ENUM_CONVERSION = YES;
-				CLANG_WARN_INFINITE_RECURSION = YES;
-				CLANG_WARN_INT_CONVERSION = YES;
-				CLANG_WARN_OBJC_ROOT_CLASS = YES;
-				CLANG_WARN_SUSPICIOUS_MOVE = YES;
-				CLANG_WARN_UNREACHABLE_CODE = YES;
-				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
-				CODE_SIGNING_REQUIRED = NO;
-				COPY_PHASE_STRIP = YES;
-				ENABLE_NS_ASSERTIONS = NO;
-				GCC_C_LANGUAGE_STANDARD = gnu99;
-				GCC_PREPROCESSOR_DEFINITIONS = (
-					"POD_CONFIGURATION_RELEASE=1",
-					"$(inherited)",
-				);
-				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
-				GCC_WARN_ABOUT_RETURN_TYPE = YES;
-				GCC_WARN_UNDECLARED_SELECTOR = YES;
-				GCC_WARN_UNINITIALIZED_AUTOS = YES;
-				GCC_WARN_UNUSED_FUNCTION = YES;
-				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 10.2;
-				PROVISIONING_PROFILE_SPECIFIER = NO_SIGNING/;
-				STRIP_INSTALLED_PRODUCT = NO;
-				SYMROOT = "${SRCROOT}/../build";
-				VALIDATE_PRODUCT = YES;
+				CODE_SIGN_IDENTITY = "-";
+				"CODE_SIGN_IDENTITY[sdk=appletvos*]" = "";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "";
+				"CODE_SIGN_IDENTITY[sdk=watchos*]" = "";
+				COMBINE_HIDPI_IMAGES = YES;
+				CURRENT_PROJECT_VERSION = 1;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				DEFINES_MODULE = YES;
+				DYLIB_COMPATIBILITY_VERSION = 1;
+				DYLIB_CURRENT_VERSION = 1;
+				DYLIB_INSTALL_NAME_BASE = "@rpath";
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				FRAMEWORK_VERSION = A;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_PREFIX_HEADER = "Target Support Files/SwiftyJSON-OSX/SwiftyJSON-OSX-prefix.pch";
+				INFOPLIST_FILE = "Target Support Files/SwiftyJSON-OSX/Info.plist";
+				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @loader_path/Frameworks";
+				MACOSX_DEPLOYMENT_TARGET = 10.9;
+				MODULEMAP_FILE = "Target Support Files/SwiftyJSON-OSX/SwiftyJSON-OSX.modulemap";
+				MTL_ENABLE_DEBUG_INFO = NO;
+				PRODUCT_NAME = SwiftyJSON;
+				SDKROOT = macosx;
+				SKIP_INSTALL = YES;
+				SWIFT_OPTIMIZATION_LEVEL = "-Owholemodule";
+				SWIFT_VERSION = 3.0;
+				VERSIONING_SYSTEM = "apple-generic";
+				VERSION_INFO_PREFIX = "";
 			};
 			name = Release;
 		};
-		AC87B65B19F186B741021641A19219B6 /* Debug */ = {
+		903D9383D34E8FDE79DE9FDF6558CD63 /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = A9BF071564C2DB39891A2D72D7B699D0 /* Pods-tapmap.debug.xcconfig */;
+			baseConfigurationReference = A2EE8F53506F37DDBC63147EC8C5CDBD /* SwiftyJSON-iOS.xcconfig */;
+			buildSettings = {
+				CODE_SIGN_IDENTITY = "";
+				"CODE_SIGN_IDENTITY[sdk=appletvos*]" = "";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "";
+				"CODE_SIGN_IDENTITY[sdk=watchos*]" = "";
+				CURRENT_PROJECT_VERSION = 1;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				DEFINES_MODULE = YES;
+				DYLIB_COMPATIBILITY_VERSION = 1;
+				DYLIB_CURRENT_VERSION = 1;
+				DYLIB_INSTALL_NAME_BASE = "@rpath";
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_PREFIX_HEADER = "Target Support Files/SwiftyJSON-iOS/SwiftyJSON-iOS-prefix.pch";
+				INFOPLIST_FILE = "Target Support Files/SwiftyJSON-iOS/Info.plist";
+				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
+				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
+				MODULEMAP_FILE = "Target Support Files/SwiftyJSON-iOS/SwiftyJSON-iOS.modulemap";
+				MTL_ENABLE_DEBUG_INFO = NO;
+				PRODUCT_NAME = SwiftyJSON;
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+				SWIFT_OPTIMIZATION_LEVEL = "-Owholemodule";
+				SWIFT_VERSION = 3.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				VERSIONING_SYSTEM = "apple-generic";
+				VERSION_INFO_PREFIX = "";
+			};
+			name = Release;
+		};
+		A080337B623AB51D297C97DF837DECC3 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = F0F55CC21B9AE9FB30E8B009F7CB8B54 /* Pods-tapmap.debug.xcconfig */;
 			buildSettings = {
 				CODE_SIGN_IDENTITY = "";
 				"CODE_SIGN_IDENTITY[sdk=appletvos*]" = "";
@@ -593,9 +830,85 @@
 			};
 			name = Debug;
 		};
-		D497DBC17F570378E8E422CCA29736C5 /* Debug */ = {
+		A3E4ACB19C61E9ACD5CE8F03083D0723 /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 2E7F7C62EE34D2D271E6E1234A2002B2 /* SwiftyJSON.xcconfig */;
+			baseConfigurationReference = 953A77C2984245C65124E2E70F1E297F /* Pods-geobakeui.debug.xcconfig */;
+			buildSettings = {
+				CODE_SIGN_IDENTITY = "-";
+				"CODE_SIGN_IDENTITY[sdk=appletvos*]" = "";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "";
+				"CODE_SIGN_IDENTITY[sdk=watchos*]" = "";
+				COMBINE_HIDPI_IMAGES = YES;
+				CURRENT_PROJECT_VERSION = 1;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				DEFINES_MODULE = YES;
+				DYLIB_COMPATIBILITY_VERSION = 1;
+				DYLIB_CURRENT_VERSION = 1;
+				DYLIB_INSTALL_NAME_BASE = "@rpath";
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				FRAMEWORK_VERSION = A;
+				GCC_NO_COMMON_BLOCKS = YES;
+				INFOPLIST_FILE = "Target Support Files/Pods-geobakeui/Info.plist";
+				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @loader_path/Frameworks";
+				MACH_O_TYPE = staticlib;
+				MACOSX_DEPLOYMENT_TARGET = 10.12;
+				MODULEMAP_FILE = "Target Support Files/Pods-geobakeui/Pods-geobakeui.modulemap";
+				MTL_ENABLE_DEBUG_INFO = YES;
+				OTHER_LDFLAGS = "";
+				OTHER_LIBTOOLFLAGS = "";
+				PODS_ROOT = "$(SRCROOT)";
+				PRODUCT_BUNDLE_IDENTIFIER = "org.cocoapods.${PRODUCT_NAME:rfc1034identifier}";
+				PRODUCT_NAME = Pods_geobakeui;
+				SDKROOT = macosx;
+				SKIP_INSTALL = YES;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 3.0;
+				VERSIONING_SYSTEM = "apple-generic";
+				VERSION_INFO_PREFIX = "";
+			};
+			name = Debug;
+		};
+		BF65B0B3480AFBAF66A5008E6D580EAE /* Debug */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = F2DEE2563753FD6DD885DCB469FD3253 /* SwiftyJSON-OSX.xcconfig */;
+			buildSettings = {
+				CODE_SIGN_IDENTITY = "-";
+				"CODE_SIGN_IDENTITY[sdk=appletvos*]" = "";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "";
+				"CODE_SIGN_IDENTITY[sdk=watchos*]" = "";
+				COMBINE_HIDPI_IMAGES = YES;
+				CURRENT_PROJECT_VERSION = 1;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				DEFINES_MODULE = YES;
+				DYLIB_COMPATIBILITY_VERSION = 1;
+				DYLIB_CURRENT_VERSION = 1;
+				DYLIB_INSTALL_NAME_BASE = "@rpath";
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				FRAMEWORK_VERSION = A;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_PREFIX_HEADER = "Target Support Files/SwiftyJSON-OSX/SwiftyJSON-OSX-prefix.pch";
+				INFOPLIST_FILE = "Target Support Files/SwiftyJSON-OSX/Info.plist";
+				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @loader_path/Frameworks";
+				MACOSX_DEPLOYMENT_TARGET = 10.9;
+				MODULEMAP_FILE = "Target Support Files/SwiftyJSON-OSX/SwiftyJSON-OSX.modulemap";
+				MTL_ENABLE_DEBUG_INFO = YES;
+				PRODUCT_NAME = SwiftyJSON;
+				SDKROOT = macosx;
+				SKIP_INSTALL = YES;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 3.0;
+				VERSIONING_SYSTEM = "apple-generic";
+				VERSION_INFO_PREFIX = "";
+			};
+			name = Debug;
+		};
+		DBEB2A62496CE7BC92BE0D7999281253 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = A2EE8F53506F37DDBC63147EC8C5CDBD /* SwiftyJSON-iOS.xcconfig */;
 			buildSettings = {
 				CODE_SIGN_IDENTITY = "";
 				"CODE_SIGN_IDENTITY[sdk=appletvos*]" = "";
@@ -609,12 +922,12 @@
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				GCC_NO_COMMON_BLOCKS = YES;
-				GCC_PREFIX_HEADER = "Target Support Files/SwiftyJSON/SwiftyJSON-prefix.pch";
-				INFOPLIST_FILE = "Target Support Files/SwiftyJSON/Info.plist";
+				GCC_PREFIX_HEADER = "Target Support Files/SwiftyJSON-iOS/SwiftyJSON-iOS-prefix.pch";
+				INFOPLIST_FILE = "Target Support Files/SwiftyJSON-iOS/Info.plist";
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
 				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
-				MODULEMAP_FILE = "Target Support Files/SwiftyJSON/SwiftyJSON.modulemap";
+				MODULEMAP_FILE = "Target Support Files/SwiftyJSON-iOS/SwiftyJSON-iOS.modulemap";
 				MTL_ENABLE_DEBUG_INFO = YES;
 				PRODUCT_NAME = SwiftyJSON;
 				SDKROOT = iphoneos;
@@ -630,7 +943,7 @@
 		};
 		DC28FB598D112976B6D4CB8476B66B74 /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = C865F976C3E10855DBC538546C3CE1CF /* Pods-tapmapTests.release.xcconfig */;
+			baseConfigurationReference = 545662D2A7577D7E4151ADF18087AEAD /* Pods-tapmapTests.release.xcconfig */;
 			buildSettings = {
 				CODE_SIGN_IDENTITY = "";
 				"CODE_SIGN_IDENTITY[sdk=appletvos*]" = "";
@@ -667,29 +980,47 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
+		0365F99C788FE12746E56E503238D405 /* Build configuration list for PBXNativeTarget "Pods-geobakeui" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				A3E4ACB19C61E9ACD5CE8F03083D0723 /* Debug */,
+				1D21D2011CD18B49D5ADB3DCA40659E3 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
 		2D8E8EC45A3A1A1D94AE762CB5028504 /* Build configuration list for PBXProject "Pods" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				166E2CAC58E8608AD59A6F0B71C9C3E0 /* Debug */,
-				AA0B5BDEB018901CD8F88AAD05F5B893 /* Release */,
+				80644909C6C62B3740B903494D862092 /* Debug */,
+				655EB392A269D54A5293942B00AD0750 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		9A2315083402283555100398506C9605 /* Build configuration list for PBXNativeTarget "Pods-tapmap" */ = {
+		BA0DBA8B716541EAD25E515E8140FFE4 /* Build configuration list for PBXNativeTarget "SwiftyJSON-OSX" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				AC87B65B19F186B741021641A19219B6 /* Debug */,
-				20E3EBA14B2CE3E613BAAA9347D6F650 /* Release */,
+				BF65B0B3480AFBAF66A5008E6D580EAE /* Debug */,
+				8E05FA13501804B685F6F28CA9E0E05C /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		AF205C04BD844349C76DF75FD6602BAF /* Build configuration list for PBXNativeTarget "SwiftyJSON" */ = {
+		CCA3B0471CC9EE2977F17270000D90F6 /* Build configuration list for PBXNativeTarget "Pods-tapmap" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				D497DBC17F570378E8E422CCA29736C5 /* Debug */,
-				6C8F714E2CE4D6FAD1D93617BE49BCBF /* Release */,
+				A080337B623AB51D297C97DF837DECC3 /* Debug */,
+				67D4A7A68D87844E3E7B998A606B759B /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		DA94B78F5C6813F112CBD62F758A824B /* Build configuration list for PBXNativeTarget "SwiftyJSON-iOS" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				DBEB2A62496CE7BC92BE0D7999281253 /* Debug */,
+				903D9383D34E8FDE79DE9FDF6558CD63 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

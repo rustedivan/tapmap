@@ -9,9 +9,8 @@
 import Foundation
 import SwiftyJSON
 
-func loadFeatureJson() -> GeoWorld {
-	let path = Bundle.main.path(forResource: "features", ofType: "json")
-	let jsonData = NSData(contentsOfFile:path!)
+func loadFeatureJson(url: URL) -> GeoWorld {
+	let jsonData = NSData(contentsOf: url)
 	let json = JSON(data: jsonData! as Data)
 	
 	var loadedContinents: [GeoContinent] = []

@@ -7,6 +7,13 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		1452103B1E98D4F30029942F /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1452103A1E98D4F30029942F /* AppDelegate.swift */; };
+		1452103D1E98D4F30029942F /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1452103C1E98D4F30029942F /* ViewController.swift */; };
+		1452103F1E98D4F30029942F /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 1452103E1E98D4F30029942F /* Assets.xcassets */; };
+		145210421E98D4F30029942F /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 145210401E98D4F30029942F /* Main.storyboard */; };
+		145210491E98D61D0029942F /* features.json in Copy Files */ = {isa = PBXBuildFile; fileRef = 146A792A1E8F931300E2EE20 /* features.json */; };
+		1452104A1E98DB860029942F /* FeatureLoader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14B74E5A1E8F9ACB00849BB5 /* FeatureLoader.swift */; };
+		1452104B1E98DB8A0029942F /* GeoRegion.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14B74E5D1E8F9C1100849BB5 /* GeoRegion.swift */; };
 		146A79071E8F912500E2EE20 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 146A79061E8F912500E2EE20 /* AppDelegate.swift */; };
 		146A79091E8F912500E2EE20 /* Shader.fsh in Resources */ = {isa = PBXBuildFile; fileRef = 146A79081E8F912500E2EE20 /* Shader.fsh */; };
 		146A790B1E8F912500E2EE20 /* Shader.vsh in Resources */ = {isa = PBXBuildFile; fileRef = 146A790A1E8F912500E2EE20 /* Shader.vsh */; };
@@ -22,6 +29,7 @@
 		14B74E711E8FB15500849BB5 /* GeoRenderer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14B74E701E8FB15500849BB5 /* GeoRenderer.swift */; };
 		14B74E731E8FCF5E00849BB5 /* FeatureLoaderTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14B74E721E8FCF5E00849BB5 /* FeatureLoaderTests.swift */; };
 		681BDD4EA9CC2EF29B50E6C1 /* Pods_tapmap.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 128FFB8F786C71132FB1F443 /* Pods_tapmap.framework */; };
+		99A6810331A45FE47995FC5F /* Pods_geobakeui.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9BE90AE329EA2EDEB1DE4076 /* Pods_geobakeui.framework */; };
 		A3C7BECC3908C1F0109D0833 /* Pods_tapmapTests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3F3EF95914CC4EAAB2D8BAFC /* Pods_tapmapTests.framework */; };
 /* End PBXBuildFile section */
 
@@ -35,9 +43,30 @@
 		};
 /* End PBXContainerItemProxy section */
 
+/* Begin PBXCopyFilesBuildPhase section */
+		145210481E98D6120029942F /* Copy Files */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 16;
+			files = (
+				145210491E98D61D0029942F /* features.json in Copy Files */,
+			);
+			name = "Copy Files";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
 /* Begin PBXFileReference section */
+		070EEB60FAEEE118A8A4F9C5 /* Pods-geobakeui.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-geobakeui.debug.xcconfig"; path = "Pods/Target Support Files/Pods-geobakeui/Pods-geobakeui.debug.xcconfig"; sourceTree = "<group>"; };
 		090767E27ECB3B219935FC22 /* Pods-tapmap-loading.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-tapmap-loading.release.xcconfig"; path = "Pods/Target Support Files/Pods-tapmap-loading/Pods-tapmap-loading.release.xcconfig"; sourceTree = "<group>"; };
 		128FFB8F786C71132FB1F443 /* Pods_tapmap.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_tapmap.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		145210381E98D4F30029942F /* geobakeui.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = geobakeui.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		1452103A1E98D4F30029942F /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
+		1452103C1E98D4F30029942F /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
+		1452103E1E98D4F30029942F /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		145210411E98D4F30029942F /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
+		145210431E98D4F30029942F /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		146A79031E8F912500E2EE20 /* tapmap.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = tapmap.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		146A79061E8F912500E2EE20 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		146A79081E8F912500E2EE20 /* Shader.fsh */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.glsl; name = Shader.fsh; path = Shaders/Shader.fsh; sourceTree = "<group>"; };
@@ -58,13 +87,23 @@
 		3DC5E5FA5F48ACD54B065BEA /* Pods-tapmap.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-tapmap.release.xcconfig"; path = "Pods/Target Support Files/Pods-tapmap/Pods-tapmap.release.xcconfig"; sourceTree = "<group>"; };
 		3F3EF95914CC4EAAB2D8BAFC /* Pods_tapmapTests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_tapmapTests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		52DCA782B4126180F0FBED92 /* Pods-tapmap.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-tapmap.debug.xcconfig"; path = "Pods/Target Support Files/Pods-tapmap/Pods-tapmap.debug.xcconfig"; sourceTree = "<group>"; };
+		6F0137EB1864309CD86CCBB8 /* Pods-geobakeui.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-geobakeui.release.xcconfig"; path = "Pods/Target Support Files/Pods-geobakeui/Pods-geobakeui.release.xcconfig"; sourceTree = "<group>"; };
 		6FE687A9A5E3C534DD662B4C /* Pods-tapmap-loading.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-tapmap-loading.debug.xcconfig"; path = "Pods/Target Support Files/Pods-tapmap-loading/Pods-tapmap-loading.debug.xcconfig"; sourceTree = "<group>"; };
 		72AC77BD73CAE3DA469470B7 /* Pods-tapmapTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-tapmapTests.release.xcconfig"; path = "Pods/Target Support Files/Pods-tapmapTests/Pods-tapmapTests.release.xcconfig"; sourceTree = "<group>"; };
 		96AFEA5C99E9F46AEB90766E /* Pods_tapmap_loading.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_tapmap_loading.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		9BE90AE329EA2EDEB1DE4076 /* Pods_geobakeui.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_geobakeui.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		B5EDA10E7FBDF4C49D54D44B /* Pods-tapmapTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-tapmapTests.debug.xcconfig"; path = "Pods/Target Support Files/Pods-tapmapTests/Pods-tapmapTests.debug.xcconfig"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
+		145210351E98D4F30029942F /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				99A6810331A45FE47995FC5F /* Pods_geobakeui.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		146A79001E8F912500E2EE20 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -84,11 +123,24 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		145210391E98D4F30029942F /* geobakeui */ = {
+			isa = PBXGroup;
+			children = (
+				1452103A1E98D4F30029942F /* AppDelegate.swift */,
+				1452103C1E98D4F30029942F /* ViewController.swift */,
+				1452103E1E98D4F30029942F /* Assets.xcassets */,
+				145210401E98D4F30029942F /* Main.storyboard */,
+				145210431E98D4F30029942F /* Info.plist */,
+			);
+			path = geobakeui;
+			sourceTree = "<group>";
+		};
 		146A78FA1E8F912400E2EE20 = {
 			isa = PBXGroup;
 			children = (
 				146A79051E8F912500E2EE20 /* tapmap */,
 				146A791E1E8F912500E2EE20 /* tapmapTests */,
+				145210391E98D4F30029942F /* geobakeui */,
 				146A79041E8F912500E2EE20 /* Products */,
 				FDA4ACC77873C239A83F7C95 /* Pods */,
 				E5E262D1B4564A75A41C2544 /* Frameworks */,
@@ -100,6 +152,7 @@
 			children = (
 				146A79031E8F912500E2EE20 /* tapmap.app */,
 				146A791B1E8F912500E2EE20 /* tapmapTests.xctest */,
+				145210381E98D4F30029942F /* geobakeui.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -155,6 +208,7 @@
 				128FFB8F786C71132FB1F443 /* Pods_tapmap.framework */,
 				3F3EF95914CC4EAAB2D8BAFC /* Pods_tapmapTests.framework */,
 				96AFEA5C99E9F46AEB90766E /* Pods_tapmap_loading.framework */,
+				9BE90AE329EA2EDEB1DE4076 /* Pods_geobakeui.framework */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -168,6 +222,8 @@
 				72AC77BD73CAE3DA469470B7 /* Pods-tapmapTests.release.xcconfig */,
 				6FE687A9A5E3C534DD662B4C /* Pods-tapmap-loading.debug.xcconfig */,
 				090767E27ECB3B219935FC22 /* Pods-tapmap-loading.release.xcconfig */,
+				070EEB60FAEEE118A8A4F9C5 /* Pods-geobakeui.debug.xcconfig */,
+				6F0137EB1864309CD86CCBB8 /* Pods-geobakeui.release.xcconfig */,
 			);
 			name = Pods;
 			sourceTree = "<group>";
@@ -175,6 +231,27 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
+		145210371E98D4F30029942F /* geobakeui */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 145210461E98D4F30029942F /* Build configuration list for PBXNativeTarget "geobakeui" */;
+			buildPhases = (
+				50041979FA3B36704A03BE50 /* [CP] Check Pods Manifest.lock */,
+				145210341E98D4F30029942F /* Sources */,
+				145210351E98D4F30029942F /* Frameworks */,
+				145210361E98D4F30029942F /* Resources */,
+				DBD7B208888761FB6DE48452 /* [CP] Embed Pods Frameworks */,
+				2FB4629F973FC266716D26EB /* [CP] Copy Pods Resources */,
+				145210481E98D6120029942F /* Copy Files */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = geobakeui;
+			productName = geobakeui;
+			productReference = 145210381E98D4F30029942F /* geobakeui.app */;
+			productType = "com.apple.product-type.application";
+		};
 		146A79021E8F912500E2EE20 /* tapmap */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = 146A79241E8F912500E2EE20 /* Build configuration list for PBXNativeTarget "tapmap" */;
@@ -222,10 +299,15 @@
 		146A78FB1E8F912400E2EE20 /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
-				LastSwiftUpdateCheck = 0820;
+				LastSwiftUpdateCheck = 0830;
 				LastUpgradeCheck = 0820;
 				ORGANIZATIONNAME = Wildbrain;
 				TargetAttributes = {
+					145210371E98D4F30029942F = {
+						CreatedOnToolsVersion = 8.3;
+						DevelopmentTeam = Y4JDRD37Q9;
+						ProvisioningStyle = Automatic;
+					};
 					146A79021E8F912500E2EE20 = {
 						CreatedOnToolsVersion = 8.2.1;
 						DevelopmentTeam = Y4JDRD37Q9;
@@ -254,11 +336,21 @@
 			targets = (
 				146A79021E8F912500E2EE20 /* tapmap */,
 				146A791A1E8F912500E2EE20 /* tapmapTests */,
+				145210371E98D4F30029942F /* geobakeui */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
+		145210361E98D4F30029942F /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				1452103F1E98D4F30029942F /* Assets.xcassets in Resources */,
+				145210421E98D4F30029942F /* Main.storyboard in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		146A79011E8F912500E2EE20 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -283,6 +375,36 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXShellScriptBuildPhase section */
+		2FB4629F973FC266716D26EB /* [CP] Copy Pods Resources */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "[CP] Copy Pods Resources";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-geobakeui/Pods-geobakeui-resources.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+		50041979FA3B36704A03BE50 /* [CP] Check Pods Manifest.lock */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "[CP] Check Pods Manifest.lock";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "diff \"${PODS_ROOT}/../Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n";
+			showEnvVarsInLog = 0;
+		};
 		5B63D5710F313C6A58D81EDF /* [CP] Copy Pods Resources */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
@@ -343,6 +465,21 @@
 			shellScript = "diff \"${PODS_ROOT}/../Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n";
 			showEnvVarsInLog = 0;
 		};
+		DBD7B208888761FB6DE48452 /* [CP] Embed Pods Frameworks */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "[CP] Embed Pods Frameworks";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-geobakeui/Pods-geobakeui-frameworks.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
 		DDB362C55750AEB296782075 /* [CP] Check Pods Manifest.lock */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
@@ -376,6 +513,17 @@
 /* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
+		145210341E98D4F30029942F /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				1452103D1E98D4F30029942F /* ViewController.swift in Sources */,
+				1452104B1E98DB8A0029942F /* GeoRegion.swift in Sources */,
+				1452104A1E98DB860029942F /* FeatureLoader.swift in Sources */,
+				1452103B1E98D4F30029942F /* AppDelegate.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		146A78FF1E8F912500E2EE20 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -408,6 +556,14 @@
 /* End PBXTargetDependency section */
 
 /* Begin PBXVariantGroup section */
+		145210401E98D4F30029942F /* Main.storyboard */ = {
+			isa = PBXVariantGroup;
+			children = (
+				145210411E98D4F30029942F /* Base */,
+			);
+			name = Main.storyboard;
+			sourceTree = "<group>";
+		};
 		146A790E1E8F912500E2EE20 /* Main.storyboard */ = {
 			isa = PBXVariantGroup;
 			children = (
@@ -427,6 +583,44 @@
 /* End PBXVariantGroup section */
 
 /* Begin XCBuildConfiguration section */
+		145210441E98D4F30029942F /* Debug */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 070EEB60FAEEE118A8A4F9C5 /* Pods-geobakeui.debug.xcconfig */;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CODE_SIGN_IDENTITY = "-";
+				COMBINE_HIDPI_IMAGES = YES;
+				DEVELOPMENT_TEAM = Y4JDRD37Q9;
+				INFOPLIST_FILE = geobakeui/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks";
+				MACOSX_DEPLOYMENT_TARGET = 10.12;
+				PRODUCT_BUNDLE_IDENTIFIER = se.wildbrain.geobakeui;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = macosx;
+				SWIFT_VERSION = 3.0;
+			};
+			name = Debug;
+		};
+		145210451E98D4F30029942F /* Release */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 6F0137EB1864309CD86CCBB8 /* Pods-geobakeui.release.xcconfig */;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CODE_SIGN_IDENTITY = "-";
+				COMBINE_HIDPI_IMAGES = YES;
+				DEVELOPMENT_TEAM = Y4JDRD37Q9;
+				INFOPLIST_FILE = geobakeui/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks";
+				MACOSX_DEPLOYMENT_TARGET = 10.12;
+				PRODUCT_BUNDLE_IDENTIFIER = se.wildbrain.geobakeui;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = macosx;
+				SWIFT_VERSION = 3.0;
+			};
+			name = Release;
+		};
 		146A79221E8F912500E2EE20 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -581,6 +775,15 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
+		145210461E98D4F30029942F /* Build configuration list for PBXNativeTarget "geobakeui" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				145210441E98D4F30029942F /* Debug */,
+				145210451E98D4F30029942F /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
 		146A78FE1E8F912400E2EE20 /* Build configuration list for PBXProject "tapmap" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
