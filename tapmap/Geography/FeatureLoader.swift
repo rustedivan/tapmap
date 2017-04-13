@@ -8,12 +8,19 @@
 
 import Foundation
 import SwiftyJSON
+import AppKit
 
-func loadFeatureJson(url: URL) -> GeoWorld {
+typealias ProgressReport = (Double, String, Bool) -> ()
+
+func loadJsonFile(url: URL) -> JSON {
 	let jsonData = NSData(contentsOf: url)
-	let json = JSON(data: jsonData! as Data)
-	
+	return JSON(data: jsonData! as Data)
+}
+
+func parseFeatureJson(_ json: JSON, progressReporter: ProgressReport) -> GeoWorld {
 	var loadedContinents: [GeoContinent] = []
+	let numContinents = json.dictionaryValue.keys.count
+	
 	for continentJson in json.dictionaryValue.values {
 		let regions = continentJson["regions"]
 		let continentName = continentJson["name"].stringValue
@@ -49,6 +56,7 @@ func loadFeatureJson(url: URL) -> GeoWorld {
 		                                   vertices: continentVertices,
 		                                   regions: loadedRegions)
 		loadedContinents.append(loadedContinent)
+		progressReporter(Double(loadedContinents.count) / Double(numContinents), continentName, false)
 	}
 	
 	return GeoWorld(continents: loadedContinents)

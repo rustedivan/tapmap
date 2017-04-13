@@ -8,28 +8,36 @@
 
 import Cocoa
 import SwiftyJSON
+import Dispatch
 
 class ViewController: NSViewController {
-
-	override func viewDidLoad() {
-		super.viewDidLoad()
-
-		for argument in CommandLine.arguments {
+	static let loadQueue = DispatchQueue(label: "se.rusted.tapmap.loadgeography", attributes: [])
+	
+	override func viewDidAppear() {
+		tryAutobakeWithArgument(arguments: CommandLine.arguments)
+	}
+	
+	func tryAutobakeWithArgument(arguments: [String]) {
+		for argument in arguments {
 			if argument.hasSuffix(".json") {
 				let autoloadJson = Bundle.main.bundleURL
 					.deletingLastPathComponent()
 					.appendingPathComponent(argument)
-				_ = loadFeatureJson(url: autoloadJson)
+				let json = loadJsonFile(url: autoloadJson)
+				let reporter = startLoading()
+				ViewController.loadQueue.async {
+					_ = parseFeatureJson(json, progressReporter: reporter)
+					reporter(1.0, "Done", true)
+				}
 			}
 		}
 	}
-
-	override var representedObject: Any? {
-		didSet {
-		// Update the view, if already loaded.
-		}
-	}
-
-
 }
 
+extension ViewController {
+	func startLoading() -> ProgressReport {
+		performSegue(withIdentifier: "ShowLoadingProgress", sender: self)
+		let loading = presentedViewControllers?.last as! GeoLoadingViewController
+		return loading.progressReporter
+	}
+}
