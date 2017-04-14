@@ -1,0 +1,6 @@
+framework module Pods_tapmap {
+  umbrella header "Pods-tapmap-umbrella.h"
+
+  export *
+  module * { export * }
+}
