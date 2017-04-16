@@ -11,12 +11,14 @@ import SwiftyJSON
 import Dispatch
 
 class ViewController: NSViewController {
+	@IBOutlet var regionOutline : RegionOutlineView!
 	let loadQueue = OperationQueue()
 	var loadJob : Operation?
 	
 	override func viewDidAppear() {
 		loadQueue.name = "Json load queue"
-		
+		loadQueue.qualityOfService = .userInitiated
+		regionOutline.isHidden = true
 		// Autoload or open file picker
 		if let autoUrl = tryAutobakeWithArgument(arguments: CommandLine.arguments) {
 			asyncLoadJson(from: autoUrl)
@@ -74,11 +76,13 @@ extension ViewController {
 				return
 			}
 			reporter(1.0, "Done", true)	// Close the loading panel
-			if let world = jsonParser.resultWorld {
-				self.finishLoad(loadedWorld: world)
-			} else {
-				print("Load failed")
-				self.cancelLoad()
+			DispatchQueue.main.async {
+				if let world = jsonParser.resultWorld {
+					self.finishLoad(loadedWorld: world)
+				} else {
+					print("Load failed")
+					self.cancelLoad()
+				}
 			}
 		}
 		
@@ -89,7 +93,9 @@ extension ViewController {
 
 extension ViewController : GeoLoadingViewDelegate {
 	func finishLoad(loadedWorld: GeoWorld) {
-		print("Loaded world.")
+		regionOutline.world = loadedWorld
+		regionOutline.isHidden = false
+		regionOutline.reloadData()
 	}
 	
 	func cancelLoad() {

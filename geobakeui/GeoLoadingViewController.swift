@@ -24,9 +24,10 @@ class GeoLoadingViewController: NSViewController {
 			DispatchQueue.main.async {
 				self.chunkLabel.stringValue = "Loading \(chunkName)..."
 				self.progressMeter.doubleValue = p
-			}
-			if done {
-				self.dismiss(self)
+				
+				if done {
+					self.dismiss(self)
+				}
 			}
 		}
 	}
