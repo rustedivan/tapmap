@@ -8,9 +8,15 @@
 
 import AppKit
 
+protocol GeoLoadingViewDelegate {
+	func finishLoad(loadedWorld: GeoWorld)
+	func cancelLoad()
+}
+
 class GeoLoadingViewController: NSViewController {
 	@IBOutlet var progressMeter: NSProgressIndicator!
 	@IBOutlet var chunkLabel: NSTextField!
+	var delegate: GeoLoadingViewDelegate?
 	
 	var progressReporter: ProgressReport {
 		return { (p: Double, chunkName: String, done: Bool) in
@@ -26,6 +32,6 @@ class GeoLoadingViewController: NSViewController {
 	}
 	
 	@IBAction func cancelLoad(sender: NSButton) {
-		dismiss(self)
+		delegate?.cancelLoad()
 	}
 }
