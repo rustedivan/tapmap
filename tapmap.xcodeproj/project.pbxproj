@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		141F25C61EA4B29B00DA808F /* OperationBakeGeometry.swift in Sources */ = {isa = PBXBuildFile; fileRef = 141F25C51EA4B29B00DA808F /* OperationBakeGeometry.swift */; };
+		141F25C81EA4B3B800DA808F /* GeoBakingViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 141F25C71EA4B3B800DA808F /* GeoBakingViewController.swift */; };
 		1452103B1E98D4F30029942F /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1452103A1E98D4F30029942F /* AppDelegate.swift */; };
 		1452103D1E98D4F30029942F /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1452103C1E98D4F30029942F /* ViewController.swift */; };
 		1452103F1E98D4F30029942F /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 1452103E1E98D4F30029942F /* Assets.xcassets */; };
@@ -64,6 +66,8 @@
 		070EEB60FAEEE118A8A4F9C5 /* Pods-geobakeui.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-geobakeui.debug.xcconfig"; path = "Pods/Target Support Files/Pods-geobakeui/Pods-geobakeui.debug.xcconfig"; sourceTree = "<group>"; };
 		090767E27ECB3B219935FC22 /* Pods-tapmap-loading.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-tapmap-loading.release.xcconfig"; path = "Pods/Target Support Files/Pods-tapmap-loading/Pods-tapmap-loading.release.xcconfig"; sourceTree = "<group>"; };
 		128FFB8F786C71132FB1F443 /* Pods_tapmap.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_tapmap.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		141F25C51EA4B29B00DA808F /* OperationBakeGeometry.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = OperationBakeGeometry.swift; sourceTree = "<group>"; };
+		141F25C71EA4B3B800DA808F /* GeoBakingViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = GeoBakingViewController.swift; sourceTree = "<group>"; };
 		145210381E98D4F30029942F /* geobakeui.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = geobakeui.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		1452103A1E98D4F30029942F /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		1452103C1E98D4F30029942F /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
@@ -136,6 +140,7 @@
 				1452103A1E98D4F30029942F /* AppDelegate.swift */,
 				1452103C1E98D4F30029942F /* ViewController.swift */,
 				14B21D841E9FEA5200D27F1E /* GeoLoadingViewController.swift */,
+				141F25C71EA4B3B800DA808F /* GeoBakingViewController.swift */,
 				14F148A91EA383CC00D419AB /* RegionOutlineView.swift */,
 				14F148A61EA3830C00D419AB /* Background jobs */,
 				1452103E1E98D4F30029942F /* Assets.xcassets */,
@@ -217,6 +222,7 @@
 			isa = PBXGroup;
 			children = (
 				14FA8F0A1EA36D4000422644 /* OperationParseGeoJson.swift */,
+				141F25C51EA4B29B00DA808F /* OperationBakeGeometry.swift */,
 			);
 			name = "Background jobs";
 			sourceTree = "<group>";
@@ -542,6 +548,8 @@
 				1452104A1E98DB860029942F /* FeatureLoader.swift in Sources */,
 				14FA8F0B1EA36D4000422644 /* OperationParseGeoJson.swift in Sources */,
 				14B21D851E9FEA5200D27F1E /* GeoLoadingViewController.swift in Sources */,
+				141F25C61EA4B29B00DA808F /* OperationBakeGeometry.swift in Sources */,
+				141F25C81EA4B3B800DA808F /* GeoBakingViewController.swift in Sources */,
 				1452103B1E98D4F30029942F /* AppDelegate.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

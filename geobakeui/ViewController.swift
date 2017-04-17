@@ -13,14 +13,19 @@ import Dispatch
 class ViewController: NSViewController {
 	@IBOutlet var regionOutline : RegionOutlineView!
 	let loadQueue = OperationQueue()
+	let saveQueue = OperationQueue()
 	var loadJob : Operation?
+	var saveJob : Operation?
+	var workWorld: GeoWorld?
 	
 	override func viewDidAppear() {
 		loadQueue.name = "Json load queue"
 		loadQueue.qualityOfService = .userInitiated
+		saveQueue.name = "Geometry save queue"
+		saveQueue.qualityOfService = .userInitiated
 		regionOutline.isHidden = true
 		// Autoload or open file picker
-		if let autoUrl = tryAutobakeWithArgument(arguments: CommandLine.arguments) {
+		if let autoUrl = tryAutoloadWithArgument(arguments: CommandLine.arguments) {
 			asyncLoadJson(from: autoUrl)
 		} else {
 			let window = self.view.window!
@@ -37,7 +42,21 @@ class ViewController: NSViewController {
 		}
 	}
 	
-	func tryAutobakeWithArgument(arguments: [String]) -> URL? {
+	@IBAction func bakeGeometry(sender: NSButton) {
+		let window = self.view.window!
+		let panel = NSSavePanel()
+		panel.message = "Save pre-baked tapmap geometry"
+		panel.allowedFileTypes = ["geo"]
+		panel.beginSheetModal(for: window) { (result) in
+			if result == NSFileHandlingPanelOKButton {
+				if let url = panel.url {
+					self.asyncBakeGeometry(to: url)
+				}
+			}
+		}
+	}
+	
+	func tryAutoloadWithArgument(arguments: [String]) -> URL? {
 		for argument in arguments {
 			if argument.hasSuffix(".json") {
 				return Bundle.main.bundleURL
@@ -49,7 +68,7 @@ class ViewController: NSViewController {
 	}
 }
 
-extension ViewController {
+extension ViewController : GeoLoadingViewDelegate {
 	func startLoading() -> ProgressReport {
 		performSegue(withIdentifier: "ShowLoadingProgress", sender: self)
 		let loading = presentedViewControllers?.last as! GeoLoadingViewController
@@ -89,10 +108,9 @@ extension ViewController {
 		loadJob = jsonParser
 		loadQueue.addOperation(jsonParser)
 	}
-}
 
-extension ViewController : GeoLoadingViewDelegate {
 	func finishLoad(loadedWorld: GeoWorld) {
+		workWorld = loadedWorld
 		regionOutline.world = loadedWorld
 		regionOutline.isHidden = false
 		regionOutline.reloadData()
@@ -104,6 +122,46 @@ extension ViewController : GeoLoadingViewDelegate {
 		}
 		if let loadJob = loadJob {
 			loadJob.cancel()
+		}
+	}
+}
+
+extension ViewController : GeoBakingViewDelegate {
+	func startBaking() -> ProgressReport {
+		performSegue(withIdentifier: "ShowBakingProgress", sender: self)
+		let loading = presentedViewControllers?.last as! GeoLoadingViewController
+		loading.delegate = self
+		return loading.progressReporter
+	}
+	
+	func asyncBakeGeometry(to url: URL) {
+		let reporter = startLoading()
+		
+		let geometryBaker = OperationBakeGeometry(workWorld!, toUrl: url, reporter: reporter)
+		geometryBaker.completionBlock = {
+			guard !geometryBaker.isCancelled else { return }
+			guard geometryBaker.error == nil else {
+				print(String(describing: geometryBaker.error))
+				return
+			}
+			reporter(1.0, "Done", true)	// Close the baking panel
+			self.finishSave(saveUrl: geometryBaker.saveUrl)
+		}
+		
+		saveJob = geometryBaker
+		saveQueue.addOperation(geometryBaker)
+	}
+	
+	func finishSave(saveUrl toUrl: URL) {
+		print("Moved to \(toUrl)")
+	}
+	
+	func cancelSave() {
+		if let loading = presentedViewControllers?.last as? GeoLoadingViewController {
+			dismissViewController(loading)
+		}
+		if let saveJob = saveJob {
+			saveJob.cancel()
 		}
 	}
 }

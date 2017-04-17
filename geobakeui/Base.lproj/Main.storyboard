@@ -724,6 +724,48 @@ Gw
             </objects>
             <point key="canvasLocation" x="694" y="958"/>
         </scene>
+        <!--Geo Baking View Controller-->
+        <scene sceneID="7uv-fv-26Z">
+            <objects>
+                <viewController id="si8-Az-I0n" customClass="GeoBakingViewController" customModule="geobakeui" customModuleProvider="target" sceneMemberID="viewController">
+                    <view key="view" id="7bu-22-85l">
+                        <rect key="frame" x="0.0" y="0.0" width="386" height="124"/>
+                        <autoresizingMask key="autoresizingMask"/>
+                        <subviews>
+                            <button verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="DJx-Sa-exh">
+                                <rect key="frame" x="290" y="13" width="82" height="32"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                <buttonCell key="cell" type="push" title="Cancel" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="RPf-e0-V3A">
+                                    <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                                    <font key="font" metaFont="system"/>
+                                    <string key="keyEquivalent" base64-UTF8="YES">
+Gw
+</string>
+                                </buttonCell>
+                                <connections>
+                                    <action selector="cancelLoadWithSender:" target="Gvy-J6-3Yu" id="xGM-6x-Ozd"/>
+                                </connections>
+                            </button>
+                            <progressIndicator wantsLayer="YES" fixedFrame="YES" maxValue="1" style="bar" translatesAutoresizingMaskIntoConstraints="NO" id="g1n-UL-Zuy">
+                                <rect key="frame" x="20" y="60" width="346" height="20"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                            </progressIndicator>
+                            <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" allowsCharacterPickerTouchBarItem="NO" translatesAutoresizingMaskIntoConstraints="NO" id="xxk-fZ-mgs">
+                                <rect key="frame" x="18" y="87" width="164" height="17"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" placeholderString="" id="tIl-fw-pkL">
+                                    <font key="font" metaFont="system"/>
+                                    <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
+                                    <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                                </textFieldCell>
+                            </textField>
+                        </subviews>
+                    </view>
+                </viewController>
+                <customObject id="UpW-dZ-MZT" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="694" y="1179"/>
+        </scene>
         <!--View Controller-->
         <scene sceneID="hIz-AP-VOD">
             <objects>
@@ -794,6 +836,9 @@ Gw
                                     <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                     <font key="font" metaFont="system"/>
                                 </buttonCell>
+                                <connections>
+                                    <action selector="bakeGeometryWithSender:" target="XfG-lQ-9wD" id="msv-Pl-Mbc"/>
+                                </connections>
                             </button>
                         </subviews>
                         <constraints>
@@ -808,6 +853,7 @@ Gw
                     <connections>
                         <outlet property="regionOutline" destination="ybe-l2-6gD" id="NIt-Sq-4CM"/>
                         <segue destination="Gvy-J6-3Yu" kind="sheet" identifier="ShowLoadingProgress" id="bll-pz-C2a"/>
+                        <segue destination="si8-Az-I0n" kind="sheet" identifier="ShowBakingProgress" id="KfE-kn-bNt"/>
                     </connections>
                 </viewController>
                 <customObject id="rPt-NT-nkU" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
