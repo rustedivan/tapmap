@@ -774,7 +774,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = B5EDA10E7FBDF4C49D54D44B /* Pods-tapmapTests.debug.xcconfig */;
 			buildSettings = {
-				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = "$(inherited)";
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				DEVELOPMENT_TEAM = Y4JDRD37Q9;
 				INFOPLIST_FILE = tapmapTests/Info.plist;
@@ -790,7 +790,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 72AC77BD73CAE3DA469470B7 /* Pods-tapmapTests.release.xcconfig */;
 			buildSettings = {
-				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = "$(inherited)";
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				DEVELOPMENT_TEAM = Y4JDRD37Q9;
 				INFOPLIST_FILE = tapmapTests/Info.plist;

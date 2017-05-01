@@ -1,12 +1,19 @@
 PODS:
+  - LibTessSwift (0.6.2)
   - SwiftyJSON (3.1.4)
 
 DEPENDENCIES:
+  - LibTessSwift (from `~/Development/LibTessSwift`)
   - SwiftyJSON
 
+EXTERNAL SOURCES:
+  LibTessSwift:
+    :path: "~/Development/LibTessSwift"
+
 SPEC CHECKSUMS:
+  LibTessSwift: d9f10d518b81410dabac17e66e7bb59980d784bd
   SwiftyJSON: c2842d878f95482ffceec5709abc3d05680c0220
 
-PODFILE CHECKSUM: 0b051c796b60a471d5c90233cfef749bc3d8f55d
+PODFILE CHECKSUM: 48bb0cf5b377478b6d3079c9b1837fa0900e92db
 
 COCOAPODS: 1.2.0
