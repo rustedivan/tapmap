@@ -39,7 +39,7 @@ class GameViewController: GLKViewController {
 	override func viewDidLoad() {
 		super.viewDidLoad()
 		let path = Bundle.main.url(forResource: "features", withExtension: "json")!
-		geoWorld = loadFeatureJson(url: path)
+		geoWorld = GeoWorld(continents: []) //loadFeatureJson(url: path)
 
 		self.context = EAGLContext(api: .openGLES2)
 		

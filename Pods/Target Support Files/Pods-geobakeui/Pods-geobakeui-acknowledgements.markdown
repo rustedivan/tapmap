@@ -1,11 +1,9 @@
 # Acknowledgements
 This application makes use of the following third party libraries:
 
-## SwiftyJSON
+## LibTessSwift
 
-The MIT License (MIT)
-
-Copyright (c) 2016 Ruoyu Fu
+Copyright (c) 2017 LuizZak <luizinho_mack@yahoo.com.br>
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -26,9 +24,11 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 
 
-## LibTessSwift
+## SwiftyJSON
 
-Copyright (c) 2017 LuizZak <luizinho_mack@yahoo.com.br>
+The MIT License (MIT)
+
+Copyright (c) 2016 Ruoyu Fu
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal

@@ -20,9 +20,12 @@ struct GeoColors {
 	}
 }
 
-
 struct Vertex {
 	let v: (Float, Float)
+}
+
+struct Triangle {
+	let i: (Int, Int, Int)
 }
 
 typealias VertexRange = (start: UInt32, count: UInt32)
@@ -45,4 +48,9 @@ struct GeoContinent {
 
 struct GeoWorld {
 	let continents: [GeoContinent]
+}
+
+// TODO: replace GeoFeature's vertexRange with this index list
+struct GeoTesselation {
+	let triangles: [Triangle]
 }

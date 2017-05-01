@@ -1,0 +1,6 @@
+framework module Pods_geobakeuiTests {
+  umbrella header "Pods-geobakeuiTests-umbrella.h"
+
+  export *
+  module * { export * }
+}

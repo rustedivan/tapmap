@@ -5,11 +5,8 @@ target 'tapmap' do
   use_frameworks!
 
   # Pods for tapmap
-  pod 'SwiftyJSON'
-
   target 'tapmapTests' do
     inherit! :search_paths
-		pod 'LibTessSwift', :path => '~/Development/LibTessSwift'
   end
 end	
 
@@ -18,4 +15,7 @@ target 'geobakeui' do
 
   pod 'SwiftyJSON'
   pod 'LibTessSwift', :path => '~/Development/LibTessSwift'
+	target 'geobakeuiTests' do
+		inherit! :search_paths
+	end
 end
