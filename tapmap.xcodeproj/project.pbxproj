@@ -32,6 +32,8 @@
 		14B74E731E8FCF5E00849BB5 /* FeatureLoaderTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14B74E721E8FCF5E00849BB5 /* FeatureLoaderTests.swift */; };
 		14E0288D1EB7332900B4D515 /* geobakeuiTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14E0288C1EB7332900B4D515 /* geobakeuiTests.swift */; };
 		14E028941EB7359400B4D515 /* OperationTesselateBorders.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14E09E6A1EB71AF000468792 /* OperationTesselateBorders.swift */; };
+		14E028951EB7374900B4D515 /* GeoRegion.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14B74E5D1E8F9C1100849BB5 /* GeoRegion.swift */; };
+		14E028961EB7377200B4D515 /* FeatureLoader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14B74E5A1E8F9ACB00849BB5 /* FeatureLoader.swift */; };
 		14E09E6B1EB71AF000468792 /* OperationTesselateBorders.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14E09E6A1EB71AF000468792 /* OperationTesselateBorders.swift */; };
 		14E09E6F1EB722CA00468792 /* GeoRegion.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14B74E5D1E8F9C1100849BB5 /* GeoRegion.swift */; };
 		14F148AA1EA383CC00D419AB /* RegionOutlineView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14F148A91EA383CC00D419AB /* RegionOutlineView.swift */; };
@@ -701,6 +703,8 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				14E028951EB7374900B4D515 /* GeoRegion.swift in Sources */,
+				14E028961EB7377200B4D515 /* FeatureLoader.swift in Sources */,
 				14E028941EB7359400B4D515 /* OperationTesselateBorders.swift in Sources */,
 				14E0288D1EB7332900B4D515 /* geobakeuiTests.swift in Sources */,
 			);
@@ -1024,6 +1028,7 @@
 				14E028931EB7332900B4D515 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};
