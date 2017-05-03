@@ -27,28 +27,45 @@ class OperationTesselateBorders : Operation {
 	}
 }
 
-func tesselate(range: VertexRange, ofVertices vertices: [Vertex]) -> [Int] {
+func tesselate(region: GeoRegion, continentVertices vertices: [Vertex]) -> GeoTesselation? {
 	guard let tess = TessC() else {
 		print("Could not init TessC")
-		return []
+		return nil
 	}
 	
-	let vs = vertices[Int(range.start) ..< Int(range.start + range.count)]
-	
-	let contour = vs.map {
-		CVector3(x: $0.v.0, y: $0.v.1, z: 0.0)
+	for feature in region.features {
+		let contour : [CVector3]
+		do {
+			let start : Int = Int(feature.vertexRange.start)
+			let end : Int = start + Int(feature.vertexRange.count)
+			let vs = vertices[start ..< end]
+			contour = vs.map {
+				CVector3(x: $0.v.0, y: $0.v.1, z: 0.0)
+			}
+		}
+		tess.addContour(contour)
 	}
 	
-	tess.addContour(contour)
 	do {
 		let t = try tess.tessellate(windingRule: .evenOdd,
 		                    elementType: ElementType.polygons,
 		                    polySize: 3,
 												vertexSize: .vertex2)
-		print(t)
-		return t.indices
+		let regionVertices = t.vertices.map {
+			Vertex(v: ($0.x, $0.y))
+		}
+		let indices = t.indices.map { UInt32($0) }
+		let aabb = regionVertices.reduce(Aabb()) { aabb, v in
+			let out = Aabb(loX: min(v.v.0, aabb.minX),
+			               loY: min(v.v.1, aabb.minY),
+			               hiX: max(v.v.0, aabb.maxX),
+			               hiY: max(v.v.1, aabb.maxY))
+			return out
+		}
+		
+		return GeoTesselation(vertices: regionVertices, indices: indices, aabb: aabb)
 	} catch (let e) {
 		print(e)
-		return []
+		return nil
 	}
 }

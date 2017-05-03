@@ -18,14 +18,14 @@ class GeoContinentRenderer {
 		glGenBuffers(1, &vertexBuffer)
 		glBindBuffer(GLenum(GL_ARRAY_BUFFER), vertexBuffer)
 		
-		var verticesCopy = continent.vertices
+		var verticesCopy = continent.borderVertices
 		glBufferData(GLenum(GL_ARRAY_BUFFER),
 								 GLsizeiptr(MemoryLayout<Vertex>.size * verticesCopy.count),
 								 &verticesCopy,
 								 GLenum(GL_STATIC_DRAW))
 		
 		// Linear index array for now until we tesselate regions
-		var indicesCopy = Array(0..<GLuint(continent.vertices.count))
+		var indicesCopy = Array(0..<GLuint(continent.borderVertices.count))
 		glGenBuffers(1, &indexBuffer)
 		glBindBuffer(GLenum(GL_ELEMENT_ARRAY_BUFFER), indexBuffer)
 		glBufferData(GLenum(GL_ELEMENT_ARRAY_BUFFER),

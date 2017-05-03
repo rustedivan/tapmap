@@ -54,12 +54,13 @@ class OperationParseGeoJson : Operation {
 				
 				let region = GeoRegion(name: regionName,
 				                       color: GeoColors.randomColor(),
-				                       features: loadedFeatures)
+				                       features: loadedFeatures,
+				                       tesselation: nil)
 				loadedRegions.append(region)
 			}
 			
 			let loadedContinent = GeoContinent(name: continentName,
-			                                   vertices: continentVertices,
+			                                   borderVertices: continentVertices,
 			                                   regions: loadedRegions)
 			loadedContinents.append(loadedContinent)
 			report(Double(loadedContinents.count) / Double(numContinents), continentName, false)

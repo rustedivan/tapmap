@@ -48,12 +48,13 @@ func parseFeatureJson(_ json: JSON, progressReporter: ProgressReport) -> GeoWorl
 			
 			let region = GeoRegion(name: regionName,
 			                       color: GeoColors.randomColor(),
-			                       features: loadedFeatures)
+			                       features: loadedFeatures,
+			                       tesselation: nil)
 			loadedRegions.append(region)
 		}
 		
 		let loadedContinent = GeoContinent(name: continentName,
-		                                   vertices: continentVertices,
+		                                   borderVertices: continentVertices,
 		                                   regions: loadedRegions)
 		loadedContinents.append(loadedContinent)
 		progressReporter(Double(loadedContinents.count) / Double(numContinents), continentName, false)

@@ -11,7 +11,6 @@ import Foundation
 typealias GeoColor = (r: Float, g: Float, b: Float)
 
 struct GeoColors {
-	
 	static func randomColor() -> GeoColor {
 		let r = Float(arc4random_uniform(100)) / 100.0
 		let g = Float(arc4random_uniform(100)) / 100.0
@@ -28,6 +27,34 @@ struct Triangle {
 	let i: (Int, Int, Int)
 }
 
+struct Aabb : Equatable {
+	let minX : Float
+	let minY : Float
+	let maxX : Float
+	let maxY : Float
+	
+	init() {
+		minX = .greatestFiniteMagnitude
+		minY = .greatestFiniteMagnitude
+		maxX = -.greatestFiniteMagnitude
+		maxY = -.greatestFiniteMagnitude
+	}
+	
+	init(loX : Float, loY : Float, hiX : Float, hiY : Float) {
+		minX = loX
+		minY = loY
+		maxX = hiX
+		maxY = hiY
+	}
+	
+	static func ==(lhs: Aabb, rhs: Aabb) -> Bool {
+		return	lhs.minX == rhs.minX &&
+						lhs.maxX == rhs.maxX &&
+						lhs.minY == rhs.minY &&
+						lhs.maxY == rhs.maxY
+	}
+}
+
 typealias VertexRange = (start: UInt32, count: UInt32)
 
 struct GeoFeature {
@@ -38,19 +65,25 @@ struct GeoRegion {
 	let name: String
 	let color: GeoColor
 	let features: [GeoFeature]
+	let tesselation: GeoTesselation?
+	
+	static func addTesselation(region: GeoRegion, tesselation: GeoTesselation) -> GeoRegion {
+		return GeoRegion(name: region.name, color: region.color, features: region.features, tesselation: tesselation)
+	}
+}
+
+struct GeoTesselation {
+	let vertices: [Vertex]
+	let indices: [UInt32]
+	let aabb: Aabb
 }
 
 struct GeoContinent {
 	let name: String
-	let vertices: [Vertex]
+	let borderVertices: [Vertex]
 	let regions: [GeoRegion]
 }
 
 struct GeoWorld {
 	let continents: [GeoContinent]
-}
-
-// TODO: replace GeoFeature's vertexRange with this index list
-struct GeoTesselation {
-	let triangles: [Triangle]
 }

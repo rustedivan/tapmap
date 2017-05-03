@@ -8,7 +8,6 @@
 
 import GLKit
 import OpenGLES
-import SwiftyJSON
 
 func BUFFER_OFFSET(_ i: UInt32) -> UnsafeRawPointer? {
 	return UnsafeRawPointer(bitPattern: Int(i))
@@ -38,7 +37,7 @@ class GameViewController: GLKViewController {
 	
 	override func viewDidLoad() {
 		super.viewDidLoad()
-		let path = Bundle.main.url(forResource: "features", withExtension: "json")!
+// TODO		let path = Bundle.main.url(forResource: "features", withExtension: "json")!
 		geoWorld = GeoWorld(continents: []) //loadFeatureJson(url: path)
 
 		self.context = EAGLContext(api: .openGLES2)

@@ -22,7 +22,7 @@ class RegionOutlineView: NSOutlineView, NSOutlineViewDataSource, NSOutlineViewDe
 			if tableColumn?.identifier == "Region" {
 				return item.name
 			} else if tableColumn?.identifier == "Vertices" {
-				return "\(item.vertices.count) vertices"
+				return "\(item.borderVertices.count) vertices"
 			}
 		} else if let item = item as? GeoRegion {
 			if tableColumn?.identifier == "Region" {

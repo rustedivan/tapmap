@@ -1,6 +1,4 @@
 # Geobaking
-- present load result in tree view
-- enable geobaking button
-- open save panel
-- run geobake as operation job
-- dump to file
+
+# Correctness
+- make all geography types conform to Equatable
