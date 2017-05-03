@@ -49,7 +49,7 @@ func parseFeatureJson(_ json: JSON, progressReporter: ProgressReport) -> GeoWorl
 			let region = GeoRegion(name: regionName,
 			                       color: GeoColors.randomColor(),
 			                       features: loadedFeatures,
-			                       tesselation: nil)
+			                       tessellation: nil)
 			loadedRegions.append(region)
 		}
 		

@@ -65,14 +65,14 @@ struct GeoRegion {
 	let name: String
 	let color: GeoColor
 	let features: [GeoFeature]
-	let tesselation: GeoTesselation?
+	let tessellation: GeoTessellation?
 	
-	static func addTesselation(region: GeoRegion, tesselation: GeoTesselation) -> GeoRegion {
-		return GeoRegion(name: region.name, color: region.color, features: region.features, tesselation: tesselation)
+	static func addtessellation(region: GeoRegion, tessellation: GeoTessellation) -> GeoRegion {
+		return GeoRegion(name: region.name, color: region.color, features: region.features, tessellation: tessellation)
 	}
 }
 
-struct GeoTesselation {
+struct GeoTessellation {
 	let vertices: [Vertex]
 	let indices: [UInt32]
 	let aabb: Aabb

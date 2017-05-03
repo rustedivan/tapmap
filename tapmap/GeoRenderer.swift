@@ -24,7 +24,7 @@ class GeoContinentRenderer {
 								 &verticesCopy,
 								 GLenum(GL_STATIC_DRAW))
 		
-		// Linear index array for now until we tesselate regions
+		// Linear index array for now until we tessellate regions
 		var indicesCopy = Array(0..<GLuint(continent.borderVertices.count))
 		glGenBuffers(1, &indexBuffer)
 		glBindBuffer(GLenum(GL_ELEMENT_ARRAY_BUFFER), indexBuffer)

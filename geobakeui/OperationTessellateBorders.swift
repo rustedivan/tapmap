@@ -1,5 +1,5 @@
 //
-//  OperationTesselateBorders.swift
+//  OperationTessellateBorders.swift
 //  tapmap
 //
 //  Created by Ivan Milles on 2017-05-01.
@@ -10,13 +10,13 @@ import Foundation
 import LibTessSwift
 import simd
 
-class OperationTesselateBorders : Operation {
+class OperationTessellateBorders : Operation {
 	let world : GeoWorld
 	let report : ProgressReport
 	var error : Error?
 	
-	init(_ worldToTesselate: GeoWorld, reporter: @escaping ProgressReport) {
-		world = worldToTesselate
+	init(_ worldToTessellate: GeoWorld, reporter: @escaping ProgressReport) {
+		world = worldToTessellate
 		report = reporter
 		
 		super.init()
@@ -27,7 +27,7 @@ class OperationTesselateBorders : Operation {
 	}
 }
 
-func tesselate(region: GeoRegion, continentVertices vertices: [Vertex]) -> GeoTesselation? {
+func tessellate(region: GeoRegion, continentVertices vertices: [Vertex]) -> GeoTessellation? {
 	guard let tess = TessC() else {
 		print("Could not init TessC")
 		return nil
@@ -63,7 +63,7 @@ func tesselate(region: GeoRegion, continentVertices vertices: [Vertex]) -> GeoTe
 			return out
 		}
 		
-		return GeoTesselation(vertices: regionVertices, indices: indices, aabb: aabb)
+		return GeoTessellation(vertices: regionVertices, indices: indices, aabb: aabb)
 	} catch (let e) {
 		print(e)
 		return nil

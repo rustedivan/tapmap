@@ -55,7 +55,7 @@ class OperationParseGeoJson : Operation {
 				let region = GeoRegion(name: regionName,
 				                       color: GeoColors.randomColor(),
 				                       features: loadedFeatures,
-				                       tesselation: nil)
+				                       tessellation: nil)
 				loadedRegions.append(region)
 			}
 			
