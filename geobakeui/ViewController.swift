@@ -127,17 +127,17 @@ extension ViewController : GeoLoadingViewDelegate {
 }
 
 extension ViewController : GeoBakingViewDelegate {
-	func startBaking() -> ProgressReport {
+	func startBaking() -> (ProgressReport, ErrorReport) {
 		performSegue(withIdentifier: "ShowBakingProgress", sender: self)
-		let loading = presentedViewControllers?.last as! GeoLoadingViewController
-		loading.delegate = self
-		return loading.progressReporter
+		let baking = presentedViewControllers?.last as! GeoBakingViewController
+		baking.delegate = self
+		return (baking.progressReporter, baking.errorReporter)
 	}
 	
 	func asyncBakeGeometry(to url: URL) {
-		let reporter = startLoading()
-		
-		let geometryBaker = OperationBakeGeometry(workWorld!, toUrl: url, reporter: reporter)
+		let (reporter, errorReporter) = startBaking()
+
+		let geometryBaker = OperationBakeGeometry(workWorld!, toUrl: url, reporter: reporter, errorReporter: errorReporter)
 		geometryBaker.completionBlock = {
 			guard !geometryBaker.isCancelled else { return }
 			guard geometryBaker.error == nil else {
@@ -157,8 +157,8 @@ extension ViewController : GeoBakingViewDelegate {
 	}
 	
 	func cancelSave() {
-		if let loading = presentedViewControllers?.last as? GeoLoadingViewController {
-			dismissViewController(loading)
+		if let baking = presentedViewControllers?.last as? GeoBakingViewController {
+			dismissViewController(baking)
 		}
 		if let saveJob = saveJob {
 			saveJob.cancel()

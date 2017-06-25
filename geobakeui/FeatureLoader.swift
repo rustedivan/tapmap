@@ -11,6 +11,7 @@ import SwiftyJSON
 import AppKit
 
 typealias ProgressReport = (Double, String, Bool) -> ()
+typealias ErrorReport = (String, String) -> ()
 
 func loadJsonFile(url: URL) -> JSON {
 	let jsonData = NSData(contentsOf: url)

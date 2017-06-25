@@ -13,10 +13,12 @@ protocol GeoBakingViewDelegate {
 	func cancelSave()
 }
 
-class GeoBakingViewController: NSViewController {
+class GeoBakingViewController: NSViewController, NSTableViewDataSource {
 	@IBOutlet var progressMeter: NSProgressIndicator!
 	@IBOutlet var chunkLabel: NSTextField!
+	@IBOutlet var warningList: NSTableView!
 	var delegate: GeoBakingViewDelegate?
+	var warnings: [(String, String)] = []
 	
 	var progressReporter: ProgressReport {
 		return { (p: Double, chunkName: String, done: Bool) in
@@ -31,6 +33,28 @@ class GeoBakingViewController: NSViewController {
 			}
 		}
 	}
+	
+	var errorReporter: ErrorReport {
+		return { (region: String, reason: String) in
+			self.warnings.append((region, reason))
+			// Progress updates on UI thread
+			DispatchQueue.main.async {
+				self.warningList.reloadData()
+			}
+		}
+	}
+	
+	func numberOfRows(in tableView: NSTableView) -> Int {
+		return warnings.count
+	}
+	
+	func tableView(_ tableView: NSTableView, objectValueFor tableColumn: NSTableColumn?, row: Int) -> Any? {
+		let warning = warnings[row]
+		if tableColumn?.identifier == "Region" { return warning.0 }
+		if tableColumn?.identifier == "Warning" { return warning.1 }
+		return nil
+	}
+
 	
 	@IBAction func cancelSave(sender: NSButton) {
 		delegate?.cancelSave()

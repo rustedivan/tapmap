@@ -13,17 +13,32 @@ import simd
 class OperationTessellateBorders : Operation {
 	let world : GeoWorld
 	let report : ProgressReport
+	let reportError : ErrorReport
 	var error : Error?
 	
-	init(_ worldToTessellate: GeoWorld, reporter: @escaping ProgressReport) {
+	init(_ worldToTessellate: GeoWorld, reporter: @escaping ProgressReport, errorReporter: @escaping ErrorReport) {
 		world = worldToTessellate
 		report = reporter
+		reportError = errorReporter
 		
 		super.init()
 	}
 	
 	override func main() {
 		guard !isCancelled else { print("Cancelled before starting"); return }
+		
+		var totalTris = 0
+		
+		for continent in world.continents {
+			for region in continent.regions {
+				if let tessellation = tessellate(region: region, continentVertices: continent.borderVertices) {
+					totalTris += tessellation.vertices.count
+					report(0.3, "Tesselated \(region.name) (total \(totalTris) triangles", false)
+				} else {
+					reportError(region.name, "Tesselation failed")
+				}
+			}
+		}
 	}
 }
 
@@ -64,8 +79,7 @@ func tessellate(region: GeoRegion, continentVertices vertices: [Vertex]) -> GeoT
 		}
 		
 		return GeoTessellation(vertices: regionVertices, indices: indices, aabb: aabb)
-	} catch (let e) {
-		print(e)
+	} catch {
 		return nil
 	}
 }
