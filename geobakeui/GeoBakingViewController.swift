@@ -9,7 +9,6 @@
 import Cocoa
 
 protocol GeoBakingViewDelegate {
-	func finishSave(saveUrl toUrl: URL)
 	func cancelSave()
 }
 

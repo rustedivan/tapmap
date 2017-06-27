@@ -137,7 +137,7 @@ extension ViewController : GeoBakingViewDelegate {
 	func asyncBakeGeometry(to url: URL) {
 		let (reporter, errorReporter) = startBaking()
 
-		let geometryBaker = OperationBakeGeometry(workWorld!, toUrl: url, reporter: reporter, errorReporter: errorReporter)
+		let geometryBaker = OperationBakeGeometry(workWorld!, reporter: reporter, errorReporter: errorReporter)
 		geometryBaker.completionBlock = {
 			guard !geometryBaker.isCancelled else { return }
 			guard geometryBaker.error == nil else {
@@ -145,15 +145,19 @@ extension ViewController : GeoBakingViewDelegate {
 				return
 			}
 			reporter(1.0, "Done", true)	// Close the baking panel
-			self.finishSave(saveUrl: geometryBaker.saveUrl)
+			self.finishSave(tempUrl: geometryBaker.tempUrl, saveUrl: url)
 		}
 		
 		saveJob = geometryBaker
 		saveQueue.addOperation(geometryBaker)
 	}
 	
-	func finishSave(saveUrl toUrl: URL) {
-		print("Moved to \(toUrl)")
+	func finishSave(tempUrl fromUrl: URL, saveUrl toUrl: URL) {
+		do {
+			try FileManager.default.moveItem(at: fromUrl, to: toUrl)
+		} catch (let e) {
+			print(e)
+		}
 	}
 	
 	func cancelSave() {

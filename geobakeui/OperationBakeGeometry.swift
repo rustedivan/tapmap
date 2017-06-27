@@ -10,18 +10,16 @@ import Foundation
 
 class OperationBakeGeometry : Operation {
 	let world : GeoWorld
-	let saveUrl : URL
 	let tempUrl : URL
 	let report : ProgressReport
 	let reportError : ErrorReport
 	var error : Error?
 	
-	init(_ worldToBake: GeoWorld, toUrl url: URL,
+	init(_ worldToBake: GeoWorld,
 	     reporter: @escaping ProgressReport,
 	     errorReporter: @escaping ErrorReport) {
 		world = worldToBake
-		tempUrl = FileManager.default.temporaryDirectory.appendingPathComponent(url.lastPathComponent)
-		saveUrl = url
+		tempUrl = FileManager.default.temporaryDirectory.appendingPathComponent("tapmap-geobake.geometry")
 		report = reporter
 		reportError = errorReporter
 		
@@ -31,26 +29,20 @@ class OperationBakeGeometry : Operation {
 	override func main() {
 		guard !isCancelled else { print("Cancelled before starting"); return }
 		
-		// $ Tesselate world while reporting progress
 		let tessQueue = OperationQueue()
 		tessQueue.name = "Tessellation queue"
 		let tessJob = OperationTessellateBorders(world, reporter: report, errorReporter: reportError)
 		
 		tessJob.start()
 		report(1.0, "Finished tesselation.", true)
-//		let didWrite = NSKeyedArchiver.archiveRootObject(world, toFile: tempUrl.path)
-//		guard didWrite else { print("Save failed"); return }
-//		
-		do {
-			try FileManager.default.moveItem(at: tempUrl, to: saveUrl)
-		} catch (let e) {
-			error = e
-			return
-		}
+		
+		let worldWrapper = GeoWorldFileWrapper(world: world)
+		let didWrite = NSKeyedArchiver.archiveRootObject(worldWrapper, toFile: tempUrl.path)
+		guard didWrite else { print("Save failed"); return }
 	}
 }
 
-class GeoWorldFileWrapper : NSCoding {
+class GeoWorldFileWrapper : NSObject, NSCoding {
 	let wrappedWorld: GeoWorld
 	init(world: GeoWorld) {
 		wrappedWorld = world
@@ -61,6 +53,6 @@ class GeoWorldFileWrapper : NSCoding {
 	}
 	
 	func encode(with aCoder: NSCoder) {
-		
+		aCoder.encode(wrappedWorld)
 	}
 }
