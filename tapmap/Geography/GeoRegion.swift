@@ -67,7 +67,7 @@ struct GeoRegion {
 	let features: [GeoFeature]
 	let tessellation: GeoTessellation?
 	
-	static func addtessellation(region: GeoRegion, tessellation: GeoTessellation) -> GeoRegion {
+	static func addTessellation(region: GeoRegion, tessellation: GeoTessellation) -> GeoRegion {
 		return GeoRegion(name: region.name, color: region.color, features: region.features, tessellation: tessellation)
 	}
 }

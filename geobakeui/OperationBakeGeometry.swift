@@ -36,23 +36,15 @@ class OperationBakeGeometry : Operation {
 		tessJob.start()
 		report(1.0, "Finished tesselation.", true)
 		
-		let worldWrapper = GeoWorldFileWrapper(world: world)
-		let didWrite = NSKeyedArchiver.archiveRootObject(worldWrapper, toFile: tempUrl.path)
-		guard didWrite else { print("Save failed"); return }
-	}
-}
-
-class GeoWorldFileWrapper : NSObject, NSCoding {
-	let wrappedWorld: GeoWorld
-	init(world: GeoWorld) {
-		wrappedWorld = world
-	}
-	
-	required init?(coder aDecoder: NSCoder) {
-		wrappedWorld = GeoWorld(continents: [])
-	}
-	
-	func encode(with aCoder: NSCoder) {
-		aCoder.encode(wrappedWorld)
+		if let encoded = world.encoded {
+			let didWrite = NSKeyedArchiver.archiveRootObject(encoded, toFile: tempUrl.path)
+			guard didWrite else { print("Save failed"); return }
+		} else {
+			print("Encoding failed")
+		}
+		
+		let loadedWorldCoding = NSKeyedUnarchiver.unarchiveObject(withFile: tempUrl.path) as? GeoWorld.Coding
+		let loadedWorld = loadedWorldCoding?.decoded as? GeoWorld
+		print("\(String(describing: loadedWorld))")
 	}
 }
