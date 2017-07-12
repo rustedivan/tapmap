@@ -144,8 +144,9 @@ extension ViewController : GeoBakingViewDelegate {
 				print(String(describing: geometryBaker.error))
 				return
 			}
-			reporter(1.0, "Done", true)	// Close the baking panel
+			reporter(0.9, "Saving...", false)
 			self.finishSave(tempUrl: geometryBaker.tempUrl, saveUrl: url)
+			reporter(1.0, "Done", true)	// Close the baking panel
 		}
 		
 		saveJob = geometryBaker
@@ -154,6 +155,13 @@ extension ViewController : GeoBakingViewDelegate {
 	
 	func finishSave(tempUrl fromUrl: URL, saveUrl toUrl: URL) {
 		do {
+			if FileManager.default.fileExists(atPath: toUrl.path) {
+				do {
+					try FileManager.default.removeItem(at: toUrl)
+				} catch (let e) {
+					print(e)
+				}
+			}
 			try FileManager.default.moveItem(at: fromUrl, to: toUrl)
 		} catch (let e) {
 			print(e)

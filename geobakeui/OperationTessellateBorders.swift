@@ -11,7 +11,7 @@ import LibTessSwift
 import simd
 
 class OperationTessellateBorders : Operation {
-	let world : GeoWorld
+	var world : GeoWorld
 	let report : ProgressReport
 	let reportError : ErrorReport
 	var error : Error?
@@ -29,16 +29,23 @@ class OperationTessellateBorders : Operation {
 		
 		var totalTris = 0
 		
-		for continent in world.continents {
-			for region in continent.regions {
+		let tessellatedContinents = world.continents.map { continent -> GeoContinent in
+			let tessellatedRegions = continent.regions.map { region -> GeoRegion in
 				if let tessellation = tessellate(region: region, continentVertices: continent.borderVertices) {
 					totalTris += tessellation.vertices.count
 					report(0.3, "Tesselated \(region.name) (total \(totalTris) triangles", false)
+					return GeoRegion.addTessellation(region: region, tessellation: tessellation)
 				} else {
 					reportError(region.name, "Tesselation failed")
+					return region
 				}
 			}
+			return GeoContinent(name: continent.name,
+			                    borderVertices: continent.borderVertices,
+			                    regions: tessellatedRegions)
 		}
+		world = GeoWorld(continents: tessellatedContinents)
+		print("Tessellated \(totalTris) triangles")
 	}
 }
 
@@ -83,3 +90,5 @@ func tessellate(region: GeoRegion, continentVertices vertices: [Vertex]) -> GeoT
 		return nil
 	}
 }
+
+

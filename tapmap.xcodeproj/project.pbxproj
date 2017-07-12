@@ -10,11 +10,11 @@
 		141F25C61EA4B29B00DA808F /* OperationBakeGeometry.swift in Sources */ = {isa = PBXBuildFile; fileRef = 141F25C51EA4B29B00DA808F /* OperationBakeGeometry.swift */; };
 		141F25C81EA4B3B800DA808F /* GeoBakingViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 141F25C71EA4B3B800DA808F /* GeoBakingViewController.swift */; };
 		143D06281F0811450002D3C3 /* Serialization.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1469F5C61F02F5F4008A37B3 /* Serialization.swift */; };
+		144AB4521F16401A00FE55BC /* countries.geo in Resources */ = {isa = PBXBuildFile; fileRef = 144AB4511F16401A00FE55BC /* countries.geo */; };
 		1452103B1E98D4F30029942F /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1452103A1E98D4F30029942F /* AppDelegate.swift */; };
 		1452103D1E98D4F30029942F /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1452103C1E98D4F30029942F /* ViewController.swift */; };
 		1452103F1E98D4F30029942F /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 1452103E1E98D4F30029942F /* Assets.xcassets */; };
 		145210421E98D4F30029942F /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 145210401E98D4F30029942F /* Main.storyboard */; };
-		145210491E98D61D0029942F /* features.json in Copy Files */ = {isa = PBXBuildFile; fileRef = 146A792A1E8F931300E2EE20 /* features.json */; };
 		1452104A1E98DB860029942F /* FeatureLoader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14B74E5A1E8F9ACB00849BB5 /* FeatureLoader.swift */; };
 		1452104B1E98DB8A0029942F /* GeoRegion.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14B74E5D1E8F9C1100849BB5 /* GeoRegion.swift */; };
 		1469F5C71F02F5F4008A37B3 /* Serialization.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1469F5C61F02F5F4008A37B3 /* Serialization.swift */; };
@@ -27,10 +27,8 @@
 		146A79121E8F912500E2EE20 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 146A79111E8F912500E2EE20 /* Assets.xcassets */; };
 		146A79151E8F912500E2EE20 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 146A79131E8F912500E2EE20 /* LaunchScreen.storyboard */; };
 		146A79201E8F912500E2EE20 /* tapmapTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 146A791F1E8F912500E2EE20 /* tapmapTests.swift */; };
-		146A792B1E8F931300E2EE20 /* features.json in Resources */ = {isa = PBXBuildFile; fileRef = 146A792A1E8F931300E2EE20 /* features.json */; };
 		14B21D851E9FEA5200D27F1E /* GeoLoadingViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14B21D841E9FEA5200D27F1E /* GeoLoadingViewController.swift */; };
 		14B74E5E1E8F9C1100849BB5 /* GeoRegion.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14B74E5D1E8F9C1100849BB5 /* GeoRegion.swift */; };
-		14B74E5F1E8FA6FD00849BB5 /* features.json in Resources */ = {isa = PBXBuildFile; fileRef = 146A792A1E8F931300E2EE20 /* features.json */; };
 		14B74E711E8FB15500849BB5 /* GeoRenderer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14B74E701E8FB15500849BB5 /* GeoRenderer.swift */; };
 		14B74E731E8FCF5E00849BB5 /* FeatureLoaderTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14B74E721E8FCF5E00849BB5 /* FeatureLoaderTests.swift */; };
 		14E0288D1EB7332900B4D515 /* geobakeuiTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14E0288C1EB7332900B4D515 /* geobakeuiTests.swift */; };
@@ -71,7 +69,6 @@
 			dstPath = "";
 			dstSubfolderSpec = 16;
 			files = (
-				145210491E98D61D0029942F /* features.json in Copy Files */,
 			);
 			name = "Copy Files";
 			runOnlyForDeploymentPostprocessing = 0;
@@ -84,6 +81,7 @@
 		128FFB8F786C71132FB1F443 /* Pods_tapmap.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_tapmap.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		141F25C51EA4B29B00DA808F /* OperationBakeGeometry.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = OperationBakeGeometry.swift; sourceTree = "<group>"; };
 		141F25C71EA4B3B800DA808F /* GeoBakingViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = GeoBakingViewController.swift; sourceTree = "<group>"; };
+		144AB4511F16401A00FE55BC /* countries.geo */ = {isa = PBXFileReference; lastKnownFileType = file.bplist; name = countries.geo; path = Raw/countries.geo; sourceTree = "<group>"; };
 		145210381E98D4F30029942F /* geobakeui.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = geobakeui.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		1452103A1E98D4F30029942F /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		1452103C1E98D4F30029942F /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
@@ -103,7 +101,6 @@
 		146A791B1E8F912500E2EE20 /* tapmapTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = tapmapTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		146A791F1E8F912500E2EE20 /* tapmapTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = tapmapTests.swift; sourceTree = "<group>"; };
 		146A79211E8F912500E2EE20 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		146A792A1E8F931300E2EE20 /* features.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; name = features.json; path = Raw/features.json; sourceTree = "<group>"; };
 		14B21D841E9FEA5200D27F1E /* GeoLoadingViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = GeoLoadingViewController.swift; sourceTree = "<group>"; };
 		14B74E5A1E8F9ACB00849BB5 /* FeatureLoader.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FeatureLoader.swift; sourceTree = "<group>"; };
 		14B74E5D1E8F9C1100849BB5 /* GeoRegion.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = GeoRegion.swift; path = Geography/GeoRegion.swift; sourceTree = "<group>"; };
@@ -240,7 +237,7 @@
 		146A792C1E8F931B00E2EE20 /* Raw */ = {
 			isa = PBXGroup;
 			children = (
-				146A792A1E8F931300E2EE20 /* features.json */,
+				144AB4511F16401A00FE55BC /* countries.geo */,
 			);
 			name = Raw;
 			sourceTree = "<group>";
@@ -456,9 +453,9 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				144AB4521F16401A00FE55BC /* countries.geo in Resources */,
 				146A79101E8F912500E2EE20 /* Main.storyboard in Resources */,
 				146A790B1E8F912500E2EE20 /* Shader.vsh in Resources */,
-				146A792B1E8F931300E2EE20 /* features.json in Resources */,
 				146A79121E8F912500E2EE20 /* Assets.xcassets in Resources */,
 				146A79151E8F912500E2EE20 /* LaunchScreen.storyboard in Resources */,
 				146A79091E8F912500E2EE20 /* Shader.fsh in Resources */,
@@ -469,7 +466,6 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				14B74E5F1E8FA6FD00849BB5 /* features.json in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

@@ -34,17 +34,21 @@ class OperationBakeGeometry : Operation {
 		let tessJob = OperationTessellateBorders(world, reporter: report, errorReporter: reportError)
 		
 		tessJob.start()
+		let tessellatedWorld = tessJob.world
 		report(1.0, "Finished tesselation.", true)
-		
-		if let encoded = world.encoded {
+		print("Persisting...")
+		if let encoded = tessellatedWorld.encoded {
+			NSKeyedArchiver.setClassName("GeoWorld.Coding", for: GeoWorld.Coding.self)
+			NSKeyedArchiver.setClassName("GeoContinent.Coding", for: GeoContinent.Coding.self)
+			NSKeyedArchiver.setClassName("GeoRegion.Coding", for: GeoRegion.Coding.self)
+			NSKeyedArchiver.setClassName("GeoFeature.Coding", for: GeoFeature.Coding.self)
+			NSKeyedArchiver.setClassName("GeoTessellation.Coding", for: GeoTessellation.Coding.self)
+			NSKeyedArchiver.setClassName("Vertex.Coding", for: Vertex.Coding.self)
+			
 			let didWrite = NSKeyedArchiver.archiveRootObject(encoded, toFile: tempUrl.path)
 			guard didWrite else { print("Save failed"); return }
 		} else {
 			print("Encoding failed")
 		}
-		
-		let loadedWorldCoding = NSKeyedUnarchiver.unarchiveObject(withFile: tempUrl.path) as? GeoWorld.Coding
-		let loadedWorld = loadedWorldCoding?.decoded as? GeoWorld
-		print("\(String(describing: loadedWorld))")
 	}
 }

@@ -7,6 +7,7 @@
 //
 
 import Foundation
+import CoreGraphics.CGGeometry
 
 // NOTE: Will be obsoleted by Swift 4
 
@@ -136,7 +137,11 @@ extension GeoRegion {
 			guard let region = region else { return }
 			aCoder.encode(region.name, forKey: "name")
 			aCoder.encode(region.features.encoded, forKey: "features")
-			aCoder.encode(region.tessellation!.encoded, forKey: "tessellation")
+			guard let tessellation = region.tessellation?.encoded else {
+				print("No tessellation for \(region.name)")
+				return
+			}
+			aCoder.encode(tessellation, forKey: "tessellation")
 		}
 	}
 }
@@ -206,7 +211,12 @@ extension GeoTessellation {
 		required init?(coder aDecoder: NSCoder) {
 			guard let vertices = aDecoder.decodeObject(forKey: "vertices") as? [Vertex.Coding] else { return nil }
 			guard let indices = aDecoder.decodeObject(forKey: "indices") as? [UInt32] else { return nil }
+
+#if os(iOS)
+			let aabbRect = aDecoder.decodeCGRect(forKey: "aabb")
+#else
 			let aabbRect = aDecoder.decodeRect(forKey: "aabb")
+#endif
 			let aabb = Aabb(loX: Float(aabbRect.minX), loY: Float(aabbRect.minY), hiX: Float(aabbRect.maxX), hiY: Float(aabbRect.maxY))
 			self.tessellation = GeoTessellation(vertices: vertices.decoded as! [Vertex], indices: indices, aabb: aabb)
 			super.init()
@@ -217,8 +227,7 @@ extension GeoTessellation {
 			
 			aCoder.encode(tessellation.vertices.encoded, forKey: "vertices")
 			aCoder.encode(tessellation.indices, forKey: "indices")
-			
-			let aabbRect = NSRect(x: CGFloat(tessellation.aabb.minX),
+			let aabbRect = CGRect(x: CGFloat(tessellation.aabb.minX),
 			                      y: CGFloat(tessellation.aabb.minY),
 			                      width: CGFloat(tessellation.aabb.maxX - tessellation.aabb.minX),
 			                      height: CGFloat(tessellation.aabb.maxY - tessellation.aabb.minY))
@@ -251,7 +260,11 @@ extension Vertex {
 		}
 		
 		required init?(coder aDecoder: NSCoder) {
+#if os(iOS)
+			let p = aDecoder.decodeCGPoint(forKey: "point")
+#else
 			let p = aDecoder.decodePoint(forKey: "point")
+#endif
 			
 			self.vertex = Vertex(v: (Float(p.x), Float(p.y)))
 			super.init()
@@ -259,7 +272,7 @@ extension Vertex {
 		
 		func encode(with aCoder: NSCoder) {
 			guard let vertex = vertex else { return }
-			aCoder.encode(NSMakePoint(CGFloat(vertex.v.0), CGFloat(vertex.v.1)), forKey: "point")
+			aCoder.encode(CGPoint(x: CGFloat(vertex.v.0), y: CGFloat(vertex.v.1)), forKey: "point")
 		}
 	}
 }
