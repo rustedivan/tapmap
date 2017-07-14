@@ -14,7 +14,7 @@ target 'geobakeui' do
   use_frameworks!
 
   pod 'SwiftyJSON'
-  pod 'LibTessSwift', :path => '~/Development/LibTessSwift'
+  pod 'LibTessSwift'
 	target 'geobakeuiTests' do
 		inherit! :search_paths
 	end

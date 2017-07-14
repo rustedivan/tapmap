@@ -7,43 +7,43 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		0B0776BF7483B9BE8D5E9CB97914A3B4 /* sweep.c in Sources */ = {isa = PBXBuildFile; fileRef = A105110ED04B991B14574E8743AD2886 /* sweep.c */; };
+		043A3C9944639F7C2A334A7F8F842688 /* tess.c in Sources */ = {isa = PBXBuildFile; fileRef = 7652C84A30A9DEA0551611360DCFDE28 /* tess.c */; };
+		0B94607D46CB7E2B8429E16474074C12 /* MemAllocators.swift in Sources */ = {isa = PBXBuildFile; fileRef = C25AB71B732CD5ECEB69EF7C0D4E4ECF /* MemAllocators.swift */; };
 		0D3D2718142C2FA1D431EAC5B4DE245E /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DB8E2D632CADFEBE217900FD1D4F3ABF /* Foundation.framework */; };
-		1988E73C8011A250C2FFE1AD3C03A24F /* geom.h in Headers */ = {isa = PBXBuildFile; fileRef = 6BE3EC0935528A5619F49497C7ED36A2 /* geom.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		1BFA994337B4D7DC3B9DA41150A6FD62 /* tess.c in Sources */ = {isa = PBXBuildFile; fileRef = 38110EDA4B3B02217EBAFE6978AA49B7 /* tess.c */; };
 		1D2F3985AA9BFC01C389CDB5F81D8ABD /* Pods-geobakeui-umbrella.h in Headers */ = {isa = PBXBuildFile; fileRef = D849ABE5838BF1257F665D646064C2A1 /* Pods-geobakeui-umbrella.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		27598FE956B1510590C30794DF31F54A /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = CDDAA23DDA8E082FC77E38FA01601C8F /* Cocoa.framework */; };
-		2C2EB675B3F590641448B6D20DC4EDE0 /* priorityq.h in Headers */ = {isa = PBXBuildFile; fileRef = 0DBE58B812BA08E22267C15089D6C190 /* priorityq.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		30D6DCCA3C49BEADA52DB29D75AE793C /* bucketalloc.c in Sources */ = {isa = PBXBuildFile; fileRef = 121F6E304ABA687B0F7415ECE2189233 /* bucketalloc.c */; };
 		326A9A2A165388BBF44DD89F65E750B2 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = CDDAA23DDA8E082FC77E38FA01601C8F /* Cocoa.framework */; };
-		39EA82AE1A6029F9E988535890F7ACD4 /* objc-clang.h in Headers */ = {isa = PBXBuildFile; fileRef = 372529064CC0E4ABBAF4A717EA70B379 /* objc-clang.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		3C7D78A8CFDFDA4C101B72E7DC41E16A /* Public.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05A7175A0770F68E56DE1616BED71FBD /* Public.swift */; };
 		3E1FCA8146A9154F565AC0840D0559CC /* Pods-tapmapTests-umbrella.h in Headers */ = {isa = PBXBuildFile; fileRef = E65A3BF890B4D699A0B49797CE95DFB7 /* Pods-tapmapTests-umbrella.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		47D34335F8988CFC2E59E6195AFDC515 /* dict.h in Headers */ = {isa = PBXBuildFile; fileRef = 52D4EEE435092D595D31EAA98B4DEB4E /* dict.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		48327D92EFB37B9DF32A87A335E18C94 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = CDDAA23DDA8E082FC77E38FA01601C8F /* Cocoa.framework */; };
 		4E24F4D6E718A7C6B99D32DC94CA736A /* Pods-geobakeui-dummy.m in Sources */ = {isa = PBXBuildFile; fileRef = A7875824FD638A2F5DDF66AF6FB58EDC /* Pods-geobakeui-dummy.m */; };
-		5098F253839F381A9A9892CEC43238B2 /* tesselator.h in Headers */ = {isa = PBXBuildFile; fileRef = BD9C4A0260A7CA23B6352DCA87B0228E /* tesselator.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		56E4A3F5B889622B98BA0D14DB3B9546 /* sweep.c in Sources */ = {isa = PBXBuildFile; fileRef = 157C3EAA388118D8B4B08AE7639AE278 /* sweep.c */; };
 		5A8D6393F3AB7ABA12FA5809BE369185 /* Pods-tapmapTests-dummy.m in Sources */ = {isa = PBXBuildFile; fileRef = A02671E7201D15D3605EEC0846E51D1B /* Pods-tapmapTests-dummy.m */; };
 		6292FCB1C88399ACC28DF1FDDB793A1F /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = CDDAA23DDA8E082FC77E38FA01601C8F /* Cocoa.framework */; };
-		62F126A5AADBA1FE96EFC3FBCE0502AD /* SwiftyJSON-umbrella.h in Headers */ = {isa = PBXBuildFile; fileRef = 05CA09B061E193906653AC21FD3A94F1 /* SwiftyJSON-umbrella.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		6D583329788F5EDD4F6A71906E3CB39A /* LibTessSwift-dummy.m in Sources */ = {isa = PBXBuildFile; fileRef = 85FA8E5D13D3105020702DC42AF8D961 /* LibTessSwift-dummy.m */; };
-		7395F1F8D723F1749BD899667BE39CA7 /* SwiftyJSON.swift in Sources */ = {isa = PBXBuildFile; fileRef = BDE506ECE97701EBA44FDBFF401C1A04 /* SwiftyJSON.swift */; };
-		782A7DA2463D81E5F55B7A8C1A5B83A1 /* Public.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8F5A62A914A0AB4631EBB6A232E30CF1 /* Public.swift */; };
-		848DAD5C57D9C1661AEE2E93C6D4A534 /* priorityq.c in Sources */ = {isa = PBXBuildFile; fileRef = FD1127C25E5E8923103DF0D59D3C4224 /* priorityq.c */; };
-		89219BD57068A9DD72CB00A85E128905 /* dict.h in Headers */ = {isa = PBXBuildFile; fileRef = CD04006CA548A143A5A3C5CDFAE26AF8 /* dict.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		8E3D774C9712ABAE0AA919E9D45E1120 /* tess.h in Headers */ = {isa = PBXBuildFile; fileRef = 83C144C42460F63EB233E4F85FD95048 /* tess.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		8E93F9497EFBDEB4DCD0E0B6D1BF2310 /* TessC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D4BF82205D6968544CDD7A458FB8AC7 /* TessC.swift */; };
-		9BB6A0C1BAE5C35D27EEB152B328BF25 /* MemAllocators.swift in Sources */ = {isa = PBXBuildFile; fileRef = D2F726BA9B4D971A29CF4300263CEFD1 /* MemAllocators.swift */; };
+		62F126A5AADBA1FE96EFC3FBCE0502AD /* SwiftyJSON-umbrella.h in Headers */ = {isa = PBXBuildFile; fileRef = 84814D07F85267AA7D3A921DFE12E0EE /* SwiftyJSON-umbrella.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		677E05EFEAD3DD9FEBAFD0B1E5B74ED2 /* geom.c in Sources */ = {isa = PBXBuildFile; fileRef = B51124D48017CB1A395AA16CBB3E5B7F /* geom.c */; };
+		6878F3E148ED02B18B95F6D6B9CC6A3A /* TessC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 38339FFBD0339966042355B9B7AB8352 /* TessC.swift */; };
+		7120C75A5F8DEFF9CB3C13F5EC3EC8F7 /* bucketalloc.h in Headers */ = {isa = PBXBuildFile; fileRef = 39BBE0298615640D0C1B2BED14EF5AB6 /* bucketalloc.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		7395F1F8D723F1749BD899667BE39CA7 /* SwiftyJSON.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4A35216EF2098059242401655E460AA2 /* SwiftyJSON.swift */; };
+		781504BDA52E1C84222639B54BB9086A /* priorityq.h in Headers */ = {isa = PBXBuildFile; fileRef = A928FB9796D84F163357C208F5828737 /* priorityq.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		96633FF1B21FF926FFB45BF9EDAE9855 /* LibTessSwift-umbrella.h in Headers */ = {isa = PBXBuildFile; fileRef = DD2564C8AC16501DA2747BB6DF71BD96 /* LibTessSwift-umbrella.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		A9F49C9AB9EA0CCEDD20A05C9AFDB3BD /* Pods-geobakeuiTests-dummy.m in Sources */ = {isa = PBXBuildFile; fileRef = 5E3C3E7B4A13D57AE5530BBE7D986894 /* Pods-geobakeuiTests-dummy.m */; };
-		B32D7D2744E4C736DE39ECB53DC53869 /* LibTessSwift-umbrella.h in Headers */ = {isa = PBXBuildFile; fileRef = C53F1E1B491EECD7751006977E44AFBB /* LibTessSwift-umbrella.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		AA40641E5ACC5E2F633F180C6653D505 /* tess.h in Headers */ = {isa = PBXBuildFile; fileRef = 7F774F324B1E33DB020EF7745475A26E /* tess.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		ABB6437EE4D036FF07C88F8CA1DF7546 /* tesselator.h in Headers */ = {isa = PBXBuildFile; fileRef = F5A18BC101186418097205354A56624B /* tesselator.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		BD7AAA6547D0619792D7985C9DB9978C /* mesh.h in Headers */ = {isa = PBXBuildFile; fileRef = BFBF4F6EADA91AC113B0E3B4025C4C55 /* mesh.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		BF61D39DF6BE177E3244EF72B43786A3 /* objc-clang.h in Headers */ = {isa = PBXBuildFile; fileRef = 3223BA5AF2DF42EDAAC0FCF5C7CC50B2 /* objc-clang.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		C08F05BD20589CF5D51D0628499F35A9 /* LibTessSwift-dummy.m in Sources */ = {isa = PBXBuildFile; fileRef = 498B9BE8FCC67A96906B9A3CC3BB02CD /* LibTessSwift-dummy.m */; };
 		C14F44A352D671045936E5C4B9705DA4 /* Pods-tapmap-dummy.m in Sources */ = {isa = PBXBuildFile; fileRef = 886379B775F10AA865450A8A687F1A9A /* Pods-tapmap-dummy.m */; };
-		C2140B16C7F7E3F79A85DE49E70F72FF /* bucketalloc.c in Sources */ = {isa = PBXBuildFile; fileRef = 2A47AA1498C584EB943F3DDA0B7DCF3B /* bucketalloc.c */; };
-		C3CC8425C976FDB4636C9F589826ED02 /* bucketalloc.h in Headers */ = {isa = PBXBuildFile; fileRef = 7AD9E05A5419265EC9F25D97C57CCA89 /* bucketalloc.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		C75F553A920F0FCFF270F2303426F973 /* mesh.c in Sources */ = {isa = PBXBuildFile; fileRef = 17422C7C6A6D9A11F45D3482409DE987 /* mesh.c */; };
-		C98B6412645251E29FE55664459793AE /* sweep.h in Headers */ = {isa = PBXBuildFile; fileRef = D91BF8B5A306721F5AB7983AF919D17B /* sweep.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		C172CC9A19620B9A45DD83EA533E4D07 /* geom.h in Headers */ = {isa = PBXBuildFile; fileRef = 7B930E6B83EBD7600934FD96D8A410D6 /* geom.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		C3B992FEDDFAB4B0C8E64378F46A9836 /* sweep.h in Headers */ = {isa = PBXBuildFile; fileRef = 0C9E788C00D624EE4A27B9E117C49B3D /* sweep.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		CABEB62A003EDEA0C16383C8269EF02C /* Pods-geobakeuiTests-umbrella.h in Headers */ = {isa = PBXBuildFile; fileRef = A3AEA43A85008A8EA16284A5DA08F3CC /* Pods-geobakeuiTests-umbrella.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		D1620FA0EC3271FECA3851B16588A751 /* mesh.h in Headers */ = {isa = PBXBuildFile; fileRef = 5A056C10A9A32CA4C2CE3CD4BE5060DB /* mesh.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		D2308F6D7DE7F80DAE63F0A156C2D088 /* Pods-tapmap-umbrella.h in Headers */ = {isa = PBXBuildFile; fileRef = BB8332A52BC9F6E977F09C78C9A104A2 /* Pods-tapmap-umbrella.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		F01B410AE1489D9EEB24DA570C95F8D8 /* geom.c in Sources */ = {isa = PBXBuildFile; fileRef = 7B83DA52A4EEDB252351D9BA822FE684 /* geom.c */; };
-		F6E6A596A5FAB0CDF838D721CB1AB681 /* dict.c in Sources */ = {isa = PBXBuildFile; fileRef = 2421409C75DDFB052DFFD87697F99D0E /* dict.c */; };
-		F784D6FAA2DC846F76E6081643A168AD /* SwiftyJSON-dummy.m in Sources */ = {isa = PBXBuildFile; fileRef = 32B9BBA8F5B33E56C38F5546432F66B7 /* SwiftyJSON-dummy.m */; };
+		D411597780DB428090AFEF4D58B5588D /* priorityq.c in Sources */ = {isa = PBXBuildFile; fileRef = CD9E765EB027ADF97CC85FB7FDEFC832 /* priorityq.c */; };
+		EDBEF4EC7FBC86488D5525A00CE1CCB0 /* dict.c in Sources */ = {isa = PBXBuildFile; fileRef = AB0870754D42AA70E6CBD5B31554272F /* dict.c */; };
+		F590461F01B6E1462ABD2A9267D740EC /* mesh.c in Sources */ = {isa = PBXBuildFile; fileRef = 8131AB61B5948A03CAFFF7A0BCADCAE6 /* mesh.c */; };
+		F784D6FAA2DC846F76E6081643A168AD /* SwiftyJSON-dummy.m in Sources */ = {isa = PBXBuildFile; fileRef = C7CC54E120BC7C66829737980F9D36E9 /* SwiftyJSON-dummy.m */; };
 		FD8199AD527FF7509114943733B2A3FE /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DB8E2D632CADFEBE217900FD1D4F3ABF /* Foundation.framework */; };
 /* End PBXBuildFile section */
 
@@ -65,87 +65,87 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
-		05CA09B061E193906653AC21FD3A94F1 /* SwiftyJSON-umbrella.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = "SwiftyJSON-umbrella.h"; sourceTree = "<group>"; };
-		0D70A6913A2B3AF231589E10D97D0F0C /* LibTessSwift-prefix.pch */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = "LibTessSwift-prefix.pch"; sourceTree = "<group>"; };
-		0DBE58B812BA08E22267C15089D6C190 /* priorityq.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = priorityq.h; sourceTree = "<group>"; };
-		17422C7C6A6D9A11F45D3482409DE987 /* mesh.c */ = {isa = PBXFileReference; includeInIndex = 1; path = mesh.c; sourceTree = "<group>"; };
+		05A7175A0770F68E56DE1616BED71FBD /* Public.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = Public.swift; path = LibTessSwift/Classes/Public.swift; sourceTree = "<group>"; };
+		0C9E788C00D624EE4A27B9E117C49B3D /* sweep.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = sweep.h; path = LibTessSwift/libtess2/sweep.h; sourceTree = "<group>"; };
+		121F6E304ABA687B0F7415ECE2189233 /* bucketalloc.c */ = {isa = PBXFileReference; includeInIndex = 1; name = bucketalloc.c; path = LibTessSwift/libtess2/bucketalloc.c; sourceTree = "<group>"; };
+		157C3EAA388118D8B4B08AE7639AE278 /* sweep.c */ = {isa = PBXFileReference; includeInIndex = 1; name = sweep.c; path = LibTessSwift/libtess2/sweep.c; sourceTree = "<group>"; };
 		182A7E690CA0FD65A3D2E1CFA5BC7A25 /* Pods-geobakeuiTests-acknowledgements.plist */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.xml; path = "Pods-geobakeuiTests-acknowledgements.plist"; sourceTree = "<group>"; };
+		1F6A5C548BB1E8241D1AB2E7F5254503 /* SwiftyJSON.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; path = SwiftyJSON.xcconfig; sourceTree = "<group>"; };
 		2345A115A81C0DCBAFDFDDAA855DE377 /* Pods-geobakeui.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; path = "Pods-geobakeui.release.xcconfig"; sourceTree = "<group>"; };
-		2421409C75DDFB052DFFD87697F99D0E /* dict.c */ = {isa = PBXFileReference; includeInIndex = 1; path = dict.c; sourceTree = "<group>"; };
 		2512835C40955AD16A94F0320E92DDA7 /* Info.plist */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		2A47AA1498C584EB943F3DDA0B7DCF3B /* bucketalloc.c */ = {isa = PBXFileReference; includeInIndex = 1; path = bucketalloc.c; sourceTree = "<group>"; };
-		2E7F7C62EE34D2D271E6E1234A2002B2 /* SwiftyJSON.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; path = SwiftyJSON.xcconfig; sourceTree = "<group>"; };
-		32B9BBA8F5B33E56C38F5546432F66B7 /* SwiftyJSON-dummy.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; path = "SwiftyJSON-dummy.m"; sourceTree = "<group>"; };
+		3223BA5AF2DF42EDAAC0FCF5C7CC50B2 /* objc-clang.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = "objc-clang.h"; path = "LibTessSwift/libtess2/objc-clang.h"; sourceTree = "<group>"; };
 		342923D58A72EF0FF332B99D7107EE51 /* Pods-geobakeui.modulemap */ = {isa = PBXFileReference; includeInIndex = 1; path = "Pods-geobakeui.modulemap"; sourceTree = "<group>"; };
-		372529064CC0E4ABBAF4A717EA70B379 /* objc-clang.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = "objc-clang.h"; sourceTree = "<group>"; };
-		38110EDA4B3B02217EBAFE6978AA49B7 /* tess.c */ = {isa = PBXFileReference; includeInIndex = 1; path = tess.c; sourceTree = "<group>"; };
+		3823AE2B015B94A49CDC62224BF689B7 /* SwiftyJSON-prefix.pch */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = "SwiftyJSON-prefix.pch"; sourceTree = "<group>"; };
+		38339FFBD0339966042355B9B7AB8352 /* TessC.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = TessC.swift; path = LibTessSwift/Classes/TessC.swift; sourceTree = "<group>"; };
+		39BBE0298615640D0C1B2BED14EF5AB6 /* bucketalloc.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = bucketalloc.h; path = LibTessSwift/libtess2/bucketalloc.h; sourceTree = "<group>"; };
 		3CCE23E467522E4E7CB2842BD5358AF8 /* Info.plist */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		41EA532D80F3785FDE12E970DA8EEF80 /* Pods-tapmap.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; path = "Pods-tapmap.debug.xcconfig"; sourceTree = "<group>"; };
 		4526D7F1BC6924CA7C40A5BE93555E54 /* Pods_geobakeuiTests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; name = Pods_geobakeuiTests.framework; path = "Pods-geobakeuiTests.framework"; sourceTree = BUILT_PRODUCTS_DIR; };
 		46E989448D0F8F232555E593E747D575 /* Pods-tapmapTests.modulemap */ = {isa = PBXFileReference; includeInIndex = 1; path = "Pods-tapmapTests.modulemap"; sourceTree = "<group>"; };
 		47B85AA485F3C8DFBF7DCF4A0647A373 /* Pods-geobakeuiTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; path = "Pods-geobakeuiTests.debug.xcconfig"; sourceTree = "<group>"; };
 		48CB3E361CE1B813CA3D9E7504E2E5F4 /* Pods_tapmapTests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; name = Pods_tapmapTests.framework; path = "Pods-tapmapTests.framework"; sourceTree = BUILT_PRODUCTS_DIR; };
+		498B9BE8FCC67A96906B9A3CC3BB02CD /* LibTessSwift-dummy.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; path = "LibTessSwift-dummy.m"; sourceTree = "<group>"; };
+		4A35216EF2098059242401655E460AA2 /* SwiftyJSON.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = SwiftyJSON.swift; path = Source/SwiftyJSON.swift; sourceTree = "<group>"; };
 		4B31EA3357FC4547A68D11C46797AF02 /* Info.plist */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		51902342BF0ECAC6135F1AABBE16486A /* Pods-geobakeui.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; path = "Pods-geobakeui.debug.xcconfig"; sourceTree = "<group>"; };
+		52D4EEE435092D595D31EAA98B4DEB4E /* dict.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = dict.h; path = LibTessSwift/libtess2/dict.h; sourceTree = "<group>"; };
 		5670F12092A8D863DB0DD91F2A3C403E /* Pods-tapmap.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; path = "Pods-tapmap.release.xcconfig"; sourceTree = "<group>"; };
 		577C20DC92E21072ACB40C073EA47D43 /* Pods-geobakeui-frameworks.sh */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.script.sh; path = "Pods-geobakeui-frameworks.sh"; sourceTree = "<group>"; };
-		5A056C10A9A32CA4C2CE3CD4BE5060DB /* mesh.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = mesh.h; sourceTree = "<group>"; };
 		5E3C3E7B4A13D57AE5530BBE7D986894 /* Pods-geobakeuiTests-dummy.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; path = "Pods-geobakeuiTests-dummy.m"; sourceTree = "<group>"; };
 		5E44C3DC2567A7F835F000A559DE31E8 /* Pods-tapmapTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; path = "Pods-tapmapTests.release.xcconfig"; sourceTree = "<group>"; };
+		6247E449EFA3A92A4FB7462D0C7B3366 /* Info.plist */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		64AB0D5F52FC5DE78328173CF41A5C72 /* Info.plist */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		67F52CF5F341F3987586539378C41ED2 /* Pods_geobakeui.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; name = Pods_geobakeui.framework; path = "Pods-geobakeui.framework"; sourceTree = BUILT_PRODUCTS_DIR; };
-		6BE3EC0935528A5619F49497C7ED36A2 /* geom.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = geom.h; sourceTree = "<group>"; };
 		72DF705E6B300CD72A6D3BE4CA4512C7 /* Pods-geobakeuiTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; path = "Pods-geobakeuiTests.release.xcconfig"; sourceTree = "<group>"; };
-		758152AC2CC9FC30AD4263EB790047F7 /* LibTessSwift.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; path = LibTessSwift.xcconfig; sourceTree = "<group>"; };
+		7652C84A30A9DEA0551611360DCFDE28 /* tess.c */ = {isa = PBXFileReference; includeInIndex = 1; name = tess.c; path = LibTessSwift/libtess2/tess.c; sourceTree = "<group>"; };
 		7A9100D10E32B0D6D585AB19B0CC88FB /* Pods-geobakeui-resources.sh */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.script.sh; path = "Pods-geobakeui-resources.sh"; sourceTree = "<group>"; };
-		7AD9E05A5419265EC9F25D97C57CCA89 /* bucketalloc.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = bucketalloc.h; sourceTree = "<group>"; };
-		7B83DA52A4EEDB252351D9BA822FE684 /* geom.c */ = {isa = PBXFileReference; includeInIndex = 1; path = geom.c; sourceTree = "<group>"; };
+		7B930E6B83EBD7600934FD96D8A410D6 /* geom.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = geom.h; path = LibTessSwift/libtess2/geom.h; sourceTree = "<group>"; };
+		7F774F324B1E33DB020EF7745475A26E /* tess.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = tess.h; path = LibTessSwift/libtess2/tess.h; sourceTree = "<group>"; };
+		8131AB61B5948A03CAFFF7A0BCADCAE6 /* mesh.c */ = {isa = PBXFileReference; includeInIndex = 1; name = mesh.c; path = LibTessSwift/libtess2/mesh.c; sourceTree = "<group>"; };
 		827F7D6EC42CD845158CF910BFE7E365 /* Pods-tapmapTests-acknowledgements.plist */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.xml; path = "Pods-tapmapTests-acknowledgements.plist"; sourceTree = "<group>"; };
 		83827CBB9A1EB62F468DFA3FAC34066B /* Pods-geobakeuiTests-frameworks.sh */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.script.sh; path = "Pods-geobakeuiTests-frameworks.sh"; sourceTree = "<group>"; };
-		83C144C42460F63EB233E4F85FD95048 /* tess.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = tess.h; sourceTree = "<group>"; };
+		84814D07F85267AA7D3A921DFE12E0EE /* SwiftyJSON-umbrella.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = "SwiftyJSON-umbrella.h"; sourceTree = "<group>"; };
 		858E3B4F88F84F463774EB8C5F5F4017 /* Pods-tapmap-acknowledgements.plist */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.xml; path = "Pods-tapmap-acknowledgements.plist"; sourceTree = "<group>"; };
-		85FA8E5D13D3105020702DC42AF8D961 /* LibTessSwift-dummy.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; path = "LibTessSwift-dummy.m"; sourceTree = "<group>"; };
 		87F49BA3F129140C0B0214B01882E680 /* Pods-tapmapTests-frameworks.sh */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.script.sh; path = "Pods-tapmapTests-frameworks.sh"; sourceTree = "<group>"; };
 		886379B775F10AA865450A8A687F1A9A /* Pods-tapmap-dummy.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; path = "Pods-tapmap-dummy.m"; sourceTree = "<group>"; };
-		8D4BF82205D6968544CDD7A458FB8AC7 /* TessC.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = TessC.swift; sourceTree = "<group>"; };
-		8F5A62A914A0AB4631EBB6A232E30CF1 /* Public.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = Public.swift; sourceTree = "<group>"; };
 		90B96A43F95FA1D41DEE4DC975C63288 /* Pods-geobakeui-acknowledgements.plist */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.xml; path = "Pods-geobakeui-acknowledgements.plist"; sourceTree = "<group>"; };
 		93A4A3777CF96A4AAC1D13BA6DCCEA73 /* Podfile */ = {isa = PBXFileReference; explicitFileType = text.script.ruby; includeInIndex = 1; lastKnownFileType = text; name = Podfile; path = ../Podfile; sourceTree = SOURCE_ROOT; xcLanguageSpecificationIdentifier = xcode.lang.ruby; };
+		95D255EEDECF37FFFD2F739792CAF19D /* LibTessSwift.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; path = LibTessSwift.xcconfig; sourceTree = "<group>"; };
 		95DC24584032A3202DA646788210D62B /* SwiftyJSON.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; name = SwiftyJSON.framework; path = SwiftyJSON.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		9BCC8DB6635DA6FC11B1F69E22DDD9A1 /* Pods-tapmapTests-acknowledgements.markdown */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text; path = "Pods-tapmapTests-acknowledgements.markdown"; sourceTree = "<group>"; };
 		9FEC6357E09295B3AC01431811A87AB2 /* Pods-tapmap.modulemap */ = {isa = PBXFileReference; includeInIndex = 1; path = "Pods-tapmap.modulemap"; sourceTree = "<group>"; };
 		A02671E7201D15D3605EEC0846E51D1B /* Pods-tapmapTests-dummy.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; path = "Pods-tapmapTests-dummy.m"; sourceTree = "<group>"; };
-		A105110ED04B991B14574E8743AD2886 /* sweep.c */ = {isa = PBXFileReference; includeInIndex = 1; path = sweep.c; sourceTree = "<group>"; };
 		A3AEA43A85008A8EA16284A5DA08F3CC /* Pods-geobakeuiTests-umbrella.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = "Pods-geobakeuiTests-umbrella.h"; sourceTree = "<group>"; };
 		A7875824FD638A2F5DDF66AF6FB58EDC /* Pods-geobakeui-dummy.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; path = "Pods-geobakeui-dummy.m"; sourceTree = "<group>"; };
+		A928FB9796D84F163357C208F5828737 /* priorityq.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = priorityq.h; path = LibTessSwift/libtess2/priorityq.h; sourceTree = "<group>"; };
 		A956175A9F76E7A08B662FF8CEF5FEF7 /* Info.plist */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		AB0870754D42AA70E6CBD5B31554272F /* dict.c */ = {isa = PBXFileReference; includeInIndex = 1; name = dict.c; path = LibTessSwift/libtess2/dict.c; sourceTree = "<group>"; };
+		AE0AF26584807E8D55D42357600A5A0A /* LibTessSwift-prefix.pch */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = "LibTessSwift-prefix.pch"; sourceTree = "<group>"; };
 		AFE109B96F08402B78A325564B158A0E /* Pods-geobakeui-acknowledgements.markdown */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text; path = "Pods-geobakeui-acknowledgements.markdown"; sourceTree = "<group>"; };
-		B77020B0AA73E88AC69D3BAD50F47D05 /* LibTessSwift.modulemap */ = {isa = PBXFileReference; includeInIndex = 1; path = LibTessSwift.modulemap; sourceTree = "<group>"; };
+		B51124D48017CB1A395AA16CBB3E5B7F /* geom.c */ = {isa = PBXFileReference; includeInIndex = 1; name = geom.c; path = LibTessSwift/libtess2/geom.c; sourceTree = "<group>"; };
 		BB8332A52BC9F6E977F09C78C9A104A2 /* Pods-tapmap-umbrella.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = "Pods-tapmap-umbrella.h"; sourceTree = "<group>"; };
-		BBF610E40BDF6E542FA21FF7E5491205 /* SwiftyJSON-prefix.pch */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = "SwiftyJSON-prefix.pch"; sourceTree = "<group>"; };
 		BD3A008A817C96E4676653E8BE2077D2 /* Pods-tapmapTests-resources.sh */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.script.sh; path = "Pods-tapmapTests-resources.sh"; sourceTree = "<group>"; };
-		BD9C4A0260A7CA23B6352DCA87B0228E /* tesselator.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = tesselator.h; sourceTree = "<group>"; };
-		BDE506ECE97701EBA44FDBFF401C1A04 /* SwiftyJSON.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = SwiftyJSON.swift; path = Source/SwiftyJSON.swift; sourceTree = "<group>"; };
 		BE57F8F7C8261F8F3EBEEBB5CC809568 /* Pods-geobakeuiTests-acknowledgements.markdown */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text; path = "Pods-geobakeuiTests-acknowledgements.markdown"; sourceTree = "<group>"; };
-		C4A9A658C966F6BB111BEDBDEA1F874A /* Info.plist */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		C53F1E1B491EECD7751006977E44AFBB /* LibTessSwift-umbrella.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = "LibTessSwift-umbrella.h"; sourceTree = "<group>"; };
-		CD04006CA548A143A5A3C5CDFAE26AF8 /* dict.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = dict.h; sourceTree = "<group>"; };
+		BFBF4F6EADA91AC113B0E3B4025C4C55 /* mesh.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = mesh.h; path = LibTessSwift/libtess2/mesh.h; sourceTree = "<group>"; };
+		C25AB71B732CD5ECEB69EF7C0D4E4ECF /* MemAllocators.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = MemAllocators.swift; path = LibTessSwift/Classes/MemAllocators.swift; sourceTree = "<group>"; };
+		C7CC54E120BC7C66829737980F9D36E9 /* SwiftyJSON-dummy.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; path = "SwiftyJSON-dummy.m"; sourceTree = "<group>"; };
+		C92373E59B2C91AEECB4AA0E45849229 /* LibTessSwift.modulemap */ = {isa = PBXFileReference; includeInIndex = 1; path = LibTessSwift.modulemap; sourceTree = "<group>"; };
+		CD9E765EB027ADF97CC85FB7FDEFC832 /* priorityq.c */ = {isa = PBXFileReference; includeInIndex = 1; name = priorityq.c; path = LibTessSwift/libtess2/priorityq.c; sourceTree = "<group>"; };
 		CDDAA23DDA8E082FC77E38FA01601C8F /* Cocoa.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Cocoa.framework; path = Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.12.sdk/System/Library/Frameworks/Cocoa.framework; sourceTree = DEVELOPER_DIR; };
-		D032A29E584B77AE187E586922267CF5 /* SwiftyJSON.modulemap */ = {isa = PBXFileReference; includeInIndex = 1; path = SwiftyJSON.modulemap; sourceTree = "<group>"; };
 		D1DA1DD3CA887EFB524E378E78D4CE2F /* Pods-geobakeuiTests-resources.sh */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.script.sh; path = "Pods-geobakeuiTests-resources.sh"; sourceTree = "<group>"; };
-		D2F726BA9B4D971A29CF4300263CEFD1 /* MemAllocators.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = MemAllocators.swift; sourceTree = "<group>"; };
 		D74AF52DEEBA6655FAA6A883B0190C6C /* Pods-tapmapTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; path = "Pods-tapmapTests.debug.xcconfig"; sourceTree = "<group>"; };
 		D849ABE5838BF1257F665D646064C2A1 /* Pods-geobakeui-umbrella.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = "Pods-geobakeui-umbrella.h"; sourceTree = "<group>"; };
-		D91BF8B5A306721F5AB7983AF919D17B /* sweep.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = sweep.h; sourceTree = "<group>"; };
-		DB7FB9C1CD23839C78C1B60021C69530 /* Info.plist */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		DB8E2D632CADFEBE217900FD1D4F3ABF /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS10.3.sdk/System/Library/Frameworks/Foundation.framework; sourceTree = DEVELOPER_DIR; };
 		DB94FDCF6B1005BECB34817DDAFA65BD /* Pods-geobakeuiTests.modulemap */ = {isa = PBXFileReference; includeInIndex = 1; path = "Pods-geobakeuiTests.modulemap"; sourceTree = "<group>"; };
+		DD2564C8AC16501DA2747BB6DF71BD96 /* LibTessSwift-umbrella.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = "LibTessSwift-umbrella.h"; sourceTree = "<group>"; };
+		DD537CAE3EF31888B698B8D4A1C373CF /* SwiftyJSON.modulemap */ = {isa = PBXFileReference; includeInIndex = 1; path = SwiftyJSON.modulemap; sourceTree = "<group>"; };
 		DEAA479E36B0E2CAB20A655BEF116829 /* Pods-tapmap-resources.sh */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.script.sh; path = "Pods-tapmap-resources.sh"; sourceTree = "<group>"; };
 		E18A36A6DFAC4F5728A215427C3A4A01 /* LibTessSwift.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; name = LibTessSwift.framework; path = LibTessSwift.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		E64D215E1D5C6681D7F283B46D42DF9F /* Pods_tapmap.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; name = Pods_tapmap.framework; path = "Pods-tapmap.framework"; sourceTree = BUILT_PRODUCTS_DIR; };
 		E65A3BF890B4D699A0B49797CE95DFB7 /* Pods-tapmapTests-umbrella.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = "Pods-tapmapTests-umbrella.h"; sourceTree = "<group>"; };
 		EFA0BACED43CB3800B6466BC1E1F0D44 /* Pods-tapmap-frameworks.sh */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.script.sh; path = "Pods-tapmap-frameworks.sh"; sourceTree = "<group>"; };
+		F5A18BC101186418097205354A56624B /* tesselator.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = tesselator.h; path = LibTessSwift/libtess2/tesselator.h; sourceTree = "<group>"; };
 		FB066E743D7778E579D5B692469E7FDA /* Pods-tapmap-acknowledgements.markdown */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text; path = "Pods-tapmap-acknowledgements.markdown"; sourceTree = "<group>"; };
-		FD1127C25E5E8923103DF0D59D3C4224 /* priorityq.c */ = {isa = PBXFileReference; includeInIndex = 1; path = priorityq.c; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -200,29 +200,15 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
-		11F1C014C06E2051D1C05CB434D6FF55 /* Support Files */ = {
+		0F846A6A521E5F9B9A3F37ACB959FC5A /* SwiftyJSON */ = {
 			isa = PBXGroup;
 			children = (
-				DB7FB9C1CD23839C78C1B60021C69530 /* Info.plist */,
-				B77020B0AA73E88AC69D3BAD50F47D05 /* LibTessSwift.modulemap */,
-				758152AC2CC9FC30AD4263EB790047F7 /* LibTessSwift.xcconfig */,
-				85FA8E5D13D3105020702DC42AF8D961 /* LibTessSwift-dummy.m */,
-				0D70A6913A2B3AF231589E10D97D0F0C /* LibTessSwift-prefix.pch */,
-				C53F1E1B491EECD7751006977E44AFBB /* LibTessSwift-umbrella.h */,
+				4A35216EF2098059242401655E460AA2 /* SwiftyJSON.swift */,
+				B9A8AB5485E504C65CCB60B6545968EE /* Support Files */,
 			);
-			name = "Support Files";
-			path = "../tapmap/Pods/Target Support Files/LibTessSwift";
+			name = SwiftyJSON;
+			path = SwiftyJSON;
 			sourceTree = "<group>";
-		};
-		2A148F110655F99DB335941F219E9FA0 /* LibTessSwift */ = {
-			isa = PBXGroup;
-			children = (
-				96043D0C27BB1A9B131DE324EDFD49A7 /* LibTessSwift */,
-				11F1C014C06E2051D1C05CB434D6FF55 /* Support Files */,
-			);
-			name = LibTessSwift;
-			path = /Users/rusted/Development/LibTessSwift;
-			sourceTree = "<absolute>";
 		};
 		2EDFAB15A7E74F864EB353FCB5A57006 /* OS X */ = {
 			isa = PBXGroup;
@@ -241,6 +227,15 @@
 			name = Frameworks;
 			sourceTree = "<group>";
 		};
+		3D9FE4EEF76430DA3AC0C8F7C23E0EB7 /* Pods */ = {
+			isa = PBXGroup;
+			children = (
+				D4B024B88BEB4333BC6577D9E5341670 /* LibTessSwift */,
+				0F846A6A521E5F9B9A3F37ACB959FC5A /* SwiftyJSON */,
+			);
+			name = Pods;
+			sourceTree = "<group>";
+		};
 		454C4076E7D1366DA9CC2417F26B103E /* Targets Support Files */ = {
 			isa = PBXGroup;
 			children = (
@@ -250,30 +245,6 @@
 				4D9BFE88BD791E5BE35730D0B81EA633 /* Pods-tapmapTests */,
 			);
 			name = "Targets Support Files";
-			sourceTree = "<group>";
-		};
-		4D6D2A6328C6AA781D4400C6CA21E0BD /* libtess2 */ = {
-			isa = PBXGroup;
-			children = (
-				2A47AA1498C584EB943F3DDA0B7DCF3B /* bucketalloc.c */,
-				7AD9E05A5419265EC9F25D97C57CCA89 /* bucketalloc.h */,
-				2421409C75DDFB052DFFD87697F99D0E /* dict.c */,
-				CD04006CA548A143A5A3C5CDFAE26AF8 /* dict.h */,
-				7B83DA52A4EEDB252351D9BA822FE684 /* geom.c */,
-				6BE3EC0935528A5619F49497C7ED36A2 /* geom.h */,
-				17422C7C6A6D9A11F45D3482409DE987 /* mesh.c */,
-				5A056C10A9A32CA4C2CE3CD4BE5060DB /* mesh.h */,
-				372529064CC0E4ABBAF4A717EA70B379 /* objc-clang.h */,
-				FD1127C25E5E8923103DF0D59D3C4224 /* priorityq.c */,
-				0DBE58B812BA08E22267C15089D6C190 /* priorityq.h */,
-				A105110ED04B991B14574E8743AD2886 /* sweep.c */,
-				D91BF8B5A306721F5AB7983AF919D17B /* sweep.h */,
-				38110EDA4B3B02217EBAFE6978AA49B7 /* tess.c */,
-				83C144C42460F63EB233E4F85FD95048 /* tess.h */,
-				BD9C4A0260A7CA23B6352DCA87B0228E /* tesselator.h */,
-			);
-			name = libtess2;
-			path = libtess2;
 			sourceTree = "<group>";
 		};
 		4D9BFE88BD791E5BE35730D0B81EA633 /* Pods-tapmapTests */ = {
@@ -325,23 +296,26 @@
 			name = Products;
 			sourceTree = "<group>";
 		};
-		70A8E4D3C62B6C203D238581DA091C21 /* SwiftyJSON */ = {
+		6ED817D20962D9550AB375C4ACEB61E8 /* Support Files */ = {
 			isa = PBXGroup;
 			children = (
-				BDE506ECE97701EBA44FDBFF401C1A04 /* SwiftyJSON.swift */,
-				8EC39E1DC11846207722B71AAFE40F98 /* Support Files */,
+				64AB0D5F52FC5DE78328173CF41A5C72 /* Info.plist */,
+				C92373E59B2C91AEECB4AA0E45849229 /* LibTessSwift.modulemap */,
+				95D255EEDECF37FFFD2F739792CAF19D /* LibTessSwift.xcconfig */,
+				498B9BE8FCC67A96906B9A3CC3BB02CD /* LibTessSwift-dummy.m */,
+				AE0AF26584807E8D55D42357600A5A0A /* LibTessSwift-prefix.pch */,
+				DD2564C8AC16501DA2747BB6DF71BD96 /* LibTessSwift-umbrella.h */,
 			);
-			name = SwiftyJSON;
-			path = SwiftyJSON;
+			name = "Support Files";
+			path = "../Target Support Files/LibTessSwift";
 			sourceTree = "<group>";
 		};
 		7DB346D0F39D3F0E887471402A8071AB = {
 			isa = PBXGroup;
 			children = (
 				93A4A3777CF96A4AAC1D13BA6DCCEA73 /* Podfile */,
-				AD8E08F0E766B5B74B9B1821349BEDFB /* Development Pods */,
 				3AEF7D761E8EA8419BB4A7000AB770CB /* Frameworks */,
-				BD1E3C710F12F4B4C092FC8E2AD22110 /* Pods */,
+				3D9FE4EEF76430DA3AC0C8F7C23E0EB7 /* Pods */,
 				54C83F2A54A6A5D2D5082C202314CF10 /* Products */,
 				454C4076E7D1366DA9CC2417F26B103E /* Targets Support Files */,
 			);
@@ -373,55 +347,18 @@
 			name = iOS;
 			sourceTree = "<group>";
 		};
-		8EC39E1DC11846207722B71AAFE40F98 /* Support Files */ = {
+		B9A8AB5485E504C65CCB60B6545968EE /* Support Files */ = {
 			isa = PBXGroup;
 			children = (
-				C4A9A658C966F6BB111BEDBDEA1F874A /* Info.plist */,
-				D032A29E584B77AE187E586922267CF5 /* SwiftyJSON.modulemap */,
-				2E7F7C62EE34D2D271E6E1234A2002B2 /* SwiftyJSON.xcconfig */,
-				32B9BBA8F5B33E56C38F5546432F66B7 /* SwiftyJSON-dummy.m */,
-				BBF610E40BDF6E542FA21FF7E5491205 /* SwiftyJSON-prefix.pch */,
-				05CA09B061E193906653AC21FD3A94F1 /* SwiftyJSON-umbrella.h */,
+				6247E449EFA3A92A4FB7462D0C7B3366 /* Info.plist */,
+				DD537CAE3EF31888B698B8D4A1C373CF /* SwiftyJSON.modulemap */,
+				1F6A5C548BB1E8241D1AB2E7F5254503 /* SwiftyJSON.xcconfig */,
+				C7CC54E120BC7C66829737980F9D36E9 /* SwiftyJSON-dummy.m */,
+				3823AE2B015B94A49CDC62224BF689B7 /* SwiftyJSON-prefix.pch */,
+				84814D07F85267AA7D3A921DFE12E0EE /* SwiftyJSON-umbrella.h */,
 			);
 			name = "Support Files";
 			path = "../Target Support Files/SwiftyJSON";
-			sourceTree = "<group>";
-		};
-		90A9F27F24756D8D953576F9DDB053F4 /* Classes */ = {
-			isa = PBXGroup;
-			children = (
-				D2F726BA9B4D971A29CF4300263CEFD1 /* MemAllocators.swift */,
-				8F5A62A914A0AB4631EBB6A232E30CF1 /* Public.swift */,
-				8D4BF82205D6968544CDD7A458FB8AC7 /* TessC.swift */,
-			);
-			name = Classes;
-			path = Classes;
-			sourceTree = "<group>";
-		};
-		96043D0C27BB1A9B131DE324EDFD49A7 /* LibTessSwift */ = {
-			isa = PBXGroup;
-			children = (
-				90A9F27F24756D8D953576F9DDB053F4 /* Classes */,
-				4D6D2A6328C6AA781D4400C6CA21E0BD /* libtess2 */,
-			);
-			name = LibTessSwift;
-			path = LibTessSwift;
-			sourceTree = "<group>";
-		};
-		AD8E08F0E766B5B74B9B1821349BEDFB /* Development Pods */ = {
-			isa = PBXGroup;
-			children = (
-				2A148F110655F99DB335941F219E9FA0 /* LibTessSwift */,
-			);
-			name = "Development Pods";
-			sourceTree = "<group>";
-		};
-		BD1E3C710F12F4B4C092FC8E2AD22110 /* Pods */ = {
-			isa = PBXGroup;
-			children = (
-				70A8E4D3C62B6C203D238581DA091C21 /* SwiftyJSON */,
-			);
-			name = Pods;
 			sourceTree = "<group>";
 		};
 		C384FA7DD12F7FDB9291F59B92372484 /* Pods-tapmap */ = {
@@ -440,6 +377,34 @@
 			);
 			name = "Pods-tapmap";
 			path = "Target Support Files/Pods-tapmap";
+			sourceTree = "<group>";
+		};
+		D4B024B88BEB4333BC6577D9E5341670 /* LibTessSwift */ = {
+			isa = PBXGroup;
+			children = (
+				121F6E304ABA687B0F7415ECE2189233 /* bucketalloc.c */,
+				39BBE0298615640D0C1B2BED14EF5AB6 /* bucketalloc.h */,
+				AB0870754D42AA70E6CBD5B31554272F /* dict.c */,
+				52D4EEE435092D595D31EAA98B4DEB4E /* dict.h */,
+				B51124D48017CB1A395AA16CBB3E5B7F /* geom.c */,
+				7B930E6B83EBD7600934FD96D8A410D6 /* geom.h */,
+				C25AB71B732CD5ECEB69EF7C0D4E4ECF /* MemAllocators.swift */,
+				8131AB61B5948A03CAFFF7A0BCADCAE6 /* mesh.c */,
+				BFBF4F6EADA91AC113B0E3B4025C4C55 /* mesh.h */,
+				3223BA5AF2DF42EDAAC0FCF5C7CC50B2 /* objc-clang.h */,
+				CD9E765EB027ADF97CC85FB7FDEFC832 /* priorityq.c */,
+				A928FB9796D84F163357C208F5828737 /* priorityq.h */,
+				05A7175A0770F68E56DE1616BED71FBD /* Public.swift */,
+				157C3EAA388118D8B4B08AE7639AE278 /* sweep.c */,
+				0C9E788C00D624EE4A27B9E117C49B3D /* sweep.h */,
+				7652C84A30A9DEA0551611360DCFDE28 /* tess.c */,
+				7F774F324B1E33DB020EF7745475A26E /* tess.h */,
+				38339FFBD0339966042355B9B7AB8352 /* TessC.swift */,
+				F5A18BC101186418097205354A56624B /* tesselator.h */,
+				6ED817D20962D9550AB375C4ACEB61E8 /* Support Files */,
+			);
+			name = LibTessSwift;
+			path = LibTessSwift;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -469,20 +434,20 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		A630106739B1428C1819E2B9814096DE /* Headers */ = {
+		C0C128A22C55E9C621A1BC1185EF9851 /* Headers */ = {
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				C3CC8425C976FDB4636C9F589826ED02 /* bucketalloc.h in Headers */,
-				89219BD57068A9DD72CB00A85E128905 /* dict.h in Headers */,
-				1988E73C8011A250C2FFE1AD3C03A24F /* geom.h in Headers */,
-				B32D7D2744E4C736DE39ECB53DC53869 /* LibTessSwift-umbrella.h in Headers */,
-				D1620FA0EC3271FECA3851B16588A751 /* mesh.h in Headers */,
-				39EA82AE1A6029F9E988535890F7ACD4 /* objc-clang.h in Headers */,
-				2C2EB675B3F590641448B6D20DC4EDE0 /* priorityq.h in Headers */,
-				C98B6412645251E29FE55664459793AE /* sweep.h in Headers */,
-				8E3D774C9712ABAE0AA919E9D45E1120 /* tess.h in Headers */,
-				5098F253839F381A9A9892CEC43238B2 /* tesselator.h in Headers */,
+				7120C75A5F8DEFF9CB3C13F5EC3EC8F7 /* bucketalloc.h in Headers */,
+				47D34335F8988CFC2E59E6195AFDC515 /* dict.h in Headers */,
+				C172CC9A19620B9A45DD83EA533E4D07 /* geom.h in Headers */,
+				96633FF1B21FF926FFB45BF9EDAE9855 /* LibTessSwift-umbrella.h in Headers */,
+				BD7AAA6547D0619792D7985C9DB9978C /* mesh.h in Headers */,
+				BF61D39DF6BE177E3244EF72B43786A3 /* objc-clang.h in Headers */,
+				781504BDA52E1C84222639B54BB9086A /* priorityq.h in Headers */,
+				C3B992FEDDFAB4B0C8E64378F46A9836 /* sweep.h in Headers */,
+				AA40641E5ACC5E2F633F180C6653D505 /* tess.h in Headers */,
+				ABB6437EE4D036FF07C88F8CA1DF7546 /* tesselator.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -509,9 +474,9 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = B16889A38BD4255700DDA11BB2834220 /* Build configuration list for PBXNativeTarget "LibTessSwift" */;
 			buildPhases = (
-				A66CEB4C5429E03967EBCF05846077D3 /* Sources */,
+				62FC86A2C95C27360B9F82576235CFE3 /* Sources */,
 				9E75AA8382BE076850F52853505697F5 /* Frameworks */,
-				A630106739B1428C1819E2B9814096DE /* Headers */,
+				C0C128A22C55E9C621A1BC1185EF9851 /* Headers */,
 			);
 			buildRules = (
 			);
@@ -641,6 +606,24 @@
 /* End PBXProject section */
 
 /* Begin PBXSourcesBuildPhase section */
+		62FC86A2C95C27360B9F82576235CFE3 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				30D6DCCA3C49BEADA52DB29D75AE793C /* bucketalloc.c in Sources */,
+				EDBEF4EC7FBC86488D5525A00CE1CCB0 /* dict.c in Sources */,
+				677E05EFEAD3DD9FEBAFD0B1E5B74ED2 /* geom.c in Sources */,
+				C08F05BD20589CF5D51D0628499F35A9 /* LibTessSwift-dummy.m in Sources */,
+				0B94607D46CB7E2B8429E16474074C12 /* MemAllocators.swift in Sources */,
+				F590461F01B6E1462ABD2A9267D740EC /* mesh.c in Sources */,
+				D411597780DB428090AFEF4D58B5588D /* priorityq.c in Sources */,
+				3C7D78A8CFDFDA4C101B72E7DC41E16A /* Public.swift in Sources */,
+				56E4A3F5B889622B98BA0D14DB3B9546 /* sweep.c in Sources */,
+				043A3C9944639F7C2A334A7F8F842688 /* tess.c in Sources */,
+				6878F3E148ED02B18B95F6D6B9CC6A3A /* TessC.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		67551C4F53716D150E25F638E5D95CDB /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -655,24 +638,6 @@
 			files = (
 				F784D6FAA2DC846F76E6081643A168AD /* SwiftyJSON-dummy.m in Sources */,
 				7395F1F8D723F1749BD899667BE39CA7 /* SwiftyJSON.swift in Sources */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		A66CEB4C5429E03967EBCF05846077D3 /* Sources */ = {
-			isa = PBXSourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				C2140B16C7F7E3F79A85DE49E70F72FF /* bucketalloc.c in Sources */,
-				F6E6A596A5FAB0CDF838D721CB1AB681 /* dict.c in Sources */,
-				F01B410AE1489D9EEB24DA570C95F8D8 /* geom.c in Sources */,
-				6D583329788F5EDD4F6A71906E3CB39A /* LibTessSwift-dummy.m in Sources */,
-				9BB6A0C1BAE5C35D27EEB152B328BF25 /* MemAllocators.swift in Sources */,
-				C75F553A920F0FCFF270F2303426F973 /* mesh.c in Sources */,
-				848DAD5C57D9C1661AEE2E93C6D4A534 /* priorityq.c in Sources */,
-				782A7DA2463D81E5F55B7A8C1A5B83A1 /* Public.swift in Sources */,
-				0B0776BF7483B9BE8D5E9CB97914A3B4 /* sweep.c in Sources */,
-				1BFA994337B4D7DC3B9DA41150A6FD62 /* tess.c in Sources */,
-				8E93F9497EFBDEB4DCD0E0B6D1BF2310 /* TessC.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -720,7 +685,7 @@
 /* Begin XCBuildConfiguration section */
 		1CF805195A2E9F55DF198E238252A548 /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 2E7F7C62EE34D2D271E6E1234A2002B2 /* SwiftyJSON.xcconfig */;
+			baseConfigurationReference = 1F6A5C548BB1E8241D1AB2E7F5254503 /* SwiftyJSON.xcconfig */;
 			buildSettings = {
 				CODE_SIGN_IDENTITY = "-";
 				"CODE_SIGN_IDENTITY[sdk=appletvos*]" = "";
@@ -755,7 +720,7 @@
 		};
 		2112626C9187B5A1CE50EC26E56939E3 /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 2E7F7C62EE34D2D271E6E1234A2002B2 /* SwiftyJSON.xcconfig */;
+			baseConfigurationReference = 1F6A5C548BB1E8241D1AB2E7F5254503 /* SwiftyJSON.xcconfig */;
 			buildSettings = {
 				CODE_SIGN_IDENTITY = "-";
 				"CODE_SIGN_IDENTITY[sdk=appletvos*]" = "";
@@ -791,7 +756,7 @@
 		};
 		3DCB174B587B0F60C99D8253C730B186 /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 758152AC2CC9FC30AD4263EB790047F7 /* LibTessSwift.xcconfig */;
+			baseConfigurationReference = 95D255EEDECF37FFFD2F739792CAF19D /* LibTessSwift.xcconfig */;
 			buildSettings = {
 				CODE_SIGN_IDENTITY = "-";
 				"CODE_SIGN_IDENTITY[sdk=appletvos*]" = "";
@@ -1146,7 +1111,7 @@
 		};
 		BDCABEF0F95E762607BBEE2A788D6873 /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 758152AC2CC9FC30AD4263EB790047F7 /* LibTessSwift.xcconfig */;
+			baseConfigurationReference = 95D255EEDECF37FFFD2F739792CAF19D /* LibTessSwift.xcconfig */;
 			buildSettings = {
 				CODE_SIGN_IDENTITY = "-";
 				"CODE_SIGN_IDENTITY[sdk=appletvos*]" = "";
