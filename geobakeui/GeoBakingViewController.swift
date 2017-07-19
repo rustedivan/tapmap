@@ -49,8 +49,8 @@ class GeoBakingViewController: NSViewController, NSTableViewDataSource {
 	
 	func tableView(_ tableView: NSTableView, objectValueFor tableColumn: NSTableColumn?, row: Int) -> Any? {
 		let warning = warnings[row]
-		if tableColumn?.identifier == "Region" { return warning.0 }
-		if tableColumn?.identifier == "Warning" { return warning.1 }
+		if tableColumn?.identifier == NSUserInterfaceItemIdentifier("Region") { return warning.0 }
+		if tableColumn?.identifier == NSUserInterfaceItemIdentifier("Warning") { return warning.1 }
 		return nil
 	}
 

@@ -33,7 +33,7 @@ class ViewController: NSViewController {
 			panel.message = "Please choose a feature json file"
 			panel.allowedFileTypes = ["json"]
 			panel.beginSheetModal(for: window) { result in
-				if result == NSFileHandlingPanelOKButton {
+				if result.rawValue == NSFileHandlingPanelOKButton {
 					if let url = panel.urls.first {
 						self.asyncLoadJson(from: url)
 					}
@@ -48,7 +48,7 @@ class ViewController: NSViewController {
 		panel.message = "Save pre-baked tapmap geometry"
 		panel.allowedFileTypes = ["geo"]
 		panel.beginSheetModal(for: window) { (result) in
-			if result == NSFileHandlingPanelOKButton {
+			if result.rawValue == NSFileHandlingPanelOKButton {
 				if let url = panel.url {
 					self.asyncBakeGeometry(to: url)
 				}
@@ -70,7 +70,7 @@ class ViewController: NSViewController {
 
 extension ViewController : GeoLoadingViewDelegate {
 	func startLoading() -> ProgressReport {
-		performSegue(withIdentifier: "ShowLoadingProgress", sender: self)
+		performSegue(withIdentifier: NSStoryboardSegue.Identifier(rawValue: "ShowLoadingProgress"), sender: self)
 		let loading = presentedViewControllers?.last as! GeoLoadingViewController
 		loading.delegate = self
 		return loading.progressReporter
@@ -128,7 +128,7 @@ extension ViewController : GeoLoadingViewDelegate {
 
 extension ViewController : GeoBakingViewDelegate {
 	func startBaking() -> (ProgressReport, ErrorReport) {
-		performSegue(withIdentifier: "ShowBakingProgress", sender: self)
+		performSegue(withIdentifier: NSStoryboardSegue.Identifier(rawValue: "ShowBakingProgress"), sender: self)
 		let baking = presentedViewControllers?.last as! GeoBakingViewController
 		baking.delegate = self
 		return (baking.progressReporter, baking.errorReporter)

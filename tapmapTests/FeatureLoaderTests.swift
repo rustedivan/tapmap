@@ -7,7 +7,6 @@
 //
 
 import XCTest
-import SwiftyJSON
 
 class FeatureLoaderTests: XCTestCase {
     override func setUp() {

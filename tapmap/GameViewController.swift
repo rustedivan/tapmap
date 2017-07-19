@@ -41,18 +41,10 @@ class GameViewController: GLKViewController {
 		
 		let path = Bundle.main.path(forResource: "countries", ofType: "geo")!
 		
-		NSKeyedUnarchiver.setClass(GeoWorld.Coding.self, forClassName: "GeoWorld.Coding")
-		NSKeyedUnarchiver.setClass(GeoContinent.Coding.self, forClassName: "GeoContinent.Coding")
-		NSKeyedUnarchiver.setClass(GeoRegion.Coding.self, forClassName: "GeoRegion.Coding")
-		NSKeyedUnarchiver.setClass(GeoFeature.Coding.self, forClassName: "GeoFeature.Coding")
-		NSKeyedUnarchiver.setClass(GeoTessellation.Coding.self, forClassName: "GeoTessellation.Coding")
-		NSKeyedUnarchiver.setClass(Vertex.Coding.self, forClassName: "Vertex.Coding")
-		
 		print("Starting to load geometry.")
 		let startTime = Date()
 		let fileContents = NSKeyedUnarchiver.unarchiveObject(withFile: path)
-		let encodedWorld = fileContents as! GeoWorld.Coding
-		geoWorld = encodedWorld.decoded as! GeoWorld
+		geoWorld = fileContents as! GeoWorld
 		let duration = Date().timeIntervalSince(startTime)
 		print("Load done in \(Int(duration)) seconds.")
 		

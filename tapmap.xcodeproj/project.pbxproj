@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		140E63F21F209645000D710E /* Serialization.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1469F5C61F02F5F4008A37B3 /* Serialization.swift */; };
 		141F25C61EA4B29B00DA808F /* OperationBakeGeometry.swift in Sources */ = {isa = PBXBuildFile; fileRef = 141F25C51EA4B29B00DA808F /* OperationBakeGeometry.swift */; };
 		141F25C81EA4B3B800DA808F /* GeoBakingViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 141F25C71EA4B3B800DA808F /* GeoBakingViewController.swift */; };
 		143D06281F0811450002D3C3 /* Serialization.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1469F5C61F02F5F4008A37B3 /* Serialization.swift */; };
@@ -39,10 +40,10 @@
 		14E09E6F1EB722CA00468792 /* GeoRegion.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14B74E5D1E8F9C1100849BB5 /* GeoRegion.swift */; };
 		14F148AA1EA383CC00D419AB /* RegionOutlineView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14F148A91EA383CC00D419AB /* RegionOutlineView.swift */; };
 		14FA8F0B1EA36D4000422644 /* OperationParseGeoJson.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14FA8F0A1EA36D4000422644 /* OperationParseGeoJson.swift */; };
-		681BDD4EA9CC2EF29B50E6C1 /* Pods_tapmap.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 128FFB8F786C71132FB1F443 /* Pods_tapmap.framework */; };
-		99A6810331A45FE47995FC5F /* Pods_geobakeui.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9BE90AE329EA2EDEB1DE4076 /* Pods_geobakeui.framework */; };
-		A3C7BECC3908C1F0109D0833 /* Pods_tapmapTests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3F3EF95914CC4EAAB2D8BAFC /* Pods_tapmapTests.framework */; };
-		E1CBFFED19B0FA1854911F0B /* Pods_geobakeuiTests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DA288FB62F9CB5F30FB0A8A4 /* Pods_geobakeuiTests.framework */; };
+		16AF126C634B2432466FB5A0 /* Pods_geobakeuiTests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1FA48C1961A4E1BA223BB9AF /* Pods_geobakeuiTests.framework */; };
+		4E7EF576A7FA03623D3045C5 /* Pods_tapmap.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E0E2CCEC0A0C2CA130F71980 /* Pods_tapmap.framework */; };
+		79C1EEE6558D06954EF73155 /* Pods_tapmapTests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 98EB48EAC979840A1AA3DDA5 /* Pods_tapmapTests.framework */; };
+		C80412AED3A0220C6A7B54FC /* Pods_geobakeui.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4F735415D89FF089D2489B33 /* Pods_geobakeui.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -76,9 +77,6 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
-		070EEB60FAEEE118A8A4F9C5 /* Pods-geobakeui.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-geobakeui.debug.xcconfig"; path = "Pods/Target Support Files/Pods-geobakeui/Pods-geobakeui.debug.xcconfig"; sourceTree = "<group>"; };
-		090767E27ECB3B219935FC22 /* Pods-tapmap-loading.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-tapmap-loading.release.xcconfig"; path = "Pods/Target Support Files/Pods-tapmap-loading/Pods-tapmap-loading.release.xcconfig"; sourceTree = "<group>"; };
-		128FFB8F786C71132FB1F443 /* Pods_tapmap.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_tapmap.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		141F25C51EA4B29B00DA808F /* OperationBakeGeometry.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = OperationBakeGeometry.swift; sourceTree = "<group>"; };
 		141F25C71EA4B3B800DA808F /* GeoBakingViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = GeoBakingViewController.swift; sourceTree = "<group>"; };
 		144AB4511F16401A00FE55BC /* countries.geo */ = {isa = PBXFileReference; lastKnownFileType = file.bplist; name = countries.geo; path = Raw/countries.geo; sourceTree = "<group>"; };
@@ -101,6 +99,7 @@
 		146A791B1E8F912500E2EE20 /* tapmapTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = tapmapTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		146A791F1E8F912500E2EE20 /* tapmapTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = tapmapTests.swift; sourceTree = "<group>"; };
 		146A79211E8F912500E2EE20 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		1494AD8EFE8515215CC13D7A /* Pods-geobakeui.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-geobakeui.debug.xcconfig"; path = "Pods/Target Support Files/Pods-geobakeui/Pods-geobakeui.debug.xcconfig"; sourceTree = "<group>"; };
 		14B21D841E9FEA5200D27F1E /* GeoLoadingViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = GeoLoadingViewController.swift; sourceTree = "<group>"; };
 		14B74E5A1E8F9ACB00849BB5 /* FeatureLoader.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FeatureLoader.swift; sourceTree = "<group>"; };
 		14B74E5D1E8F9C1100849BB5 /* GeoRegion.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = GeoRegion.swift; path = Geography/GeoRegion.swift; sourceTree = "<group>"; };
@@ -113,18 +112,17 @@
 		14F148A51EA3826B00D419AB /* dotplan */ = {isa = PBXFileReference; lastKnownFileType = text; name = dotplan; path = geobakeui/dotplan; sourceTree = "<group>"; };
 		14F148A91EA383CC00D419AB /* RegionOutlineView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RegionOutlineView.swift; sourceTree = "<group>"; };
 		14FA8F0A1EA36D4000422644 /* OperationParseGeoJson.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = OperationParseGeoJson.swift; sourceTree = "<group>"; };
-		1D45C5ABB66E774E7B04F05F /* Pods-geobakeuiTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-geobakeuiTests.release.xcconfig"; path = "Pods/Target Support Files/Pods-geobakeuiTests/Pods-geobakeuiTests.release.xcconfig"; sourceTree = "<group>"; };
-		3DC5E5FA5F48ACD54B065BEA /* Pods-tapmap.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-tapmap.release.xcconfig"; path = "Pods/Target Support Files/Pods-tapmap/Pods-tapmap.release.xcconfig"; sourceTree = "<group>"; };
-		3F3EF95914CC4EAAB2D8BAFC /* Pods_tapmapTests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_tapmapTests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
-		52DCA782B4126180F0FBED92 /* Pods-tapmap.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-tapmap.debug.xcconfig"; path = "Pods/Target Support Files/Pods-tapmap/Pods-tapmap.debug.xcconfig"; sourceTree = "<group>"; };
-		5DD058BF70BCABBB2B4F0B5E /* Pods-geobakeuiTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-geobakeuiTests.debug.xcconfig"; path = "Pods/Target Support Files/Pods-geobakeuiTests/Pods-geobakeuiTests.debug.xcconfig"; sourceTree = "<group>"; };
-		6F0137EB1864309CD86CCBB8 /* Pods-geobakeui.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-geobakeui.release.xcconfig"; path = "Pods/Target Support Files/Pods-geobakeui/Pods-geobakeui.release.xcconfig"; sourceTree = "<group>"; };
-		6FE687A9A5E3C534DD662B4C /* Pods-tapmap-loading.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-tapmap-loading.debug.xcconfig"; path = "Pods/Target Support Files/Pods-tapmap-loading/Pods-tapmap-loading.debug.xcconfig"; sourceTree = "<group>"; };
-		72AC77BD73CAE3DA469470B7 /* Pods-tapmapTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-tapmapTests.release.xcconfig"; path = "Pods/Target Support Files/Pods-tapmapTests/Pods-tapmapTests.release.xcconfig"; sourceTree = "<group>"; };
-		96AFEA5C99E9F46AEB90766E /* Pods_tapmap_loading.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_tapmap_loading.framework; sourceTree = BUILT_PRODUCTS_DIR; };
-		9BE90AE329EA2EDEB1DE4076 /* Pods_geobakeui.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_geobakeui.framework; sourceTree = BUILT_PRODUCTS_DIR; };
-		B5EDA10E7FBDF4C49D54D44B /* Pods-tapmapTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-tapmapTests.debug.xcconfig"; path = "Pods/Target Support Files/Pods-tapmapTests/Pods-tapmapTests.debug.xcconfig"; sourceTree = "<group>"; };
-		DA288FB62F9CB5F30FB0A8A4 /* Pods_geobakeuiTests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_geobakeuiTests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		1FA48C1961A4E1BA223BB9AF /* Pods_geobakeuiTests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_geobakeuiTests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		29E581D48B393A457E64B392 /* Pods-geobakeuiTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-geobakeuiTests.debug.xcconfig"; path = "Pods/Target Support Files/Pods-geobakeuiTests/Pods-geobakeuiTests.debug.xcconfig"; sourceTree = "<group>"; };
+		4E357795572D2DB05BB21BB7 /* Pods-tapmap.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-tapmap.release.xcconfig"; path = "Pods/Target Support Files/Pods-tapmap/Pods-tapmap.release.xcconfig"; sourceTree = "<group>"; };
+		4F735415D89FF089D2489B33 /* Pods_geobakeui.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_geobakeui.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		9414C37F2C78AB9794868A5C /* Pods-tapmapTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-tapmapTests.debug.xcconfig"; path = "Pods/Target Support Files/Pods-tapmapTests/Pods-tapmapTests.debug.xcconfig"; sourceTree = "<group>"; };
+		98EB48EAC979840A1AA3DDA5 /* Pods_tapmapTests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_tapmapTests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		A71062750044DF0B4A962A51 /* Pods-geobakeuiTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-geobakeuiTests.release.xcconfig"; path = "Pods/Target Support Files/Pods-geobakeuiTests/Pods-geobakeuiTests.release.xcconfig"; sourceTree = "<group>"; };
+		AA56D3B4F7037DE8FF2CEBB3 /* Pods-tapmapTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-tapmapTests.release.xcconfig"; path = "Pods/Target Support Files/Pods-tapmapTests/Pods-tapmapTests.release.xcconfig"; sourceTree = "<group>"; };
+		E0E2CCEC0A0C2CA130F71980 /* Pods_tapmap.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_tapmap.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		E5DC7DE9F14A34CF286DE4D1 /* Pods-geobakeui.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-geobakeui.release.xcconfig"; path = "Pods/Target Support Files/Pods-geobakeui/Pods-geobakeui.release.xcconfig"; sourceTree = "<group>"; };
+		F790ABC66E9BB25256061487 /* Pods-tapmap.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-tapmap.debug.xcconfig"; path = "Pods/Target Support Files/Pods-tapmap/Pods-tapmap.debug.xcconfig"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -132,7 +130,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				99A6810331A45FE47995FC5F /* Pods_geobakeui.framework in Frameworks */,
+				C80412AED3A0220C6A7B54FC /* Pods_geobakeui.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -140,7 +138,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				681BDD4EA9CC2EF29B50E6C1 /* Pods_tapmap.framework in Frameworks */,
+				4E7EF576A7FA03623D3045C5 /* Pods_tapmap.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -148,7 +146,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				A3C7BECC3908C1F0109D0833 /* Pods_tapmapTests.framework in Frameworks */,
+				79C1EEE6558D06954EF73155 /* Pods_tapmapTests.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -156,7 +154,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				E1CBFFED19B0FA1854911F0B /* Pods_geobakeuiTests.framework in Frameworks */,
+				16AF126C634B2432466FB5A0 /* Pods_geobakeuiTests.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -189,8 +187,8 @@
 				145210391E98D4F30029942F /* geobakeui */,
 				14E0288B1EB7332900B4D515 /* geobakeuiTests */,
 				146A79041E8F912500E2EE20 /* Products */,
-				FDA4ACC77873C239A83F7C95 /* Pods */,
-				E5E262D1B4564A75A41C2544 /* Frameworks */,
+				D3328A264063703880F3D874 /* Pods */,
+				1F547DE2B72FAF0FE2B6A3C9 /* Frameworks */,
 			);
 			sourceTree = "<group>";
 		};
@@ -269,31 +267,28 @@
 			name = "Background jobs";
 			sourceTree = "<group>";
 		};
-		E5E262D1B4564A75A41C2544 /* Frameworks */ = {
+		1F547DE2B72FAF0FE2B6A3C9 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
-				128FFB8F786C71132FB1F443 /* Pods_tapmap.framework */,
-				3F3EF95914CC4EAAB2D8BAFC /* Pods_tapmapTests.framework */,
-				96AFEA5C99E9F46AEB90766E /* Pods_tapmap_loading.framework */,
-				9BE90AE329EA2EDEB1DE4076 /* Pods_geobakeui.framework */,
-				DA288FB62F9CB5F30FB0A8A4 /* Pods_geobakeuiTests.framework */,
+				4F735415D89FF089D2489B33 /* Pods_geobakeui.framework */,
+				1FA48C1961A4E1BA223BB9AF /* Pods_geobakeuiTests.framework */,
+				E0E2CCEC0A0C2CA130F71980 /* Pods_tapmap.framework */,
+				98EB48EAC979840A1AA3DDA5 /* Pods_tapmapTests.framework */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
 		};
-		FDA4ACC77873C239A83F7C95 /* Pods */ = {
+		D3328A264063703880F3D874 /* Pods */ = {
 			isa = PBXGroup;
 			children = (
-				52DCA782B4126180F0FBED92 /* Pods-tapmap.debug.xcconfig */,
-				3DC5E5FA5F48ACD54B065BEA /* Pods-tapmap.release.xcconfig */,
-				B5EDA10E7FBDF4C49D54D44B /* Pods-tapmapTests.debug.xcconfig */,
-				72AC77BD73CAE3DA469470B7 /* Pods-tapmapTests.release.xcconfig */,
-				6FE687A9A5E3C534DD662B4C /* Pods-tapmap-loading.debug.xcconfig */,
-				090767E27ECB3B219935FC22 /* Pods-tapmap-loading.release.xcconfig */,
-				070EEB60FAEEE118A8A4F9C5 /* Pods-geobakeui.debug.xcconfig */,
-				6F0137EB1864309CD86CCBB8 /* Pods-geobakeui.release.xcconfig */,
-				5DD058BF70BCABBB2B4F0B5E /* Pods-geobakeuiTests.debug.xcconfig */,
-				1D45C5ABB66E774E7B04F05F /* Pods-geobakeuiTests.release.xcconfig */,
+				1494AD8EFE8515215CC13D7A /* Pods-geobakeui.debug.xcconfig */,
+				E5DC7DE9F14A34CF286DE4D1 /* Pods-geobakeui.release.xcconfig */,
+				29E581D48B393A457E64B392 /* Pods-geobakeuiTests.debug.xcconfig */,
+				A71062750044DF0B4A962A51 /* Pods-geobakeuiTests.release.xcconfig */,
+				F790ABC66E9BB25256061487 /* Pods-tapmap.debug.xcconfig */,
+				4E357795572D2DB05BB21BB7 /* Pods-tapmap.release.xcconfig */,
+				9414C37F2C78AB9794868A5C /* Pods-tapmapTests.debug.xcconfig */,
+				AA56D3B4F7037DE8FF2CEBB3 /* Pods-tapmapTests.release.xcconfig */,
 			);
 			name = Pods;
 			sourceTree = "<group>";
@@ -305,13 +300,13 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 145210461E98D4F30029942F /* Build configuration list for PBXNativeTarget "geobakeui" */;
 			buildPhases = (
-				50041979FA3B36704A03BE50 /* [CP] Check Pods Manifest.lock */,
+				8D3140D8B94D3AC2ACAD0F1C /* [CP] Check Pods Manifest.lock */,
 				145210341E98D4F30029942F /* Sources */,
 				145210351E98D4F30029942F /* Frameworks */,
 				145210361E98D4F30029942F /* Resources */,
-				DBD7B208888761FB6DE48452 /* [CP] Embed Pods Frameworks */,
-				2FB4629F973FC266716D26EB /* [CP] Copy Pods Resources */,
 				145210481E98D6120029942F /* Copy Files */,
+				1181C58831E6489A4D71A957 /* [CP] Embed Pods Frameworks */,
+				538366D9EA66E5B29B030C24 /* [CP] Copy Pods Resources */,
 			);
 			buildRules = (
 			);
@@ -326,12 +321,12 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 146A79241E8F912500E2EE20 /* Build configuration list for PBXNativeTarget "tapmap" */;
 			buildPhases = (
-				DDB362C55750AEB296782075 /* [CP] Check Pods Manifest.lock */,
+				744063832470972EA0C0DF37 /* [CP] Check Pods Manifest.lock */,
 				146A78FF1E8F912500E2EE20 /* Sources */,
 				146A79001E8F912500E2EE20 /* Frameworks */,
 				146A79011E8F912500E2EE20 /* Resources */,
-				74175CB175B114963D622862 /* [CP] Embed Pods Frameworks */,
-				5B63D5710F313C6A58D81EDF /* [CP] Copy Pods Resources */,
+				76F6EA5D48CCCD3ECEEE8D9C /* [CP] Embed Pods Frameworks */,
+				2E9FC71BDA7200C752041969 /* [CP] Copy Pods Resources */,
 			);
 			buildRules = (
 			);
@@ -346,12 +341,12 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 146A79271E8F912500E2EE20 /* Build configuration list for PBXNativeTarget "tapmapTests" */;
 			buildPhases = (
-				8A1034EE0430668BCDE8FF3B /* [CP] Check Pods Manifest.lock */,
+				C4CE2142A7E25512F855FC05 /* [CP] Check Pods Manifest.lock */,
 				146A79171E8F912500E2EE20 /* Sources */,
 				146A79181E8F912500E2EE20 /* Frameworks */,
 				146A79191E8F912500E2EE20 /* Resources */,
-				66A38F759A21986CD3BFB299 /* [CP] Embed Pods Frameworks */,
-				FB838368018062C0D4E50FB3 /* [CP] Copy Pods Resources */,
+				F0A0A892E8BF717A2A54F41E /* [CP] Embed Pods Frameworks */,
+				F77C8A277C15C49E0A855EC0 /* [CP] Copy Pods Resources */,
 			);
 			buildRules = (
 			);
@@ -367,12 +362,12 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 14E028911EB7332900B4D515 /* Build configuration list for PBXNativeTarget "geobakeuiTests" */;
 			buildPhases = (
-				8CB838D22BDCC4A17A82D10E /* [CP] Check Pods Manifest.lock */,
+				6BA90593FF0207EBA7E392C5 /* [CP] Check Pods Manifest.lock */,
 				14E028861EB7332900B4D515 /* Sources */,
 				14E028871EB7332900B4D515 /* Frameworks */,
 				14E028881EB7332900B4D515 /* Resources */,
-				B488545713460164F3E93242 /* [CP] Embed Pods Frameworks */,
-				61A08CF3437269CAD4779045 /* [CP] Copy Pods Resources */,
+				90B981A5BAE79294D3546AAD /* [CP] Embed Pods Frameworks */,
+				95C6F0C4CD963365B504AA42 /* [CP] Copy Pods Resources */,
 			);
 			buildRules = (
 			);
@@ -391,28 +386,32 @@
 			isa = PBXProject;
 			attributes = {
 				LastSwiftUpdateCheck = 0830;
-				LastUpgradeCheck = 0820;
+				LastUpgradeCheck = 0900;
 				ORGANIZATIONNAME = Wildbrain;
 				TargetAttributes = {
 					145210371E98D4F30029942F = {
 						CreatedOnToolsVersion = 8.3;
 						DevelopmentTeam = Y4JDRD37Q9;
+						LastSwiftMigration = 0900;
 						ProvisioningStyle = Automatic;
 					};
 					146A79021E8F912500E2EE20 = {
 						CreatedOnToolsVersion = 8.2.1;
 						DevelopmentTeam = Y4JDRD37Q9;
+						LastSwiftMigration = 0900;
 						ProvisioningStyle = Automatic;
 					};
 					146A791A1E8F912500E2EE20 = {
 						CreatedOnToolsVersion = 8.2.1;
 						DevelopmentTeam = Y4JDRD37Q9;
+						LastSwiftMigration = 0900;
 						ProvisioningStyle = Automatic;
 						TestTargetID = 146A79021E8F912500E2EE20;
 					};
 					14E028891EB7332900B4D515 = {
 						CreatedOnToolsVersion = 8.3.2;
 						DevelopmentTeam = Y4JDRD37Q9;
+						LastSwiftMigration = 0900;
 						ProvisioningStyle = Automatic;
 						TestTargetID = 145210371E98D4F30029942F;
 					};
@@ -479,142 +478,7 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXShellScriptBuildPhase section */
-		2FB4629F973FC266716D26EB /* [CP] Copy Pods Resources */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputPaths = (
-			);
-			name = "[CP] Copy Pods Resources";
-			outputPaths = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-geobakeui/Pods-geobakeui-resources.sh\"\n";
-			showEnvVarsInLog = 0;
-		};
-		50041979FA3B36704A03BE50 /* [CP] Check Pods Manifest.lock */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputPaths = (
-			);
-			name = "[CP] Check Pods Manifest.lock";
-			outputPaths = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "diff \"${PODS_ROOT}/../Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n";
-			showEnvVarsInLog = 0;
-		};
-		5B63D5710F313C6A58D81EDF /* [CP] Copy Pods Resources */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputPaths = (
-			);
-			name = "[CP] Copy Pods Resources";
-			outputPaths = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-tapmap/Pods-tapmap-resources.sh\"\n";
-			showEnvVarsInLog = 0;
-		};
-		61A08CF3437269CAD4779045 /* [CP] Copy Pods Resources */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputPaths = (
-			);
-			name = "[CP] Copy Pods Resources";
-			outputPaths = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-geobakeuiTests/Pods-geobakeuiTests-resources.sh\"\n";
-			showEnvVarsInLog = 0;
-		};
-		66A38F759A21986CD3BFB299 /* [CP] Embed Pods Frameworks */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputPaths = (
-			);
-			name = "[CP] Embed Pods Frameworks";
-			outputPaths = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-tapmapTests/Pods-tapmapTests-frameworks.sh\"\n";
-			showEnvVarsInLog = 0;
-		};
-		74175CB175B114963D622862 /* [CP] Embed Pods Frameworks */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputPaths = (
-			);
-			name = "[CP] Embed Pods Frameworks";
-			outputPaths = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-tapmap/Pods-tapmap-frameworks.sh\"\n";
-			showEnvVarsInLog = 0;
-		};
-		8A1034EE0430668BCDE8FF3B /* [CP] Check Pods Manifest.lock */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputPaths = (
-			);
-			name = "[CP] Check Pods Manifest.lock";
-			outputPaths = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "diff \"${PODS_ROOT}/../Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n";
-			showEnvVarsInLog = 0;
-		};
-		8CB838D22BDCC4A17A82D10E /* [CP] Check Pods Manifest.lock */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputPaths = (
-			);
-			name = "[CP] Check Pods Manifest.lock";
-			outputPaths = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "diff \"${PODS_ROOT}/../Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n";
-			showEnvVarsInLog = 0;
-		};
-		B488545713460164F3E93242 /* [CP] Embed Pods Frameworks */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputPaths = (
-			);
-			name = "[CP] Embed Pods Frameworks";
-			outputPaths = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-geobakeuiTests/Pods-geobakeuiTests-frameworks.sh\"\n";
-			showEnvVarsInLog = 0;
-		};
-		DBD7B208888761FB6DE48452 /* [CP] Embed Pods Frameworks */ = {
+		1181C58831E6489A4D71A957 /* [CP] Embed Pods Frameworks */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -629,7 +493,37 @@
 			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-geobakeui/Pods-geobakeui-frameworks.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
-		DDB362C55750AEB296782075 /* [CP] Check Pods Manifest.lock */ = {
+		2E9FC71BDA7200C752041969 /* [CP] Copy Pods Resources */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "[CP] Copy Pods Resources";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-tapmap/Pods-tapmap-resources.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+		538366D9EA66E5B29B030C24 /* [CP] Copy Pods Resources */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "[CP] Copy Pods Resources";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-geobakeui/Pods-geobakeui-resources.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+		6BA90593FF0207EBA7E392C5 /* [CP] Check Pods Manifest.lock */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -644,7 +538,112 @@
 			shellScript = "diff \"${PODS_ROOT}/../Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n";
 			showEnvVarsInLog = 0;
 		};
-		FB838368018062C0D4E50FB3 /* [CP] Copy Pods Resources */ = {
+		744063832470972EA0C0DF37 /* [CP] Check Pods Manifest.lock */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "[CP] Check Pods Manifest.lock";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "diff \"${PODS_ROOT}/../Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n";
+			showEnvVarsInLog = 0;
+		};
+		76F6EA5D48CCCD3ECEEE8D9C /* [CP] Embed Pods Frameworks */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "[CP] Embed Pods Frameworks";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-tapmap/Pods-tapmap-frameworks.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+		8D3140D8B94D3AC2ACAD0F1C /* [CP] Check Pods Manifest.lock */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "[CP] Check Pods Manifest.lock";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "diff \"${PODS_ROOT}/../Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n";
+			showEnvVarsInLog = 0;
+		};
+		90B981A5BAE79294D3546AAD /* [CP] Embed Pods Frameworks */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "[CP] Embed Pods Frameworks";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-geobakeuiTests/Pods-geobakeuiTests-frameworks.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+		95C6F0C4CD963365B504AA42 /* [CP] Copy Pods Resources */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "[CP] Copy Pods Resources";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-geobakeuiTests/Pods-geobakeuiTests-resources.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+		C4CE2142A7E25512F855FC05 /* [CP] Check Pods Manifest.lock */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "[CP] Check Pods Manifest.lock";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "diff \"${PODS_ROOT}/../Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n";
+			showEnvVarsInLog = 0;
+		};
+		F0A0A892E8BF717A2A54F41E /* [CP] Embed Pods Frameworks */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "[CP] Embed Pods Frameworks";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-tapmapTests/Pods-tapmapTests-frameworks.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+		F77C8A277C15C49E0A855EC0 /* [CP] Copy Pods Resources */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -696,6 +695,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				140E63F21F209645000D710E /* Serialization.swift in Sources */,
 				146A79201E8F912500E2EE20 /* tapmapTests.swift in Sources */,
 				14B74E731E8FCF5E00849BB5 /* FeatureLoaderTests.swift in Sources */,
 				14E09E6F1EB722CA00468792 /* GeoRegion.swift in Sources */,
@@ -759,7 +759,7 @@
 /* Begin XCBuildConfiguration section */
 		145210441E98D4F30029942F /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 070EEB60FAEEE118A8A4F9C5 /* Pods-geobakeui.debug.xcconfig */;
+			baseConfigurationReference = 1494AD8EFE8515215CC13D7A /* Pods-geobakeui.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
@@ -772,13 +772,14 @@
 				PRODUCT_BUNDLE_IDENTIFIER = se.wildbrain.geobakeui;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = macosx;
-				SWIFT_VERSION = 3.0;
+				SWIFT_SWIFT3_OBJC_INFERENCE = Default;
+				SWIFT_VERSION = 4.0;
 			};
 			name = Debug;
 		};
 		145210451E98D4F30029942F /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 6F0137EB1864309CD86CCBB8 /* Pods-geobakeui.release.xcconfig */;
+			baseConfigurationReference = E5DC7DE9F14A34CF286DE4D1 /* Pods-geobakeui.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
@@ -791,7 +792,8 @@
 				PRODUCT_BUNDLE_IDENTIFIER = se.wildbrain.geobakeui;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = macosx;
-				SWIFT_VERSION = 3.0;
+				SWIFT_SWIFT3_OBJC_INFERENCE = Default;
+				SWIFT_VERSION = 4.0;
 			};
 			name = Release;
 		};
@@ -804,7 +806,9 @@
 				CLANG_CXX_LIBRARY = "libc++";
 				CLANG_ENABLE_MODULES = YES;
 				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
 				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
 				CLANG_WARN_CONSTANT_CONVERSION = YES;
 				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
 				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
@@ -812,7 +816,11 @@
 				CLANG_WARN_ENUM_CONVERSION = YES;
 				CLANG_WARN_INFINITE_RECURSION = YES;
 				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
 				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
 				CLANG_WARN_SUSPICIOUS_MOVE = YES;
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
@@ -853,7 +861,9 @@
 				CLANG_CXX_LIBRARY = "libc++";
 				CLANG_ENABLE_MODULES = YES;
 				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
 				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
 				CLANG_WARN_CONSTANT_CONVERSION = YES;
 				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
 				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
@@ -861,7 +871,11 @@
 				CLANG_WARN_ENUM_CONVERSION = YES;
 				CLANG_WARN_INFINITE_RECURSION = YES;
 				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
 				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
 				CLANG_WARN_SUSPICIOUS_MOVE = YES;
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
@@ -888,21 +902,23 @@
 		};
 		146A79251E8F912500E2EE20 /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 52DCA782B4126180F0FBED92 /* Pods-tapmap.debug.xcconfig */;
+			baseConfigurationReference = F790ABC66E9BB25256061487 /* Pods-tapmap.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				DEVELOPMENT_TEAM = Y4JDRD37Q9;
 				INFOPLIST_FILE = tapmap/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				ONLY_ACTIVE_ARCH = YES;
 				PRODUCT_BUNDLE_IDENTIFIER = se.wildbrain.tapmap;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				SWIFT_VERSION = 3.0;
+				SWIFT_SWIFT3_OBJC_INFERENCE = Default;
+				SWIFT_VERSION = 4.0;
 			};
 			name = Debug;
 		};
 		146A79261E8F912500E2EE20 /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 3DC5E5FA5F48ACD54B065BEA /* Pods-tapmap.release.xcconfig */;
+			baseConfigurationReference = 4E357795572D2DB05BB21BB7 /* Pods-tapmap.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				DEVELOPMENT_TEAM = Y4JDRD37Q9;
@@ -910,13 +926,14 @@
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = se.wildbrain.tapmap;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				SWIFT_VERSION = 3.0;
+				SWIFT_SWIFT3_OBJC_INFERENCE = Default;
+				SWIFT_VERSION = 4.0;
 			};
 			name = Release;
 		};
 		146A79281E8F912500E2EE20 /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = B5EDA10E7FBDF4C49D54D44B /* Pods-tapmapTests.debug.xcconfig */;
+			baseConfigurationReference = 9414C37F2C78AB9794868A5C /* Pods-tapmapTests.debug.xcconfig */;
 			buildSettings = {
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = "$(inherited)";
 				BUNDLE_LOADER = "$(TEST_HOST)";
@@ -925,14 +942,15 @@
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = se.wildbrain.tapmapTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				SWIFT_VERSION = 3.0;
+				SWIFT_SWIFT3_OBJC_INFERENCE = Default;
+				SWIFT_VERSION = 4.0;
 				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/tapmap.app/tapmap";
 			};
 			name = Debug;
 		};
 		146A79291E8F912500E2EE20 /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 72AC77BD73CAE3DA469470B7 /* Pods-tapmapTests.release.xcconfig */;
+			baseConfigurationReference = AA56D3B4F7037DE8FF2CEBB3 /* Pods-tapmapTests.release.xcconfig */;
 			buildSettings = {
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = "$(inherited)";
 				BUNDLE_LOADER = "$(TEST_HOST)";
@@ -941,14 +959,15 @@
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = se.wildbrain.tapmapTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				SWIFT_VERSION = 3.0;
+				SWIFT_SWIFT3_OBJC_INFERENCE = Default;
+				SWIFT_VERSION = 4.0;
 				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/tapmap.app/tapmap";
 			};
 			name = Release;
 		};
 		14E028921EB7332900B4D515 /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 5DD058BF70BCABBB2B4F0B5E /* Pods-geobakeuiTests.debug.xcconfig */;
+			baseConfigurationReference = 29E581D48B393A457E64B392 /* Pods-geobakeuiTests.debug.xcconfig */;
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
@@ -961,14 +980,15 @@
 				PRODUCT_BUNDLE_IDENTIFIER = se.wildbrain.geobakeuiTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = macosx;
-				SWIFT_VERSION = 3.0;
+				SWIFT_SWIFT3_OBJC_INFERENCE = Default;
+				SWIFT_VERSION = 4.0;
 				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/geobakeui.app/Contents/MacOS/geobakeui";
 			};
 			name = Debug;
 		};
 		14E028931EB7332900B4D515 /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 1D45C5ABB66E774E7B04F05F /* Pods-geobakeuiTests.release.xcconfig */;
+			baseConfigurationReference = A71062750044DF0B4A962A51 /* Pods-geobakeuiTests.release.xcconfig */;
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
@@ -981,7 +1001,8 @@
 				PRODUCT_BUNDLE_IDENTIFIER = se.wildbrain.geobakeuiTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = macosx;
-				SWIFT_VERSION = 3.0;
+				SWIFT_SWIFT3_OBJC_INFERENCE = Default;
+				SWIFT_VERSION = 4.0;
 				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/geobakeui.app/Contents/MacOS/geobakeui";
 			};
 			name = Release;

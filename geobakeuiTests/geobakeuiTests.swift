@@ -26,16 +26,16 @@ class geobakeuiTests: XCTestCase {
 	
 	func testSerialisationVertex() {
 		let v = Vertex(v: (2.0, -3.5))
-		let d = NSKeyedArchiver.archivedData(withRootObject: v.encoded!)
-		let v2 = (NSKeyedUnarchiver.unarchiveObject(with: d) as! Vertex.Coding).vertex!
+		let d = try! PropertyListEncoder().encode(v)
+		let v2 = try! PropertyListDecoder().decode(Vertex.self, from: d)
 		XCTAssertEqual(v2.v.0, 2.0)
 		XCTAssertEqual(v2.v.1, -3.5)
 	}
 	
 	func testSerialisationFeature() {
 		let f = GeoFeature(vertexRange: VertexRange(5, 20))
-		let d = NSKeyedArchiver.archivedData(withRootObject: f.encoded!)
-		let f2 = (NSKeyedUnarchiver.unarchiveObject(with: d) as! GeoFeature.Coding).feature!
+		let d = try! PropertyListEncoder().encode(f)
+		let f2 = try! PropertyListDecoder().decode(GeoFeature.self, from: d)
 		XCTAssertEqual(f2.vertexRange.start, 5)
 		XCTAssertEqual(f2.vertexRange.count, 20)
 	}
@@ -47,8 +47,8 @@ class geobakeuiTests: XCTestCase {
 		let f2 = GeoFeature(vertexRange: VertexRange(5, 20))
 		let t = GeoTessellation(vertices: [v, v2], indices: [0, 1], aabb: Aabb(loX: 1.0, loY: 2.0, hiX: 3.0, hiY: 4.0))
 		let r = GeoRegion(name: "Test", color: GeoColor(r: 1.0, g: 2.0, b: 3.0), features: [f, f2], tessellation: t)
-		let d = NSKeyedArchiver.archivedData(withRootObject: r.encoded!)
-		let r2 = (NSKeyedUnarchiver.unarchiveObject(with: d) as! GeoRegion.Coding).region!
+		let d = try! PropertyListEncoder().encode(r)
+		let r2 = try! PropertyListDecoder().decode(GeoRegion.self, from: d)
 		XCTAssertEqual(r2.name, "Test")
 //		XCTAssertEqual(r2.color.g, 2.0)
 		XCTAssertEqual(r2.tessellation!.aabb.maxX, 3.0)
@@ -68,8 +68,8 @@ class geobakeuiTests: XCTestCase {
 		let r2 = GeoRegion(name: "Test2", color: GeoColor(r: 1.0, g: 2.0, b: 3.0), features: [f3, f4], tessellation: t2)
 		
 		let c = GeoContinent(name: "test", borderVertices: [v, v2], regions: [r, r2])
-		let d = NSKeyedArchiver.archivedData(withRootObject: c.encoded!)
-		let c2 = (NSKeyedUnarchiver.unarchiveObject(with: d) as! GeoContinent.Coding).continent!
+		let d = try! PropertyListEncoder().encode(c)
+		let c2 = try! PropertyListDecoder().decode(GeoContinent.self, from: d)
 		
 		XCTAssertEqual(c2.name, "test")
 		XCTAssertEqual(c2.borderVertices.count, 2)
@@ -91,8 +91,8 @@ class geobakeuiTests: XCTestCase {
 		let c2 = GeoContinent(name: "test2", borderVertices: [v2, v], regions: [r2, r])
 		
 		let w = GeoWorld(continents: [c, c2])
-		let d = NSKeyedArchiver.archivedData(withRootObject: w.encoded!)
-		let w2 = (NSKeyedUnarchiver.unarchiveObject(with: d) as! GeoWorld.Coding).world!
+		let d = try! PropertyListEncoder().encode(w)
+		let w2 = try! PropertyListDecoder().decode(GeoWorld.self, from: d)
 		
 		XCTAssertEqual(w2.continents.count, 2)
 	}

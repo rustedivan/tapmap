@@ -8,9 +8,11 @@
 
 import Foundation
 
-typealias GeoColor = (r: Float, g: Float, b: Float)
+struct GeoColor : Codable {
+	let r, g, b: Float
+}
 
-struct GeoColors {
+struct GeoColors : Codable {
 	static func randomColor() -> GeoColor {
 		let r = Float(arc4random_uniform(100)) / 100.0
 		let g = Float(arc4random_uniform(100)) / 100.0
@@ -27,7 +29,7 @@ struct Triangle {
 	let i: (Int, Int, Int)
 }
 
-struct Aabb : Equatable {
+struct Aabb : Equatable, Codable {
 	let minX : Float
 	let minY : Float
 	let maxX : Float
@@ -61,7 +63,7 @@ struct GeoFeature {
 	let vertexRange: VertexRange
 }
 
-struct GeoRegion {
+struct GeoRegion : Codable {
 	let name: String
 	let color: GeoColor
 	let features: [GeoFeature]
@@ -72,18 +74,18 @@ struct GeoRegion {
 	}
 }
 
-struct GeoTessellation {
+struct GeoTessellation : Codable {
 	let vertices: [Vertex]
 	let indices: [UInt32]
 	let aabb: Aabb
 }
 
-struct GeoContinent {
+struct GeoContinent : Codable {
 	let name: String
 	let borderVertices: [Vertex]
 	let regions: [GeoRegion]
 }
 
-struct GeoWorld {
+struct GeoWorld : Codable {
 	let continents: [GeoContinent]
 }

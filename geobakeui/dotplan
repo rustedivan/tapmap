@@ -2,3 +2,26 @@
 
 # Correctness
 - make all geography types conform to Equatable
+
+
+Nordamerikas regioner är tomma, men border vertices verkar finnas...
+
+
+// FIXME: very drawcall-heavy. Can be done in one drawcall with fatter vertices.
+// Possible to draw each region with barycenter and national colors in vertex buffer.
+// Can run vertex transforms from that barycenter and a progression in uniforms
+
+// Rendering overview:
+/*
+Regions outlines are single drawcalls, ~250 of them. Possible to pack all border
+vertices into one buffer and run _LINES instead of _LINE_LOOP. That would roughly
+double the index count, but save almost a frame's worth of draw call.
+
+Region fills could also be crushed into 1+1 drawcalls (separate handling of interacted
+region.
+
+That would get us down from ~500 drawcalls to ~5. At that point, it might actually be
+viable to run with the full 250ktri dataset, or at least close to it. It leaves plenty
+of space for POI markers and better shading, especially with aabb culling.
+*/
+

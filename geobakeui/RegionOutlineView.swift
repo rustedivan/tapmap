@@ -19,19 +19,19 @@ class RegionOutlineView: NSOutlineView, NSOutlineViewDataSource, NSOutlineViewDe
 	func outlineView(_ outlineView: NSOutlineView, objectValueFor tableColumn: NSTableColumn?, byItem item: Any?) -> Any? {
 
 		if let item = item as? GeoContinent {
-			if tableColumn?.identifier == "Region" {
+			if tableColumn?.identifier == NSUserInterfaceItemIdentifier("Region") {
 				return item.name
-			} else if tableColumn?.identifier == "Vertices" {
+			} else if tableColumn?.identifier == NSUserInterfaceItemIdentifier("Vertices") {
 				return "\(item.borderVertices.count) vertices"
 			}
 		} else if let item = item as? GeoRegion {
-			if tableColumn?.identifier == "Region" {
+			if tableColumn?.identifier == NSUserInterfaceItemIdentifier("Region") {
 				return item.name
-			} else if tableColumn?.identifier == "Vertices" {
+			} else if tableColumn?.identifier == NSUserInterfaceItemIdentifier("Vertices") {
 				return "\(item.features.count) features"
 			}
 		} else if let item = item as? GeoFeature {
-			if tableColumn?.identifier == "Vertices" {
+			if tableColumn?.identifier == NSUserInterfaceItemIdentifier("Vertices") {
 				return "\(item.vertexRange.start) -> \(item.vertexRange.start + item.vertexRange.count)"
 			}
 		}

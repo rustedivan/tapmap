@@ -37,17 +37,18 @@ class OperationBakeGeometry : Operation {
 		let tessellatedWorld = tessJob.world
 		report(1.0, "Finished tesselation.", true)
 		print("Persisting...")
-		if let encoded = tessellatedWorld.encoded {
-			NSKeyedArchiver.setClassName("GeoWorld.Coding", for: GeoWorld.Coding.self)
-			NSKeyedArchiver.setClassName("GeoContinent.Coding", for: GeoContinent.Coding.self)
-			NSKeyedArchiver.setClassName("GeoRegion.Coding", for: GeoRegion.Coding.self)
-			NSKeyedArchiver.setClassName("GeoFeature.Coding", for: GeoFeature.Coding.self)
-			NSKeyedArchiver.setClassName("GeoTessellation.Coding", for: GeoTessellation.Coding.self)
-			NSKeyedArchiver.setClassName("Vertex.Coding", for: Vertex.Coding.self)
-			
-			let didWrite = NSKeyedArchiver.archiveRootObject(encoded, toFile: tempUrl.path)
-			guard didWrite else { print("Save failed"); return }
-		} else {
+		
+		let encoder = PropertyListEncoder()
+		
+		if let encoded = try? encoder.encode(tessellatedWorld) {
+			do {
+				// FIXME: not needed, atomic write handles this temp stuff
+				try encoded.write(to: tempUrl, options: .atomicWrite)
+			} catch {
+				print("Saving failed")
+			}
+		}
+		else {
 			print("Encoding failed")
 		}
 	}
