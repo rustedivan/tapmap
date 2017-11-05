@@ -17,7 +17,7 @@ let UNIFORM_MODELVIEWPROJECTION_MATRIX = 0
 let UNIFORM_COLOR = 1
 var uniforms = [GLint](repeating: 0, count: 2)
 
-class GameViewController: GLKViewController {
+class GameViewController: GLKViewController, GLKViewControllerDelegate {
 	var geoWorld: GeoWorld!
 	var continentRenderers : [GeoBorderRenderer] = []
 	var regionRenderers : [GeoRegionRenderer] = []
@@ -43,8 +43,15 @@ class GameViewController: GLKViewController {
 		
 		print("Starting to load geometry.")
 		let startTime = Date()
-		let fileContents = NSKeyedUnarchiver.unarchiveObject(withFile: path)
-		geoWorld = fileContents as! GeoWorld
+		let geoData = NSData(contentsOfFile: path)!
+		
+		do {
+			try self.geoWorld = PropertyListDecoder().decode(GeoWorld.self, from: geoData as Data)
+		} catch {
+			print("Could not load world.")
+			return
+		}
+		
 		let duration = Date().timeIntervalSince(startTime)
 		print("Load done in \(Int(duration)) seconds.")
 		
@@ -57,6 +64,8 @@ class GameViewController: GLKViewController {
 		let view = self.view as! GLKView
 		view.context = self.context!
 		view.drawableDepthFormat = .format24
+		
+		delegate = self
 		
 		self.setupGL()
 	}
@@ -105,9 +114,9 @@ class GameViewController: GLKViewController {
 	
 	// MARK: - GLKView and GLKViewController delegate methods
 	
-	func update() {
+	func glkViewControllerUpdate(_ controller: GLKViewController) {
 		let projectionMatrix = GLKMatrix4MakeOrtho(-180.0, 180.0, -80.0, 80.0, 0.1, 2.0)
-		let zoom = 5.0 + 4.0 * sin(timeSinceLastResume * 0.5)
+		let zoom = 5.0 + 4.0 * sin(timeSinceLastResume * 0.15)
 		let lat = 90.0 * cos(timeSinceLastResume * 0.37)
 		let lng = 25.0 * sin(timeSinceLastResume * 0.23)
 
@@ -133,7 +142,8 @@ class GameViewController: GLKViewController {
 		var i = 0
 		var j = 0
 		for continent in geoWorld.continents {
-			for region in continent.regions {
+			let renderableRegions = continent.regions.filter { $0.tessellation != nil }
+			for region in renderableRegions {
 				regionRenderers[j].render(region: region)
 				j += 1
 			}
