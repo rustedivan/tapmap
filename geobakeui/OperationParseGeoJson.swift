@@ -21,66 +21,79 @@ class OperationParseGeoJson : Operation {
 	
 	override func main() {
 		guard !isCancelled else { print("Cancelled before starting"); return }
-		
+
 		var loadedContinents: [GeoContinent] = []
 		let numContinents = json.dictionaryValue.keys.count
-		
+
 		for continentJson in json.dictionaryValue.values {
-			let regions = continentJson["regions"]
-			let continentName = continentJson["name"].stringValue
-			var continentVertices: [Vertex] = []
-		
-			guard !isCancelled else { print("Cancelled load"); return }
-			
-			var loadedRegions: [GeoRegion] = []
-			for regionJson in regions.dictionaryValue.values {
-				let features = regionJson["coordinates"].arrayValue
-				let regionName = regionJson["name"].stringValue
-				
-				var loadedFeatures: [GeoFeature] = []
-				for featureJson in features {
-					guard !featureJson.arrayValue.isEmpty else { continue	}
-					
-					let partVertices = buildVertices(featureJson.arrayValue)
-					
-					let range = VertexRange(start: UInt32(continentVertices.count),
-					                        count: UInt32(partVertices.count))
-					
-					let feature = GeoFeature(vertexRange: range)
-					loadedFeatures.append(feature)
-					
-					continentVertices.append(contentsOf: partVertices)
-				}
-				
-				let region = GeoRegion(name: regionName,
-				                       color: GeoColors.randomColor(),
-				                       features: loadedFeatures,
-				                       tessellation: nil)
-				loadedRegions.append(region)
-			}
-			
-			let loadedContinent = GeoContinent(name: continentName,
-			                                   borderVertices: continentVertices,
-			                                   regions: loadedRegions)
+			let loadedContinent = parseContinent(continentJson)
 			loadedContinents.append(loadedContinent)
-			report(Double(loadedContinents.count) / Double(numContinents), continentName, false)
+
+			report(Double(loadedContinents.count) / Double(numContinents), loadedContinent.name, false)
+		}
+	}
+	
+	func parseContinent(_ json: JSON) -> GeoContinent {
+		let continentName = json["name"].stringValue
+		let regions = json["regions"]
+		var continentVertices: [Vertex] = []
+
+		var loadedRegions: [GeoRegion] = []
+		for regionJson in regions.dictionaryValue.values {
+			let (loadedRegion, regionVertices) = parseRegion(regionJson)
+			
+			loadedRegions.append(loadedRegion)
+			continentVertices.append(contentsOf: regionVertices)
+		}
+
+		return GeoContinent(name: continentName, borderVertices: [], regions: [])
+	}
+	
+	func parseRegion(_ json: JSON) -> (GeoRegion, [Vertex]) {
+		let features = json["coordinates"].arrayValue
+		let regionName = json["name"].stringValue
+		
+		var loadedFeatures: [GeoFeature] = []
+		for featureJson in features {
+			guard let firstPart = featureJson.array?.first else { print("Skipping feature."); continue }
+		
+			switch firstPart.type {
+			case .dictionary:
+				let (loadedFeature, featureVertices) = parseFeature(featureJson)
+				loadedFeatures.append(loadedFeature)
+			case .array:
+				for subFeature in featureJson.arrayValue {
+					let (subFeature, subFeatureVertices) = parseFeature(subFeature)
+					loadedFeatures.append(subFeature)
+				}
+			default:
+				print("Feature array contains \(firstPart.type)")
+			}
 		}
 		
-		resultWorld = GeoWorld(continents: loadedContinents)
+		return (GeoRegion(name: regionName,
+											color: GeoColors.randomColor(),
+											features: loadedFeatures,
+											tessellation: nil), [])
+	}
+	
+	func parseFeature(_ json: JSON) -> (GeoFeature, [Vertex]) {
+		let partVertices = buildVertices(json.arrayValue)
+		
+		// $$$ TEMP: zero offset
+		let range = VertexRange(UInt32(0), UInt32(partVertices.count))
+		return (GeoFeature(vertexRange: range), partVertices)
 	}
 	
 	func buildVertices(_ coords: [JSON]) -> [Vertex] {
 		var outVertices: [Vertex] = []
 		for c in coords {
-			if c.type == .array {
-				let subVertices = buildVertices(c.arrayValue)
-				outVertices.append(contentsOf: subVertices)
-			} else if c.type == .dictionary {
+			if c.type == .dictionary {
 				let v = Vertex(v: (c["lng"].floatValue,
 													 c["lat"].floatValue))
 				outVertices.append(v)
 			} else {
-				print("Feature has unexpected internal type")
+				print("Feature has unexpected internal type: \(c.type)")
 			}
 		}
 		return outVertices
