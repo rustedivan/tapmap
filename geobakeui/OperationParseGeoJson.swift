@@ -68,4 +68,21 @@ class OperationParseGeoJson : Operation {
 		
 		resultWorld = GeoWorld(continents: loadedContinents)
 	}
+	
+	func buildVertices(_ coords: [JSON]) -> [Vertex] {
+		var outVertices: [Vertex] = []
+		for c in coords {
+			if c.type == .array {
+				let subVertices = buildVertices(c.arrayValue)
+				outVertices.append(contentsOf: subVertices)
+			} else if c.type == .dictionary {
+				let v = Vertex(v: (c["lng"].floatValue,
+													 c["lat"].floatValue))
+				outVertices.append(v)
+			} else {
+				print("Feature has unexpected internal type")
+			}
+		}
+		return outVertices
+	}
 }
