@@ -46,7 +46,7 @@ class OperationParseGeoJson : Operation {
 			continentVertices.append(contentsOf: regionVertices)
 		}
 
-		return GeoContinent(name: continentName, borderVertices: [], regions: [])
+		return GeoContinent(name: continentName, regions: loadedRegions)
 	}
 	
 	func parseRegion(_ json: JSON) -> (GeoRegion, [Vertex]) {
@@ -78,11 +78,9 @@ class OperationParseGeoJson : Operation {
 	}
 	
 	func parseFeature(_ json: JSON) -> (GeoFeature, [Vertex]) {
-		let partVertices = buildVertices(json.arrayValue)
+		let featureVertices = buildVertices(json.arrayValue)
 		
-		// $$$ TEMP: zero offset
-		let range = VertexRange(UInt32(0), UInt32(partVertices.count))
-		return (GeoFeature(vertexRange: range), partVertices)
+		return (GeoFeature(), partVertices)
 	}
 	
 	func buildVertices(_ coords: [JSON]) -> [Vertex] {

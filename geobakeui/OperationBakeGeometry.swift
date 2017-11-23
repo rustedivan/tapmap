@@ -31,7 +31,7 @@ class OperationBakeGeometry : Operation {
 		
 		let tessQueue = OperationQueue()
 		tessQueue.name = "Tessellation queue"
-		let tessJob = OperationTessellateBorders(world, reporter: report, errorReporter: reportError)
+		let tessJob = OperationTessellateRegions(world, reporter: report, errorReporter: reportError)
 		
 		tessJob.start()
 		let tessellatedWorld = tessJob.world

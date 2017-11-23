@@ -10,7 +10,7 @@ import Foundation
 import LibTessSwift
 import simd
 
-class OperationTessellateBorders : Operation {
+class OperationTessellateRegions : Operation {
 	var world : GeoWorld
 	let report : ProgressReport
 	let reportError : ErrorReport
