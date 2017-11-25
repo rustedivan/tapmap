@@ -9,10 +9,19 @@
 import Foundation
 import SwiftyJSON
 
+fileprivate struct GeoFeature {
+	let vertices: [Vertex]
+}
+
+fileprivate struct GeoMultiFeature {
+	let name: String
+	let subFeatures: [GeoFeature]
+	let subMultiFeatures: [GeoMultiFeature]
+}
+
 class OperationParseGeoJson : Operation {
 	let json : JSON
 	let report : ProgressReport
-	var resultWorld : GeoWorld?
 	
 	init(_ geoJson: JSON, reporter: @escaping ProgressReport) {
 		json = geoJson
@@ -22,7 +31,7 @@ class OperationParseGeoJson : Operation {
 	override func main() {
 		guard !isCancelled else { print("Cancelled before starting"); return }
 
-		var loadedContinents: [GeoContinent] = []
+		var loadedContinents: [GeoMultiFeature] = []
 		let numContinents = json.dictionaryValue.keys.count
 
 		for continentJson in json.dictionaryValue.values {
@@ -33,54 +42,43 @@ class OperationParseGeoJson : Operation {
 		}
 	}
 	
-	func parseContinent(_ json: JSON) -> GeoContinent {
+	fileprivate func parseContinent(_ json: JSON) -> GeoMultiFeature {
 		let continentName = json["name"].stringValue
-		let regions = json["regions"]
-		var continentVertices: [Vertex] = []
-
-		var loadedRegions: [GeoRegion] = []
-		for regionJson in regions.dictionaryValue.values {
-			let (loadedRegion, regionVertices) = parseRegion(regionJson)
-			
-			loadedRegions.append(loadedRegion)
-			continentVertices.append(contentsOf: regionVertices)
-		}
-
-		return GeoContinent(name: continentName, regions: loadedRegions)
+		let regions = json["regions"].dictionaryValue
+		
+		let loadedRegions = regions.values.map { parseRegion($0) }
+		
+		return GeoMultiFeature(name: continentName,
+													 subFeatures: [],
+													 subMultiFeatures: loadedRegions)
 	}
 	
-	func parseRegion(_ json: JSON) -> (GeoRegion, [Vertex]) {
-		let features = json["coordinates"].arrayValue
+	fileprivate func parseRegion(_ json: JSON) -> GeoMultiFeature {
 		let regionName = json["name"].stringValue
+		let features = json["coordinates"].arrayValue
 		
 		var loadedFeatures: [GeoFeature] = []
-		for featureJson in features {
-			guard let firstPart = featureJson.array?.first else { print("Skipping feature."); continue }
 		
-			switch firstPart.type {
-			case .dictionary:
-				let (loadedFeature, featureVertices) = parseFeature(featureJson)
-				loadedFeatures.append(loadedFeature)
+		for featureJson in features {
+			let featureType = featureJson.array?.first?.type ?? .unknown
+			switch featureType {
 			case .array:
-				for subFeature in featureJson.arrayValue {
-					let (subFeature, subFeatureVertices) = parseFeature(subFeature)
-					loadedFeatures.append(subFeature)
+				for subFeatureJson in featureJson.arrayValue {
+					loadedFeatures.append(parseFeature(subFeatureJson))
 				}
+			case .dictionary:
+				loadedFeatures.append(parseFeature(featureJson))
+			case .unknown:
+				break
 			default:
-				print("Feature array contains \(firstPart.type)")
+				print("Malformed feature in \(regionName)")
 			}
 		}
-		
-		return (GeoRegion(name: regionName,
-											color: GeoColors.randomColor(),
-											features: loadedFeatures,
-											tessellation: nil), [])
+		return GeoMultiFeature(name: regionName, subFeatures: loadedFeatures, subMultiFeatures: [])
 	}
 	
-	func parseFeature(_ json: JSON) -> (GeoFeature, [Vertex]) {
-		let featureVertices = buildVertices(json.arrayValue)
-		
-		return (GeoFeature(), partVertices)
+	fileprivate func parseFeature(_ json: JSON) -> GeoFeature {
+		return GeoFeature(vertices: [])
 	}
 	
 	func buildVertices(_ coords: [JSON]) -> [Vertex] {
