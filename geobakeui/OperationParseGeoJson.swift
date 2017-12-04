@@ -72,7 +72,14 @@ class OperationParseGeoJson : Operation {
 	}
 	
 	fileprivate func parseFeature(_ json: JSON) -> GeoFeature {
-		return GeoFeature(vertices: [])
+		let vertices : [Vertex]
+		if let coordinates = json.array {
+			vertices = buildVertices(coordinates)
+		} else {
+			print("Vertices not found in feature.")
+			vertices = []
+		}
+		return GeoFeature(vertices: vertices)
 	}
 	
 	func buildVertices(_ coords: [JSON]) -> [Vertex] {
