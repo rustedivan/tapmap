@@ -9,13 +9,13 @@
 import Foundation
 
 class OperationBakeGeometry : Operation {
-	let world : GeoWorld
+	let world : [GeoMultiFeature]?
 	let tempUrl : URL
 	let report : ProgressReport
 	let reportError : ErrorReport
 	var error : Error?
 	
-	init(_ worldToBake: GeoWorld,
+	init(_ worldToBake: [GeoMultiFeature],
 	     reporter: @escaping ProgressReport,
 	     errorReporter: @escaping ErrorReport) {
 		world = worldToBake
@@ -31,10 +31,10 @@ class OperationBakeGeometry : Operation {
 		
 		let tessQueue = OperationQueue()
 		tessQueue.name = "Tessellation queue"
-		let tessJob = OperationTessellateRegions(world, reporter: report, errorReporter: reportError)
+		let tessJob = OperationTessellateRegions([], reporter: report, errorReporter: reportError)
 		
 		tessJob.start()
-		let tessellatedWorld = tessJob.world
+		let tessellatedWorld = GeoWorld(continents: []) //tessJob.world
 		report(1.0, "Finished tesselation.", true)
 		print("Persisting...")
 		

@@ -9,19 +9,10 @@
 import Foundation
 import SwiftyJSON
 
-fileprivate struct GeoFeature {
-	let vertices: [Vertex]
-}
-
-fileprivate struct GeoMultiFeature {
-	let name: String
-	let subFeatures: [GeoFeature]
-	let subMultiFeatures: [GeoMultiFeature]
-}
-
 class OperationParseGeoJson : Operation {
 	let json : JSON
 	let report : ProgressReport
+	var continents : [GeoMultiFeature]?
 	
 	init(_ geoJson: JSON, reporter: @escaping ProgressReport) {
 		json = geoJson
@@ -40,22 +31,25 @@ class OperationParseGeoJson : Operation {
 
 			report(Double(loadedContinents.count) / Double(numContinents), loadedContinent.name, false)
 		}
+		
+		continents = loadedContinents
+		
 	}
 	
 	fileprivate func parseContinent(_ json: JSON) -> GeoMultiFeature {
 		let continentName = json["name"].stringValue
 		let regions = json["regions"].dictionaryValue
 		
-		let loadedRegions = regions.values.map { parseRegion($0) }
+		let loadedRegions = regions.values.flatMap { parseRegion($0) }
 		
 		return GeoMultiFeature(name: continentName,
 													 subFeatures: [],
 													 subMultiFeatures: loadedRegions)
 	}
 	
-	fileprivate func parseRegion(_ json: JSON) -> GeoMultiFeature {
-		let regionName = json["name"].stringValue
-		let features = json["coordinates"].arrayValue
+	fileprivate func parseRegion(_ json: JSON) -> GeoMultiFeature? {
+		guard let regionName = json["name"].string else { print("No name in region"); return nil }
+		guard let features = json["coordinates"].array else { print("No coordinates in region"); return nil}
 		
 		var loadedFeatures: [GeoFeature] = []
 		

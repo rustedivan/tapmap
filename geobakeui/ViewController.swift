@@ -19,7 +19,7 @@ class ViewController: NSViewController {
 	let saveQueue = OperationQueue()
 	var loadJob : Operation?
 	var saveJob : Operation?
-	var workWorld: GeoWorld?
+	var workWorld: [GeoMultiFeature]?
 	
 	override func viewDidAppear() {
 		loadQueue.name = "Json load queue"
@@ -99,8 +99,8 @@ extension ViewController : GeoLoadingViewDelegate {
 			}
 			reporter(1.0, "Done", true)	// Close the loading panel
 			DispatchQueue.main.async {
-				if let world = jsonParser.resultWorld {
-					self.finishLoad(loadedWorld: world)
+				if let world = jsonParser.continents {
+					self.finishLoad(loadedContinents: world)
 				} else {
 					print("Load failed")
 					self.cancelLoad()
@@ -112,9 +112,9 @@ extension ViewController : GeoLoadingViewDelegate {
 		loadQueue.addOperation(jsonParser)
 	}
 
-	func finishLoad(loadedWorld: GeoWorld) {
-		workWorld = loadedWorld
-		regionOutline.world = loadedWorld
+	func finishLoad(loadedContinents: [GeoMultiFeature]) {
+		workWorld = loadedContinents
+		regionOutline.world = loadedContinents
 		regionOutline.isHidden = false
 		regionOutline.reloadData()
 	}
