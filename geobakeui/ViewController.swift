@@ -19,7 +19,7 @@ class ViewController: NSViewController {
 	let saveQueue = OperationQueue()
 	var loadJob : Operation?
 	var saveJob : Operation?
-	var workWorld: [GeoMultiFeature]?
+	var workWorld: [GeoFeatureCollection]?
 	
 	override func viewDidAppear() {
 		loadQueue.name = "Json load queue"
@@ -112,7 +112,7 @@ extension ViewController : GeoLoadingViewDelegate {
 		loadQueue.addOperation(jsonParser)
 	}
 
-	func finishLoad(loadedContinents: [GeoMultiFeature]) {
+	func finishLoad(loadedContinents: [GeoFeatureCollection]) {
 		workWorld = loadedContinents
 		regionOutline.world = loadedContinents
 		regionOutline.isHidden = false

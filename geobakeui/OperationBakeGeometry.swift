@@ -9,13 +9,13 @@
 import Foundation
 
 class OperationBakeGeometry : Operation {
-	let world : [GeoMultiFeature]
+	let world : [GeoFeatureCollection]
 	let tempUrl : URL
 	let report : ProgressReport
 	let reportError : ErrorReport
 	var error : Error?
 	
-	init(_ worldToBake: [GeoMultiFeature],
+	init(_ worldToBake: [GeoFeatureCollection],
 	     reporter: @escaping ProgressReport,
 	     errorReporter: @escaping ErrorReport) {
 		world = worldToBake

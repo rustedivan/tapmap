@@ -8,17 +8,35 @@
 
 import Foundation
 
-struct GeoFeature {
-	let vertices: [Vertex]
+struct GeoPolygonRing {
+    let vertices: [Vertex]
 }
 
-struct GeoMultiFeature {
+struct GeoPolygon {
+    let exteriorRing: GeoPolygonRing
+    let interiorRings: [GeoPolygonRing]
+    
+    func totalVertexCount() -> Int {
+        return exteriorRing.vertices.count +
+            interiorRings.reduce(0) { $0 + $1.vertices.count }
+    }
+}
+
+struct GeoFeature {
 	let name: String
-	let subFeatures: [GeoFeature]
-	let subMultiFeatures: [GeoMultiFeature]
-	
+    let regionName: String
+    let polygons: [GeoPolygon]
+    
 	func totalVertexCount() -> Int {
-		return subFeatures.reduce(0) { $0 + $1.vertices.count } +
-					 subMultiFeatures.reduce(0) { $0 + $1.totalVertexCount() }
+        return polygons.reduce(0) { $0 + $1.totalVertexCount() }
 	}
+}
+
+struct GeoFeatureCollection {
+    let name: String
+    let features: [GeoFeature]
+    
+    func totalVertexCount() -> Int {
+        return features.reduce(0) { $0 + $1.totalVertexCount() }
+    }
 }

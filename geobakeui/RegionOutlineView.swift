@@ -9,7 +9,7 @@
 import Cocoa
 
 class RegionOutlineView: NSOutlineView, NSOutlineViewDataSource, NSOutlineViewDelegate {
-	var world: [GeoMultiFeature]? = nil
+	var world: [GeoFeatureCollection]?
 	
 	override func awakeFromNib() {
 		delegate = self
@@ -17,15 +17,25 @@ class RegionOutlineView: NSOutlineView, NSOutlineViewDataSource, NSOutlineViewDe
 	}
 	
 	func outlineView(_ outlineView: NSOutlineView, objectValueFor tableColumn: NSTableColumn?, byItem item: Any?) -> Any? {
-		if let item = item as? GeoMultiFeature {
+		if let continent = item as? GeoFeatureCollection {
 			if tableColumn?.identifier == NSUserInterfaceItemIdentifier("Region") {
-				return item.name
+				return continent.name
 			} else if tableColumn?.identifier == NSUserInterfaceItemIdentifier("Vertices") {
-				return "\(item.totalVertexCount()) vertices"
+				return "\(continent.features.count) countries"
 			}
-		} else if let item = item as? GeoFeature {
+        } else if let country = item as? GeoFeature {
+            if tableColumn?.identifier == NSUserInterfaceItemIdentifier("Region") {
+                return country.name
+            } else if tableColumn?.identifier == NSUserInterfaceItemIdentifier("Vertices") {
+                return "\(country.totalVertexCount()) vertices"
+            }
+		} else if let polygon = item as? GeoPolygon {
 			if tableColumn?.identifier == NSUserInterfaceItemIdentifier("Vertices") {
-				return "\(item.vertices.count) vertices"
+                if polygon.interiorRings.isEmpty {
+                    return "Simple (\(polygon.totalVertexCount()) vertices)"
+                } else {
+                    return "Complex (\(polygon.totalVertexCount()) vertices, \(polygon.interiorRings.count) hole(s))"
+                }
 			}
 		}
 		return ""
@@ -36,33 +46,27 @@ class RegionOutlineView: NSOutlineView, NSOutlineViewDataSource, NSOutlineViewDe
 		if item == nil {
 			return world.count
 		} else {
-			if let region = item as? GeoMultiFeature {
-				return region.subFeatures.count + region.subMultiFeatures.count
-			}
-			
+			if let region = item as? GeoFeatureCollection {
+				return region.features.count
+            } else if let country = item as? GeoFeature {
+                return country.polygons.count
+            }
 			return 0
 		}
 	}
 	
 	func outlineView(_ outlineView: NSOutlineView, isItemExpandable item: Any) -> Bool {
-		return !(item is GeoFeature)
+		return !(item is GeoPolygon)
 	}
 	
 	func outlineView(_ outlineView: NSOutlineView, child index: Int, ofItem item: Any?) -> Any {
 		if item == nil {
 			return world![index]
-		} else  {
-			if let multiFeature = item as? GeoMultiFeature {
-				// Treat index as mapping into subFeatures.concat(subMultiFeatures)
-				let featuresCount = multiFeature.subFeatures.count
-				let indexIntoSubMultiFeatures = index - featuresCount
-				if index < featuresCount {
-					return multiFeature.subFeatures[index]
-				} else {
-					return multiFeature.subMultiFeatures[indexIntoSubMultiFeatures]
-				}
-			}
-		}
+		} else if let continent = item as? GeoFeatureCollection {
+            return continent.features[index]
+        } else if let country = item as? GeoFeature {
+            return country.polygons[index]
+        }
 		return 0
 	}
 }

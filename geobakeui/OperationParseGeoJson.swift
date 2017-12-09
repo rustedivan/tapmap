@@ -12,7 +12,7 @@ import SwiftyJSON
 class OperationParseGeoJson : Operation {
 	let json : JSON
 	let report : ProgressReport
-	var continents : [GeoMultiFeature]?
+	var continents : [GeoFeatureCollection]?
 	
 	init(_ geoJson: JSON, reporter: @escaping ProgressReport) {
 		json = geoJson
@@ -22,77 +22,104 @@ class OperationParseGeoJson : Operation {
 	override func main() {
 		guard !isCancelled else { print("Cancelled before starting"); return }
 
-		var loadedContinents: [GeoMultiFeature] = []
+		var loadedCountries: [GeoFeature] = []
 		let numContinents = json.dictionaryValue.keys.count
 
-		for continentJson in json.dictionaryValue.values {
-			let loadedContinent = parseContinent(continentJson)
-			loadedContinents.append(loadedContinent)
+        guard json["type"] == "FeatureCollection" else {
+            print("Root node is not multi-feature")
+            return
+        }
+    
+        guard let countryArray = json["features"].array else {
+            print("Did not find country \"features\" array")
+            return
+        }
+        
+		for countryJson in countryArray {
+            if let loadedCountry = parseCountry(countryJson) {
+                loadedCountries.append(loadedCountry)
+                report(Double(loadedCountries.count) / Double(numContinents), loadedCountry.name, false)
+            }
+		}
+		
+        continents = binContinents(loadedCountries)
+	}
+    
+    fileprivate func binContinents(_ countries: [GeoFeature]) -> [GeoFeatureCollection] {
+        var subRegionMap : [String : [GeoFeature]] = [:]
+        
+        for country in countries {
+            if subRegionMap[country.regionName] == nil {
+                subRegionMap[country.regionName] = []
+            }
+            subRegionMap[country.regionName]!.append(country)
+        }
+        
+        return subRegionMap.map { GeoFeatureCollection(name: $0.0, features: $0.1) }
+    }
+	
+	fileprivate func parseCountry(_ json: JSON) -> GeoFeature? {
+		guard let countryName = json["properties"]["NAME_LONG"].string else {
+            print("No name in region")
+            return nil
+        }
+		guard let featureType = json["geometry"]["type"].string else {
+            print("No feature type in geometry")
+            return nil
+        }
+        let regionName = json["properties"]["SUBREGION"].string ?? "No region"
+    
+        let loadedPolygons: [GeoPolygon]
 
-			report(Double(loadedContinents.count) / Double(numContinents), loadedContinent.name, false)
-		}
-		
-		continents = loadedContinents
-		
+		switch featureType {
+        case "MultiPolygon":
+            let polygonsJson = json["geometry"]["coordinates"]
+            loadedPolygons = polygonsJson.arrayValue.flatMap { parsePolygon($0) }
+        case "Polygon":
+            let polygonJson = json["geometry"]["coordinates"]
+            if let polygon = parsePolygon(polygonJson) {
+                loadedPolygons = [polygon]
+            } else {
+                print("Polygon in \"\(countryName)\" has no coordinate list.")
+                loadedPolygons = []
+            }
+        default:
+            print("Malformed feature in \(countryName)")
+            return nil
+        }
+		return GeoFeature(name: countryName, regionName: regionName, polygons: loadedPolygons)
 	}
 	
-	fileprivate func parseContinent(_ json: JSON) -> GeoMultiFeature {
-		let continentName = json["name"].stringValue
-		let regions = json["regions"].dictionaryValue
-		
-		let loadedRegions = regions.values.flatMap { parseRegion($0) }
-		
-		return GeoMultiFeature(name: continentName,
-													 subFeatures: [],
-													 subMultiFeatures: loadedRegions)
+	fileprivate func parsePolygon(_ polygonJson: JSON) -> GeoPolygon? {
+        guard let ringsJson = polygonJson.array, !ringsJson.isEmpty else {
+            print("Polygon has no ring array")
+            return nil
+        }
+        
+        guard let exteriorRingJson = ringsJson.first?.array else {
+            print("Polygon's exterior ring has no elements.")
+            return nil
+        }
+        let exteriorRing = parseRing(exteriorRingJson)
+        
+        let interiorRingsJson = ringsJson.dropFirst()
+        let interiorRings = interiorRingsJson.map { parseRing($0.arrayValue) }
+        
+		return GeoPolygon(exteriorRing: exteriorRing, interiorRings: interiorRings)
 	}
 	
-	fileprivate func parseRegion(_ json: JSON) -> GeoMultiFeature? {
-		guard let regionName = json["name"].string else { print("No name in region"); return nil }
-		guard let features = json["coordinates"].array else { print("No coordinates in region"); return nil}
-		
-		var loadedFeatures: [GeoFeature] = []
-		
-		for featureJson in features {
-			let featureType = featureJson.array?.first?.type ?? .unknown
-			switch featureType {
-			case .array:
-				for subFeatureJson in featureJson.arrayValue {
-					loadedFeatures.append(parseFeature(subFeatureJson))
-				}
-			case .dictionary:
-				loadedFeatures.append(parseFeature(featureJson))
-			case .unknown:
-				break
-			default:
-				print("Malformed feature in \(regionName)")
-			}
-		}
-		return GeoMultiFeature(name: regionName, subFeatures: loadedFeatures, subMultiFeatures: [])
-	}
-	
-	fileprivate func parseFeature(_ json: JSON) -> GeoFeature {
-		let vertices : [Vertex]
-		if let coordinates = json.array {
-			vertices = buildVertices(coordinates)
-		} else {
-			print("Vertices not found in feature.")
-			vertices = []
-		}
-		return GeoFeature(vertices: vertices)
-	}
-	
-	func buildVertices(_ coords: [JSON]) -> [Vertex] {
+	fileprivate func parseRing(_ coords: [JSON]) -> GeoPolygonRing {
 		var outVertices: [Vertex] = []
 		for c in coords {
-			if c.type == .dictionary {
-				let v = Vertex(v: (c["lng"].floatValue,
-													 c["lat"].floatValue))
-				outVertices.append(v)
-			} else {
-				print("Feature has unexpected internal type: \(c.type)")
-			}
+			guard c.type == .array else {
+                print("Coordinate has unexpected internal type: \(c.type)")
+                continue
+                
+            }
+            let v = Vertex(v: (c[0].floatValue,
+                               c[1].floatValue))
+			outVertices.append(v)
 		}
-		return outVertices
+        return GeoPolygonRing(vertices: outVertices)
 	}
 }
