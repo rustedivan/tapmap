@@ -26,7 +26,7 @@ class GeoBakingViewController: NSViewController, NSTableViewDataSource {
 				self.chunkLabel.stringValue = "Baking \(chunkName)..."
 				self.progressMeter.doubleValue = p
 				
-				if done {
+				if done && self.warnings.isEmpty {
 					self.dismiss(self)
 				}
 			}
