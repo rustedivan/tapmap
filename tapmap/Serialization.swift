@@ -36,17 +36,3 @@ extension Triangle : Codable {
 		i = (i0, i1, i2)
 	}
 }
-
-extension GeoFeature : Codable {
-	func encode(to encoder: Encoder) throws {
-		var container = encoder.unkeyedContainer()
-		try container.encode(contentsOf: [vertexRange.start, vertexRange.count])
-	}
-	
-	init(from decoder: Decoder) throws {
-		var container = try decoder.unkeyedContainer()
-		let start = try container.decode(UInt32.self)
-		let count = try container.decode(UInt32.self)
-		vertexRange = (start: start, count: count)
-	}
-}

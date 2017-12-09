@@ -19,7 +19,6 @@ var uniforms = [GLint](repeating: 0, count: 2)
 
 class GameViewController: GLKViewController, GLKViewControllerDelegate {
 	var geoWorld: GeoWorld!
-	var continentRenderers : [GeoBorderRenderer] = []
 	var regionRenderers : [GeoRegionRenderer] = []
 	
 	var program: GLuint = 0
@@ -91,14 +90,9 @@ class GameViewController: GLKViewController, GLKViewControllerDelegate {
 		if(self.loadShaders() == false) {
 			print("Failed to load shaders")
 		}
-		
-		glEnable(GLenum(GL_DEPTH_TEST))
 		for continent in geoWorld.continents {
-			continentRenderers.append(GeoBorderRenderer(continent: continent))
 			for region in continent.regions {
-				if let regionRenderer = GeoRegionRenderer(region: region) {
-					regionRenderers.append(regionRenderer)
-				}
+				regionRenderers.append(GeoRegionRenderer(region: region))
 			}
 		}
 	}
@@ -140,15 +134,11 @@ class GameViewController: GLKViewController, GLKViewControllerDelegate {
 		})
 	
 		var i = 0
-		var j = 0
 		for continent in geoWorld.continents {
-			let renderableRegions = continent.regions.filter { $0.tessellation != nil }
-			for region in renderableRegions {
-				regionRenderers[j].render(region: region)
-				j += 1
+			for region in continent.regions {
+				regionRenderers[i].render(region: region)
+				i += 1
 			}
-			continentRenderers[i].render(regions: continent.regions)
-			i += 1
 		}
 	}
 	
