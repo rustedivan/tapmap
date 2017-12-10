@@ -111,12 +111,12 @@ class GameViewController: GLKViewController, GLKViewControllerDelegate {
 	func glkViewControllerUpdate(_ controller: GLKViewController) {
 		let projectionMatrix = GLKMatrix4MakeOrtho(-180.0, 180.0, -80.0, 80.0, 0.1, 2.0)
 		let zoom = 5.0 + 4.0 * sin(timeSinceLastResume * 0.15)
-		let lat = 90.0 * cos(timeSinceLastResume * 0.37)
-		let lng = 25.0 * sin(timeSinceLastResume * 0.23)
+		let lng = 90.0 * cos(timeSinceLastResume * 0.37)
+		let lat = 25.0 * sin(timeSinceLastResume * 0.23)
 
 		// Compute the model view matrix for the object rendered with GLKit
 		var modelViewMatrix = GLKMatrix4MakeScale(Float(zoom), Float(zoom), 1.0)
-		modelViewMatrix = GLKMatrix4Translate(modelViewMatrix, Float(lat), Float(lng), -1.5)
+		modelViewMatrix = GLKMatrix4Translate(modelViewMatrix, Float(-lng), Float(-lat), -1.5)
 		modelViewProjectionMatrix = GLKMatrix4Multiply(projectionMatrix, modelViewMatrix)
 	}
 	
