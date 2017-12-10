@@ -58,17 +58,17 @@ class OperationParseGeoJson : Operation {
         return subRegionMap.map { GeoFeatureCollection(name: $0.0, features: $0.1) }
     }
 	
-	fileprivate func parseCountry(_ json: JSON) -> GeoFeature? {
-		guard let countryName = json["properties"]["NAME_LONG"].string else {
-            print("No name in region")
-            return nil
-        }
+	fileprivate func parseFeature(_ json: JSON) -> GeoFeature? {
+		let properties = json["properties"]
+		guard let featureName = properties["NAME"].string ?? properties["name"].string else {
+			print("No name in feature")
+			return nil
+		}
 		guard let featureType = json["geometry"]["type"].string else {
-            print("No feature type in geometry")
-            return nil
+			print("No feature type in geometry for \"\(featureName)\"")
+      return nil
         }
-        let regionName = json["properties"]["SUBREGION"].string ?? "No region"
-    
+        
         let loadedPolygons: [GeoPolygon]
 
 		switch featureType {
@@ -80,14 +80,23 @@ class OperationParseGeoJson : Operation {
             if let polygon = parsePolygon(polygonJson) {
                 loadedPolygons = [polygon]
             } else {
-                print("Polygon in \"\(countryName)\" has no coordinate list.")
+                print("Polygon in \"\(featureName)\" has no coordinate list.")
                 loadedPolygons = []
             }
         default:
-            print("Malformed feature in \(countryName)")
+            print("Malformed feature in \(featureName)")
             return nil
         }
-		return GeoFeature(name: countryName, regionName: regionName, polygons: loadedPolygons)
+        
+        // Flatten string/value properties
+        let stringProperties = properties.dictionaryValue
+            .filter { $0.value.type == .string }
+            .mapValues { $0.stringValue }
+        let valueProperties = properties.dictionaryValue
+            .filter { $0.value.type == .number }
+            .mapValues { $0.doubleValue }
+        
+        return GeoFeature(polygons: loadedPolygons, properties: stringProperties, values: valueProperties)
 	}
 	
 	fileprivate func parsePolygon(_ polygonJson: JSON) -> GeoPolygon? {
