@@ -11,17 +11,17 @@ import LibTessSwift
 import simd
 
 class OperationTessellateRegions : Operation {
-	var continents : [GeoFeatureCollection]
+	var world : GeoFeatureCollection
 	let report : ProgressReport
 	let reportError : ErrorReport
-	var tessellatedContinents : [GeoContinent]
+	var tessellatedRegions : [GeoRegion]
 	var error : Error?
 	
-	init(_ continentsToTessellate: [GeoFeatureCollection], reporter: @escaping ProgressReport, errorReporter: @escaping ErrorReport) {
-		continents = continentsToTessellate
+	init(_ featuresToTessellate: GeoFeatureCollection, reporter: @escaping ProgressReport, errorReporter: @escaping ErrorReport) {
+        world = featuresToTessellate
 		report = reporter
 		reportError = errorReporter
-		tessellatedContinents = []
+		tessellatedRegions = []
 		super.init()
 	}
 	
@@ -30,33 +30,28 @@ class OperationTessellateRegions : Operation {
 		
 		var totalTris = 0
 		
-		tessellatedContinents = continents.map { continent -> GeoContinent in
-			// Tessellate countries
-            let tessellatedRegions = continent.features.map { region -> GeoRegion? in
-                if let tessellation = tessellate(region: region) {
-                    totalTris += tessellation.vertices.count
-                    report(0.3, "Tesselated \(region.name) (total \(totalTris) triangles", false)
-                    return GeoRegion(name: region.name, geometry: tessellation)
-                } else {
-                    reportError(region.name, "Tesselation failed")
-                    return nil
-                }
-            }
-			return GeoContinent(name: continent.name,
-                                regions: tessellatedRegions.flatMap { $0 })
+		tessellatedRegions = world.features.flatMap { feature -> GeoRegion? in
+				if let tessellation = tessellate(feature) {
+						totalTris += tessellation.vertices.count
+						report(0.3, "Tesselated \(feature.name) (total \(totalTris) triangles", false)
+						return GeoRegion(name: feature.name, geometry: tessellation)
+				} else {
+						reportError(feature.name, "Tesselation failed")
+						return nil
+				}
 		}
 		
 		print("Tessellated \(totalTris) triangles")
 	}
 }
 
-func tessellate(region: GeoFeature) -> GeoTessellation? {
+func tessellate(_ feature: GeoFeature) -> GeoTessellation? {
     guard let tess = TessC() else {
         print("Could not init TessC")
         return nil
     }
 
-    for polygon in region.polygons {
+    for polygon in feature.polygons {
         let exterior = polygon.exteriorRing.contour
         tess.addContour(exterior)
         let interiorContours = polygon.interiorRings.map{ $0.contour }

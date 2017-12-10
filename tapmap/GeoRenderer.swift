@@ -11,8 +11,6 @@ import OpenGLES
 import GLKit
 
 // FIXME: very drawcall-heavy. Can be done in one drawcall with fatter vertices.
-// Possible to draw each region with barycenter and national colors in vertex buffer.
-// Can run vertex transforms from that barycenter and a progression in uniforms
 
 class GeoRegionRenderer {
 	var vertexBuffer: GLuint = 0
@@ -51,7 +49,7 @@ class GeoRegionRenderer {
 		glEnableVertexAttribArray(GLuint(GLKVertexAttrib.position.rawValue))
 		glVertexAttribPointer(GLuint(GLKVertexAttrib.position.rawValue), 2, GLenum(GL_FLOAT), GLboolean(GL_FALSE), 8, BUFFER_OFFSET(0))
 		
-		let c = region.color
+        let c = GeoColors.randomColor() //(r: 0.1 as Float, g: 0.6 as Float, b: 0.3 as Float)
 		var components : [GLfloat] = [c.r, c.g, c.b, 1.0]
 		glUniform4f(uniforms[UNIFORM_COLOR], GLfloat(components[0]), GLfloat(components[1]), GLfloat(components[2]), GLfloat(components[3]))
 		

@@ -12,7 +12,7 @@ import SwiftyJSON
 class OperationParseGeoJson : Operation {
 	let json : JSON
 	let report : ProgressReport
-	var continents : [GeoFeatureCollection]?
+	var world : GeoFeatureCollection?
 	
 	init(_ geoJson: JSON, reporter: @escaping ProgressReport) {
 		json = geoJson
@@ -22,41 +22,29 @@ class OperationParseGeoJson : Operation {
 	override func main() {
 		guard !isCancelled else { print("Cancelled before starting"); return }
 
-		var loadedCountries: [GeoFeature] = []
-		let numContinents = json.dictionaryValue.keys.count
-
         guard json["type"] == "FeatureCollection" else {
             print("Root node is not multi-feature")
             return
         }
     
-        guard let countryArray = json["features"].array else {
+        guard let featureArray = json["features"].array else {
             print("Did not find country \"features\" array")
             return
         }
-        
-		for countryJson in countryArray {
-            if let loadedCountry = parseCountry(countryJson) {
-                loadedCountries.append(loadedCountry)
-                report(Double(loadedCountries.count) / Double(numContinents), loadedCountry.name, false)
+
+        let numFeatures = featureArray.count
+        var loadedFeatures : [GeoFeature] = []
+		for featureJson in featureArray {
+            if let loadedFeature = parseFeature(featureJson) {
+                loadedFeatures.append(loadedFeature)
+                
+                let name = loadedFeature.properties["NAME"] ?? loadedFeature.properties["name"] ?? "Unnamed"
+                report(Double(loadedFeatures.count) / Double(numFeatures), name, false)
             }
 		}
-		
-        continents = binContinents(loadedCountries)
+        
+        world = GeoFeatureCollection(features: loadedFeatures)
 	}
-    
-    fileprivate func binContinents(_ countries: [GeoFeature]) -> [GeoFeatureCollection] {
-        var subRegionMap : [String : [GeoFeature]] = [:]
-        
-        for country in countries {
-            if subRegionMap[country.regionName] == nil {
-                subRegionMap[country.regionName] = []
-            }
-            subRegionMap[country.regionName]!.append(country)
-        }
-        
-        return subRegionMap.map { GeoFeatureCollection(name: $0.0, features: $0.1) }
-    }
 	
 	fileprivate func parseFeature(_ json: JSON) -> GeoFeature? {
 		let properties = json["properties"]

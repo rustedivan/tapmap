@@ -76,5 +76,5 @@ struct GeoContinent : Codable {
 }
 
 struct GeoWorld : Codable {
-	let continents: [GeoContinent]
+	let regions: [GeoRegion]
 }

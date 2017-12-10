@@ -90,10 +90,8 @@ class GameViewController: GLKViewController, GLKViewControllerDelegate {
 		if(self.loadShaders() == false) {
 			print("Failed to load shaders")
 		}
-		for continent in geoWorld.continents {
-			for region in continent.regions {
-				regionRenderers.append(GeoRegionRenderer(region: region))
-			}
+		for region in geoWorld.regions {
+			regionRenderers.append(GeoRegionRenderer(region: region))
 		}
 	}
 	
@@ -134,11 +132,9 @@ class GameViewController: GLKViewController, GLKViewControllerDelegate {
 		})
 	
 		var i = 0
-		for continent in geoWorld.continents {
-			for region in continent.regions {
-				regionRenderers[i].render(region: region)
-				i += 1
-			}
+		for region in geoWorld.regions {
+			regionRenderers[i].render(region: region)
+			i += 1
 		}
 	}
 	
