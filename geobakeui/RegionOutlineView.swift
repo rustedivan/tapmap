@@ -18,17 +18,17 @@ class RegionOutlineView: NSOutlineView, NSOutlineViewDataSource, NSOutlineViewDe
 	
 	func outlineView(_ outlineView: NSOutlineView, objectValueFor tableColumn: NSTableColumn?, byItem item: Any?) -> Any? {
 		if let feature = item as? GeoFeature {
-            if tableColumn?.identifier == NSUserInterfaceItemIdentifier("Region") {
-                return feature.name
-            } else if tableColumn?.identifier == NSUserInterfaceItemIdentifier("Vertices") {
-                return "\(feature.totalVertexCount()) vertices"
-            }
+			if tableColumn?.identifier == NSUserInterfaceItemIdentifier("Region") {
+				return feature.name
+			} else if tableColumn?.identifier == NSUserInterfaceItemIdentifier("Vertices") {
+				return "\(feature.totalVertexCount()) vertices"
+			}
 		} else if let polygon = item as? GeoPolygon {
 			if tableColumn?.identifier == NSUserInterfaceItemIdentifier("Vertices") {
 				if polygon.interiorRings.isEmpty {
-						return "Simple (\(polygon.totalVertexCount()) vertices)"
+					return "Simple (\(polygon.totalVertexCount()) vertices)"
 				} else {
-						return "Complex (\(polygon.totalVertexCount()) vertices, \(polygon.interiorRings.count) hole(s))"
+					return "Complex (\(polygon.totalVertexCount()) vertices, \(polygon.interiorRings.count) hole(s))"
 				}
 			}
 		}
@@ -54,8 +54,8 @@ class RegionOutlineView: NSOutlineView, NSOutlineViewDataSource, NSOutlineViewDe
 		if item == nil {
 			return world!.features[index]
 		} else if let feature = item as? GeoFeature {
-            return feature.polygons[index]
-        }
+			return feature.polygons[index]
+		}
 		return 0
 	}
 }

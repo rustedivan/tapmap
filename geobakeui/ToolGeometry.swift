@@ -9,17 +9,17 @@
 import Foundation
 
 struct GeoPolygonRing {
-    let vertices: [Vertex]
+	let vertices: [Vertex]
 }
 
 struct GeoPolygon {
-    let exteriorRing: GeoPolygonRing
-    let interiorRings: [GeoPolygonRing]
-    
-    func totalVertexCount() -> Int {
-        return exteriorRing.vertices.count +
-            interiorRings.reduce(0) { $0 + $1.vertices.count }
-    }
+	let exteriorRing: GeoPolygonRing
+	let interiorRings: [GeoPolygonRing]
+	
+	func totalVertexCount() -> Int {
+			return exteriorRing.vertices.count +
+						 interiorRings.reduce(0) { $0 + $1.vertices.count }
+	}
 }
 
 struct GeoFeature {
@@ -32,14 +32,14 @@ struct GeoFeature {
 	}
 	
 	func totalVertexCount() -> Int {
-        return polygons.reduce(0) { $0 + $1.totalVertexCount() }
+		return polygons.reduce(0) { $0 + $1.totalVertexCount() }
 	}
 }
 
 struct GeoFeatureCollection {
-    let features: [GeoFeature]
-    
-    func totalVertexCount() -> Int {
-        return features.reduce(0) { $0 + $1.totalVertexCount() }
-    }
+	let features: [GeoFeature]
+	
+	func totalVertexCount() -> Int {
+		return features.reduce(0) { $0 + $1.totalVertexCount() }
+	}
 }

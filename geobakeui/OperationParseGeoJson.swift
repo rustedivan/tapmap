@@ -21,29 +21,27 @@ class OperationParseGeoJson : Operation {
 	
 	override func main() {
 		guard !isCancelled else { print("Cancelled before starting"); return }
-
-        guard json["type"] == "FeatureCollection" else {
-            print("Root node is not multi-feature")
-            return
-        }
-    
-        guard let featureArray = json["features"].array else {
-            print("Did not find country \"features\" array")
-            return
-        }
-
-        let numFeatures = featureArray.count
-        var loadedFeatures : [GeoFeature] = []
-		for featureJson in featureArray {
-            if let loadedFeature = parseFeature(featureJson) {
-                loadedFeatures.append(loadedFeature)
-                
-                let name = loadedFeature.properties["NAME"] ?? loadedFeature.properties["name"] ?? "Unnamed"
-                report(Double(loadedFeatures.count) / Double(numFeatures), name, false)
-            }
+		guard json["type"] == "FeatureCollection" else {
+			print("Root node is not multi-feature")
+			return
 		}
-        
-        world = GeoFeatureCollection(features: loadedFeatures)
+		guard let featureArray = json["features"].array else {
+			print("Did not find country \"features\" array")
+			return
+		}
+
+		let numFeatures = featureArray.count
+		var loadedFeatures : [GeoFeature] = []
+		for featureJson in featureArray {
+			if let loadedFeature = parseFeature(featureJson) {
+				loadedFeatures.append(loadedFeature)
+					
+				let name = loadedFeature.properties["NAME"] ?? loadedFeature.properties["name"] ?? "Unnamed"
+				report(Double(loadedFeatures.count) / Double(numFeatures), name, false)
+			}
+		}
+	
+		world = GeoFeatureCollection(features: loadedFeatures)
 	}
 	
 	fileprivate func parseFeature(_ json: JSON) -> GeoFeature? {
@@ -54,54 +52,54 @@ class OperationParseGeoJson : Operation {
 		}
 		guard let featureType = json["geometry"]["type"].string else {
 			print("No feature type in geometry for \"\(featureName)\"")
-      return nil
-        }
-        
-        let loadedPolygons: [GeoPolygon]
+			return nil
+		}
+		
+		let loadedPolygons: [GeoPolygon]
 
 		switch featureType {
-        case "MultiPolygon":
-            let polygonsJson = json["geometry"]["coordinates"]
-            loadedPolygons = polygonsJson.arrayValue.flatMap { parsePolygon($0) }
-        case "Polygon":
-            let polygonJson = json["geometry"]["coordinates"]
-            if let polygon = parsePolygon(polygonJson) {
-                loadedPolygons = [polygon]
-            } else {
-                print("Polygon in \"\(featureName)\" has no coordinate list.")
-                loadedPolygons = []
-            }
-        default:
-            print("Malformed feature in \(featureName)")
-            return nil
-        }
-        
-        // Flatten string/value properties
-        let stringProperties = properties.dictionaryValue
-            .filter { $0.value.type == .string }
-            .mapValues { $0.stringValue }
-        let valueProperties = properties.dictionaryValue
-            .filter { $0.value.type == .number }
-            .mapValues { $0.doubleValue }
-        
-        return GeoFeature(polygons: loadedPolygons, properties: stringProperties, values: valueProperties)
+			case "MultiPolygon":
+				let polygonsJson = json["geometry"]["coordinates"]
+				loadedPolygons = polygonsJson.arrayValue.flatMap { parsePolygon($0) }
+			case "Polygon":
+				let polygonJson = json["geometry"]["coordinates"]
+				if let polygon = parsePolygon(polygonJson) {
+					loadedPolygons = [polygon]
+				} else {
+					print("Polygon in \"\(featureName)\" has no coordinate list.")
+					loadedPolygons = []
+				}
+			default:
+				print("Malformed feature in \(featureName)")
+				return nil
+		}
+		
+		// Flatten string/value properties
+		let stringProperties = properties.dictionaryValue
+					.filter { $0.value.type == .string }
+					.mapValues { $0.stringValue }
+		let valueProperties = properties.dictionaryValue
+					.filter { $0.value.type == .number }
+					.mapValues { $0.doubleValue }
+		
+		return GeoFeature(polygons: loadedPolygons, properties: stringProperties, values: valueProperties)
 	}
 	
 	fileprivate func parsePolygon(_ polygonJson: JSON) -> GeoPolygon? {
-        guard let ringsJson = polygonJson.array, !ringsJson.isEmpty else {
-            print("Polygon has no ring array")
-            return nil
-        }
-        
-        guard let exteriorRingJson = ringsJson.first?.array else {
-            print("Polygon's exterior ring has no elements.")
-            return nil
-        }
-        let exteriorRing = parseRing(exteriorRingJson)
-        
-        let interiorRingsJson = ringsJson.dropFirst()
-        let interiorRings = interiorRingsJson.map { parseRing($0.arrayValue) }
-        
+		guard let ringsJson = polygonJson.array, !ringsJson.isEmpty else {
+			print("Polygon has no ring array")
+			return nil
+		}
+		
+		guard let exteriorRingJson = ringsJson.first?.array else {
+			print("Polygon's exterior ring has no elements.")
+			return nil
+		}
+		let exteriorRing = parseRing(exteriorRingJson)
+		
+		let interiorRingsJson = ringsJson.dropFirst()
+		let interiorRings = interiorRingsJson.map { parseRing($0.arrayValue) }
+		
 		return GeoPolygon(exteriorRing: exteriorRing, interiorRings: interiorRings)
 	}
 	
@@ -109,14 +107,14 @@ class OperationParseGeoJson : Operation {
 		var outVertices: [Vertex] = []
 		for c in coords {
 			guard c.type == .array else {
-                print("Coordinate has unexpected internal type: \(c.type)")
-                continue
-                
-            }
-            let v = Vertex(v: (c[0].floatValue,
-                               c[1].floatValue))
+      	print("Coordinate has unexpected internal type: \(c.type)")
+        continue
+      }
+			
+			let v = Vertex(v: (c[0].floatValue,
+                         c[1].floatValue))
 			outVertices.append(v)
 		}
-        return GeoPolygonRing(vertices: outVertices)
+		return GeoPolygonRing(vertices: outVertices)
 	}
 }
