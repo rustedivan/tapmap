@@ -13,7 +13,7 @@ struct GeoColor : Codable {
 }
 
 struct GeoColors : Codable {
-	static func randomColor() -> GeoColor {
+	static func randomGreen() -> GeoColor {
 		let r = 0.0 + Float(arc4random_uniform(50)) / 100.0
 		let g = 0.5 + Float(arc4random_uniform(50)) / 100.0
 		let b = 0.0 + Float(arc4random_uniform(50)) / 100.0
