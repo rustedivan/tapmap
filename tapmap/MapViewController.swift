@@ -10,6 +10,11 @@ import GLKit
 import OpenGLES
 
 class MapViewController: GLKViewController, GLKViewControllerDelegate {
+	@IBOutlet var scrollView: UIScrollView!
+	
+	var zoom: CGFloat = 1.0
+	var offset: CGPoint = .zero
+	
 	var geoWorld: GeoWorld!
 	var mapRenderer: MapRenderer!
 	
@@ -46,6 +51,9 @@ class MapViewController: GLKViewController, GLKViewControllerDelegate {
 		view.context = self.context!
 		view.drawableDepthFormat = .format24
 		
+		scrollView.contentSize = view.frame.size
+		scrollView.zoomScale = 1.0
+		
 		delegate = self
 		
 		EAGLContext.setCurrent(self.context)
@@ -67,14 +75,20 @@ class MapViewController: GLKViewController, GLKViewControllerDelegate {
 	
 	// MARK: - GLKView and GLKViewController delegate methods
 	func glkViewControllerUpdate(_ controller: GLKViewController) {
-		let projectionMatrix = GLKMatrix4MakeOrtho(-180.0, 180.0, -80.0, 80.0, 0.1, 2.0)
-		let zoom = 5.0 + 4.0 * sin(timeSinceLastResume * 0.15)
-		let lng = 90.0 * cos(timeSinceLastResume * 0.37)
-		let lat = 25.0 * sin(timeSinceLastResume * 0.23)
-
+		let viewSize = scrollView.bounds.size
+		let mapSize = CGSize(width: 360.0, height: 160.0)
+		
+		let projectionMatrix = GLKMatrix4MakeOrtho(Float(-mapSize.width) / 2.0, Float(mapSize.width) / 2.0,
+																							 Float(-mapSize.height) / 2.0, Float(mapSize.height) / 2.0,
+																							 0.1, 2.0)
+		let lng = offset.x * (mapSize.width / viewSize.width) / zoom
+		let lat = offset.y * (mapSize.height / viewSize.height) / zoom
+		
+//		print("Framing \(-offset.x) : \(offset.y) @ \(zoom)")
+		
 		// Compute the model view matrix for the object rendered with GLKit
 		var modelViewMatrix = GLKMatrix4MakeScale(Float(zoom), Float(zoom), 1.0)
-		modelViewMatrix = GLKMatrix4Translate(modelViewMatrix, Float(-lng), Float(-lat), -1.5)
+		modelViewMatrix = GLKMatrix4Translate(modelViewMatrix, Float(-lng), Float(lat), -1.5)
 		modelViewProjectionMatrix = GLKMatrix4Multiply(projectionMatrix, modelViewMatrix)
 	}
 	
@@ -86,3 +100,16 @@ class MapViewController: GLKViewController, GLKViewControllerDelegate {
 	}
 }
 
+extension MapViewController : UIScrollViewDelegate {
+	func viewForZooming(in scrollView: UIScrollView) -> UIView? {
+		return view
+	}
+	
+	func scrollViewDidZoom(_ scrollView: UIScrollView) {
+		zoom = scrollView.zoomScale
+	}
+	
+	func scrollViewDidScroll(_ scrollView: UIScrollView) {
+		offset = scrollView.contentOffset
+	}
+}
