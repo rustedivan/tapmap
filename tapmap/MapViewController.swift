@@ -12,14 +12,18 @@ import OpenGLES
 class MapViewController: GLKViewController, GLKViewControllerDelegate {
 	@IBOutlet var scrollView: UIScrollView!
 	
-	var zoom: CGFloat = 1.0
-	var offset: CGPoint = .zero
-	
+	// Presentation
 	var geoWorld: GeoWorld!
 	var mapRenderer: MapRenderer!
+	var dummyView: UIView!
 	
+	// Navigation
+	var zoom: Float = 1.0
+	var offset: CGPoint = .zero
+	let mapSpace = CGRect(x: -180.0, y: -80.0, width: 360.0, height: 160.0)
+	
+	// Rendering
 	var modelViewProjectionMatrix: GLKMatrix4 = GLKMatrix4Identity
-	
 	var context: EAGLContext? = nil
 	
 	override func viewDidLoad() {
@@ -30,14 +34,14 @@ class MapViewController: GLKViewController, GLKViewControllerDelegate {
 		print("Starting to load geometry.")
 		let startTime = Date()
 		let geoData = NSData(contentsOfFile: path)!
-		
+
 		do {
 			try self.geoWorld = PropertyListDecoder().decode(GeoWorld.self, from: geoData as Data)
 		} catch {
 			print("Could not load world.")
 			return
 		}
-		
+
 		let duration = Date().timeIntervalSince(startTime)
 		print("Load done in \(Int(duration)) seconds.")
 		
@@ -51,8 +55,9 @@ class MapViewController: GLKViewController, GLKViewControllerDelegate {
 		view.context = self.context!
 		view.drawableDepthFormat = .format24
 		
-		scrollView.contentSize = view.frame.size
-		scrollView.zoomScale = 1.0
+		dummyView = UIView(frame: view.frame)
+		scrollView.contentSize = dummyView.frame.size
+		scrollView.addSubview(dummyView)
 		
 		delegate = self
 		
@@ -76,19 +81,26 @@ class MapViewController: GLKViewController, GLKViewControllerDelegate {
 	// MARK: - GLKView and GLKViewController delegate methods
 	func glkViewControllerUpdate(_ controller: GLKViewController) {
 		let viewSize = scrollView.bounds.size
-		let mapSize = CGSize(width: 360.0, height: 160.0)
-		
-		let projectionMatrix = GLKMatrix4MakeOrtho(Float(-mapSize.width) / 2.0, Float(mapSize.width) / 2.0,
-																							 Float(-mapSize.height) / 2.0, Float(mapSize.height) / 2.0,
+		let projectionMatrix = GLKMatrix4MakeOrtho(0.0, Float(mapSpace.width),
+																							 Float(mapSpace.height), 0.0,
 																							 0.1, 2.0)
-		let lng = offset.x * (mapSize.width / viewSize.width) / zoom
-		let lat = offset.y * (mapSize.height / viewSize.height) / zoom
-		
-//		print("Framing \(-offset.x) : \(offset.y) @ \(zoom)")
+		let lng = Float((offset.x / viewSize.width) * mapSpace.width)
+		let lat = Float((offset.y / viewSize.height) * mapSpace.height)
+		let lngOffset = Float(mapSpace.width / 2.0)
+		let latOffset = Float(mapSpace.height / 2.0)
 		
 		// Compute the model view matrix for the object rendered with GLKit
-		var modelViewMatrix = GLKMatrix4MakeScale(Float(zoom), Float(zoom), 1.0)
-		modelViewMatrix = GLKMatrix4Translate(modelViewMatrix, Float(-lng), Float(lat), -1.5)
+		// (Z = -1.0 to position between the clipping planes)
+		var modelViewMatrix = GLKMatrix4Translate(GLKMatrix4Identity, 0.0, 0.0, -1.0)
+		
+		// Matrix operations, applied in reverse order
+		// 3: Move to scaled UIScrollView content offset
+		modelViewMatrix = GLKMatrix4Translate(modelViewMatrix, -lng, -lat, 0.0)
+		// 2: Scale the data and flip the Y axis
+		modelViewMatrix = GLKMatrix4Scale(modelViewMatrix, zoom, -zoom, 1.0)
+		// 1: Center the data
+		modelViewMatrix = GLKMatrix4Translate(modelViewMatrix, lngOffset, -latOffset, 0.0)
+		
 		modelViewProjectionMatrix = GLKMatrix4Multiply(projectionMatrix, modelViewMatrix)
 	}
 	
@@ -102,11 +114,11 @@ class MapViewController: GLKViewController, GLKViewControllerDelegate {
 
 extension MapViewController : UIScrollViewDelegate {
 	func viewForZooming(in scrollView: UIScrollView) -> UIView? {
-		return view
+		return dummyView
 	}
 	
 	func scrollViewDidZoom(_ scrollView: UIScrollView) {
-		zoom = scrollView.zoomScale
+		zoom = Float(scrollView.zoomScale)
 	}
 	
 	func scrollViewDidScroll(_ scrollView: UIScrollView) {

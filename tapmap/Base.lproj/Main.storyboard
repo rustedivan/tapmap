@@ -21,7 +21,7 @@
                         <rect key="frame" x="0.0" y="0.0" width="667" height="375"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
-                            <scrollView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" indicatorStyle="black" maximumZoomScale="10" translatesAutoresizingMaskIntoConstraints="NO" id="p98-sO-tuF">
+                            <scrollView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" indicatorStyle="white" maximumZoomScale="10" translatesAutoresizingMaskIntoConstraints="NO" id="p98-sO-tuF">
                                 <rect key="frame" x="0.0" y="0.0" width="667" height="375"/>
                                 <connections>
                                     <outlet property="delegate" destination="BV1-FR-VrT" id="sXa-h1-27s"/>
