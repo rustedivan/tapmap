@@ -21,8 +21,19 @@
                         <rect key="frame" x="0.0" y="0.0" width="667" height="375"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
-                            <scrollView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" indicatorStyle="white" maximumZoomScale="10" translatesAutoresizingMaskIntoConstraints="NO" id="p98-sO-tuF">
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="" textAlignment="right" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="ekB-nX-Jxg">
+                                <rect key="frame" x="8" y="8" width="651" height="21"/>
+                                <color key="backgroundColor" white="0.33333333333333331" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="21" id="XwE-gU-7Qz"/>
+                                </constraints>
+                                <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                <color key="textColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                <nil key="highlightedColor"/>
+                            </label>
+                            <scrollView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" fixedFrame="YES" indicatorStyle="white" maximumZoomScale="10" translatesAutoresizingMaskIntoConstraints="NO" id="p98-sO-tuF">
                                 <rect key="frame" x="0.0" y="0.0" width="667" height="375"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                 <connections>
                                     <outlet property="delegate" destination="BV1-FR-VrT" id="sXa-h1-27s"/>
                                 </connections>
@@ -30,18 +41,19 @@
                         </subviews>
                         <color key="backgroundColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                         <constraints>
-                            <constraint firstItem="p98-sO-tuF" firstAttribute="top" secondItem="3se-qz-xqx" secondAttribute="top" id="3ww-4f-wfz"/>
-                            <constraint firstAttribute="trailing" secondItem="p98-sO-tuF" secondAttribute="trailing" id="A56-pp-RCJ"/>
-                            <constraint firstItem="p98-sO-tuF" firstAttribute="leading" secondItem="3se-qz-xqx" secondAttribute="leading" id="NTw-Gs-oB0"/>
-                            <constraint firstAttribute="bottom" secondItem="p98-sO-tuF" secondAttribute="bottom" id="WBH-05-iY4"/>
+                            <constraint firstItem="ekB-nX-Jxg" firstAttribute="leading" secondItem="3se-qz-xqx" secondAttribute="leading" constant="8" id="Hv3-D0-o6d"/>
+                            <constraint firstItem="ekB-nX-Jxg" firstAttribute="top" secondItem="8aa-yV-Osq" secondAttribute="bottom" constant="8" id="j9G-EA-H7H"/>
+                            <constraint firstAttribute="trailing" secondItem="ekB-nX-Jxg" secondAttribute="trailing" constant="8" id="nhd-2C-voy"/>
                         </constraints>
                     </view>
                     <connections>
+                        <outlet property="placeName" destination="ekB-nX-Jxg" id="wBG-gA-Mrn"/>
                         <outlet property="scrollView" destination="p98-sO-tuF" id="hSM-9M-UjH"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="SZV-WD-TEh" sceneMemberID="firstResponder"/>
             </objects>
+            <point key="canvasLocation" x="140.77961019490255" y="117.59999999999999"/>
         </scene>
     </scenes>
 </document>

@@ -16,6 +16,7 @@ class GeoRegionRenderer {
 	var vertexBuffer: GLuint = 0
 	var indexBuffer: GLuint = 1
 	let indexCount: GLsizei
+	var aabbBuffer: GLuint = 2
 	
 	init(region: GeoRegion) {
 		glGenBuffers(1, &vertexBuffer)
@@ -35,6 +36,19 @@ class GeoRegionRenderer {
 		             GLsizeiptr(MemoryLayout<GLint>.size * indicesCopy.count),
 		             &indicesCopy,
 		             GLenum(GL_STATIC_DRAW))
+		
+		let aabb = region.geometry.aabb
+		var aabbVertices = [Vertex(v: (aabb.minX, aabb.minY)),
+												Vertex(v: (aabb.maxX, aabb.minY)),
+												Vertex(v: (aabb.maxX, aabb.maxY)),
+												Vertex(v: (aabb.minX, aabb.maxY))]
+		
+		glGenBuffers(1, &aabbBuffer)
+		glBindBuffer(GLenum(GL_ELEMENT_ARRAY_BUFFER), aabbBuffer)
+		glBufferData(GLenum(GL_ELEMENT_ARRAY_BUFFER),
+								 GLsizeiptr(MemoryLayout<Vertex>.size * 4),
+								 &aabbVertices,
+								 GLenum(GL_STATIC_DRAW))
 	}
 	
 	deinit {
@@ -43,10 +57,12 @@ class GeoRegionRenderer {
 	}
 	
 	func render(region: GeoRegion) {
+		glEnableClientState(GLenum(GL_VERTEX_ARRAY))
+		glEnableVertexAttribArray(GLuint(GLKVertexAttrib.position.rawValue))
+		
 		glBindBuffer(GLenum(GL_ELEMENT_ARRAY_BUFFER), indexBuffer)
 		glBindBuffer(GLenum(GL_ARRAY_BUFFER), vertexBuffer)
 		
-		glEnableVertexAttribArray(GLuint(GLKVertexAttrib.position.rawValue))
 		glVertexAttribPointer(GLuint(GLKVertexAttrib.position.rawValue), 2, GLenum(GL_FLOAT), GLboolean(GL_FALSE), 8, BUFFER_OFFSET(0))
 		
 		var hashKey = 5381;
@@ -66,5 +82,20 @@ class GeoRegionRenderer {
 		               indexCount,
 		               GLenum(GL_UNSIGNED_INT),
 		               BUFFER_OFFSET(0))
+		
+		
+		glBindBuffer(GLenum(GL_ELEMENT_ARRAY_BUFFER), 0)
+		glBindBuffer(GLenum(GL_ARRAY_BUFFER), aabbBuffer)
+		
+		glVertexAttribPointer(GLuint(GLKVertexAttrib.position.rawValue), 2, GLenum(GL_FLOAT), GLboolean(GL_FALSE), 8, BUFFER_OFFSET(0))
+		
+		let c2 = (r: 1.0 as Float, g: 1.0 as Float, b: 0.0 as Float)
+		var components2 : [GLfloat] = [c2.r, c2.g, c2.b, 1.0]
+		glUniform4f(uniforms[UNIFORM_COLOR], GLfloat(components2[0]), GLfloat(components2[1]), GLfloat(components2[2]), GLfloat(components2[3]))
+		
+		glDrawArrays(GLenum(GL_LINE_LOOP), 0, 4)
+		
+		glDisableVertexAttribArray(GLuint(GLKVertexAttrib.position.rawValue))
+		glDisableClientState(GLenum(GL_VERTEX_ARRAY))
 	}
 }

@@ -11,6 +11,7 @@ import OpenGLES
 
 class MapViewController: GLKViewController, GLKViewControllerDelegate {
 	@IBOutlet var scrollView: UIScrollView!
+	@IBOutlet var placeName: UILabel!
 	
 	// Presentation
 	var geoWorld: GeoWorld!
@@ -58,6 +59,7 @@ class MapViewController: GLKViewController, GLKViewControllerDelegate {
 		dummyView = UIView(frame: view.frame)
 		scrollView.contentSize = dummyView.frame.size
 		scrollView.addSubview(dummyView)
+		dummyView.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(handleTap)))
 		
 		delegate = self
 		
@@ -75,6 +77,24 @@ class MapViewController: GLKViewController, GLKViewControllerDelegate {
 				EAGLContext.setCurrent(nil)
 			}
 			self.context = nil
+		}
+	}
+	
+	@objc func handleTap(sender: UITapGestureRecognizer) {
+		if sender.state == .ended {
+			let viewP = sender.location(in: dummyView)
+			var mapP = mapPoint(viewP,
+													from: dummyView.bounds,
+													to: mapSpace)
+			mapP.y = -mapP.y
+			
+			var placeNames: [String] = []
+			for region in geoWorld.regions {
+				if (aabbHitTest(p: mapP, in: region)) {
+					placeNames.append(region.name)
+				}
+			}
+			placeName.text = placeNames.joined(separator: ", ")
 		}
 	}
 	

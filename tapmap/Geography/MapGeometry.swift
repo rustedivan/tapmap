@@ -14,3 +14,11 @@ func mapPoint(_ p: CGPoint, from a: CGRect, to b: CGRect) -> CGPoint {
 	let v = (b.height) * (p.y - a.minY) / (a.height) + b.minY
 	return CGPoint(x: u, y: v)
 }
+
+func aabbHitTest(p: CGPoint, in region: GeoRegion) -> Bool{
+	let aabb = region.geometry.aabb
+	
+	// $ Replace aabb with CGRect directly.
+	let rect = CGRect(x: Double(aabb.minX), y: Double(aabb.minY), width: Double(aabb.maxX - aabb.minX), height: Double(aabb.maxY - aabb.minY))
+	return rect.contains(p)
+}
