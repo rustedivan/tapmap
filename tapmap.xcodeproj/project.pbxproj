@@ -14,6 +14,14 @@
 		1419520F1FAE562100C81191 /* countries.geo in Resources */ = {isa = PBXBuildFile; fileRef = 144AB4511F16401A00FE55BC /* countries.geo */; };
 		141F25C81EA4B3B800DA808F /* GeoBakingViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 141F25C71EA4B3B800DA808F /* GeoBakingViewController.swift */; };
 		143D06281F0811450002D3C3 /* Serialization.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1469F5C61F02F5F4008A37B3 /* Serialization.swift */; };
+		1448235A217549F800FFBBEB /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1452103C1E98D4F30029942F /* ViewController.swift */; };
+		1448236021754A3000FFBBEB /* GeoLoadingViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14B21D841E9FEA5200D27F1E /* GeoLoadingViewController.swift */; };
+		1448236121754A3000FFBBEB /* GeoBakingViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 141F25C71EA4B3B800DA808F /* GeoBakingViewController.swift */; };
+		1448236221754A3000FFBBEB /* RegionOutlineView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14F148A91EA383CC00D419AB /* RegionOutlineView.swift */; };
+		1448236321754A3000FFBBEB /* ToolGeometry.swift in Sources */ = {isa = PBXBuildFile; fileRef = 149E2EDF1FCFDC47008387A2 /* ToolGeometry.swift */; };
+		1448236421754A3000FFBBEB /* OperationBakeGeometry.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14F52E401FD67EBB002D3A3A /* OperationBakeGeometry.swift */; };
+		1448236521754A3000FFBBEB /* OperationParseGeoJson.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14F52E421FD67EBB002D3A3A /* OperationParseGeoJson.swift */; };
+		1448236621754A3000FFBBEB /* OperationTessellateRegions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14F52E411FD67EBB002D3A3A /* OperationTessellateRegions.swift */; };
 		1452103B1E98D4F30029942F /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1452103A1E98D4F30029942F /* AppDelegate.swift */; };
 		1452103D1E98D4F30029942F /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1452103C1E98D4F30029942F /* ViewController.swift */; };
 		1452103F1E98D4F30029942F /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 1452103E1E98D4F30029942F /* Assets.xcassets */; };
@@ -400,7 +408,7 @@
 					145210371E98D4F30029942F = {
 						CreatedOnToolsVersion = 8.3;
 						DevelopmentTeam = Y4JDRD37Q9;
-						LastSwiftMigration = 0900;
+						LastSwiftMigration = 1000;
 						ProvisioningStyle = Automatic;
 					};
 					146A79021E8F912500E2EE20 = {
@@ -419,7 +427,7 @@
 					14E028891EB7332900B4D515 = {
 						CreatedOnToolsVersion = 8.3.2;
 						DevelopmentTeam = Y4JDRD37Q9;
-						LastSwiftMigration = 0900;
+						LastSwiftMigration = 1000;
 						ProvisioningStyle = Automatic;
 						TestTargetID = 145210371E98D4F30029942F;
 					};
@@ -718,9 +726,17 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				1448235A217549F800FFBBEB /* ViewController.swift in Sources */,
+				1448236221754A3000FFBBEB /* RegionOutlineView.swift in Sources */,
 				14E028951EB7374900B4D515 /* GeoRegion.swift in Sources */,
+				1448236621754A3000FFBBEB /* OperationTessellateRegions.swift in Sources */,
+				1448236521754A3000FFBBEB /* OperationParseGeoJson.swift in Sources */,
 				143D06281F0811450002D3C3 /* Serialization.swift in Sources */,
+				1448236021754A3000FFBBEB /* GeoLoadingViewController.swift in Sources */,
+				1448236121754A3000FFBBEB /* GeoBakingViewController.swift in Sources */,
+				1448236421754A3000FFBBEB /* OperationBakeGeometry.swift in Sources */,
 				14E0288D1EB7332900B4D515 /* geobakeuiTests.swift in Sources */,
+				1448236321754A3000FFBBEB /* ToolGeometry.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -782,8 +798,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = se.wildbrain.geobakeui;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = macosx;
-				SWIFT_SWIFT3_OBJC_INFERENCE = Default;
-				SWIFT_VERSION = 4.0;
+				SWIFT_VERSION = 4.2;
 			};
 			name = Debug;
 		};
@@ -802,8 +817,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = se.wildbrain.geobakeui;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = macosx;
-				SWIFT_SWIFT3_OBJC_INFERENCE = Default;
-				SWIFT_VERSION = 4.0;
+				SWIFT_VERSION = 4.2;
 			};
 			name = Release;
 		};
@@ -994,8 +1008,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = se.wildbrain.geobakeuiTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = macosx;
-				SWIFT_SWIFT3_OBJC_INFERENCE = Default;
-				SWIFT_VERSION = 4.0;
+				SWIFT_VERSION = 4.2;
 				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/geobakeui.app/Contents/MacOS/geobakeui";
 			};
 			name = Debug;
@@ -1015,8 +1028,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = se.wildbrain.geobakeuiTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = macosx;
-				SWIFT_SWIFT3_OBJC_INFERENCE = Default;
-				SWIFT_VERSION = 4.0;
+				SWIFT_VERSION = 4.2;
 				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/geobakeui.app/Contents/MacOS/geobakeui";
 			};
 			name = Release;

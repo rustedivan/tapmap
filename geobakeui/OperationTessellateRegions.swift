@@ -30,7 +30,7 @@ class OperationTessellateRegions : Operation {
 		
 		var totalTris = 0
 		
-		tessellatedRegions = world.features.flatMap { feature -> GeoRegion? in
+		tessellatedRegions = world.features.compactMap { feature -> GeoRegion? in
 				if let tessellation = tessellate(feature) {
 						totalTris += tessellation.vertices.count
 						report(0.3, "Tesselated \(feature.name) (total \(totalTris) triangles", false)

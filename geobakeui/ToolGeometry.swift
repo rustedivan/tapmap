@@ -24,11 +24,11 @@ struct GeoPolygon {
 
 struct GeoFeature {
 	let polygons: [GeoPolygon]
-	let properties: Dictionary<String, String>
-	let values: Dictionary<String, Double>
+	let stringProperties: [String : String]
+	let valueProperties: [String : Double]
 	
 	var name : String {
-		return properties["name"] ?? properties["NAME"] ?? "Unnamed"
+		return stringProperties["name"] ?? stringProperties["NAME"] ?? "Unnamed"
 	}
 	
 	func totalVertexCount() -> Int {

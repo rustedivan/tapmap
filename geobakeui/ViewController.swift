@@ -73,7 +73,7 @@ class ViewController: NSViewController {
 
 extension ViewController : GeoLoadingViewDelegate {
 	func startLoading() -> ProgressReport {
-		performSegue(withIdentifier: NSStoryboardSegue.Identifier(rawValue: "ShowLoadingProgress"), sender: self)
+		performSegue(withIdentifier: "ShowLoadingProgress", sender: self)
 		let loading = presentedViewControllers?.last as! GeoLoadingViewController
 		loading.delegate = self
 		return loading.progressReporter
@@ -88,12 +88,13 @@ extension ViewController : GeoLoadingViewDelegate {
 			return
 		}
 		
-		var error: NSError?
-		let json = JSON(data: jsonData, options: .allowFragments, error: &error)
-        if let error = error {
-            presentError(error)
-            return
-        }
+		let json: JSON
+		do {
+			json = try JSON(data: jsonData, options: .allowFragments)
+		} catch let error {
+				presentError(error)
+				return
+		}
 		let reporter = startLoading()
 		
 		let jsonParser = OperationParseGeoJson(json, reporter: reporter)
@@ -125,7 +126,7 @@ extension ViewController : GeoLoadingViewDelegate {
 	
 	func cancelLoad() {
 		if let loading = presentedViewControllers?.last as? GeoLoadingViewController {
-			dismissViewController(loading)
+			dismiss(loading)
 		}
 		if let loadJob = loadJob {
 			loadJob.cancel()
@@ -135,7 +136,7 @@ extension ViewController : GeoLoadingViewDelegate {
 
 extension ViewController : GeoBakingViewDelegate {
 	func startBaking() -> (ProgressReport, ErrorReport) {
-		performSegue(withIdentifier: NSStoryboardSegue.Identifier(rawValue: "ShowBakingProgress"), sender: self)
+		performSegue(withIdentifier: "ShowBakingProgress", sender: self)
 		let baking = presentedViewControllers?.last as! GeoBakingViewController
 		baking.delegate = self
 		return (baking.progressReporter, baking.errorReporter)
@@ -177,7 +178,7 @@ extension ViewController : GeoBakingViewDelegate {
 	
 	func cancelSave() {
 		if let baking = presentedViewControllers?.last as? GeoBakingViewController {
-			dismissViewController(baking)
+			dismiss(baking)
 		}
 		if let saveJob = saveJob {
 			saveJob.cancel()

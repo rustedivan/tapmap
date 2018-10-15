@@ -57,8 +57,6 @@ struct Aabb : Equatable, Codable {
 	}
 }
 
-typealias VertexRange = (start: UInt32, count: UInt32)
-
 struct GeoRegion : Codable {
 	let name: String
 	let geometry: GeoTessellation

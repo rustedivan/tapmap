@@ -35,9 +35,7 @@ class OperationParseGeoJson : Operation {
 		for featureJson in featureArray {
 			if let loadedFeature = parseFeature(featureJson) {
 				loadedFeatures.append(loadedFeature)
-					
-				let name = loadedFeature.properties["NAME"] ?? loadedFeature.properties["name"] ?? "Unnamed"
-				report(Double(loadedFeatures.count) / Double(numFeatures), name, false)
+				report(Double(loadedFeatures.count) / Double(numFeatures), loadedFeature.name, false)
 			}
 		}
 	
@@ -60,7 +58,7 @@ class OperationParseGeoJson : Operation {
 		switch featureType {
 			case "MultiPolygon":
 				let polygonsJson = json["geometry"]["coordinates"]
-				loadedPolygons = polygonsJson.arrayValue.flatMap { parsePolygon($0) }
+				loadedPolygons = polygonsJson.arrayValue.compactMap { parsePolygon($0) }
 			case "Polygon":
 				let polygonJson = json["geometry"]["coordinates"]
 				if let polygon = parsePolygon(polygonJson) {
@@ -75,14 +73,14 @@ class OperationParseGeoJson : Operation {
 		}
 		
 		// Flatten string/value properties
-		let stringProperties = properties.dictionaryValue
+		let stringProps = properties.dictionaryValue
 					.filter { $0.value.type == .string }
 					.mapValues { $0.stringValue }
-		let valueProperties = properties.dictionaryValue
+		let valueProps = properties.dictionaryValue
 					.filter { $0.value.type == .number }
 					.mapValues { $0.doubleValue }
 		
-		return GeoFeature(polygons: loadedPolygons, properties: stringProperties, values: valueProperties)
+		return GeoFeature(polygons: loadedPolygons, stringProperties: stringProps, valueProperties: valueProps)
 	}
 	
 	fileprivate func parsePolygon(_ polygonJson: JSON) -> GeoPolygon? {
