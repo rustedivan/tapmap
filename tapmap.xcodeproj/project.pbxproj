@@ -13,6 +13,8 @@
 		140E63F21F209645000D710E /* Serialization.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1469F5C61F02F5F4008A37B3 /* Serialization.swift */; };
 		1419520F1FAE562100C81191 /* countries.geo in Resources */ = {isa = PBXBuildFile; fileRef = 144AB4511F16401A00FE55BC /* countries.geo */; };
 		141F25C81EA4B3B800DA808F /* GeoBakingViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 141F25C71EA4B3B800DA808F /* GeoBakingViewController.swift */; };
+		143A0F2A217E685C008C432A /* SourceData in Copy Files */ = {isa = PBXBuildFile; fileRef = 14031E3E217C8A9400128077 /* SourceData */; };
+		143A0F2C217E6B1A008C432A /* OperationFixupHierarchy.swift in Sources */ = {isa = PBXBuildFile; fileRef = 143A0F2B217E6B1A008C432A /* OperationFixupHierarchy.swift */; };
 		143D06281F0811450002D3C3 /* Serialization.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1469F5C61F02F5F4008A37B3 /* Serialization.swift */; };
 		1448235A217549F800FFBBEB /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1452103C1E98D4F30029942F /* ViewController.swift */; };
 		1448236021754A3000FFBBEB /* GeoLoadingViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14B21D841E9FEA5200D27F1E /* GeoLoadingViewController.swift */; };
@@ -80,6 +82,7 @@
 			dstPath = "";
 			dstSubfolderSpec = 16;
 			files = (
+				143A0F2A217E685C008C432A /* SourceData in Copy Files */,
 			);
 			name = "Copy Files";
 			runOnlyForDeploymentPostprocessing = 0;
@@ -87,8 +90,10 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		14031E3E217C8A9400128077 /* SourceData */ = {isa = PBXFileReference; lastKnownFileType = folder; path = SourceData; sourceTree = "<group>"; };
 		140C99DA20D8DC610062486A /* MapGeometry.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = MapGeometry.swift; path = Geography/MapGeometry.swift; sourceTree = "<group>"; };
 		141F25C71EA4B3B800DA808F /* GeoBakingViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = GeoBakingViewController.swift; sourceTree = "<group>"; };
+		143A0F2B217E6B1A008C432A /* OperationFixupHierarchy.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OperationFixupHierarchy.swift; sourceTree = "<group>"; };
 		144AB4511F16401A00FE55BC /* countries.geo */ = {isa = PBXFileReference; lastKnownFileType = file.bplist; name = countries.geo; path = Raw/countries.geo; sourceTree = "<group>"; };
 		145210381E98D4F30029942F /* geobakeui.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = geobakeui.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		1452103A1E98D4F30029942F /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
@@ -187,6 +192,7 @@
 				1452103E1E98D4F30029942F /* Assets.xcassets */,
 				145210401E98D4F30029942F /* Main.storyboard */,
 				145210431E98D4F30029942F /* Info.plist */,
+				14031E3E217C8A9400128077 /* SourceData */,
 			);
 			path = geobakeui;
 			sourceTree = "<group>";
@@ -279,6 +285,7 @@
 				14F52E401FD67EBB002D3A3A /* OperationBakeGeometry.swift */,
 				14F52E421FD67EBB002D3A3A /* OperationParseGeoJson.swift */,
 				14F52E411FD67EBB002D3A3A /* OperationTessellateRegions.swift */,
+				143A0F2B217E6B1A008C432A /* OperationFixupHierarchy.swift */,
 			);
 			name = "Background jobs";
 			sourceTree = "<group>";
@@ -685,6 +692,7 @@
 				1469F5C81F02F5F4008A37B3 /* Serialization.swift in Sources */,
 				14F148AA1EA383CC00D419AB /* RegionOutlineView.swift in Sources */,
 				1452104B1E98DB8A0029942F /* GeoRegion.swift in Sources */,
+				143A0F2C217E6B1A008C432A /* OperationFixupHierarchy.swift in Sources */,
 				14F52E441FD67EBB002D3A3A /* OperationTessellateRegions.swift in Sources */,
 				149E2EE01FCFDC47008387A2 /* ToolGeometry.swift in Sources */,
 				14F52E451FD67EBB002D3A3A /* OperationParseGeoJson.swift in Sources */,

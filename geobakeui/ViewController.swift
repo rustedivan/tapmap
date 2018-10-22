@@ -19,7 +19,10 @@ class ViewController: NSViewController {
 	let saveQueue = OperationQueue()
 	var loadJob : Operation?
 	var saveJob : Operation?
+	var workRegions: GeoFeatureCollection?
+	var workCountries: GeoFeatureCollection?
 	var workWorld: GeoFeatureCollection?
+
 	
 	override func viewDidAppear() {
 		loadQueue.name = "Json load queue"
@@ -29,7 +32,8 @@ class ViewController: NSViewController {
 		regionOutline.isHidden = true
 		// Autoload or open file picker
 		if let autoUrl = tryAutoloadWithArgument(arguments: CommandLine.arguments) {
-			asyncLoadJson(from: autoUrl)
+			asyncLoadJson(from: autoUrl.0, dataset: .Countries)
+			asyncLoadJson(from: autoUrl.1, dataset: .Regions)
 		} else {
 			let window = self.view.window!
 			let panel = NSOpenPanel()
@@ -38,7 +42,7 @@ class ViewController: NSViewController {
 			panel.beginSheetModal(for: window) { result in
 				if result.rawValue == NSFileHandlingPanelOKButton {
 					if let url = panel.urls.first {
-						self.asyncLoadJson(from: url)
+						self.asyncLoadJson(from: url, dataset: .Countries)
 					}
 				}
 			}
@@ -59,15 +63,24 @@ class ViewController: NSViewController {
 		}
 	}
 	
-	func tryAutoloadWithArgument(arguments: [String]) -> URL? {
-		for argument in arguments {
-			if argument.hasSuffix(".json") {
-				return Bundle.main.bundleURL
-					.deletingLastPathComponent()
-					.appendingPathComponent(argument)
-			}
+	func tryAutoloadWithArgument(arguments: [String]) -> (URL, URL)? {
+		var jsons : [URL] = []
+		
+		jsons = arguments.compactMap( {
+			$0.hasSuffix(".json")
+				? Bundle.main.bundleURL
+						.deletingLastPathComponent()
+						.appendingPathComponent("SourceData")
+						.appendingPathComponent($0)
+				: nil
+		})
+		
+		guard jsons.count == 2 else {
+			print("Invalid arguments. Pass <countries> <regions>.")
+			return nil
 		}
-		return nil
+		
+		return (jsons[0], jsons[1])
 	}
 }
 
@@ -79,7 +92,7 @@ extension ViewController : GeoLoadingViewDelegate {
 		return loading.progressReporter
 	}
 	
-	func asyncLoadJson(from url: URL) {
+	func asyncLoadJson(from url: URL, dataset: GeoLoadingViewController.Dataset) {
 		let jsonData: Data
 		do {
 			jsonData = try Data(contentsOf: url)
@@ -102,13 +115,27 @@ extension ViewController : GeoLoadingViewDelegate {
 			guard !jsonParser.isCancelled else {
 				return
 			}
-			reporter(1.0, "Done", true)	// Close the loading panel
+			reporter(0.8, "Done", true)	// Close the loading panel
 			DispatchQueue.main.async {
-				if let world = jsonParser.world {
-					self.finishLoad(loadedWorld: world)
-				} else {
-					print("Load failed")
+				guard jsonParser.world != nil else {
 					self.cancelLoad()
+					return
+				}
+				
+				switch dataset {
+					case .Countries: self.workCountries = jsonParser.world
+					case .Regions: self.workRegions = jsonParser.world
+				}
+				
+				if self.workCountries != nil && self.workRegions != nil {
+					let fixupJob = OperationFixupHierarchy(countryCollection: self.workCountries!,
+																								 regionCollection: self.workRegions!,
+																								 reporter: reporter)
+					fixupJob.completionBlock = {
+						
+					}
+					
+					self.loadQueue.addOperation(fixupJob)
 				}
 			}
 		}
@@ -117,7 +144,7 @@ extension ViewController : GeoLoadingViewDelegate {
 		loadQueue.addOperation(jsonParser)
 	}
 
-	func finishLoad(loadedWorld: GeoFeatureCollection) {
+	func finishLoad(loadedWorld: GeoFeatureCollection, dataSet: GeoLoadingViewController.Dataset) {
 		workWorld = loadedWorld
 		regionOutline.world = loadedWorld
 		regionOutline.isHidden = false

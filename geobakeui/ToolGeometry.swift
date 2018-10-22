@@ -31,6 +31,10 @@ struct GeoFeature {
 		return stringProperties["name"] ?? stringProperties["NAME"] ?? "Unnamed"
 	}
 	
+	var admin : String {
+		return stringProperties["admin"] ?? stringProperties["ADMIN"] ?? "Unnamed"
+	}
+	
 	func totalVertexCount() -> Int {
 		return polygons.reduce(0) { $0 + $1.totalVertexCount() }
 	}

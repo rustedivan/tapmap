@@ -9,7 +9,7 @@
 import AppKit
 
 protocol GeoLoadingViewDelegate {
-	func finishLoad(loadedWorld: GeoFeatureCollection)
+	func finishLoad(loadedWorld: GeoFeatureCollection, dataSet: GeoLoadingViewController.Dataset)
 	func cancelLoad()
 }
 
@@ -17,6 +17,11 @@ class GeoLoadingViewController: NSViewController {
 	@IBOutlet var progressMeter: NSProgressIndicator!
 	@IBOutlet var chunkLabel: NSTextField!
 	var delegate: GeoLoadingViewDelegate?
+	
+	enum Dataset {
+		case Countries
+		case Regions
+	}
 	
 	var progressReporter: ProgressReport {
 		return { (p: Double, chunkName: String, done: Bool) in
