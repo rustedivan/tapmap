@@ -1,12 +1,13 @@
 # Geobaking
 - ingest both country and region files
--- select two files
+-+ select two files
 -+ run two parse jobs
 -+ parse into two GeoFeatureCollections
 -- run two tessellation jobs
 -- at this point we have two collections of GeoRegions
 -+ run the hierarchy fixup job
 - figure out a way to not nestle jobs so goddamn deep
+-- run the load jobs synchronously inside an async job that finishes up with the fixup op
 - build up full continent->region hierarchy
 -- put everything in Universe for now
 - fixup parent links
@@ -16,12 +17,14 @@
 -- add a third tessellation job
 -- make sure all barycenters lie inside the parent
 
+# Data
+- make sure all regions have at least one polygon
 
 
 # Correctness
 - make all geography types conform to Equatable
-- make GeoFeatureCollection hold sets of features...
-- ...so it is easy to knock out collected features
++ make GeoFeatureCollection hold sets of features...
++ ...so it is easy to knock out collected features
 
 
 

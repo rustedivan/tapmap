@@ -22,7 +22,7 @@ struct GeoPolygon {
 	}
 }
 
-struct GeoFeature {
+struct GeoFeature : Equatable, Hashable {
 	let polygons: [GeoPolygon]
 	let stringProperties: [String : String]
 	let valueProperties: [String : Double]
@@ -32,16 +32,24 @@ struct GeoFeature {
 	}
 	
 	var admin : String {
-		return stringProperties["admin"] ?? stringProperties["ADMIN"] ?? "Unnamed"
+		return stringProperties["adm0_a3"] ?? stringProperties["ADM0_A3"] ?? "Unnamed"
 	}
 	
 	func totalVertexCount() -> Int {
 		return polygons.reduce(0) { $0 + $1.totalVertexCount() }
 	}
+	
+	public static func == (lhs: GeoFeature, rhs: GeoFeature) -> Bool {
+		return lhs.name == rhs.name && lhs.admin == rhs.admin
+	}
+	
+	public var hashValue: Int {
+		return name.hashValue ^ admin.hashValue
+	}
 }
 
 struct GeoFeatureCollection {
-	let features: [GeoFeature]
+	let features: Set<GeoFeature>
 	
 	func totalVertexCount() -> Int {
 		return features.reduce(0) { $0 + $1.totalVertexCount() }

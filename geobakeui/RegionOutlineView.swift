@@ -52,7 +52,7 @@ class RegionOutlineView: NSOutlineView, NSOutlineViewDataSource, NSOutlineViewDe
 	
 	func outlineView(_ outlineView: NSOutlineView, child index: Int, ofItem item: Any?) -> Any {
 		if item == nil {
-			return world!.features[index]
+//			return world!.features[index]
 		} else if let feature = item as? GeoFeature {
 			return feature.polygons[index]
 		}

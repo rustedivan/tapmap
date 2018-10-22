@@ -34,10 +34,15 @@ class OperationFixupHierarchy : Operation {
 				$0.admin == country.admin
 			}
 			
+			remainingRegions.subtract(belongingRegions)
+			
 			print(country.name.uppercased())
 			for subRegion in belongingRegions {
 				print("\t\(subRegion.name)")
 			}
 		}
+		
+		print("Remaining regions:")
+		print(remainingRegions.map { "\($0.name) in \($0.admin)" })
 	}
 }

@@ -31,10 +31,10 @@ class OperationParseGeoJson : Operation {
 		}
 
 		let numFeatures = featureArray.count
-		var loadedFeatures : [GeoFeature] = []
+		var loadedFeatures : Set<GeoFeature> = []
 		for featureJson in featureArray {
 			if let loadedFeature = parseFeature(featureJson) {
-				loadedFeatures.append(loadedFeature)
+				loadedFeatures.insert(loadedFeature)
 				report(Double(loadedFeatures.count) / Double(numFeatures), loadedFeature.name, false)
 			}
 		}
