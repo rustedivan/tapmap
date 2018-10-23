@@ -10,26 +10,36 @@ import Foundation
 import SwiftyJSON
 
 class OperationParseGeoJson : Operation {
-	let json : JSON
+	let countryJson : JSON
+	let regionJson : JSON
 	let report : ProgressReport
-	var world : GeoFeatureCollection?
+	var countries : GeoFeatureCollection?
+	var regions : GeoFeatureCollection?
 	
-	init(_ geoJson: JSON, reporter: @escaping ProgressReport) {
-		json = geoJson
+	init(countries: JSON, regions: JSON, reporter: @escaping ProgressReport) {
+		countryJson = countries
+		regionJson = regions
 		report = reporter
 	}
 	
 	override func main() {
 		guard !isCancelled else { print("Cancelled before starting"); return }
+		
+		countries = parseFeatures(json: countryJson, dataSet: .Countries)
+		regions = parseFeatures(json: regionJson, dataSet: .Regions)
+	}
+	
+	fileprivate func parseFeatures(json: JSON,
+																 dataSet: GeoLoadingViewController.Dataset) -> GeoFeatureCollection? {
 		guard json["type"] == "FeatureCollection" else {
 			print("Root node is not multi-feature")
-			return
+			return nil
 		}
 		guard let featureArray = json["features"].array else {
-			print("Did not find country \"features\" array")
-			return
+			print("Did not find the \"features\" array")
+			return nil
 		}
-
+		
 		let numFeatures = featureArray.count
 		var loadedFeatures : Set<GeoFeature> = []
 		for featureJson in featureArray {
@@ -38,8 +48,8 @@ class OperationParseGeoJson : Operation {
 				report(Double(loadedFeatures.count) / Double(numFeatures), loadedFeature.name, false)
 			}
 		}
-	
-		world = GeoFeatureCollection(features: loadedFeatures)
+		
+		return GeoFeatureCollection(features: loadedFeatures)
 	}
 	
 	fileprivate func parseFeature(_ json: JSON) -> GeoFeature? {

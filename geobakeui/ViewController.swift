@@ -19,10 +19,7 @@ class ViewController: NSViewController {
 	let saveQueue = OperationQueue()
 	var loadJob : Operation?
 	var saveJob : Operation?
-	var workRegions: GeoFeatureCollection?
-	var workCountries: GeoFeatureCollection?
 	var workWorld: GeoFeatureCollection?
-
 	
 	override func viewDidAppear() {
 		loadQueue.name = "Json load queue"
@@ -32,8 +29,7 @@ class ViewController: NSViewController {
 		regionOutline.isHidden = true
 		// Autoload or open file picker
 		if let autoUrl = tryAutoloadWithArgument(arguments: CommandLine.arguments) {
-			asyncLoadJson(from: autoUrl.0, dataset: .Countries)
-			asyncLoadJson(from: autoUrl.1, dataset: .Regions)
+			asyncLoadJson(countriesFrom: autoUrl.0, regionsFrom: autoUrl.1)
 		} else {
 			let window = self.view.window!
 			let panel = NSOpenPanel()
@@ -42,7 +38,7 @@ class ViewController: NSViewController {
 			panel.beginSheetModal(for: window) { result in
 				if result.rawValue == NSFileHandlingPanelOKButton {
 					if let url = panel.urls.first {
-						self.asyncLoadJson(from: url, dataset: .Countries)
+//						self.asyncLoadJson(from: url, dataset: .Countries)
 					}
 				}
 			}
@@ -92,52 +88,53 @@ extension ViewController : GeoLoadingViewDelegate {
 		return loading.progressReporter
 	}
 	
-	func asyncLoadJson(from url: URL, dataset: GeoLoadingViewController.Dataset) {
-		let jsonData: Data
+	func asyncLoadJson(countriesFrom countryUrl: URL, regionsFrom regionUrl: URL) {
+		// Load the country/region files
+		let countryData: Data
+		let regionData: Data
 		do {
-			jsonData = try Data(contentsOf: url)
+			countryData = try Data(contentsOf: countryUrl)
+			regionData = try Data(contentsOf: regionUrl)
 		} catch let e {
 			presentError(e)
 			return
 		}
 		
-		let json: JSON
+		// Load country/region content json
+		let countryJson: JSON
+		let regionJson: JSON
 		do {
-			json = try JSON(data: jsonData, options: .allowFragments)
+			countryJson = try JSON(data: countryData, options: .allowFragments)
+			regionJson = try JSON(data: regionData, options: .allowFragments)
 		} catch let error {
-				presentError(error)
-				return
+			presentError(error)
+			return
 		}
+		
 		let reporter = startLoading()
 		
-		let jsonParser = OperationParseGeoJson(json, reporter: reporter)
+		// Parse json into GeoFeaturesCollections
+		let jsonParser = OperationParseGeoJson(countries: countryJson, regions: regionJson, reporter: reporter)
 		jsonParser.completionBlock = {
 			guard !jsonParser.isCancelled else {
 				return
 			}
-			reporter(0.8, "Done", true)	// Close the loading panel
-			DispatchQueue.main.async {
-				guard jsonParser.world != nil else {
+			guard jsonParser.countries != nil && jsonParser.regions != nil else {
+				DispatchQueue.main.async {
 					self.cancelLoad()
-					return
 				}
-				
-				switch dataset {
-					case .Countries: self.workCountries = jsonParser.world
-					case .Regions: self.workRegions = jsonParser.world
-				}
-				
-				if self.workCountries != nil && self.workRegions != nil {
-					let fixupJob = OperationFixupHierarchy(countryCollection: self.workCountries!,
-																								 regionCollection: self.workRegions!,
-																								 reporter: reporter)
-					fixupJob.completionBlock = {
-						
-					}
-					
-					self.loadQueue.addOperation(fixupJob)
-				}
+				return
 			}
+			
+			reporter(0.9, "Building hierarchy...", false)
+			
+			let fixupJob = OperationFixupHierarchy(countryCollection: jsonParser.countries!,
+																						 regionCollection: jsonParser.regions!,
+																						 reporter: reporter)
+			fixupJob.completionBlock = {
+				reporter(1.0, "Done", true)
+			}
+			self.loadQueue.addOperation(fixupJob)
 		}
 		
 		loadJob = jsonParser
