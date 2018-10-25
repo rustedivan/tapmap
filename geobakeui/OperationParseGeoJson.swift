@@ -42,8 +42,10 @@ class OperationParseGeoJson : Operation {
 		
 		let numFeatures = featureArray.count
 		var loadedFeatures : Set<GeoFeature> = []
+		let featureLevel = (dataSet == .Countries) ? GeoFeature.Level.Country : GeoFeature.Level.Region
+		
 		for featureJson in featureArray {
-			if let loadedFeature = parseFeature(featureJson) {
+			if let loadedFeature = parseFeature(featureJson, into: featureLevel) {
 				loadedFeatures.insert(loadedFeature)
 				report(Double(loadedFeatures.count) / Double(numFeatures), loadedFeature.name, false)
 			}
@@ -52,7 +54,7 @@ class OperationParseGeoJson : Operation {
 		return GeoFeatureCollection(features: loadedFeatures)
 	}
 	
-	fileprivate func parseFeature(_ json: JSON) -> GeoFeature? {
+	fileprivate func parseFeature(_ json: JSON, into level: GeoFeature.Level) -> GeoFeature? {
 		let properties = json["properties"]
 		guard let featureName = properties["NAME"].string ?? properties["name"].string else {
 			print("No name in feature")
@@ -90,7 +92,7 @@ class OperationParseGeoJson : Operation {
 					.filter { $0.value.type == .number }
 					.mapValues { $0.doubleValue }
 		
-		return GeoFeature(polygons: loadedPolygons, stringProperties: stringProps, valueProperties: valueProps)
+		return GeoFeature(level: level, polygons: loadedPolygons, stringProperties: stringProps, valueProperties: valueProps)
 	}
 	
 	fileprivate func parsePolygon(_ polygonJson: JSON) -> GeoPolygon? {

@@ -9,7 +9,7 @@
 import AppKit
 
 protocol GeoLoadingViewDelegate {
-	func finishLoad(loadedWorld: GeoFeatureCollection, dataSet: GeoLoadingViewController.Dataset)
+	func finishLoad(loadedCountries: GeoFeatureCollection, loadedRegions: GeoFeatureCollection)
 	func cancelLoad()
 }
 

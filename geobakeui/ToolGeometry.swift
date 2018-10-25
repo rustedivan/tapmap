@@ -23,6 +23,12 @@ struct GeoPolygon {
 }
 
 struct GeoFeature : Equatable, Hashable {
+	enum Level {
+		case Country
+		case Region
+	}
+	
+	let level: Level
 	let polygons: [GeoPolygon]
 	let stringProperties: [String : String]
 	let valueProperties: [String : Double]
@@ -40,11 +46,11 @@ struct GeoFeature : Equatable, Hashable {
 	}
 	
 	public static func == (lhs: GeoFeature, rhs: GeoFeature) -> Bool {
-		return lhs.name == rhs.name && lhs.admin == rhs.admin
+		return lhs.level == rhs.level && lhs.name == rhs.name && lhs.admin == rhs.admin
 	}
 	
 	public var hashValue: Int {
-		return name.hashValue ^ admin.hashValue
+		return level.hashValue ^ name.hashValue ^ admin.hashValue
 	}
 }
 

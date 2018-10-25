@@ -133,6 +133,9 @@ extension ViewController : GeoLoadingViewDelegate {
 																						 reporter: reporter)
 			fixupJob.completionBlock = {
 				reporter(1.0, "Done", true)
+				DispatchQueue.main.async {
+					self.finishLoad(loadedCountries: fixupJob.countries, loadedRegions: fixupJob.regions)
+				}
 			}
 			self.loadQueue.addOperation(fixupJob)
 		}
@@ -141,9 +144,10 @@ extension ViewController : GeoLoadingViewDelegate {
 		loadQueue.addOperation(jsonParser)
 	}
 
-	func finishLoad(loadedWorld: GeoFeatureCollection, dataSet: GeoLoadingViewController.Dataset) {
-		workWorld = loadedWorld
-		regionOutline.world = loadedWorld
+	func finishLoad(loadedCountries: GeoFeatureCollection, loadedRegions: GeoFeatureCollection) {
+//		workWorld = loadedWorld
+		regionOutline.countries = loadedCountries
+		regionOutline.regions = loadedRegions
 		regionOutline.isHidden = false
 		regionOutline.reloadData()
 	}

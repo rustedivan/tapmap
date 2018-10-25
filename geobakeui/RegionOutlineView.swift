@@ -9,7 +9,8 @@
 import Cocoa
 
 class RegionOutlineView: NSOutlineView, NSOutlineViewDataSource, NSOutlineViewDelegate {
-	var world: GeoFeatureCollection?
+	var countries: GeoFeatureCollection!
+	var regions: GeoFeatureCollection!
 	
 	override func awakeFromNib() {
 		delegate = self
@@ -36,11 +37,18 @@ class RegionOutlineView: NSOutlineView, NSOutlineViewDataSource, NSOutlineViewDe
 	}
 	
 	func outlineView(_ outlineView: NSOutlineView, numberOfChildrenOfItem item: Any?) -> Int {
-		guard let world = world else { return 0 }
 		if item == nil {
-			return world.features.count
+			return countries?.features.count ?? 0
 		} else if let feature = item as? GeoFeature {
-			return feature.polygons.count
+			switch feature.level {
+			case .Country: // Find the number of region-features that has `feature` as its admin
+				let countryRegions = regions.features.filter {
+					$0.admin == feature.admin
+				}
+				return countryRegions.count
+			case .Region: // Return the number of polygons in the region
+				return feature.polygons.count
+			}
 		} else {
 			return 0
 		}
@@ -52,8 +60,16 @@ class RegionOutlineView: NSOutlineView, NSOutlineViewDataSource, NSOutlineViewDe
 	
 	func outlineView(_ outlineView: NSOutlineView, child index: Int, ofItem item: Any?) -> Any {
 		if item == nil {
-//			return world!.features[index]
-		} else if let feature = item as? GeoFeature {
+			let countrySet = countries.features
+			let countryIndex = countrySet.index(countrySet.startIndex, offsetBy: index)
+			return countrySet[countryIndex]
+		} else if let feature = item as? GeoFeature, feature.level == .Country {
+			let regionSet = regions.features.filter {
+				$0.admin == feature.admin
+			}
+			let regionIndex = regionSet.index(regionSet.startIndex, offsetBy: index)
+			return regionSet[regionIndex]
+		} else if let feature = item as? GeoFeature, feature.level == .Region {
 			return feature.polygons[index]
 		}
 		return 0
