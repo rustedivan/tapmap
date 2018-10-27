@@ -9,8 +9,15 @@
 import Cocoa
 
 class RegionOutlineView: NSOutlineView, NSOutlineViewDataSource, NSOutlineViewDelegate {
-	var countries: GeoFeatureCollection!
-	var regions: GeoFeatureCollection!
+	var countries: GeoFeatureCollection! {
+		didSet {
+			sortedCountries = Array(countries.features)
+			sortDescriptors.append(NSSortDescriptor(key: "name", ascending: true))
+			outlineView(self, sortDescriptorsDidChange: [])
+		}
+	}
+	var regions: GeoFeatureCollection! 
+	var sortedCountries: [GeoFeature] = []
 	
 	override func awakeFromNib() {
 		delegate = self
@@ -38,7 +45,7 @@ class RegionOutlineView: NSOutlineView, NSOutlineViewDataSource, NSOutlineViewDe
 	
 	func outlineView(_ outlineView: NSOutlineView, numberOfChildrenOfItem item: Any?) -> Int {
 		if item == nil {
-			return countries?.features.count ?? 0
+			return sortedCountries.count
 		} else if let feature = item as? GeoFeature {
 			switch feature.level {
 			case .Country: // Find the number of region-features that has `feature` as its admin
@@ -60,9 +67,7 @@ class RegionOutlineView: NSOutlineView, NSOutlineViewDataSource, NSOutlineViewDe
 	
 	func outlineView(_ outlineView: NSOutlineView, child index: Int, ofItem item: Any?) -> Any {
 		if item == nil {
-			let countrySet = countries.features
-			let countryIndex = countrySet.index(countrySet.startIndex, offsetBy: index)
-			return countrySet[countryIndex]
+			return sortedCountries[index]
 		} else if let feature = item as? GeoFeature, feature.level == .Country {
 			let regionSet = regions.features.filter {
 				$0.admin == feature.admin
@@ -73,5 +78,24 @@ class RegionOutlineView: NSOutlineView, NSOutlineViewDataSource, NSOutlineViewDe
 			return feature.polygons[index]
 		}
 		return 0
+	}
+	
+	func outlineView(_ outlineView: NSOutlineView, sortDescriptorsDidChange oldDescriptors: [NSSortDescriptor]) {
+		guard let sorting = outlineView.sortDescriptors.first else {
+			return
+		}
+		
+		let predicate: ((GeoFeature, GeoFeature) -> Bool)
+		switch sorting.key {
+		case "name":
+			predicate = sorting.ascending ? { $0.name < $1.name	} : { $0.name > $1.name }
+		case "size":
+			predicate = sorting.ascending ? { $0.totalVertexCount() < $1.totalVertexCount()	} : { $0.totalVertexCount() > $1.totalVertexCount() }
+		default:
+			assertionFailure("Sort key \(sorting.key!) is not implemented.")
+			return
+		}
+		sortedCountries.sort { predicate($0, $1) }
+		reloadData()
 	}
 }
