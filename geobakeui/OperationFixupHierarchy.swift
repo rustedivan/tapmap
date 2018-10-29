@@ -37,8 +37,7 @@ class OperationFixupHierarchy : Operation {
 				$0.admin == country.admin
 			}
 			
-			let newCountry = GeoCountry(name: country.name,
-																	admin: country.admin,
+			let newCountry = GeoCountry(geography: country,
 																	regions: belongingRegions)
 			
 			geoCountries.insert(newCountry)

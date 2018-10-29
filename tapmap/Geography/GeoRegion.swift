@@ -78,16 +78,15 @@ struct GeoTessellation : Codable {
 }
 
 struct GeoCountry : Codable, Equatable, Hashable {
-	let name: String
-	let admin: String
+	let geography: GeoRegion
 	let regions: Set<GeoRegion>
 	
 	public static func == (lhs: GeoCountry, rhs: GeoCountry) -> Bool {
-		return lhs.name == rhs.name && lhs.admin == rhs.admin
+		return lhs.geography == rhs.geography
 	}
 	
 	public var hashValue: Int {
-		return name.hashValue ^ admin.hashValue
+		return geography.hashValue
 	}
 }
 
