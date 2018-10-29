@@ -33,30 +33,32 @@ class OperationBakeGeometry : Operation {
 	override func main() {
 		guard !isCancelled else { print("Cancelled before starting"); return }
 		
-		let tessQueue = OperationQueue()
-		tessQueue.name = "Tessellation queue"
-		let tessJob1 = OperationTessellateRegions(countries, reporter: report, errorReporter: reportError)
-		let tessJob2 = OperationTessellateRegions(regions, reporter: report, errorReporter: reportError)
+		let bakeQueue = OperationQueue()
+		bakeQueue.name = "Baking queue"
+		let countryTessJob = OperationTessellateRegions(countries, reporter: report, errorReporter: reportError)
+		let regionTessJob = OperationTessellateRegions(regions, reporter: report, errorReporter: reportError)
 		
-		// $ Run two tessjobs
-		// $ When they finish, run the fixup
-		// $ Build a full-hierarchy GeoWorld
-		// $ Save
+		bakeQueue.addOperations([countryTessJob, regionTessJob], waitUntilFinished: true)
 		
-		tessJob1.start()
-		tessJob2.start()
+		report(0.9, "Finished tesselation. Building hierarchy...", false)
 		
-		tessQueue.waitUntilAllOperationsAreFinished()
+		print("Building a world with \(countryTessJob.tessellatedRegions.count) country regions and \(regionTessJob.tessellatedRegions.count) province regions.")
 		
-		print("Building a world with \(tessJob1.tessellatedRegions.count) country regions and \(tessJob2.tessellatedRegions.count) province regions.")
+		let fixupJob = OperationFixupHierarchy(countryCollection: countryTessJob.tessellatedRegions,
+																					 regionCollection: regionTessJob.tessellatedRegions,
+																					 reporter: report)
+		fixupJob.start()
 		
-		let tessellatedWorld = GeoWorld(regions: tessJob1.tessellatedRegions)
-		report(1.0, "Finished tesselation.", true)
-		print("Persisting...")
+		guard let bakedWorld = fixupJob.world else {
+			print("Failed")
+			return
+		}
+		
+		report(1.0, "Baked world. Saving...", false)
 		
 		let encoder = PropertyListEncoder()
 		
-		if let encoded = try? encoder.encode(tessellatedWorld) {
+		if let encoded = try? encoder.encode(bakedWorld) {
 			do {
 				try encoded.write(to: saveUrl, options: .atomicWrite)
 			} catch {
@@ -66,5 +68,7 @@ class OperationBakeGeometry : Operation {
 		else {
 			print("Encoding failed")
 		}
+		
+		report(1.0, "Done.", true)
 	}
 }

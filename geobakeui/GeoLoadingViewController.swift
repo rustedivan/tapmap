@@ -80,25 +80,17 @@ extension ViewController : GeoLoadingViewDelegate {
 		let jsonParser = OperationParseGeoJson(countries: countryJson, regions: regionJson, reporter: reporter)
 		jsonParser.completionBlock = {
 			guard !jsonParser.isCancelled else { return	}
-			guard jsonParser.countries != nil && jsonParser.regions != nil else {
+			guard let jsonCountries = jsonParser.countries, let jsonRegions = jsonParser.regions else {
 				DispatchQueue.main.async {
 					self.cancelLoad()
 				}
 				return
 			}
 			
-			reporter(0.9, "Building hierarchy...", false)
-			
-			let fixupJob = OperationFixupHierarchy(countryCollection: jsonParser.countries!,
-																						 regionCollection: jsonParser.regions!,
-																						 reporter: reporter)
-			fixupJob.completionBlock = {
-				reporter(1.0, "Done", true)
-				DispatchQueue.main.async {
-					self.finishLoad(loadedCountries: fixupJob.countries, loadedRegions: fixupJob.regions)
-				}
+			reporter(1.0, "Done", true)
+			DispatchQueue.main.async {
+				self.finishLoad(loadedCountries: jsonCountries, loadedRegions: jsonRegions)
 			}
-			self.loadQueue.addOperation(fixupJob)
 		}
 		
 		loadJob = jsonParser

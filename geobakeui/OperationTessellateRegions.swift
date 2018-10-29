@@ -34,7 +34,7 @@ class OperationTessellateRegions : Operation {
 				if let tessellation = tessellate(feature) {
 						totalTris += tessellation.vertices.count
 						report(0.3, "Tesselated \(feature.name) (total \(totalTris) triangles", false)
-						return GeoRegion(name: feature.name, geometry: tessellation)
+						return GeoRegion(name: feature.name, admin: feature.admin, geometry: tessellation)
 				} else {
 						reportError(feature.name, "Tesselation failed")
 						return nil

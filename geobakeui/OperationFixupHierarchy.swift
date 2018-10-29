@@ -9,16 +9,17 @@
 import Foundation
 
 class OperationFixupHierarchy : Operation {
-	let countries : GeoFeatureCollection
-	let regions : GeoFeatureCollection
+	var world : GeoWorld?
+	let countryList : [GeoRegion]
+	let regionList : [GeoRegion]
 	let report : ProgressReport
 	
-	init(countryCollection: GeoFeatureCollection,
-			 regionCollection: GeoFeatureCollection,
+	init(countryCollection: [GeoRegion],
+			 regionCollection: [GeoRegion],
 			 reporter: @escaping ProgressReport) {
 		
-		countries = countryCollection
-		regions = regionCollection
+		countryList = countryCollection
+		regionList = regionCollection
 		report = reporter
 		
 		super.init()
@@ -27,21 +28,27 @@ class OperationFixupHierarchy : Operation {
 	override func main() {
 		guard !isCancelled else { print("Cancelled before starting"); return }
 		
-		var remainingRegions = regions.features
+		var remainingRegions = Set<GeoRegion>(regionList)
 		
-		for country in countries.features {
+		var geoCountries = Set<GeoCountry>()
+		
+		for country in countryList {
 			let belongingRegions = remainingRegions.filter {
 				$0.admin == country.admin
 			}
 			
-			remainingRegions.subtract(belongingRegions)
+			let newCountry = GeoCountry(name: country.name,
+																	admin: country.admin,
+																	regions: belongingRegions)
 			
-			print(country.name.uppercased())
-			for subRegion in belongingRegions {
-				print("\t\(subRegion.name)")
-			}
+			geoCountries.insert(newCountry)
+			
+			remainingRegions.subtract(belongingRegions)
 		}
 		
+		world = GeoWorld(countries: geoCountries)
+
+		// $ Pass to warnings
 		print("Remaining regions:")
 		print(remainingRegions.map { "\($0.name) in \($0.admin)" })
 	}
