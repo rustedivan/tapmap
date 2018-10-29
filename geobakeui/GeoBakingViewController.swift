@@ -59,3 +59,52 @@ class GeoBakingViewController: NSViewController, NSTableViewDataSource {
 		delegate?.cancelSave()
 	}
 }
+
+extension ViewController : GeoBakingViewDelegate {
+	func startBaking() -> (ProgressReport, ErrorReport) {
+		performSegue(withIdentifier: "ShowBakingProgress", sender: self)
+		let baking = presentedViewControllers?.last as! GeoBakingViewController
+		baking.delegate = self
+		return (baking.progressReporter, baking.errorReporter)
+	}
+	
+	func asyncBakeGeometry(to url: URL) {
+		let (reporter, errorReporter) = startBaking()
+		
+		let geometryBaker = OperationBakeGeometry(workWorld!, reporter: reporter, errorReporter: errorReporter)
+		geometryBaker.completionBlock = {
+			guard !geometryBaker.isCancelled else { return }
+			guard geometryBaker.error == nil else {
+				print(String(describing: geometryBaker.error))
+				return
+			}
+			
+			reporter(0.9, "Saving...", false)
+			self.finishSave(tempUrl: geometryBaker.tempUrl, saveUrl: url)
+			reporter(1.0, "Done", true)	// Close the baking panel
+		}
+		
+		saveJob = geometryBaker
+		saveQueue.addOperation(geometryBaker)
+	}
+	
+	func finishSave(tempUrl fromUrl: URL, saveUrl toUrl: URL) {
+		do {
+			if FileManager.default.fileExists(atPath: toUrl.path) {
+				try FileManager.default.removeItem(at: toUrl)
+			}
+			try FileManager.default.moveItem(at: fromUrl, to: toUrl)
+		} catch (let e) {
+			print(e)
+		}
+	}
+	
+	func cancelSave() {
+		if let baking = presentedViewControllers?.last as? GeoBakingViewController {
+			dismiss(baking)
+		}
+		
+		saveJob?.cancel()
+	}
+}
+

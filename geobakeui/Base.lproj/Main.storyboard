@@ -702,9 +702,11 @@
                                 <rect key="frame" x="20" y="60" width="346" height="20"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                             </progressIndicator>
-                            <button verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="7YZ-ZF-wWa">
+                            <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="7YZ-ZF-wWa">
                                 <rect key="frame" x="290" y="13" width="82" height="32"/>
-                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="21" id="mq9-HR-og1"/>
+                                </constraints>
                                 <buttonCell key="cell" type="push" title="Cancel" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="Ko3-6Z-7ve">
                                     <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                     <font key="font" metaFont="system"/>
@@ -717,6 +719,11 @@ Gw
                                 </connections>
                             </button>
                         </subviews>
+                        <constraints>
+                            <constraint firstItem="7YZ-ZF-wWa" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="YuH-V2-z44" secondAttribute="leading" id="iWQ-Xo-kvU"/>
+                            <constraint firstAttribute="bottom" secondItem="7YZ-ZF-wWa" secondAttribute="bottom" constant="20" id="lW6-l2-0bD"/>
+                            <constraint firstAttribute="trailing" secondItem="7YZ-ZF-wWa" secondAttribute="trailing" constant="20" id="nrD-RW-OFi"/>
+                        </constraints>
                     </view>
                     <connections>
                         <outlet property="chunkLabel" destination="Luj-Lf-xZM" id="2IC-w8-QDq"/>
@@ -796,11 +803,11 @@ Gw
                                         </tableView>
                                     </subviews>
                                 </clipView>
-                                <scroller key="horizontalScroller" hidden="YES" verticalHuggingPriority="750" horizontal="YES" id="w8n-DT-8jY">
+                                <scroller key="horizontalScroller" hidden="YES" wantsLayer="YES" verticalHuggingPriority="750" horizontal="YES" id="w8n-DT-8jY">
                                     <rect key="frame" x="1" y="7" width="0.0" height="16"/>
                                     <autoresizingMask key="autoresizingMask"/>
                                 </scroller>
-                                <scroller key="verticalScroller" hidden="YES" verticalHuggingPriority="750" doubleValue="1" horizontal="NO" id="NtD-EP-zmQ">
+                                <scroller key="verticalScroller" hidden="YES" wantsLayer="YES" verticalHuggingPriority="750" doubleValue="1" horizontal="NO" id="NtD-EP-zmQ">
                                     <rect key="frame" x="224" y="17" width="15" height="102"/>
                                     <autoresizingMask key="autoresizingMask"/>
                                 </scroller>
@@ -811,6 +818,9 @@ Gw
                             </scrollView>
                             <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="DJx-Sa-exh">
                                 <rect key="frame" x="290" y="13" width="82" height="32"/>
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="21" id="NQH-Mn-ZmL"/>
+                                </constraints>
                                 <buttonCell key="cell" type="push" title="Cancel" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="RPf-e0-V3A">
                                     <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                     <font key="font" metaFont="system"/>
@@ -824,9 +834,9 @@ Gw
                             </button>
                         </subviews>
                         <constraints>
+                            <constraint firstItem="DJx-Sa-exh" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="7bu-22-85l" secondAttribute="leading" id="0Zh-Yo-uvh"/>
                             <constraint firstAttribute="trailing" secondItem="DJx-Sa-exh" secondAttribute="trailing" constant="20" id="HnP-wc-CPg"/>
                             <constraint firstAttribute="bottom" secondItem="DJx-Sa-exh" secondAttribute="bottom" constant="20" id="kbm-Tc-T0l"/>
-                            <constraint firstItem="DJx-Sa-exh" firstAttribute="top" secondItem="x7a-qq-0tT" secondAttribute="bottom" constant="22" id="psL-lx-eYU"/>
                         </constraints>
                     </view>
                     <connections>
@@ -850,11 +860,11 @@ Gw
                             <scrollView autohidesScrollers="YES" horizontalLineScroll="19" horizontalPageScroll="10" verticalLineScroll="19" verticalPageScroll="10" usesPredominantAxisScrolling="NO" translatesAutoresizingMaskIntoConstraints="NO" id="KD5-VM-SFD">
                                 <rect key="frame" x="20" y="69" width="440" height="451"/>
                                 <clipView key="contentView" id="JvY-im-Aq7">
-                                    <rect key="frame" x="1" y="0.0" width="438" height="435"/>
+                                    <rect key="frame" x="1" y="0.0" width="438" height="450"/>
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                     <subviews>
                                         <outlineView verticalHuggingPriority="750" allowsExpansionToolTips="YES" columnAutoresizingStyle="lastColumnOnly" columnReordering="NO" multipleSelection="NO" autosaveColumns="NO" headerView="wI9-ig-YNI" indentationPerLevel="5" outlineTableColumn="Slc-40-mH4" id="ybe-l2-6gD" customClass="RegionOutlineView" customModule="geobakeui" customModuleProvider="target">
-                                            <rect key="frame" x="0.0" y="0.0" width="442" height="412"/>
+                                            <rect key="frame" x="0.0" y="0.0" width="442" height="427"/>
                                             <autoresizingMask key="autoresizingMask"/>
                                             <size key="intercellSpacing" width="3" height="2"/>
                                             <color key="backgroundColor" name="controlBackgroundColor" catalog="System" colorSpace="catalog"/>
@@ -892,11 +902,11 @@ Gw
                                         </outlineView>
                                     </subviews>
                                 </clipView>
-                                <scroller key="horizontalScroller" verticalHuggingPriority="750" horizontal="YES" id="ohz-Mx-2eP">
-                                    <rect key="frame" x="1" y="435" width="438" height="15"/>
+                                <scroller key="horizontalScroller" wantsLayer="YES" verticalHuggingPriority="750" horizontal="YES" id="ohz-Mx-2eP">
+                                    <rect key="frame" x="1" y="434" width="438" height="16"/>
                                     <autoresizingMask key="autoresizingMask"/>
                                 </scroller>
-                                <scroller key="verticalScroller" hidden="YES" verticalHuggingPriority="750" horizontal="NO" id="S5g-Mc-GTj">
+                                <scroller key="verticalScroller" hidden="YES" wantsLayer="YES" verticalHuggingPriority="750" horizontal="NO" id="S5g-Mc-GTj">
                                     <rect key="frame" x="-15" y="0.0" width="16" height="0.0"/>
                                     <autoresizingMask key="autoresizingMask"/>
                                 </scroller>
@@ -907,6 +917,9 @@ Gw
                             </scrollView>
                             <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="ywK-zb-SEN">
                                 <rect key="frame" x="309" y="13" width="157" height="32"/>
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="21" id="jLS-oZ-GAo"/>
+                                </constraints>
                                 <buttonCell key="cell" type="push" title="Pre-bake geometry" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="wal-TF-U9V">
                                     <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                     <font key="font" metaFont="system"/>
@@ -922,6 +935,7 @@ Gw
                             <constraint firstItem="KD5-VM-SFD" firstAttribute="top" secondItem="m2S-Jp-Qdl" secondAttribute="top" constant="20" id="4gD-gb-OVk"/>
                             <constraint firstAttribute="bottom" secondItem="KD5-VM-SFD" secondAttribute="bottom" constant="69" id="5I2-iM-ygg"/>
                             <constraint firstAttribute="trailing" secondItem="ywK-zb-SEN" secondAttribute="trailing" constant="20" id="Bc5-9O-kyk"/>
+                            <constraint firstItem="ywK-zb-SEN" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="m2S-Jp-Qdl" secondAttribute="leading" id="X4B-gJ-94N"/>
                             <constraint firstAttribute="trailing" secondItem="KD5-VM-SFD" secondAttribute="trailing" constant="20" id="rY3-ER-RNr"/>
                         </constraints>
                     </view>
