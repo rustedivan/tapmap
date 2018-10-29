@@ -19,7 +19,8 @@ class ViewController: NSViewController {
 	let saveQueue = OperationQueue()
 	var loadJob : Operation?
 	var saveJob : Operation?
-	var workWorld: GeoFeatureCollection?
+	var workCountries: GeoFeatureCollection?
+	var workRegions: GeoFeatureCollection?
 	
 	override func viewDidAppear() {
 		loadQueue.name = "Json load queue"

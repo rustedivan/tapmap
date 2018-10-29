@@ -106,7 +106,9 @@ extension ViewController : GeoLoadingViewDelegate {
 	}
 	
 	func finishLoad(loadedCountries: GeoFeatureCollection, loadedRegions: GeoFeatureCollection) {
-		//		workWorld = loadedWorld
+		workCountries = loadedCountries
+		workRegions = loadedRegions
+		
 		regionOutline.countries = loadedCountries
 		regionOutline.regions = loadedRegions
 		regionOutline.isHidden = false

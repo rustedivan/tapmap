@@ -68,10 +68,18 @@ extension ViewController : GeoBakingViewDelegate {
 		return (baking.progressReporter, baking.errorReporter)
 	}
 	
-	func asyncBakeGeometry(to url: URL) {
+	func asyncBakeGeometry(to saveUrl: URL) {
 		let (reporter, errorReporter) = startBaking()
+		guard let bakeCountries = workCountries, let bakeRegions = workRegions else {
+			print("Baking without working set")
+			return
+		}
 		
-		let geometryBaker = OperationBakeGeometry(workWorld!, reporter: reporter, errorReporter: errorReporter)
+		let geometryBaker = OperationBakeGeometry(countries: bakeCountries,
+																							region: bakeRegions,
+																							saveUrl: saveUrl,
+																							reporter: reporter,
+																							errorReporter: errorReporter)
 		geometryBaker.completionBlock = {
 			guard !geometryBaker.isCancelled else { return }
 			guard geometryBaker.error == nil else {
@@ -79,24 +87,11 @@ extension ViewController : GeoBakingViewDelegate {
 				return
 			}
 			
-			reporter(0.9, "Saving...", false)
-			self.finishSave(tempUrl: geometryBaker.tempUrl, saveUrl: url)
-			reporter(1.0, "Done", true)	// Close the baking panel
+			reporter(1.0, "Done", false)	// Close the baking panel
 		}
 		
 		saveJob = geometryBaker
 		saveQueue.addOperation(geometryBaker)
-	}
-	
-	func finishSave(tempUrl fromUrl: URL, saveUrl toUrl: URL) {
-		do {
-			if FileManager.default.fileExists(atPath: toUrl.path) {
-				try FileManager.default.removeItem(at: toUrl)
-			}
-			try FileManager.default.moveItem(at: fromUrl, to: toUrl)
-		} catch (let e) {
-			print(e)
-		}
 	}
 	
 	func cancelSave() {
