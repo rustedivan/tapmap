@@ -19,7 +19,7 @@ let UNIFORM_COLOR = 1
 var uniforms = [GLint](repeating: 0, count: 2)
 
 class MapRenderer {
-	let regionRenderers : [GeoRegionRenderer]
+	let regionPrimitives : [RenderPrimitive]
 	let program: GLuint
 	
 	init(withGeoWorld geoWorld: GeoWorld) {
@@ -28,8 +28,12 @@ class MapRenderer {
 			print("Failed to load shaders")
 		}
 		
-		regionRenderers = geoWorld.regions.map {
-			GeoRegionRenderer(region: $0)
+		regionPrimitives = geoWorld.countries.flatMap { country -> [RenderPrimitive] in
+			if country.opened {
+				return country.regions.flatMap { [$0.renderPrimitive()] }
+			} else {
+				return [country.geography.renderPrimitive()]
+			}
 		}
 	}
 	
@@ -48,11 +52,9 @@ class MapRenderer {
 				glUniformMatrix4fv(uniforms[UNIFORM_MODELVIEWPROJECTION_MATRIX], 1, 0, $0)
 			})
 		})
-	
-		var i = 0
-		for region in geoWorld.regions {
-			regionRenderers[i].render(region: region)
-			i += 1
+		
+		for primitive in regionPrimitives {
+			render(primitive: primitive)
 		}
 	}
 }

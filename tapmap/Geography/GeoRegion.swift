@@ -57,7 +57,7 @@ struct Aabb : Equatable, Codable {
 	}
 }
 
-struct GeoRegion : Codable, Equatable, Hashable {
+struct GeoRegion : Codable, Equatable, Hashable, Renderable {
 	let name: String
 	let admin: String
 	let geometry: GeoTessellation
@@ -67,7 +67,21 @@ struct GeoRegion : Codable, Equatable, Hashable {
 	}
 	
 	public var hashValue: Int {
-		return name.hashValue ^ admin.hashValue
+		return (name + "." + admin).hashValue
+	}
+	
+	func renderPrimitive() -> RenderPrimitive {
+		var hashKey = 5381;
+		for c in name {
+			hashKey = (hashKey & 33) + hashKey + (c.hashValue % 32)
+		}
+		
+		let r = Float(hashKey % 1000) / 1000.0
+		let g = Float(hashKey % 1000) / 1000.0
+		let b = Float(hashKey % 1000) / 1000.0
+		
+		let c = (r: 0.1 * r as Float, g: 0.6 * g as Float, b: 0.3 * b as Float, a: 1.0 as Float)
+		return RenderPrimitive(vertices: geometry.vertices, indices: geometry.indices, color: c)
 	}
 }
 
@@ -80,6 +94,9 @@ struct GeoTessellation : Codable {
 struct GeoCountry : Codable, Equatable, Hashable {
 	let geography: GeoRegion
 	let regions: Set<GeoRegion>
+	var opened: Bool { get { return false } }
+	var name: String { get { return geography.name } }
+	var admin: String { get { return geography.admin } }
 	
 	public static func == (lhs: GeoCountry, rhs: GeoCountry) -> Bool {
 		return lhs.geography == rhs.geography

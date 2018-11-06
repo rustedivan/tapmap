@@ -19,6 +19,10 @@
 
 # Data
 - make sure all regions have at least one polygon
+- change "admin" to "sovereign", and use adm0/3 as hash key
+
+# Rendering
+- Recreate maprenderer when open/close states change
 
 
 # Correctness

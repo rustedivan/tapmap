@@ -89,9 +89,9 @@ class MapViewController: GLKViewController, GLKViewControllerDelegate {
 			mapP.y = -mapP.y
 			
 			var placeNames: [String] = []
-			for region in geoWorld.regions {
-				if (aabbHitTest(p: mapP, in: region)) {
-					placeNames.append(region.name)
+			for country in geoWorld.countries {
+				if (aabbHitTest(p: mapP, in: country.geography)) {
+					placeNames.append(country.name)
 				}
 			}
 			placeName.text = placeNames.joined(separator: ", ")
