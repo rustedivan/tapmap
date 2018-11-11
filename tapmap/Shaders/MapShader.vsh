@@ -1,5 +1,5 @@
 //
-//  Shader.vsh
+//  MapShader.vsh
 //  tapmap
 //
 //  Created by Ivan Milles on 2017-04-01.

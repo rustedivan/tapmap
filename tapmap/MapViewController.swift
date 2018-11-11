@@ -18,6 +18,9 @@ class MapViewController: GLKViewController, GLKViewControllerDelegate {
 	var mapRenderer: MapRenderer!
 	var dummyView: UIView!
 	
+	// Interaction
+	var pickingRenderer: PickingTarget!
+	
 	// Navigation
 	var zoom: Float = 1.0
 	var offset: CGPoint = .zero
@@ -30,7 +33,7 @@ class MapViewController: GLKViewController, GLKViewControllerDelegate {
 	override func viewDidLoad() {
 		super.viewDidLoad()
 		
-		let path = Bundle.main.path(forResource: "countries", ofType: "geo")!
+		let path = Bundle.main.path(forResource: "world", ofType: "geo")!
 		
 		print("Starting to load geometry.")
 		let startTime = Date()
@@ -65,6 +68,7 @@ class MapViewController: GLKViewController, GLKViewControllerDelegate {
 		
 		EAGLContext.setCurrent(self.context)
 		mapRenderer = MapRenderer(withGeoWorld: geoWorld)!
+		pickingRenderer = PickingTarget()
 	}
 	
 	override func didReceiveMemoryWarning() {
@@ -82,6 +86,14 @@ class MapViewController: GLKViewController, GLKViewControllerDelegate {
 	
 	@objc func handleTap(sender: UITapGestureRecognizer) {
 		if sender.state == .ended {
+			let pickBoxMatrix = buildProjectionMatrix(viewSize: scrollView.bounds.size,
+																								mapSize: pickingRenderer.pickBoxSize,
+																								centeredOn: sender.location(in: dummyView),
+																								zoomedTo: zoom)
+			pickingRenderer.renderPickingMap(world: geoWorld,
+																			 renderer: mapRenderer,
+																			 projection: pickBoxMatrix)
+			
 			let viewP = sender.location(in: dummyView)
 			var mapP = mapPoint(viewP,
 													from: dummyView.bounds,
