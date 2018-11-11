@@ -22,7 +22,7 @@ class RenderPrimitive {
 	let indexCount: GLsizei
 	let color: (r: GLfloat, g: GLfloat, b: GLfloat, a: GLfloat)
 	
-	init(vertices: [Vertex], indices: [UInt32], color c: (r: Float, g: Float, b: Float, a: Float)) {
+	init(vertices: [Vertex], indices: [UInt32], color c: (r: Float, g: Float, b: Float, a: Float), debugName: String) {
 		color = c
 		
 		glGenBuffers(1, &vertexBuffer)
@@ -40,6 +40,9 @@ class RenderPrimitive {
 		             GLsizeiptr(MemoryLayout<GLint>.size * indices.count),
 								 indices,
 		             GLenum(GL_STATIC_DRAW))
+		
+		glLabelObjectEXT(GLenum(GL_BUFFER_OBJECT_EXT), vertexBuffer, 0, "\(debugName).vertices")
+		glLabelObjectEXT(GLenum(GL_BUFFER_OBJECT_EXT), indexBuffer, 0, "\(debugName).indices")
 	}
 	
 	deinit {
@@ -58,9 +61,6 @@ func render(primitive: RenderPrimitive) {
 	glVertexAttribPointer(GLuint(GLKVertexAttrib.position.rawValue), 2,
 												GLenum(GL_FLOAT), GLboolean(GL_FALSE),
 												8, BUFFER_OFFSET(0))
-	
-	var components : [GLfloat] = [primitive.color.r, primitive.color.g, primitive.color.b, 1.0]
-	glUniform4f(uniforms[UNIFORM_COLOR], GLfloat(components[0]), GLfloat(components[1]), GLfloat(components[2]), GLfloat(components[3]))
 	
 	glDrawElements(GLenum(GL_TRIANGLES),
 								 primitive.indexCount,

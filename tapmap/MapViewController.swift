@@ -64,7 +64,7 @@ class MapViewController: GLKViewController, GLKViewControllerDelegate {
 		delegate = self
 		
 		EAGLContext.setCurrent(self.context)
-		mapRenderer = MapRenderer(withGeoWorld: geoWorld)
+		mapRenderer = MapRenderer(withGeoWorld: geoWorld)!
 	}
 	
 	override func didReceiveMemoryWarning() {
@@ -100,28 +100,10 @@ class MapViewController: GLKViewController, GLKViewControllerDelegate {
 	
 	// MARK: - GLKView and GLKViewController delegate methods
 	func glkViewControllerUpdate(_ controller: GLKViewController) {
-		let viewSize = scrollView.bounds.size
-		let projectionMatrix = GLKMatrix4MakeOrtho(0.0, Float(mapSpace.width),
-																							 Float(mapSpace.height), 0.0,
-																							 0.1, 2.0)
-		let lng = Float((offset.x / viewSize.width) * mapSpace.width)
-		let lat = Float((offset.y / viewSize.height) * mapSpace.height)
-		let lngOffset = Float(mapSpace.width / 2.0)
-		let latOffset = Float(mapSpace.height / 2.0)
-		
-		// Compute the model view matrix for the object rendered with GLKit
-		// (Z = -1.0 to position between the clipping planes)
-		var modelViewMatrix = GLKMatrix4Translate(GLKMatrix4Identity, 0.0, 0.0, -1.0)
-		
-		// Matrix operations, applied in reverse order
-		// 3: Move to scaled UIScrollView content offset
-		modelViewMatrix = GLKMatrix4Translate(modelViewMatrix, -lng, -lat, 0.0)
-		// 2: Scale the data and flip the Y axis
-		modelViewMatrix = GLKMatrix4Scale(modelViewMatrix, zoom, -zoom, 1.0)
-		// 1: Center the data
-		modelViewMatrix = GLKMatrix4Translate(modelViewMatrix, lngOffset, -latOffset, 0.0)
-		
-		modelViewProjectionMatrix = GLKMatrix4Multiply(projectionMatrix, modelViewMatrix)
+		modelViewProjectionMatrix = buildProjectionMatrix(viewSize: scrollView.bounds.size,
+																											mapSize: mapSpace.size,
+																											centeredOn: offset,
+																											zoomedTo: zoom)
 	}
 	
 	override func glkView(_ view: GLKView, drawIn rect: CGRect) {
@@ -144,4 +126,28 @@ extension MapViewController : UIScrollViewDelegate {
 	func scrollViewDidScroll(_ scrollView: UIScrollView) {
 		offset = scrollView.contentOffset
 	}
+}
+
+fileprivate func buildProjectionMatrix(viewSize: CGSize, mapSize: CGSize, centeredOn center: CGPoint, zoomedTo zoom: Float) -> GLKMatrix4 {
+	let projectionMatrix = GLKMatrix4MakeOrtho(0.0, Float(mapSize.width),
+																						 Float(mapSize.height), 0.0,
+																						 0.1, 2.0)
+	let lng = Float((center.x / viewSize.width) * mapSize.width)
+	let lat = Float((center.y / viewSize.height) * mapSize.height)
+	let lngOffset = Float(mapSize.width / 2.0)
+	let latOffset = Float(mapSize.height / 2.0)
+	
+	// Compute the model view matrix for the object rendered with GLKit
+	// (Z = -1.0 to position between the clipping planes)
+	var modelViewMatrix = GLKMatrix4Translate(GLKMatrix4Identity, 0.0, 0.0, -1.0)
+	
+	// Matrix operations, applied in reverse order
+	// 3: Move to scaled UIScrollView content offset
+	modelViewMatrix = GLKMatrix4Translate(modelViewMatrix, -lng, -lat, 0.0)
+	// 2: Scale the data and flip the Y axis
+	modelViewMatrix = GLKMatrix4Scale(modelViewMatrix, zoom, -zoom, 1.0)
+	// 1: Center the data
+	modelViewMatrix = GLKMatrix4Translate(modelViewMatrix, lngOffset, -latOffset, 0.0)
+	
+	return GLKMatrix4Multiply(projectionMatrix, modelViewMatrix)
 }

@@ -14,19 +14,22 @@ func BUFFER_OFFSET(_ i: UInt32) -> UnsafeRawPointer? {
 	return UnsafeRawPointer(bitPattern: Int(i))
 }
 
-let UNIFORM_MODELVIEWPROJECTION_MATRIX = 0
-let UNIFORM_COLOR = 1
-var uniforms = [GLint](repeating: 0, count: 2)
-
 class MapRenderer {
 	let regionPrimitives : [RenderPrimitive]
-	let program: GLuint
+	let mapProgram: GLuint
+	let mapUniforms : (modelViewMatrix: GLint, color: GLint)
 	
-	init(withGeoWorld geoWorld: GeoWorld) {
-		program = loadShaders()
-		if (program == 0) {
-			print("Failed to load shaders")
+	
+	init?(withGeoWorld geoWorld: GeoWorld) {
+		
+		mapProgram = loadShaders(shaderName: "MapShader")
+		guard mapProgram != 0 else {
+			print("Failed to load map shaders")
+			return nil
 		}
+		mapUniforms.modelViewMatrix = glGetUniformLocation(mapProgram, "modelViewProjectionMatrix")
+		mapUniforms.color = glGetUniformLocation(mapProgram, "regionColor")
+		
 		
 		regionPrimitives = geoWorld.countries.flatMap { country -> [RenderPrimitive] in
 			if country.opened {
@@ -38,28 +41,38 @@ class MapRenderer {
 	}
 	
 	deinit {
-		if program != 0 {
-			glDeleteProgram(program)
+		if mapProgram != 0 {
+			glDeleteProgram(mapProgram)
 		}
 	}
 	
 	func renderWorld(geoWorld: GeoWorld, inProjection projection: GLKMatrix4) {
-		glUseProgram(program)
+		glPushGroupMarkerEXT(0, "Render world")
+		glUseProgram(mapProgram)
 		
 		var mutableProjection = projection // The 'let' argument is not safe to pass into withUnsafePointer. No copy, since copy-on-write.
 		withUnsafePointer(to: &mutableProjection, {
 			$0.withMemoryRebound(to: Float.self, capacity: 16, {
-				glUniformMatrix4fv(uniforms[UNIFORM_MODELVIEWPROJECTION_MATRIX], 1, 0, $0)
+				glUniformMatrix4fv(mapUniforms.modelViewMatrix, 1, 0, $0)
 			})
 		})
 		
 		for primitive in regionPrimitives {
+			var components : [GLfloat] = [primitive.color.r, primitive.color.g, primitive.color.b, 1.0]
+			glUniform4f(mapUniforms.color,
+									GLfloat(components[0]),
+									GLfloat(components[1]),
+									GLfloat(components[2]),
+									GLfloat(components[3]))
 			render(primitive: primitive)
 		}
+		glPopGroupMarkerEXT()
+	}
+	
 	}
 }
 
-fileprivate func loadShaders() -> GLuint {
+fileprivate func loadShaders(shaderName: String) -> GLuint {
 	var program: GLuint = 0
 	var vertShader: GLuint = 0
 	var fragShader: GLuint = 0
@@ -70,16 +83,14 @@ fileprivate func loadShaders() -> GLuint {
 	program = glCreateProgram()
 	
 	// Create and compile vertex shader.
-	vertShaderPathname = Bundle.main.path(forResource: "Shader", ofType: "vsh")!
+	vertShaderPathname = Bundle.main.path(forResource: shaderName, ofType: "vsh")!
 	if compileShader(&vertShader, type: GLenum(GL_VERTEX_SHADER), file: vertShaderPathname) == false {
-		print("Failed to compile vertex shader")
 		return 0
 	}
 	
 	// Create and compile fragment shader.
-	fragShaderPathname = Bundle.main.path(forResource: "Shader", ofType: "fsh")!
+	fragShaderPathname = Bundle.main.path(forResource: shaderName, ofType: "fsh")!
 	if !compileShader(&fragShader, type: GLenum(GL_FRAGMENT_SHADER), file: fragShaderPathname) {
-		print("Failed to compile fragment shader")
 		return 0
 	}
 	
@@ -110,10 +121,6 @@ fileprivate func loadShaders() -> GLuint {
 		return 0
 	}
 	
-	// Get uniform locations.
-	uniforms[UNIFORM_MODELVIEWPROJECTION_MATRIX] = glGetUniformLocation(program, "modelViewProjectionMatrix")
-	uniforms[UNIFORM_COLOR] = glGetUniformLocation(program, "regionColor")
-	
 	// Release vertex and fragment shaders.
 	if vertShader != 0 {
 		glDetachShader(program, vertShader)
@@ -130,24 +137,29 @@ fileprivate func loadShaders() -> GLuint {
 
 fileprivate func compileShader(_ shader: inout GLuint, type: GLenum, file: String) -> Bool {
 	var status: GLint = 0
-	var source: UnsafePointer<Int8>
 	do {
+		var source: UnsafePointer<Int8>
+		var castSource: UnsafePointer<GLchar>?
+		
 		source = try NSString(contentsOfFile: file, encoding: String.Encoding.utf8.rawValue).utf8String!
+		castSource = UnsafePointer<GLchar>(source)
+		shader = glCreateShader(type)
+		glShaderSource(shader, 1, &castSource, nil)
+		glCompileShader(shader)
 	} catch {
 		print("Failed to load vertex shader")
 		return false
 	}
-	var castSource: UnsafePointer<GLchar>? = UnsafePointer<GLchar>(source)
-	
-	shader = glCreateShader(type)
-	glShaderSource(shader, 1, &castSource, nil)
-	glCompileShader(shader)
 	
 	glGetShaderiv(shader, GLenum(GL_COMPILE_STATUS), &status)
 	if status == 0 {
+		var log: [GLchar] = [GLchar](repeating: 0, count: Int(1024))
+		glGetShaderInfoLog(shader, 1024, nil, &log)
+		print("Failed to compile shader: \(String(cString: log))")
 		glDeleteShader(shader)
 		return false
 	}
+	
 	return true
 }
 
@@ -172,7 +184,7 @@ fileprivate func validateProgram(prog: GLuint) -> Bool {
 	if logLength > 0 {
 		var log: [GLchar] = [GLchar](repeating: 0, count: Int(logLength))
 		glGetProgramInfoLog(prog, logLength, &logLength, &log)
-		print("Program validate log: \n\(log)")
+		print("Program validate log: \n\(String(cString: log))")
 	}
 	
 	glGetProgramiv(prog, GLenum(GL_VALIDATE_STATUS), &status)
