@@ -86,27 +86,20 @@ class MapViewController: GLKViewController, GLKViewControllerDelegate {
 	
 	@objc func handleTap(sender: UITapGestureRecognizer) {
 		if sender.state == .ended {
-			let pickBoxMatrix = buildProjectionMatrix(viewSize: scrollView.bounds.size,
-																								mapSize: pickingRenderer.pickBoxSize,
-																								centeredOn: sender.location(in: dummyView),
-																								zoomedTo: zoom)
-			pickingRenderer.renderPickingMap(world: geoWorld,
-																			 renderer: mapRenderer,
-																			 projection: pickBoxMatrix)
-			
 			let viewP = sender.location(in: dummyView)
 			var mapP = mapPoint(viewP,
 													from: dummyView.bounds,
 													to: mapSpace)
 			mapP.y = -mapP.y
 			
-			var placeNames: [String] = []
-			for country in geoWorld.countries {
-				if (aabbHitTest(p: mapP, in: country.geography)) {
-					placeNames.append(country.name)
+			GeometryCounters.begin()
+				let candidateCountries = geoWorld.countries.filter { aabbHitTest(p: mapP, in: $0.geography) }
+				let countryRegions = candidateCountries.flatMap { $0.regions }
+				let candidateRegions = countryRegions.filter { aabbHitTest(p: mapP, in: $0) }
+				if let hitCountry = pickFromRegions(p: mapP, regions: candidateRegions) {
+					placeName.text = hitCountry.name
 				}
-			}
-			placeName.text = placeNames.joined(separator: ", ")
+			GeometryCounters.end()
 		}
 	}
 	

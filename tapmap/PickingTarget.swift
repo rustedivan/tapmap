@@ -67,3 +67,12 @@ class PickingTarget {
 		glBindFramebuffer(GLenum(GL_FRAMEBUFFER), 0);
 	}
 }
+
+func pickFromRegions(p: CGPoint, regions: [GeoRegion]) -> GeoRegion? {
+	for region in regions {
+		if triangleSoupHitTest(point: p, inVertices: region.geometry.vertices, inIndices: region.geometry.indices) {
+			return region
+		}
+	}
+	return nil
+}
