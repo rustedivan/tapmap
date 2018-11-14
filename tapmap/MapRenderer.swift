@@ -15,15 +15,13 @@ func BUFFER_OFFSET(_ i: UInt32) -> UnsafeRawPointer? {
 }
 
 class MapRenderer {
-	let regionPrimitives : [RenderPrimitive]
+	var regionPrimitives : [Int : RenderPrimitive]
 	let mapProgram: GLuint
 	let mapUniforms : (modelViewMatrix: GLint, color: GLint)
 	let pickProgram: GLuint
 	let pickUniforms : (modelViewMatrix: GLint, id: GLint)
 	
-	
 	init?(withGeoWorld geoWorld: GeoWorld) {
-		
 		mapProgram = loadShaders(shaderName: "MapShader")
 		guard mapProgram != 0 else {
 			print("Failed to load map shaders")
@@ -40,13 +38,19 @@ class MapRenderer {
 		pickUniforms.modelViewMatrix = glGetUniformLocation(pickProgram, "modelViewProjectionMatrix")
 		pickUniforms.id = glGetUniformLocation(pickProgram, "pickingId")
 		
-		regionPrimitives = geoWorld.countries.flatMap { country -> [RenderPrimitive] in
-			if country.opened {
-				return country.regions.flatMap { [$0.renderPrimitive()] }
+		let userState = AppDelegate.sharedUserState
+		
+		// Collect a list of all primitives and their hash keys
+		let hashedPrimitivesList = geoWorld.countries.flatMap { country -> [(Int, RenderPrimitive)] in
+			if userState.regionOpened(r: country.geography) {
+				return country.regions.flatMap { [($0.hashValue, $0.renderPrimitive())] }
 			} else {
-				return [country.geography.renderPrimitive()]
+				return [(country.hashValue, country.geography.renderPrimitive())]
 			}
 		}
+		
+		// Insert them into the primitive dictionary, ignoring any later duplicates
+		regionPrimitives = Dictionary(hashedPrimitivesList, uniquingKeysWith: { (l, r) in l  })
 	}
 	
 	deinit {
@@ -66,7 +70,7 @@ class MapRenderer {
 			})
 		})
 		
-		for primitive in regionPrimitives {
+		for primitive in regionPrimitives.values {
 			var components : [GLfloat] = [primitive.color.r, primitive.color.g, primitive.color.b, 1.0]
 			glUniform4f(mapUniforms.color,
 									GLfloat(components[0]),
@@ -89,7 +93,7 @@ class MapRenderer {
 			})
 		})
 		
-		for primitive in regionPrimitives {
+		for primitive in regionPrimitives.values {
 			glUniform1f(pickUniforms.id, primitive.color.g)
 			render(primitive: primitive)
 		}
