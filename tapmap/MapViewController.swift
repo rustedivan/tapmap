@@ -92,12 +92,16 @@ class MapViewController: GLKViewController, GLKViewControllerDelegate {
 													to: mapSpace)
 			mapP.y = -mapP.y
 			
+			let userState = AppDelegate.sharedUserState
 			GeometryCounters.begin()
 				let candidateCountries = geoWorld.countries.filter { aabbHitTest(p: mapP, in: $0.geography) }
-				let countryRegions = candidateCountries.flatMap { $0.regions }
+				let countryRegions = candidateCountries.flatMap {
+					userState.regionOpened(r: $0.geography) ? $0.regions : [$0.geography]
+				}
 				let candidateRegions = countryRegions.filter { aabbHitTest(p: mapP, in: $0) }
 				if let hitCountry = pickFromRegions(p: mapP, regions: candidateRegions) {
 					placeName.text = hitCountry.name
+					userState.openRegion(hitCountry)
 				}
 			GeometryCounters.end()
 		}

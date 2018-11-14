@@ -94,7 +94,6 @@ struct GeoTessellation : Codable {
 struct GeoCountry : Codable, Equatable, Hashable {
 	let geography: GeoRegion
 	let regions: Set<GeoRegion>
-	var opened: Bool { get { return false } }
 	var name: String { get { return geography.name } }
 	var admin: String { get { return geography.admin } }
 	
