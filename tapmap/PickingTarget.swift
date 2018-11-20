@@ -68,7 +68,7 @@ class PickingTarget {
 	}
 }
 
-func pickFromRegions(p: CGPoint, regions: [GeoRegion]) -> GeoRegion? {
+func pickFromRegions(p: CGPoint, regions: Set<GeoRegion>) -> GeoRegion? {
 	for region in regions {
 		if triangleSoupHitTest(point: p, inVertices: region.geometry.vertices, inIndices: region.geometry.indices) {
 			return region

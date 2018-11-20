@@ -50,12 +50,23 @@ class MapRenderer {
 		}
 		
 		// Insert them into the primitive dictionary, ignoring any later duplicates
-		regionPrimitives = Dictionary(hashedPrimitivesList, uniquingKeysWith: { (l, r) in l  })
+		regionPrimitives = Dictionary(hashedPrimitivesList, uniquingKeysWith: { (l, r) in l })
 	}
 	
 	deinit {
 		if mapProgram != 0 {
 			glDeleteProgram(mapProgram)
+		}
+	}
+	
+	func updatePrimitives(forCountry country: GeoCountry) {
+		if AppDelegate.sharedUserState.regionOpened(r: country.geography) {
+			regionPrimitives.removeValue(forKey: country.geography.hashValue)
+			
+			let hashedPrimitives = country.regions.map {
+				($0.hashValue, $0.renderPrimitive())
+			}
+			regionPrimitives.merge(hashedPrimitives, uniquingKeysWith: { (l, r) in l })
 		}
 	}
 	

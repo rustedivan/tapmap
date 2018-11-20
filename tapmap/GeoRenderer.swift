@@ -21,6 +21,7 @@ class RenderPrimitive {
 	var indexBuffer: GLuint = 1
 	let indexCount: GLsizei
 	let color: (r: GLfloat, g: GLfloat, b: GLfloat, a: GLfloat)
+	let name: String
 	
 	init(vertices: [Vertex], indices: [UInt32], color c: (r: Float, g: Float, b: Float, a: Float), debugName: String) {
 		color = c
@@ -43,6 +44,7 @@ class RenderPrimitive {
 		
 		glLabelObjectEXT(GLenum(GL_BUFFER_OBJECT_EXT), vertexBuffer, 0, "\(debugName).vertices")
 		glLabelObjectEXT(GLenum(GL_BUFFER_OBJECT_EXT), indexBuffer, 0, "\(debugName).indices")
+		name = debugName
 	}
 	
 	deinit {
