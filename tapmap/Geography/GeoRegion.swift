@@ -57,7 +57,7 @@ struct Aabb : Equatable, Codable {
 	}
 }
 
-struct GeoRegion : Codable, Equatable, Hashable, Renderable {
+struct GeoRegion : Codable, Equatable, Hashable {
 	let name: String
 	let admin: String
 	let geometry: GeoTessellation
@@ -68,20 +68,6 @@ struct GeoRegion : Codable, Equatable, Hashable, Renderable {
 	
 	public var hashValue: Int {
 		return (name + "." + admin).hashValue
-	}
-	
-	func renderPrimitive() -> RenderPrimitive {
-		var hashKey = 5381;
-		for c in name {
-			hashKey = (hashKey & 33) + hashKey + (c.hashValue % 32)
-		}
-		
-		let r = Float(hashKey % 1000) / 1000.0
-		let g = Float(hashKey % 1000) / 1000.0
-		let b = Float(hashKey % 1000) / 1000.0
-		
-		let c = (r: 0.1 * r as Float, g: 0.6 * g as Float, b: 0.3 * b as Float, a: 1.0 as Float)
-		return RenderPrimitive(vertices: geometry.vertices, indices: geometry.indices, color: c, debugName: "Region " + admin + "." + name)
 	}
 }
 
