@@ -11,14 +11,13 @@ import Foundation
 extension Vertex : Codable {
 	func encode(to encoder: Encoder) throws {
 		var container = encoder.unkeyedContainer()
-		try container.encode(contentsOf: [v.0, v.1])
+		try container.encode(contentsOf: [x, y])
 	}
 
 	init(from decoder: Decoder) throws {
 		var container = try decoder.unkeyedContainer()
-		let v0 = try container.decode(Float.self)
-		let v1 = try container.decode(Float.self)
-		v = (v0, v1)
+		x = try container.decode(Float.self)
+		y = try container.decode(Float.self)
 	}
 }
 

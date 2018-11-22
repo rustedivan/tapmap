@@ -22,7 +22,8 @@ struct GeoColors : Codable {
 }
 
 struct Vertex {
-	let v: (Float, Float)
+	let x: Float
+	let y: Float
 }
 
 struct Triangle {

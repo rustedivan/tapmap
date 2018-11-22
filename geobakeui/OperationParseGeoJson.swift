@@ -121,8 +121,8 @@ class OperationParseGeoJson : Operation {
         continue
       }
 			
-			let v = Vertex(v: (c[0].floatValue,
-                         c[1].floatValue))
+			let v = Vertex(x: c[0].floatValue,
+										 y: c[1].floatValue)
 			outVertices.append(v)
 		}
 		return GeoPolygonRing(vertices: outVertices)

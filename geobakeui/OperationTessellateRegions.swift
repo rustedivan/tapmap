@@ -66,14 +66,14 @@ func tessellate(_ feature: GeoFeature) -> GeoTessellation? {
                             polySize: 3,
                                                 vertexSize: .vertex2)
         let regionVertices = t.vertices.map {
-            Vertex(v: ($0.x, $0.y))
+					Vertex(x: $0.x, y: $0.y)
         }
         let indices = t.indices.map { UInt32($0) }
         let aabb = regionVertices.reduce(Aabb()) { aabb, v in
-            let out = Aabb(loX: min(v.v.0, aabb.minX),
-                           loY: min(v.v.1, aabb.minY),
-                           hiX: max(v.v.0, aabb.maxX),
-                           hiY: max(v.v.1, aabb.maxY))
+            let out = Aabb(loX: min(v.x, aabb.minX),
+                           loY: min(v.y, aabb.minY),
+                           hiX: max(v.x, aabb.maxX),
+                           hiY: max(v.y, aabb.maxY))
             return out
         }
 
@@ -85,6 +85,6 @@ func tessellate(_ feature: GeoFeature) -> GeoTessellation? {
 
 fileprivate extension GeoPolygonRing {
     var contour : [CVector3] {
-        return vertices.map { CVector3(x: $0.v.0, y: $0.v.1, z: 0.0) }
+        return vertices.map { CVector3(x: $0.x, y: $0.y, z: 0.0) }
     }
 }

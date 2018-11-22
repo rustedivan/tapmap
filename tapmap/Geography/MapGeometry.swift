@@ -51,9 +51,9 @@ func triangleSoupHitTest(point p: CGPoint, inVertices vertices: [Vertex], inIndi
 		let i0 = Int(indices[i+0])
 		let i1 = Int(indices[i+1])
 		let i2 = Int(indices[i+2])
-		let x0 = vertices[i0].v.0, y0 = vertices[i0].v.1
-		let x1 = vertices[i1].v.0, y1 = vertices[i1].v.1
-		let x2 = vertices[i2].v.0, y2 = vertices[i2].v.1
+		let x0 = vertices[i0].x, y0 = vertices[i0].y
+		let x1 = vertices[i1].x, y1 = vertices[i1].y
+		let x2 = vertices[i2].x, y2 = vertices[i2].y
 		
 		// Triangle hits are resolved using barycentric coordinates.
 		// The point is expressed in barycentric coordinates, that is,
