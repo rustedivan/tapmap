@@ -61,3 +61,64 @@ struct GeoFeatureCollection {
 		return features.reduce(0) { $0 + $1.totalVertexCount() }
 	}
 }
+
+func snapPointToEdge(p: Vertex, threshold: Float, edge: (a : Vertex, b : Vertex)) -> (Vertex, Float) {
+	let a = edge.a
+	let b = edge.b
+	let ab = Vertex(x: b.x - a.x, y: b.y - a.y)
+	let ap = Vertex(x: p.x - a.x, y: p.y - a.y)
+	let segLenSqr = ab.x * ab.x + ab.y * ab.y
+	let t = (ap.x * ab.x + ap.y * ab.y) / segLenSqr
+	
+	// If the closest point is within the segment...
+	if t >= 0.0 && t <= 1.0 {
+		// Find the closest point
+		let q = Vertex(x: a.x + ab.x * t, y: a.y + ab.y * t)
+		// Calculate distance to closest point on the line
+		let pq = Vertex(x: p.x - q.x, y: p.y - q.y)
+		let dSqr = pq.x * pq.x + pq.y * pq.y
+		if dSqr < threshold * threshold {
+			return (q, dSqr)
+		}
+	}
+	
+	return (p, Float.greatestFiniteMagnitude)
+}
+
+func tessellate(_ feature: GeoFeature) -> GeoTessellation? {
+	guard let tess = TessC() else {
+		print("Could not init TessC")
+		return nil
+	}
+	
+	for polygon in feature.polygons {
+		let exterior = polygon.exteriorRing.contour
+		tess.addContour(exterior)
+		let interiorContours = polygon.interiorRings.map{ $0.contour }
+		for interior in interiorContours {
+			tess.addContour(interior)
+		}
+	}
+	
+	do {
+		let t = try tess.tessellate(windingRule: .evenOdd,
+																elementType: ElementType.polygons,
+																polySize: 3,
+																vertexSize: .vertex2)
+		let regionVertices = t.vertices.map {
+			Vertex(x: $0.x, y: $0.y)
+		}
+		let indices = t.indices.map { UInt32($0) }
+		let aabb = regionVertices.reduce(Aabb()) { aabb, v in
+			let out = Aabb(loX: min(v.x, aabb.minX),
+										 loY: min(v.y, aabb.minY),
+										 hiX: max(v.x, aabb.maxX),
+										 hiY: max(v.y, aabb.maxY))
+			return out
+		}
+		
+		return GeoTessellation(vertices: regionVertices, indices: indices, aabb: aabb)
+	} catch {
+		return nil
+	}
+}

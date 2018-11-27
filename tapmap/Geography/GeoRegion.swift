@@ -21,9 +21,15 @@ struct GeoColors : Codable {
 	}
 }
 
-struct Vertex {
+struct Vertex : Equatable {
 	let x: Float
 	let y: Float
+	init(x _x: Float, y _y: Float) { x = _x; y = _y }
+	init(x _x: Double, y _y: Double) { x = Float(_x); y = Float(_y) }
+	
+	static func ==(lhs: Vertex, rhs: Vertex) -> Bool {
+		return fabsf(lhs.x - rhs.x) < .ulpOfOne && fabsf(lhs.y - rhs.y) < .ulpOfOne
+	}
 }
 
 struct Triangle {
