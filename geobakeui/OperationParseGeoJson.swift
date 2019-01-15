@@ -30,7 +30,7 @@ class OperationParseGeoJson : Operation {
 	}
 	
 	fileprivate func parseFeatures(json: JSON,
-																 dataSet: GeoLoadingViewController.Dataset) -> GeoFeatureCollection? {
+																 dataSet: Dataset) -> GeoFeatureCollection? {
 		guard json["type"] == "FeatureCollection" else {
 			print("Root node is not multi-feature")
 			return nil

@@ -19,3 +19,11 @@ target 'geobakeui' do
 		inherit! :search_paths
 	end
 end
+
+target 'geobaketool' do
+	pod 'SwiftyJSON'
+	pod 'LibTessSwift'
+	target 'geobaketoolTests' do
+		inherit! :complete
+	end
+end

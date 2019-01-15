@@ -6,10 +6,15 @@ DEPENDENCIES:
   - LibTessSwift
   - SwiftyJSON
 
+SPEC REPOS:
+  https://github.com/cocoapods/specs.git:
+    - LibTessSwift
+    - SwiftyJSON
+
 SPEC CHECKSUMS:
   LibTessSwift: 516dbe912163f0e94e2f1e3e2add4430e9829055
   SwiftyJSON: c4bcba26dd9ec7a027fc8eade48e2c911f229e96
 
-PODFILE CHECKSUM: 334b133896ab250b611b8a983291f731fae1a124
+PODFILE CHECKSUM: 9c7f8a2b994c16caa3779578174eb2628f2dbf7b
 
-COCOAPODS: 1.2.0
+COCOAPODS: 1.5.3

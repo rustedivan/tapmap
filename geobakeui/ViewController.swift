@@ -10,9 +10,6 @@ import Cocoa
 import SwiftyJSON
 import Dispatch
 
-typealias ProgressReport = (Double, String, Bool) -> ()
-typealias ErrorReport = (String, String) -> ()
-
 class ViewController: NSViewController {
 	@IBOutlet var regionOutline : RegionOutlineView!
 	let loadQueue = OperationQueue()
