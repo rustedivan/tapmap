@@ -18,8 +18,6 @@ class MapRenderer {
 	var regionPrimitives : [Int : RenderPrimitive]
 	let mapProgram: GLuint
 	let mapUniforms : (modelViewMatrix: GLint, color: GLint)
-	let pickProgram: GLuint
-	let pickUniforms : (modelViewMatrix: GLint, id: GLint)
 	
 	init?(withGeoWorld geoWorld: GeoWorld) {
 		mapProgram = loadShaders(shaderName: "MapShader")
@@ -29,14 +27,6 @@ class MapRenderer {
 		}
 		mapUniforms.modelViewMatrix = glGetUniformLocation(mapProgram, "modelViewProjectionMatrix")
 		mapUniforms.color = glGetUniformLocation(mapProgram, "regionColor")
-		
-		pickProgram = loadShaders(shaderName: "PickShader")
-		guard pickProgram != 0 else {
-			print("Failed to load picking shaders")
-			return nil
-		}
-		pickUniforms.modelViewMatrix = glGetUniformLocation(pickProgram, "modelViewProjectionMatrix")
-		pickUniforms.id = glGetUniformLocation(pickProgram, "pickingId")
 		
 		let userState = AppDelegate.sharedUserState
 		
@@ -92,26 +82,8 @@ class MapRenderer {
 		}
 		glPopGroupMarkerEXT()
 	}
-	
-	func renderPickPlane(geoWorld: GeoWorld, inProjection projection: GLKMatrix4) {
-		glPushGroupMarkerEXT(0, "Render picking view")
-		glUseProgram(pickProgram)
-		
-		var mutableProjection = projection
-		withUnsafePointer(to: &mutableProjection, {
-			$0.withMemoryRebound(to: Float.self, capacity: 16, {
-				glUniformMatrix4fv(pickUniforms.modelViewMatrix, 1, 0, $0)
-			})
-		})
-		
-		for primitive in regionPrimitives.values {
-			glUniform1f(pickUniforms.id, primitive.color.g)
-			render(primitive: primitive)
-		}
-		glPopGroupMarkerEXT()
-	}
 }
-
+	
 fileprivate func loadShaders(shaderName: String) -> GLuint {
 	var program: GLuint = 0
 	var vertShader: GLuint = 0

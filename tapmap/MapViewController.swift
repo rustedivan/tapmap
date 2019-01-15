@@ -18,9 +18,6 @@ class MapViewController: GLKViewController, GLKViewControllerDelegate {
 	var mapRenderer: MapRenderer!
 	var dummyView: UIView!
 	
-	// Interaction
-	var pickingRenderer: PickingTarget!
-	
 	// Navigation
 	var zoom: Float = 1.0
 	var offset: CGPoint = .zero
@@ -68,7 +65,6 @@ class MapViewController: GLKViewController, GLKViewControllerDelegate {
 		
 		EAGLContext.setCurrent(self.context)
 		mapRenderer = MapRenderer(withGeoWorld: geoWorld)!
-		pickingRenderer = PickingTarget()
 	}
 	
 	override func didReceiveMemoryWarning() {
@@ -112,6 +108,15 @@ class MapViewController: GLKViewController, GLKViewControllerDelegate {
 		}
 	}
 	
+	func pickFromRegions(p: CGPoint, regions: Set<GeoRegion>) -> GeoRegion? {
+		for region in regions {
+			if triangleSoupHitTest(point: p, inVertices: region.geometry.vertices, inIndices: region.geometry.indices) {
+				return region
+			}
+		}
+		return nil
+	}
+
 	// MARK: - GLKView and GLKViewController delegate methods
 	func glkViewControllerUpdate(_ controller: GLKViewController) {
 		modelViewProjectionMatrix = buildProjectionMatrix(viewSize: scrollView.bounds.size,
