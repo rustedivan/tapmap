@@ -14,6 +14,7 @@
 		141F25C81EA4B3B800DA808F /* GeoBakingViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 141F25C71EA4B3B800DA808F /* GeoBakingViewController.swift */; };
 		142D3B5E219781190046A604 /* PickShader.vsh in Resources */ = {isa = PBXBuildFile; fileRef = 142D3B5C219781190046A604 /* PickShader.vsh */; };
 		142D3B5F219781190046A604 /* PickShader.fsh in Resources */ = {isa = PBXBuildFile; fileRef = 142D3B5D219781190046A604 /* PickShader.fsh */; };
+		14333CBE21EE861E0084A286 /* OperationFixupHierarchy.swift in Sources */ = {isa = PBXBuildFile; fileRef = 143A0F2B217E6B1A008C432A /* OperationFixupHierarchy.swift */; };
 		1438DB722187D99D00FEB1D1 /* world.geo in Resources */ = {isa = PBXBuildFile; fileRef = 1438DB712187D99D00FEB1D1 /* world.geo */; };
 		143A0F2A217E685C008C432A /* SourceData in Copy Files */ = {isa = PBXBuildFile; fileRef = 14031E3E217C8A9400128077 /* SourceData */; };
 		143A0F2C217E6B1A008C432A /* OperationFixupHierarchy.swift in Sources */ = {isa = PBXBuildFile; fileRef = 143A0F2B217E6B1A008C432A /* OperationFixupHierarchy.swift */; };
@@ -758,6 +759,7 @@
 				1448236221754A3000FFBBEB /* RegionOutlineView.swift in Sources */,
 				1448236621754A3000FFBBEB /* OperationTessellateRegions.swift in Sources */,
 				1448236521754A3000FFBBEB /* OperationParseGeoJson.swift in Sources */,
+				14333CBE21EE861E0084A286 /* OperationFixupHierarchy.swift in Sources */,
 				143D06281F0811450002D3C3 /* Serialization.swift in Sources */,
 				1448236021754A3000FFBBEB /* GeoLoadingViewController.swift in Sources */,
 				1448236121754A3000FFBBEB /* GeoBakingViewController.swift in Sources */,

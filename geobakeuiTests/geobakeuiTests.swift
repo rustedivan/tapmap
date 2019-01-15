@@ -29,12 +29,12 @@ class geobakeuiTests: XCTestCase {
 		let ignorePs = [Vertex(x: 0.0, y: 2.0), Vertex(x: -2.0, y: 0.5), Vertex(x: 0.5, y: -2.0)]
 		
 		for p in snapPs {
-			let p2 = snapPointToEdge(p: p, threshold: 1.0, edge: e)
+			let (p2, _) = snapPointToEdge(p: p, threshold: 1.0, edge: e)
 			XCTAssertNotEqual(p, p2)
 		}
 		
 		for p in ignorePs {
-			let p2 = snapPointToEdge(p: p, threshold: 1.0, edge: e)
+			let (p2, _) = snapPointToEdge(p: p, threshold: 1.0, edge: e)
 			XCTAssertEqual(p, p2)
 		}
 	}

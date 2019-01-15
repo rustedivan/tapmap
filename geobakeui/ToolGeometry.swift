@@ -7,14 +7,18 @@
 //
 
 import Foundation
+import LibTessSwift
 
 struct GeoPolygonRing {
-	let vertices: [Vertex]
+	var vertices: [Vertex]
+	var contour : [CVector3] {
+		return vertices.map { CVector3(x: $0.x, y: $0.y, z: 0.0) }
+	}
 }
 
 struct GeoPolygon {
-	let exteriorRing: GeoPolygonRing
-	let interiorRings: [GeoPolygonRing]
+	var exteriorRing: GeoPolygonRing
+	var interiorRings: [GeoPolygonRing]
 	
 	func totalVertexCount() -> Int {
 			return exteriorRing.vertices.count +
