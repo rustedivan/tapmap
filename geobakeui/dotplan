@@ -1,3 +1,40 @@
+# 2019 work branches
+
+## CLI pipeline (2d)
+- Create geobakecli as new target
+- Link util code
+- Investigate moving to SPM
+- Link Rainbow library
+- Parse bake.json file
+-- NE soure data files
+-- geojson source data files + simplicity rate + name/hierarchy keys
+- Download NE data files command
+-- use URLSession, don't bother linking Alamofire
+-- do initial geojson parse step?
+- Bake command
+-- Verify that mapshaper is installed
+-- Verify shapefiles exist
+-- Run the baking and tessellation operations as usual
+-- Output to json-defined location
+
+## Continent collation (2d)
+
+## Edge cleanup (5d)
+
+## Cities (3d)
+
+## POIs and POI types (3d)
+
+## Region labelling (4d)
+
+## Region closing (1d)
+
+## POI labels (2d)
+
+
+
+
+
 # Geobaking
 - ingest both country and region files
 -+ select two files
@@ -22,7 +59,7 @@
 - change "admin" to "sovereign", and use adm0/3 as hash key
 
 # Rendering
-- Recreate maprenderer when open/close states change
++ Recreate maprenderer when open/close states change
 
 
 # Correctness
