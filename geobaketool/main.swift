@@ -8,7 +8,10 @@
 
 import Foundation
 
-for arg in CommandLine.arguments {
-	print(arg)
-}
+let commands = CommandLine.arguments.dropFirst()
 
+switch commands.first {
+case "download":
+	try downloadFiles(params: commands.dropFirst())
+default: print("Usage")
+}

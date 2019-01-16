@@ -38,6 +38,7 @@
 		146A79151E8F912500E2EE20 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 146A79131E8F912500E2EE20 /* LaunchScreen.storyboard */; };
 		146A79201E8F912500E2EE20 /* tapmapTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 146A791F1E8F912500E2EE20 /* tapmapTests.swift */; };
 		146B476D21EE971100CC36D9 /* libPods-geobaketoolTests.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 146B476C21EE971100CC36D9 /* libPods-geobaketoolTests.a */; };
+		146B476F21EFDB7200CC36D9 /* download.swift in Sources */ = {isa = PBXBuildFile; fileRef = 146B476E21EFDB7200CC36D9 /* download.swift */; };
 		1488E7EE201CDD9900AA00F1 /* MapRenderer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1488E7ED201CDD9900AA00F1 /* MapRenderer.swift */; };
 		1495AB1220D500C00025A2DD /* GeometryTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1495AB1120D500C00025A2DD /* GeometryTests.swift */; };
 		1498FE20219C2F4D006D0B78 /* UserState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1498FE1F219C2F4D006D0B78 /* UserState.swift */; };
@@ -157,6 +158,7 @@
 		146A79211E8F912500E2EE20 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		146B476A21EE96F700CC36D9 /* libPods-geobaketool.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; path = "libPods-geobaketool.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		146B476C21EE971100CC36D9 /* libPods-geobaketoolTests.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; path = "libPods-geobaketoolTests.a"; sourceTree = BUILT_PRODUCTS_DIR; };
+		146B476E21EFDB7200CC36D9 /* download.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = download.swift; sourceTree = "<group>"; };
 		1488E7ED201CDD9900AA00F1 /* MapRenderer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MapRenderer.swift; sourceTree = "<group>"; };
 		1495AB1120D500C00025A2DD /* GeometryTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GeometryTests.swift; sourceTree = "<group>"; };
 		1498FE1F219C2F4D006D0B78 /* UserState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserState.swift; sourceTree = "<group>"; };
@@ -379,6 +381,7 @@
 			isa = PBXGroup;
 			children = (
 				14FF12D921EE889400AF4474 /* main.swift */,
+				146B476E21EFDB7200CC36D9 /* download.swift */,
 			);
 			path = geobaketool;
 			sourceTree = "<group>";
@@ -872,6 +875,7 @@
 				14BDA61621EE91B8004CC319 /* JobHelpers.swift in Sources */,
 				14FF12F621EE8B4800AF4474 /* Serialization.swift in Sources */,
 				14BDA60C21EE9188004CC319 /* OperationCleanUpBorders.swift in Sources */,
+				146B476F21EFDB7200CC36D9 /* download.swift in Sources */,
 				14FF12F221EE8B1400AF4474 /* GeoRegion.swift in Sources */,
 				14BDA60D21EE9188004CC319 /* OperationFixupHierarchy.swift in Sources */,
 				14BDA60A21EE9188004CC319 /* OperationParseGeoJson.swift in Sources */,
