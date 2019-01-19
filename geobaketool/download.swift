@@ -10,13 +10,41 @@ import Foundation
 import Dispatch
 
 enum GeoBakeDownloadError : Error {
-	case timedOut
+	case timedOut(host: String)
+	case downloadFailed(key: String)
 	case unpackFailed
+}
+
+func downloadFiles(params: ArraySlice<String>) throws {
+	let semaphore = DispatchSemaphore(value: 0)
+	let reporter = URLDownloadReporter(doneSemaphore: semaphore)
+	let session = URLSession(configuration: URLSessionConfiguration.ephemeral,
+													 delegate: reporter,
+													 delegateQueue: nil)
+	
+	let geometryFilesPath = try prepareGeometryDirectory()
+	
+	let archiveUrls = [PipelineConfig.shared.sourceCountryUrl, PipelineConfig.shared.sourceRegionUrl]
+	let _ = try archiveUrls.map({ (url: URL) -> () in
+		let downloadTask = session.downloadTask(with: url)
+		downloadTask.resume()
+		let result = semaphore.wait(timeout: DispatchTime.now() + DispatchTimeInterval.seconds(600))
+		guard result == DispatchTimeoutResult.success else {
+			throw GeoBakeDownloadError.timedOut(host: url.host ?? "No host")
+		}
+		guard let archiveTempPath = reporter.tempFilePath else {
+			throw GeoBakeDownloadError.downloadFailed(key: "source.countries")
+		}
+	
+		let geometryTempPath = try unpackFile(archiveUrl: archiveTempPath)
+		try pickGeometryFiles(from: geometryTempPath, to: geometryFilesPath)
+	})
 }
 
 class URLDownloadReporter : NSObject, URLSessionDownloadDelegate {
 	let semaphore: DispatchSemaphore
-	var tempFilePath: String?
+	var tempFilePath: URL?
+	var downloadUpdateCounter: Int = 0
 	
 	init(doneSemaphore: DispatchSemaphore) {
 		semaphore = doneSemaphore
@@ -27,23 +55,18 @@ class URLDownloadReporter : NSObject, URLSessionDownloadDelegate {
 										 didWriteData bytesWritten: Int64,
 										 totalBytesWritten: Int64,
 										 totalBytesExpectedToWrite: Int64) {
-		print("\(totalBytesWritten)/\(totalBytesExpectedToWrite)")
+		downloadUpdateCounter += 1
+		if downloadUpdateCounter > 20 {
+			print("\(totalBytesWritten)/\(totalBytesExpectedToWrite)")
+			downloadUpdateCounter = 0
+		}
 	}
 	
 	func urlSession(_ session: URLSession,
 										downloadTask: URLSessionDownloadTask,
 										didFinishDownloadingTo location: URL) {
 		print("Downloaded source archive...")
-		let source = location.path
-		let destination = FileManager.default.currentDirectoryPath.appending("/temp-source-data.tmp")
-		
-		do {
-			try FileManager.default.moveItem(atPath: source, toPath: destination)
-			tempFilePath = destination
-		} catch {
-			print(error.localizedDescription)
-		}
-		
+		tempFilePath = location
 		semaphore.signal()
 	}
 	
@@ -57,37 +80,44 @@ class URLDownloadReporter : NSObject, URLSessionDownloadDelegate {
 	}
 }
 
-func unpackFile(archivePath: String) throws {
-	let task = Process()
-	task.launchPath = "/usr/bin/unzip"
-	task.arguments = ["temp-source-data.tmp", "-d", "temp"]
-	task.launch()
-	task.waitUntilExit()
+func unpackFile(archiveUrl: URL) throws -> URL {
+	let tempArea = archiveUrl.lastPathComponent + "-temp"
+	let unzipTask = Process()
+	unzipTask.launchPath = "/usr/bin/unzip"
+	unzipTask.currentDirectoryPath = archiveUrl.deletingLastPathComponent().path
+	unzipTask.arguments = ["-o", archiveUrl.lastPathComponent, "-d", tempArea]
+	unzipTask.standardOutput = Pipe()
+	unzipTask.launch()
+	unzipTask.waitUntilExit()
 	
-	if task.terminationStatus != 0 {
+	if unzipTask.terminationStatus != 0 {
 		throw GeoBakeDownloadError.unpackFailed
 	}
+	
+	return unzipTask.currentDirectoryURL!.appendingPathComponent(tempArea)
 }
 
-func downloadFiles(params: ArraySlice<String>) throws {
-	let semaphore = DispatchSemaphore(value: 0)
-	let reporter = URLDownloadReporter(doneSemaphore: semaphore)
-	let session = URLSession(configuration: URLSessionConfiguration.ephemeral,
-													 		delegate: reporter,
-															delegateQueue: nil)
-	let tempUrl = URL(string: "https://www.naturalearthdata.com/http//www.naturalearthdata.com/download/50m/cultural/ne_50m_admin_0_countries.zip")!
+func prepareGeometryDirectory() throws -> URL {
+	let path = FileManager.default.currentDirectoryPath + "/source-geometry"
+
+	if FileManager.default.fileExists(atPath: path) {
+		do { try FileManager.default.removeItem(atPath: path)	}
+		catch { }
+	}
 	
-	let downloadTask = session.downloadTask(with: tempUrl)
-	downloadTask.resume()
+	try FileManager.default.createDirectory(atPath: path, withIntermediateDirectories: false, attributes: nil)
+	return URL(fileURLWithPath: path)
+}
+
+func pickGeometryFiles(from src: URL, to dst: URL) throws {
+	let allFiles = try FileManager.default.contentsOfDirectory(at: src, includingPropertiesForKeys: nil, options: [])
+	let usefulFiles = allFiles.filter { $0.pathExtension == "shp" || $0.pathExtension == "dbf" }
 	
-	let result = semaphore.wait(timeout: DispatchTime.now() + DispatchTimeInterval.seconds(60))
-	switch result {
-	case DispatchTimeoutResult.timedOut:
-		throw GeoBakeDownloadError.timedOut
-	default:
-		if let tempFilePath = reporter.tempFilePath {
-			try unpackFile(archivePath: tempFilePath)
-		}
+	_ = try usefulFiles.map {
+		try FileManager.default.moveItem(at: $0,
+																		 to: dst.appendingPathComponent($0.lastPathComponent))
 	}
 }
+	
+
 
