@@ -41,6 +41,7 @@
 		146B476F21EFDB7200CC36D9 /* download.swift in Sources */ = {isa = PBXBuildFile; fileRef = 146B476E21EFDB7200CC36D9 /* download.swift */; };
 		146B477121F0F7FA00CC36D9 /* config.swift in Sources */ = {isa = PBXBuildFile; fileRef = 146B477021F0F7FA00CC36D9 /* config.swift */; };
 		146B477521F3E62400CC36D9 /* pipeline.json in CopyFiles */ = {isa = PBXBuildFile; fileRef = 146B477421F3E61700CC36D9 /* pipeline.json */; };
+		146B477721F47B6000CC36D9 /* reshape.swift in Sources */ = {isa = PBXBuildFile; fileRef = 146B477621F47B6000CC36D9 /* reshape.swift */; };
 		1488E7EE201CDD9900AA00F1 /* MapRenderer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1488E7ED201CDD9900AA00F1 /* MapRenderer.swift */; };
 		1495AB1220D500C00025A2DD /* GeometryTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1495AB1120D500C00025A2DD /* GeometryTests.swift */; };
 		1498FE20219C2F4D006D0B78 /* UserState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1498FE1F219C2F4D006D0B78 /* UserState.swift */; };
@@ -164,6 +165,7 @@
 		146B476E21EFDB7200CC36D9 /* download.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = download.swift; sourceTree = "<group>"; };
 		146B477021F0F7FA00CC36D9 /* config.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = config.swift; sourceTree = "<group>"; };
 		146B477421F3E61700CC36D9 /* pipeline.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = pipeline.json; sourceTree = "<group>"; };
+		146B477621F47B6000CC36D9 /* reshape.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = reshape.swift; sourceTree = "<group>"; };
 		1488E7ED201CDD9900AA00F1 /* MapRenderer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MapRenderer.swift; sourceTree = "<group>"; };
 		1495AB1120D500C00025A2DD /* GeometryTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GeometryTests.swift; sourceTree = "<group>"; };
 		1498FE1F219C2F4D006D0B78 /* UserState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserState.swift; sourceTree = "<group>"; };
@@ -388,6 +390,7 @@
 				14FF12D921EE889400AF4474 /* main.swift */,
 				146B477021F0F7FA00CC36D9 /* config.swift */,
 				146B476E21EFDB7200CC36D9 /* download.swift */,
+				146B477621F47B6000CC36D9 /* reshape.swift */,
 				146B477421F3E61700CC36D9 /* pipeline.json */,
 			);
 			path = geobaketool;
@@ -885,6 +888,7 @@
 				146B476F21EFDB7200CC36D9 /* download.swift in Sources */,
 				14FF12F221EE8B1400AF4474 /* GeoRegion.swift in Sources */,
 				14BDA60D21EE9188004CC319 /* OperationFixupHierarchy.swift in Sources */,
+				146B477721F47B6000CC36D9 /* reshape.swift in Sources */,
 				14BDA60A21EE9188004CC319 /* OperationParseGeoJson.swift in Sources */,
 				14FF12DA21EE889400AF4474 /* main.swift in Sources */,
 				146B477121F0F7FA00CC36D9 /* config.swift in Sources */,

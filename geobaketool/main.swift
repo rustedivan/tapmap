@@ -21,9 +21,16 @@ case "download":
 	} catch GeoBakeDownloadError.unpackFailed {
 		print("Could not unzip the downloaded geometry file archive.")
 	}
+case "reshape":
+	do {
+		try reshapeGeometry(params: commands.dropFirst())
+	} catch GeoBakeReshapeError.noNodePath {
+		print("No mapshaper path set in pipeline.config. Please set user-relative path to mapshaper in \"reshape.mapshaper\".")
+	} catch GeoBakeReshapeError.noMapshaperInstall {
+		print("No mapshaper install available on PATH. Please run 'npm install -g mapshaper'")
+	} catch GeoBakeReshapeError.missingShapeFile(let level) {
+		print("Could not find a \"\(level)\"-level shapefile. Please re-download.")
+	}
+	
 default: print("Usage")
 }
-
-//case timedOut
-//case downloadFailed
-//case unpackFailed
