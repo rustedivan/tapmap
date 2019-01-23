@@ -66,4 +66,23 @@ class PipelineConfig {
 	var reshapeMethod : String { return configString("reshape.method") }
 	var countrySimplification : Int { return configValue("reshape.simplify-countries") }
 	var regionSimplification : Int { return configValue("reshape.simplify-regions") }
+	var reshapedCountriesFilePath : URL {
+		return URL(fileURLWithPath: FileManager.default.currentDirectoryPath)
+			.appendingPathComponent(PipelineConfig.sourceDirectory)
+			.appendingPathComponent(PipelineConfig.reshapedCountriesFilename)
+	}
+	var reshapedRegionsFilePath : URL {
+		return URL(fileURLWithPath: FileManager.default.currentDirectoryPath)
+			.appendingPathComponent(PipelineConfig.sourceDirectory)
+			.appendingPathComponent(PipelineConfig.reshapedRegionsFilename)
+	}
+	var outputFilePath : URL {
+		let setting = configString("output")
+		return URL(fileURLWithPath: setting, relativeTo: FileManager.default.homeDirectoryForCurrentUser)
+	}
+	
+	// Constants
+	static let sourceDirectory = "source-geometry"
+	static let reshapedCountriesFilename = "reshaped-countries.json"
+	static let reshapedRegionsFilename = "reshaped-regions.json"
 }

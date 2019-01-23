@@ -8,5 +8,6 @@
 		"method" : "visvalingam",
 		"simplify-countries" : 20,
 		"simplify-regions" : 30
-	}
+	},
+	"output": "Development/tapmap/tapmap/Raw/world.geo"
 }

@@ -14,14 +14,12 @@ enum GeoBakeReshapeError : Error {
 	case missingShapeFile(level: String)
 }
 
-fileprivate let sourceDirectory = "source-geometry"
-
 func reshapeGeometry(params: ArraySlice<String>) throws {
 	let method = PipelineConfig.shared.reshapeMethod
 	let countryStrength = PipelineConfig.shared.countrySimplification
 	let regionStrength = PipelineConfig.shared.regionSimplification
 	
-	let shapeFiles = try FileManager.default.contentsOfDirectory(atPath: sourceDirectory)
+	let shapeFiles = try FileManager.default.contentsOfDirectory(atPath: PipelineConfig.sourceDirectory)
 																					.filter { $0.hasSuffix(".shp") }
 	
 	guard let countryFile = (shapeFiles.first { $0.contains("admin_0") }) else {
@@ -31,14 +29,14 @@ func reshapeGeometry(params: ArraySlice<String>) throws {
 		throw GeoBakeReshapeError.missingShapeFile(level: "admin_1")
 	}
 	
-	try reshapeFile(input: countryFile, strength: countryStrength, method: method, output: "reshaped-countries.json")
-	try reshapeFile(input: regionFile, strength: regionStrength, method: method, output: "reshaped-regions.json")
+	try reshapeFile(input: countryFile, strength: countryStrength, method: method, output: PipelineConfig.reshapedCountriesFilename)
+	try reshapeFile(input: regionFile, strength: regionStrength, method: method, output: PipelineConfig.reshapedRegionsFilename)
 }
 
 func reshapeFile(input: String, strength: Int, method: String, output: String) throws {
 	let nodeInstallPath = try findMapshaperInstall()
 	let nodePath = nodeInstallPath.appendingPathComponent("node").path
-	let sourceGeoPath = FileManager.default.currentDirectoryPath.appending("/\(sourceDirectory)")
+	let sourceGeoPath = FileManager.default.currentDirectoryPath.appending("/\(PipelineConfig.sourceDirectory)")
 	let fileInPath = sourceGeoPath.appending("/\(input)")
 	let fileOutPath = sourceGeoPath.appending("/\(output)")
 

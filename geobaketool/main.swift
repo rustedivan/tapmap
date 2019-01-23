@@ -31,6 +31,14 @@ case "reshape":
 	} catch GeoBakeReshapeError.missingShapeFile(let level) {
 		print("Could not find a \"\(level)\"-level shapefile. Please re-download.")
 	}
+case "bake":
+	do {
+		try bakeGeometry()
+	} catch GeoBakePipelineError.datasetFailed(let dataset) {
+		print("Could not bake the \"\(dataset)\" dataset.")
+	} catch {
+		print("Could not bake geometry: \(error.localizedDescription)")
+	}
 	
 default: print("Usage")
 }
