@@ -86,3 +86,17 @@ class PipelineConfig {
 	static let reshapedCountriesFilename = "reshaped-countries.json"
 	static let reshapedRegionsFilename = "reshaped-regions.json"
 }
+
+typealias ProgressBar = (Int, String) -> ()
+
+func makeBar(bar fill: Character, of width: Int, on back: Character) -> ProgressBar {
+	return { (length: Int, message: String) in
+		let bar = Array(repeating: back, count: width).enumerated()
+			.map { ($0.offset < length ? fill : back) }
+		
+		print("\u{1B}[2K\r" + String(bar) + " \(message)", terminator: "")
+		fflush(__stdoutp)
+	}
+}
+
+let progressBar = makeBar(bar: "\u{25cd}", of: 10, on: "\u{25cb}")
