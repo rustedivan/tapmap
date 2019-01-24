@@ -15,7 +15,7 @@ enum GeoBakePipelineError : Error {
 }
 
 func reportLoad(_ progress: Double, _ message: String, _ done: Bool) {
-	print(message)
+	progressBar(Int(progress * 10.0), done ? "√ \(message)\n" : "  \(message)")
 }
 
 func reportError(_ feature: String, _ error: String) {
@@ -28,25 +28,23 @@ func bakeGeometry() throws {
 		throw GeoBakePipelineError.outputPathInvalid(path: outputUrl.path)
 	}
 	
-	// Load the country/region files
+	print("Loading...")
+	
+	progressBar(1, "Countries")
 	let countryData = try Data(contentsOf: PipelineConfig.shared.reshapedCountriesFilePath)
+	progressBar(3, "Countries")
+	let countryJson = try JSON(data: countryData, options: .allowFragments)
+	
+	progressBar(5, "Regions")
 	let regionData = try Data(contentsOf: PipelineConfig.shared.reshapedRegionsFilePath)
+	progressBar(7, "Regions")
+	let regionJson = try JSON(data: regionData, options: .allowFragments)
+	progressBar(10, "√ Loading done\n")
 	
-	// Load country/region content json
-	let countryJson: JSON
-	let regionJson: JSON
-	do {
-		countryJson = try JSON(data: countryData, options: .allowFragments)
-		regionJson = try JSON(data: regionData, options: .allowFragments)
-	}
-	
-	// Parse json into GeoFeaturesCollections
-	let jsonParser = OperationParseGeoJson(countries: countryJson, regions: regionJson, reporter: reportLoad)
-	jsonParser.completionBlock = {
-		guard !jsonParser.isCancelled else { return	}
-		reportLoad(1.0, "Done", true)
-	}
-	
+	print("\nBuilding geography collections...")
+	let jsonParser = OperationParseGeoJson(countries: countryJson,
+																				 regions: regionJson,
+																				 reporter: reportLoad)
 	
 	let workQueue = OperationQueue()
 	workQueue.name = "Json load queue"
@@ -61,6 +59,7 @@ func bakeGeometry() throws {
 		throw GeoBakePipelineError.datasetFailed(dataset: "regions")
 	}
 	
+	print("\nTessellating geometry...")
 	let geoBaker = OperationBakeGeometry(countries: countries,
 																			 region: regions,
 																			 saveUrl: outputUrl,
@@ -69,5 +68,5 @@ func bakeGeometry() throws {
 	workQueue.addOperation(geoBaker)
 	workQueue.waitUntilAllOperationsAreFinished()
 	
-	print("Wrote world to \(outputUrl.path)")
+	print("Wrote world-file to \(outputUrl.path)")
 }

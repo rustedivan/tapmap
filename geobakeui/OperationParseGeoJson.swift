@@ -25,8 +25,12 @@ class OperationParseGeoJson : Operation {
 	override func main() {
 		guard !isCancelled else { print("Cancelled before starting"); return }
 		
+		report(0.0, "Parsing countries", false)
 		countries = parseFeatures(json: countryJson, dataSet: .Countries)
+		report(1.0, "Parsed countries", true)
+		report(0.0, "Parsing regions", false)
 		regions = parseFeatures(json: regionJson, dataSet: .Regions)
+		report(1.0, "Parsed regions", true)
 	}
 	
 	fileprivate func parseFeatures(json: JSON,

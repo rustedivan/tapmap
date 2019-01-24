@@ -30,17 +30,23 @@ class OperationTessellateRegions : Operation {
 		
 		var totalTris = 0
 		
+		let numFeatures = world.features.count
+		var doneFeatures = 0
 		tessellatedRegions = world.features.compactMap { feature -> GeoRegion? in
-				if let tessellation = tessellate(feature) {
-						totalTris += tessellation.vertices.count
-						report(0.3, "Tesselated \(feature.name) (total \(totalTris) triangles", false)
-						return GeoRegion(name: feature.name, admin: feature.admin, geometry: tessellation)
-				} else {
-						reportError(feature.name, "Tesselation failed")
-						return nil
-				}
+			if let tessellation = tessellate(feature) {
+				totalTris += tessellation.vertices.count
+				doneFeatures += 1
+				
+				let progress = Double(doneFeatures) / Double(numFeatures)
+				let shortName = feature.name.prefix(16)
+				report(progress, "\(totalTris) triangles @ \(shortName)", false)
+				return GeoRegion(name: feature.name, admin: feature.admin, geometry: tessellation)
+			} else {
+				reportError(feature.name, "Tesselation failed")
+				return nil
+			}
 		}
 		
-		print("Tessellated \(totalTris) triangles")
+		report(1.0, "Tessellated \(totalTris) triangles.", true)
 	}
 }

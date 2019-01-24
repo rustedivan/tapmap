@@ -40,10 +40,6 @@ class OperationBakeGeometry : Operation {
 		
 		bakeQueue.addOperations([countryTessJob, regionTessJob], waitUntilFinished: true)
 		
-		report(0.9, "Finished tesselation. Building hierarchy...", false)
-		
-		print("Building a world with \(countryTessJob.tessellatedRegions.count) country regions and \(regionTessJob.tessellatedRegions.count) province regions.")
-		
 		let fixupJob = OperationFixupHierarchy(countryCollection: countryTessJob.tessellatedRegions,
 																					 regionCollection: regionTessJob.tessellatedRegions,
 																					 reporter: report)
@@ -54,7 +50,8 @@ class OperationBakeGeometry : Operation {
 			return
 		}
 		
-		report(1.0, "Baked world. Saving...", false)
+		print("\n")
+		report(0.1, "Writing world to \(saveUrl.lastPathComponent)...", false)
 		
 		let encoder = PropertyListEncoder()
 		

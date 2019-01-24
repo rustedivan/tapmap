@@ -32,6 +32,7 @@ class OperationFixupHierarchy : Operation {
 		
 		var geoCountries = Set<GeoCountry>()
 		
+		let numRegions = remainingRegions.count
 		for country in countryList {
 			let belongingRegions = remainingRegions.filter {
 				$0.admin == country.admin
@@ -43,12 +44,18 @@ class OperationFixupHierarchy : Operation {
 			geoCountries.insert(newCountry)
 			
 			remainingRegions.subtract(belongingRegions)
+			report(1.0 - (Double(remainingRegions.count) / Double(numRegions)), country.name, false)
 		}
 		
 		world = GeoWorld(countries: geoCountries)
-
-		// $ Pass to warnings
-		print("Remaining regions:")
-		print(remainingRegions.map { "\($0.name) in \($0.admin)" })
+		report(1.0, "Assembled completed world.", true)
+		print("             - Country regions:  \(countryList.count)")
+		print("             - Province regions: \(regionList.count)")
+		print("\n")
+		
+		if !remainingRegions.isEmpty {
+			print("Remaining regions:")
+			print(remainingRegions.map { "\($0.name) in \($0.admin)" })
+		}
 	}
 }
