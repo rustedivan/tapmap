@@ -55,17 +55,14 @@ class URLDownloadReporter : NSObject, URLSessionDownloadDelegate {
 										 didWriteData bytesWritten: Int64,
 										 totalBytesWritten: Int64,
 										 totalBytesExpectedToWrite: Int64) {
-		downloadUpdateCounter += 1
-		if downloadUpdateCounter > 20 {
-			print("\(totalBytesWritten)/\(totalBytesExpectedToWrite)")
-			downloadUpdateCounter = 0
-		}
+		let filename = downloadTask.originalRequest?.url?.lastPathComponent ?? "unknown file"
+		reportLoad(Double(totalBytesWritten)/Double(totalBytesExpectedToWrite), "Downloading \(filename)...", false)
 	}
 	
 	func urlSession(_ session: URLSession,
 										downloadTask: URLSessionDownloadTask,
 										didFinishDownloadingTo location: URL) {
-		print("Downloaded source archive...")
+		reportLoad(1.0, "Downloaded \(location.lastPathComponent)", true)
 		tempFilePath = location
 		semaphore.signal()
 	}

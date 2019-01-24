@@ -14,10 +14,6 @@ enum GeoBakePipelineError : Error {
 	case datasetFailed(dataset: String)
 }
 
-func reportLoad(_ progress: Double, _ message: String, _ done: Bool) {
-	progressBar(Int(progress * 10.0), done ? "√ \(message)\n" : "  \(message)")
-}
-
 func reportError(_ feature: String, _ error: String) {
 	print("Error: \(feature) failed - \(error)")
 }

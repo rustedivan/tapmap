@@ -100,3 +100,7 @@ func makeBar(bar fill: Character, of width: Int, on back: Character) -> Progress
 }
 
 let progressBar = makeBar(bar: "\u{25cd}", of: 10, on: "\u{25cb}")
+
+func reportLoad(_ progress: Double, _ message: String, _ done: Bool) {
+	progressBar(Int(progress * 10.0), done ? "√ \(message)\n" : "  \(message)")
+}
