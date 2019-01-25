@@ -38,4 +38,37 @@ class geobaketoolTests: XCTestCase {
 			XCTAssertEqual(p, p2)
 		}
 	}
+	
+	func testFindSimilarEdges() {
+		let e1 = Edge(v0: Vertex(x:  1.0001, y: -3.0003), v1: Vertex(x: -15.0015, y: 0.0000))
+		let e2 = Edge(v0: Vertex(x:  1.0001, y: -3.0003), v1: Vertex(x: -15.0015, y: 0.0000))
+		let e3 = Edge(v0: Vertex(x:-15.0015, y:  0.0000), v1: Vertex(x:   1.0001, y: -3.0003))
+		let e4 = Edge(v0: Vertex(x:-15.0015, y:  0.0000), v1: Vertex(x:   2.0001, y: -3.0003))
+		
+		XCTAssertEqual(e1, e2, "Edges should be equal")
+		XCTAssertEqual(e1, e3, "Edges should not be oriented")
+		XCTAssertNotEqual(e1, e4, "Edges should not be equal")
+	}
+	
+	func testCountEdgeNeighbors() {
+		let v0 = Vertex(x: -5.0, y:  0.0)
+		let v1 = Vertex(x:  0.0, y:  5.0)
+		let v2 = Vertex(x:  0.0, y: -5.0)
+		let v3 = Vertex(x:  5.0, y:  0.0)
+		let v4 = Vertex(x: 10.0, y:  5.0)
+		
+		let ring1 = GeoPolygonRing(vertices: [v0, v1, v2])
+		let ring2 = GeoPolygonRing(vertices: [v2, v1, v3])
+		let ring3 = GeoPolygonRing(vertices: [v2, v3, v4])
+		
+		let edgeCardinalities = countEdgeCardinalities(rings: [ring1, ring2, ring3])
+		
+		let contourEdges = edgeCardinalities.filter { $0.1 == 1 }
+		let innerEdges = edgeCardinalities.filter { $0.1 != 1 }
+		XCTAssertEqual(contourEdges.count, 5)
+		XCTAssertEqual(innerEdges.count, 2)
+		
+		XCTAssertTrue(innerEdges.map({ $0.0 }).contains(Edge(v0: v1, v1: v2)))
+		XCTAssertTrue(innerEdges.map({ $0.0 }).contains(Edge(v0: v2, v1: v3)))
+	}
 }

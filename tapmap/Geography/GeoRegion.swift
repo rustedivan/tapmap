@@ -36,6 +36,24 @@ struct Triangle {
 	let i: (Int, Int, Int)
 }
 
+struct Edge : Equatable {
+	let v0: Vertex
+	let v1: Vertex
+	
+	static func ==(lhs: Edge, rhs: Edge) -> Bool {
+		let accuracy : Float = 0.001
+		let notSame = (abs(lhs.v0.x - rhs.v0.x) > accuracy || abs(lhs.v0.y - rhs.v0.y) > accuracy ||
+									 abs(lhs.v1.x - rhs.v1.x) > accuracy || abs(lhs.v1.y - rhs.v1.y) > accuracy)
+		if notSame {
+			let notFlipped = (abs(lhs.v0.x - rhs.v1.x) > accuracy || abs(lhs.v0.y - rhs.v1.y) > accuracy ||
+									   		abs(lhs.v1.x - rhs.v0.x) > accuracy || abs(lhs.v1.y - rhs.v0.y) > accuracy)
+			return !notFlipped
+		}
+		
+		return true
+	}
+}
+
 struct Aabb : Equatable, Codable {
 	let minX : Float
 	let minY : Float
