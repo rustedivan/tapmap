@@ -71,4 +71,42 @@ class geobaketoolTests: XCTestCase {
 		XCTAssertTrue(innerEdges.map({ $0.0 }).contains(Edge(v0: v1, v1: v2)))
 		XCTAssertTrue(innerEdges.map({ $0.0 }).contains(Edge(v0: v2, v1: v3)))
 	}
+	
+	func testBuildEdgeRing() {
+		let v0 = Vertex(x:  0.0, y:  0.0)
+		let v1 = Vertex(x:  5.0, y:  5.0)
+		let v2 = Vertex(x: 10.0, y: -5.0)
+		let v3 = Vertex(x: 15.0, y: 10.0)
+		let v4 = Vertex(x: 20.0, y:-10.0)
+		
+		let e0 = Edge(v0: v0, v1: v1)
+		let e1 = Edge(v0: v1, v1: v2)
+		let e2 = Edge(v0: v2, v1: v3)
+		let e3 = Edge(v0: v3, v1: v4)
+		let e4 = Edge(v0: v4, v1: v0)
+		
+		let orderedRing = GeoPolygonRing(edges: [e0, e1, e2, e3, e4])
+		XCTAssertEqual(orderedRing.vertices, [v0, v1, v2, v3, v4])
+		let unorderedEdges = [e0, e3, e1, e2, e4]
+		let reorderedRing = buildContiguousEdgeRing(edges: unorderedEdges)!
+		
+		XCTAssertEqual(orderedRing.vertices, reorderedRing.vertices)
+	}
+	
+	func testBuildContourFromRings() {
+		let v0 = Vertex(x: -5.0, y:  0.0)
+		let v1 = Vertex(x:  0.0, y:  5.0)
+		let v2 = Vertex(x:  0.0, y: -5.0)
+		let v3 = Vertex(x:  5.0, y:  0.0)
+		let v4 = Vertex(x: 10.0, y:  5.0)
+		
+		let ring1 = GeoPolygonRing(vertices: [v0, v1, v2])
+		let ring2 = GeoPolygonRing(vertices: [v2, v1, v3])
+		let ring3 = GeoPolygonRing(vertices: [v2, v3, v4])
+		
+		let contour = buildContourOf(rings: [ring1, ring2, ring3])!
+		XCTAssertEqual(contour.vertices, [v0, v1, v3, v4, v2])
+	}
+	
+
 }

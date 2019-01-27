@@ -35,3 +35,32 @@ func countEdgeCardinalities(rings: [GeoPolygonRing]) -> [(Edge, Int)] {
 	
 	return cardinalities
 }
+
+func buildContiguousEdgeRing(edges: [Edge]) -> GeoPolygonRing? {
+	var vertices: [Vertex] = []
+	var workEdges = Slice<[Edge]>(edges)
+	
+	// Select the starting vertex
+	vertices.append(workEdges.first!.v0)
+	
+	while (!workEdges.isEmpty) {
+		// Find the edge leading from the last vertex
+		if let nextEdge = workEdges.first(where: { $0.v0 == vertices.last }) {
+			vertices.append(nextEdge.v1)
+			workEdges.removeAll { $0 == nextEdge }
+		} else {
+			break
+		}
+	}
+	
+	return GeoPolygonRing(vertices: vertices)
+}
+
+func buildContourOf(rings: [GeoPolygonRing]) -> GeoPolygonRing? {
+	let edgeCardinalities = countEdgeCardinalities(rings: rings)
+	let contourEdges = edgeCardinalities
+		.filter{ $0.1 == 1 }
+		.map { $0.0 }
+	
+	return buildContiguousEdgeRing(edges: contourEdges)
+}
