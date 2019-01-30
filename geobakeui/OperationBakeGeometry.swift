@@ -35,10 +35,20 @@ class OperationBakeGeometry : Operation {
 		
 		let bakeQueue = OperationQueue()
 		bakeQueue.name = "Baking queue"
+		
+		let continentAssemblyJob = OperationAssembleContinents(countries: countries, reporter: report)
+		
+		bakeQueue.addOperation(continentAssemblyJob)
+		bakeQueue.waitUntilAllOperationsAreFinished()
+		
+		let continentTessJob = OperationTessellateRegions(continentAssemblyJob.continents!, reporter: report, errorReporter: reportError)
 		let countryTessJob = OperationTessellateRegions(countries, reporter: report, errorReporter: reportError)
 		let regionTessJob = OperationTessellateRegions(regions, reporter: report, errorReporter: reportError)
 		
-		bakeQueue.addOperations([countryTessJob, regionTessJob], waitUntilFinished: true)
+		continentTessJob.addDependency(continentAssemblyJob)
+		
+		bakeQueue.addOperations([continentTessJob, countryTessJob, regionTessJob],
+														waitUntilFinished: true)
 		
 		let fixupJob = OperationFixupHierarchy(countryCollection: countryTessJob.tessellatedRegions,
 																					 regionCollection: regionTessJob.tessellatedRegions,

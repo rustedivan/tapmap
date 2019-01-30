@@ -39,6 +39,7 @@ struct GeoPolygon {
 
 struct GeoFeature : Equatable, Hashable {
 	enum Level {
+		case Continent
 		case Country
 		case Region
 	}
@@ -54,6 +55,10 @@ struct GeoFeature : Equatable, Hashable {
 	
 	var admin : String {
 		return stringProperties["adm0_a3"] ?? stringProperties["ADM0_A3"] ?? "Unnamed"
+	}
+	
+	var continent : String {
+		return stringProperties["continent"] ?? stringProperties["CONTINENT"] ?? "Unnamed"
 	}
 	
 	func totalVertexCount() -> Int {
