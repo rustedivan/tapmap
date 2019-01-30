@@ -28,7 +28,8 @@ struct Vertex : Equatable {
 	init(x _x: Double, y _y: Double) { x = Float(_x); y = Float(_y) }
 	
 	static func ==(lhs: Vertex, rhs: Vertex) -> Bool {
-		return fabsf(lhs.x - rhs.x) < .ulpOfOne && fabsf(lhs.y - rhs.y) < .ulpOfOne
+		let accuracy : Float = 0.01
+		return fabsf(lhs.x - rhs.x) < accuracy && fabsf(lhs.y - rhs.y) < accuracy
 	}
 }
 
@@ -41,16 +42,7 @@ struct Edge : Equatable {
 	let v1: Vertex
 	
 	static func ==(lhs: Edge, rhs: Edge) -> Bool {
-		let accuracy : Float = 0.001
-		let notSame = (abs(lhs.v0.x - rhs.v0.x) > accuracy || abs(lhs.v0.y - rhs.v0.y) > accuracy ||
-									 abs(lhs.v1.x - rhs.v1.x) > accuracy || abs(lhs.v1.y - rhs.v1.y) > accuracy)
-		if notSame {
-			let notFlipped = (abs(lhs.v0.x - rhs.v1.x) > accuracy || abs(lhs.v0.y - rhs.v1.y) > accuracy ||
-									   		abs(lhs.v1.x - rhs.v0.x) > accuracy || abs(lhs.v1.y - rhs.v0.y) > accuracy)
-			return !notFlipped
-		}
-		
-		return true
+		return (lhs.v0 == rhs.v0 && lhs.v1 == rhs.v1) || (lhs.v0 == rhs.v1 && lhs.v1 == rhs.v0)
 	}
 }
 
