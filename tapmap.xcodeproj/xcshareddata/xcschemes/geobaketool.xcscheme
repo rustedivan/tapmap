@@ -73,6 +73,10 @@
       </BuildableProductRunnable>
       <CommandLineArguments>
          <CommandLineArgument
+            argument = "reshape"
+            isEnabled = "YES">
+         </CommandLineArgument>
+         <CommandLineArgument
             argument = "bake"
             isEnabled = "YES">
          </CommandLineArgument>
