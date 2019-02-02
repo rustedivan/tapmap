@@ -58,6 +58,14 @@ class PipelineConfig {
 		return confInt
 	}
 	
+	fileprivate func configArray(_ key : String) -> [String]? {
+		var out : [String]? = nil
+		if let arr = dictionary.value(forKeyPath: key) as? NSArray {
+			out = arr as? [String]
+		}
+		return out
+	}
+	
 	fileprivate func keyToSourceFileURL(_ key: String) -> URL { return sourceUrl(configString(key), forKey: key) }
 	
 	var sourceCountryUrl : URL { return keyToSourceFileURL("source.countries") }
@@ -76,6 +84,10 @@ class PipelineConfig {
 			.appendingPathComponent(PipelineConfig.sourceDirectory)
 			.appendingPathComponent(PipelineConfig.reshapedRegionsFilename)
 	}
+	var selectedCountries : [String]? { return configArray("bake.countries") }
+	var selectedRegions : [String]? { return configArray("bake.regions") }
+	
+	
 	var outputFilePath : URL {
 		let setting = configString("output")
 		return URL(fileURLWithPath: setting, relativeTo: FileManager.default.homeDirectoryForCurrentUser)

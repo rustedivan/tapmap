@@ -69,6 +69,13 @@ class OperationParseGeoJson : Operation {
 			return nil
 		}
 		
+		// Filter on pipeline settings before parsing JSON
+		switch level {
+		case .Continent: break
+		case .Country: guard PipelineConfig.shared.selectedCountries?.contains(featureName) ?? true else { return nil }
+		case .Region: guard PipelineConfig.shared.selectedRegions?.contains(featureName) ?? true else { return nil }
+		}
+		
 		let loadedPolygons: [GeoPolygon]
 
 		switch featureType {

@@ -44,7 +44,9 @@ class OperationFixupHierarchy : Operation {
 			geoCountries.insert(newCountry)
 			
 			remainingRegions.subtract(belongingRegions)
-			report(1.0 - (Double(remainingRegions.count) / Double(numRegions)), country.name, false)
+			if (numRegions > 0) {
+				report(1.0 - (Double(remainingRegions.count) / Double(numRegions)), country.name, false)
+			}
 		}
 		
 		world = GeoWorld(countries: geoCountries)
