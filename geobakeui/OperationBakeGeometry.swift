@@ -50,7 +50,8 @@ class OperationBakeGeometry : Operation {
 		bakeQueue.addOperations([continentTessJob, countryTessJob, regionTessJob],
 														waitUntilFinished: true)
 		
-		let fixupJob = OperationFixupHierarchy(countryCollection: countryTessJob.tessellatedRegions,
+		let fixupJob = OperationFixupHierarchy(continentCollection: continentTessJob.tessellatedRegions,
+																					 countryCollection: countryTessJob.tessellatedRegions,
 																					 regionCollection: regionTessJob.tessellatedRegions,
 																					 reporter: report)
 		fixupJob.start()

@@ -40,7 +40,10 @@ class OperationTessellateRegions : Operation {
 				let progress = Double(doneFeatures) / Double(numFeatures)
 				let shortName = feature.name.prefix(16)
 				report(progress, "\(totalTris) triangles @ \(shortName)", false)
-				return GeoRegion(name: feature.name, admin: feature.admin, geometry: tessellation)
+				return GeoRegion(name: feature.name,
+												 admin: feature.admin,
+												 continent: feature.continent,
+												 geometry: tessellation)
 			} else {
 				reportError(feature.name, "Tesselation failed")
 				return nil

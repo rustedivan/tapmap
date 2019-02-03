@@ -48,7 +48,7 @@ class OperationAssembleContinents : Operation {
 			let geometry = continentRings.map { GeoPolygon(exteriorRing: $0, interiorRings: []) }
 			let continent = GeoFeature(level: .Continent,
 																 polygons: geometry,
-																 stringProperties: [:],
+																 stringProperties: ["name" : countryList.key],
 																 valueProperties: [:])
 			continentFeatures.insert(continent)
 		}

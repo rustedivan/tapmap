@@ -77,6 +77,7 @@ struct Aabb : Equatable, Codable {
 struct GeoRegion : Codable, Equatable, Hashable {
 	let name: String
 	let admin: String
+	let continent: String
 	let geometry: GeoTessellation
 	
 	public static func == (lhs: GeoRegion, rhs: GeoRegion) -> Bool {
@@ -99,6 +100,7 @@ struct GeoCountry : Codable, Equatable, Hashable {
 	let regions: Set<GeoRegion>
 	var name: String { get { return geography.name } }
 	var admin: String { get { return geography.admin } }
+	var continent: String { get { return geography.continent } }
 	
 	public static func == (lhs: GeoCountry, rhs: GeoCountry) -> Bool {
 		return lhs.geography == rhs.geography
@@ -109,11 +111,21 @@ struct GeoCountry : Codable, Equatable, Hashable {
 	}
 }
 
-struct GeoContinent : Codable {
-	let name: String
-	let regions: [GeoRegion]
+struct GeoContinent : Codable, Equatable, Hashable {
+	let geography: GeoRegion
+	let countries: Set<GeoCountry>
+	
+	var name: String { get { return geography.name } }
+	
+	public static func == (lhs: GeoContinent, rhs: GeoContinent) -> Bool {
+		return lhs.geography == rhs.geography
+	}
+	
+	public var hashValue: Int {
+		return geography.hashValue
+	}
 }
 
 struct GeoWorld : Codable {
-	let countries: Set<GeoCountry>
+	let continents: Set<GeoContinent>
 }

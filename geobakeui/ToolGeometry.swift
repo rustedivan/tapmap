@@ -54,11 +54,11 @@ struct GeoFeature : Equatable, Hashable {
 	}
 	
 	var admin : String {
-		return stringProperties["adm0_a3"] ?? stringProperties["ADM0_A3"] ?? "Unnamed"
+		return stringProperties["adm0_a3"] ?? stringProperties["ADM0_A3"] ?? "No admin"
 	}
 	
 	var continent : String {
-		return stringProperties["continent"] ?? stringProperties["CONTINENT"] ?? "Unnamed"
+		return stringProperties["continent"] ?? stringProperties["CONTINENT"] ?? "No continent"
 	}
 	
 	func totalVertexCount() -> Int {
