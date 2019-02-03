@@ -28,6 +28,8 @@
 		145210421E98D4F30029942F /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 145210401E98D4F30029942F /* Main.storyboard */; };
 		1462EED821A69B0900611C7A /* GeoRegion.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14B74E5D1E8F9C1100849BB5 /* GeoRegion.swift */; };
 		1462EED921A69B0A00611C7A /* GeoRegion.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14B74E5D1E8F9C1100849BB5 /* GeoRegion.swift */; };
+		14657D32220758F900EF116F /* KDTree.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14657D31220758F900EF116F /* KDTree.swift */; };
+		14657D33220759A500EF116F /* KDTree.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14657D31220758F900EF116F /* KDTree.swift */; };
 		1469F5C71F02F5F4008A37B3 /* Serialization.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1469F5C61F02F5F4008A37B3 /* Serialization.swift */; };
 		1469F5C81F02F5F4008A37B3 /* Serialization.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1469F5C61F02F5F4008A37B3 /* Serialization.swift */; };
 		146A79071E8F912500E2EE20 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 146A79061E8F912500E2EE20 /* AppDelegate.swift */; };
@@ -148,6 +150,7 @@
 		1452103E1E98D4F30029942F /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		145210411E98D4F30029942F /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
 		145210431E98D4F30029942F /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		14657D31220758F900EF116F /* KDTree.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KDTree.swift; sourceTree = "<group>"; };
 		1469F5C61F02F5F4008A37B3 /* Serialization.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Serialization.swift; sourceTree = "<group>"; };
 		146A79031E8F912500E2EE20 /* tapmap.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = tapmap.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		146A79061E8F912500E2EE20 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
@@ -359,6 +362,7 @@
 			children = (
 				14B74E5D1E8F9C1100849BB5 /* GeoRegion.swift */,
 				140C99DA20D8DC610062486A /* MapGeometry.swift */,
+				14657D31220758F900EF116F /* KDTree.swift */,
 			);
 			name = Geography;
 			sourceTree = "<group>";
@@ -836,6 +840,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				1498FE20219C2F4D006D0B78 /* UserState.swift in Sources */,
+				14657D32220758F900EF116F /* KDTree.swift in Sources */,
 				1469F5C71F02F5F4008A37B3 /* Serialization.swift in Sources */,
 				1488E7EE201CDD9900AA00F1 /* MapRenderer.swift in Sources */,
 				14B74E711E8FB15500849BB5 /* GeoRenderer.swift in Sources */,
@@ -890,6 +895,7 @@
 				14FF12F621EE8B4800AF4474 /* Serialization.swift in Sources */,
 				14BDA60C21EE9188004CC319 /* OperationCleanUpBorders.swift in Sources */,
 				14BB448121F8784C0029D62A /* bake.swift in Sources */,
+				14657D33220759A500EF116F /* KDTree.swift in Sources */,
 				146B476F21EFDB7200CC36D9 /* download.swift in Sources */,
 				14FF12F221EE8B1400AF4474 /* GeoRegion.swift in Sources */,
 				14BDA60D21EE9188004CC319 /* OperationFixupHierarchy.swift in Sources */,
