@@ -30,12 +30,24 @@ class MapRenderer {
 		
 		let userState = AppDelegate.sharedUserState
 		
-		// Collect a list of all primitives and their hash keys
-		let hashedPrimitivesList = geoWorld.countries.flatMap { country -> [(Int, RenderPrimitive)] in
-			if userState.regionOpened(r: country.geography) {
-				return country.regions.flatMap { [($0.hashValue, $0.renderPrimitive())] }
+		// Collect a flat list of all primitives and their hash keys
+		let hashedPrimitivesList = geoWorld.continents.flatMap { continent -> [(Int, RenderPrimitive)] in
+			if userState.regionOpened(r: continent.geography) {
+				// Countries in opened continents
+				return continent.countries.flatMap { country -> [(Int, RenderPrimitive)] in
+					if userState.regionOpened(r: country.geography) {
+						return country.regions.map { region -> (Int, RenderPrimitive) in
+							// All regions
+							return (region.hashValue, region.renderPrimitive())
+						}
+					} else {
+						// Closed countries
+						return [(country.hashValue, country.geography.renderPrimitive())]
+					}
+				}
 			} else {
-				return [(country.hashValue, country.geography.renderPrimitive())]
+				// Closed continents
+				return [(continent.hashValue, continent.geography.renderPrimitive())]
 			}
 		}
 		
@@ -49,11 +61,11 @@ class MapRenderer {
 		}
 	}
 	
-	func updatePrimitives(forCountry country: GeoCountry) {
-		if AppDelegate.sharedUserState.regionOpened(r: country.geography) {
-			regionPrimitives.removeValue(forKey: country.geography.hashValue)
+	func updatePrimitives(forGeography geography: GeoRegion, withSubregions regions: Set<GeoRegion>) {
+		if AppDelegate.sharedUserState.regionOpened(r: geography) {
+			regionPrimitives.removeValue(forKey: geography.hashValue)
 			
-			let hashedPrimitives = country.regions.map {
+			let hashedPrimitives = regions.map {
 				($0.hashValue, $0.renderPrimitive())
 			}
 			regionPrimitives.merge(hashedPrimitives, uniquingKeysWith: { (l, r) in l })
