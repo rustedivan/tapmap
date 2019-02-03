@@ -18,12 +18,16 @@ enum SplitDirection {
 	}
 }
 
-indirect enum KDNode {
+protocol PointForm {
+	var p : Vertex { get }
+}
+
+indirect enum KDNode<Element : PointForm> {
 	case Empty
-	case Split(KDNode, Vertex, KDNode, SplitDirection)
+	case Split(KDNode, Element, KDNode, SplitDirection)
 	
 	init() { self = .Empty }
-	init(left: KDNode, _ p: Vertex, right: KDNode, _ d: SplitDirection) {
+	init(left: KDNode, _ p: Element, right: KDNode, _ d: SplitDirection) {
 		self = .Split(left, p, right, d)
 	}
 	
@@ -39,20 +43,20 @@ indirect enum KDNode {
 }
 
 // MARK: Helpers
-fileprivate func kdCompare(u: Vertex, v: Vertex, d: SplitDirection) -> Bool {
+fileprivate func kdCompare(u: PointForm, v: PointForm, d: SplitDirection) -> Bool {
 	switch d {
-	case .x: return u.x < v.x
-	case .y: return u.y < v.y
+	case .x: return u.p.x < v.p.x
+	case .y: return u.p.y < v.p.y
 	}
 }
 
-fileprivate func sqDist(v: Vertex, q: Vertex) -> Double {
-	return Double(pow(v.x - q.x, 2.0) + pow(v.y - q.y, 2.0))
+fileprivate func sqDist(v: PointForm, q: PointForm) -> Double {
+	return Double(pow(v.p.x - q.p.x, 2.0) + pow(v.p.y - q.p.y, 2.0))
 }
 
-fileprivate func bbDist(v: Vertex, bb: CGRect) -> Double {
-	let dx = max(abs(CGFloat(v.x) - bb.midX) - bb.width / 2.0, 0.0)
-	let dy = max(abs(CGFloat(v.y) - bb.midY) - bb.height / 2.0, 0.0)
+fileprivate func bbDist(v: PointForm, bb: CGRect) -> Double {
+	let dx = max(abs(CGFloat(v.p.x) - bb.midX) - bb.width / 2.0, 0.0)
+	let dy = max(abs(CGFloat(v.p.y) - bb.midY) - bb.height / 2.0, 0.0)
 	return Double(dx * dx + dy * dy)
 }
 
@@ -73,11 +77,11 @@ fileprivate func bbTrimHigh(d: SplitDirection, value: Float, bb: CGRect) -> CGRe
 }
 
 // MARK: Algoritm
-func kdInsert(v: Vertex, n: KDNode, d: SplitDirection = .x) -> KDNode {
+func kdInsert<T:PointForm>(v: T, n: KDNode<T>, d: SplitDirection = .x) -> KDNode<T> {
 	switch n {
 	case .Empty: return KDNode(left: .Empty, v, right: .Empty, d)
 	case .Split(let left, let a, let right, let d):
-		guard a != v else { return n }
+		guard a.p != v.p else { return n }
 		if kdCompare(u: v, v: a, d: d) {
 			return n.replaceLeft(newLeft: kdInsert(v: v, n: left, d: d.flip()))
 		} else {
@@ -86,9 +90,9 @@ func kdInsert(v: Vertex, n: KDNode, d: SplitDirection = .x) -> KDNode {
 	}
 }
 
-typealias Result = (bestPoint: Vertex, bestDistance: Double)
+typealias Result = (bestPoint: PointForm, bestDistance: Double)
 
-func kdFindNearest(query q: Vertex, node: KDNode,
+func kdFindNearest<T:PointForm>(query q: T, node: KDNode<T>,
 									 d: SplitDirection, aabb: CGRect,
 									 result: Result) -> Result {
 	switch node {
@@ -110,17 +114,17 @@ func kdFindNearest(query q: Vertex, node: KDNode,
 		let rightResult: Result
 		if kdCompare(u: q, v: v, d: d) {
 			leftResult = kdFindNearest(query: q, node: l, d: d.flip(),
-																 aabb: bbTrimLow(d: d, value: v.x, bb: aabb),
+																 aabb: bbTrimLow(d: d, value: v.p.x, bb: aabb),
 																 result: newResult)
 			rightResult = kdFindNearest(query: q, node: r, d: d.flip(),
-																	aabb: bbTrimHigh(d: d, value: v.x, bb: aabb),
+																	aabb: bbTrimHigh(d: d, value: v.p.x, bb: aabb),
 																	result: newResult)
 		} else {
 			rightResult = kdFindNearest(query: q, node: r, d: d.flip(),
-																	aabb: bbTrimHigh(d: d, value: v.x, bb: aabb),
+																	aabb: bbTrimHigh(d: d, value: v.p.x, bb: aabb),
 																	result: newResult)
 			leftResult = kdFindNearest(query: q, node: l, d: d.flip(),
-																 aabb: bbTrimLow(d: d, value: v.x, bb: aabb),
+																 aabb: bbTrimLow(d: d, value: v.p.x, bb: aabb),
 																 result: newResult)
 		}
 		
