@@ -77,6 +77,23 @@ fileprivate func bbTrimHigh(d: SplitDirection, value: Float, bb: CGRect) -> CGRe
 }
 
 // MARK: Algoritm
+func kdFindMin<T:PointForm>(m: T, n: KDNode<T>, s: SplitDirection) -> T {
+	switch n {
+	case .Empty: return m
+	case .Split(let left, let a, let right, let d):
+		if d == s {
+			let minLeft = kdFindMin(m: a, n: left, s: s)
+			return kdCompare(u: a, v: minLeft, d: s) ? a : minLeft
+		} else {
+			let minLeft = kdFindMin(m: a, n: left, s: s)
+			let minRight = kdFindMin(m: a, n: right, s: s)
+			return kdCompare(u: minLeft, v: minRight, d: s) ?
+				(kdCompare(u: a, v: minLeft, d: s) ? a : minLeft) :
+				(kdCompare(u: a, v: minRight, d: s) ? a : minRight)
+		}
+	}
+}
+
 func kdInsert<T:PointForm>(v: T, n: KDNode<T>, d: SplitDirection = .x) -> KDNode<T> {
 	switch n {
 	case .Empty: return KDNode(left: .Empty, v, right: .Empty, d)
@@ -86,6 +103,31 @@ func kdInsert<T:PointForm>(v: T, n: KDNode<T>, d: SplitDirection = .x) -> KDNode
 			return n.replaceLeft(newLeft: kdInsert(v: v, n: left, d: d.flip()))
 		} else {
 			return n.replaceRight(newRight: kdInsert(v: v, n: right, d: d.flip()))
+		}
+	}
+}
+
+func kdRemove<T:PointForm>(v: T, n: KDNode<T>, d: SplitDirection = .x) -> KDNode<T> {
+	switch n {
+	case .Empty: return n
+	case .Split(let left, let a, let right, let d):
+		if v.p == a.p {
+			if case .Split = right {
+				let minRight = kdFindMin(m: a, n: right, s: d)
+				let newRight = kdRemove(v: minRight, n: right)
+				return KDNode(left: left, minRight, right: newRight, d.flip())
+			} else if case .Split = left {
+				let minLeft = kdFindMin(m: a, n: left, s: d)
+				return KDNode(left: kdRemove(v: minLeft, n: left), minLeft, right: right, d.flip())
+			} else {
+				return .Empty
+			}
+		} else {
+			if kdCompare(u: v, v: a, d: d) {
+				return n.replaceLeft(newLeft: kdRemove(v: v, n: left, d: d.flip()))
+			} else {
+				return n.replaceRight(newRight: kdRemove(v: v, n: right, d: d.flip()))
+			}
 		}
 	}
 }
