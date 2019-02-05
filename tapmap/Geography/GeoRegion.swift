@@ -37,12 +37,30 @@ struct Triangle {
 	let i: (Int, Int, Int)
 }
 
-struct Edge : Equatable {
+struct Edge : Equatable, Hashable, PointForm {
 	let v0: Vertex
 	let v1: Vertex
 	
+	var p : Vertex { return v0 }
+	
 	static func ==(lhs: Edge, rhs: Edge) -> Bool {
 		return (lhs.v0 == rhs.v0 && lhs.v1 == rhs.v1) || (lhs.v0 == rhs.v1 && lhs.v1 == rhs.v0)
+	}
+	
+	var hashValue : Int {
+		let accuracy : Float = 0.01
+		var leftToRight = (v0, v1)
+		
+		if abs(v0.x - v1.x) < accuracy {
+			if v1.y < v0.y {
+				leftToRight = (v1, v0)
+			}
+		} else if v1.x < v0.x {
+			leftToRight = (v1, v0)
+		}
+		
+		return String(format: "%.3f-%.3f|%.3f-%.3f",
+									arguments: [leftToRight.0.x, leftToRight.0.y, leftToRight.1.x, leftToRight.1.y]).hashValue
 	}
 }
 
