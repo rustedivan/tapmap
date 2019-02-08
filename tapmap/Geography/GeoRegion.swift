@@ -21,46 +21,8 @@ struct GeoColors : Codable {
 	}
 }
 
-struct Vertex : Equatable, Hashable, PointForm {
-	var p: Vertex { return self }
-	
-	let x: Float
-	let y: Float
-	init(x _x: Float, y _y: Float) { x = _x; y = _y }
-	init(x _x: Double, y _y: Double) { x = Float(_x); y = Float(_y) }
-	
-	var quantized : (Int64, Int64) {
-		let quant: Float = 1e-6
-		return (Int64(floor(x / quant)), Int64(floor(y / quant)))
-	}
-	
-	static func ==(lhs: Vertex, rhs: Vertex) -> Bool {
-		return lhs.quantized == rhs.quantized
-	}
-	
-	var hashValue : Int {
-		return String("\(quantized)").hashValue
-	}
-}
-
 struct Triangle {
 	let i: (Int, Int, Int)
-}
-
-struct Edge : Equatable, Hashable, PointForm {
-	let v0: Vertex
-	let v1: Vertex
-	
-	var p : Vertex { return v0 }
-	
-	static func ==(lhs: Edge, rhs: Edge) -> Bool {
-		return (lhs.v0 == rhs.v0 && lhs.v1 == rhs.v1) || (lhs.v0 == rhs.v1 && lhs.v1 == rhs.v0)
-	}
-	
-	var hashValue : Int {
-		let orderedHashes = [v0.hashValue, v1.hashValue].sorted()
-		return String("\(orderedHashes)").hashValue
-	}
 }
 
 struct Aabb : Equatable, Codable {

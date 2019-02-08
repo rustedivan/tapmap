@@ -12,7 +12,7 @@ import simd
 
 class OperationCleanUpBorders : Operation {
 	let report : ProgressReport
-	let distanceThresholdSqr : Float = 0.1 * 0.1
+	let distanceThresholdSqr = 0.1 * 0.1
 	let country : GeoFeature
 	let regions : GeoFeatureCollection
 	var snappedRegions : GeoFeatureCollection?
@@ -46,7 +46,7 @@ class OperationCleanUpBorders : Operation {
 			for p in f.polygons {
 				var snappedVertices : [Vertex] = []
 				for v in p.exteriorRing.vertices {
-					var shortestDistanceSqr = Float.greatestFiniteMagnitude
+					var shortestDistanceSqr = Double.greatestFiniteMagnitude
 					var shortestSnappedPoint : Vertex?
 					for e in countryEdges {
 						let (q, d) = snapPointToEdge(p: v, threshold: distanceThresholdSqr, edge: e)

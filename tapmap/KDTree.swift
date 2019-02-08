@@ -44,12 +44,11 @@ indirect enum KDNode<Element : PointForm> {
 
 // MARK: Helpers
 fileprivate func kdCompare(u: PointForm?, v: PointForm?, d: SplitDirection) -> Bool {
-	let accuracy: Float = 0.01
 	guard let lhs = u?.p else { return false }
 	guard let rhs = v?.p else { return true }
 	switch d {
-	case .x: return lhs.x < rhs.x - accuracy
-	case .y: return lhs.y < rhs.y - accuracy
+	case .x: return lhs.quantized.0 < rhs.quantized.0
+	case .y: return lhs.quantized.1 < rhs.quantized.1
 	}
 }
 
@@ -58,12 +57,12 @@ fileprivate func sqDist(v: PointForm, q: PointForm) -> Double {
 }
 
 fileprivate func bbDist(v: PointForm, bb: CGRect) -> Double {
-	let dx = max(abs(CGFloat(v.p.x) - bb.midX) - bb.width / 2.0, 0.0)
-	let dy = max(abs(CGFloat(v.p.y) - bb.midY) - bb.height / 2.0, 0.0)
+	let dx = max(abs(v.p.x - Double(bb.midX)) - Double(bb.width) / 2.0, 0.0)
+	let dy = max(abs(v.p.y - Double(bb.midY)) - Double(bb.height) / 2.0, 0.0)
 	return Double(dx * dx + dy * dy)
 }
 
-fileprivate func bbTrimLow(d: SplitDirection, value: Float, bb: CGRect) -> CGRect {
+fileprivate func bbTrimLow(d: SplitDirection, value: Double, bb: CGRect) -> CGRect {
 	if case .x = d {
 		return CGRect(x: bb.minX, y: bb.minY, width: bb.width / 2.0, height: bb.height)
 	} else {
@@ -71,7 +70,7 @@ fileprivate func bbTrimLow(d: SplitDirection, value: Float, bb: CGRect) -> CGRec
 	}
 }
 
-fileprivate func bbTrimHigh(d: SplitDirection, value: Float, bb: CGRect) -> CGRect {
+fileprivate func bbTrimHigh(d: SplitDirection, value: Double, bb: CGRect) -> CGRect {
 	if case .x = d {
 		return CGRect(x: bb.midX, y: bb.minY, width: bb.width / 2.0, height: bb.height)
 	} else {

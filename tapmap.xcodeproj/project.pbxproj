@@ -28,7 +28,6 @@
 		145210421E98D4F30029942F /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 145210401E98D4F30029942F /* Main.storyboard */; };
 		1462EED821A69B0900611C7A /* GeoRegion.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14B74E5D1E8F9C1100849BB5 /* GeoRegion.swift */; };
 		1462EED921A69B0A00611C7A /* GeoRegion.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14B74E5D1E8F9C1100849BB5 /* GeoRegion.swift */; };
-		14657D32220758F900EF116F /* KDTree.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14657D31220758F900EF116F /* KDTree.swift */; };
 		14657D33220759A500EF116F /* KDTree.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14657D31220758F900EF116F /* KDTree.swift */; };
 		1469F5C71F02F5F4008A37B3 /* Serialization.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1469F5C61F02F5F4008A37B3 /* Serialization.swift */; };
 		1469F5C81F02F5F4008A37B3 /* Serialization.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1469F5C61F02F5F4008A37B3 /* Serialization.swift */; };
@@ -40,7 +39,6 @@
 		146A79121E8F912500E2EE20 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 146A79111E8F912500E2EE20 /* Assets.xcassets */; };
 		146A79151E8F912500E2EE20 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 146A79131E8F912500E2EE20 /* LaunchScreen.storyboard */; };
 		146A79201E8F912500E2EE20 /* tapmapTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 146A791F1E8F912500E2EE20 /* tapmapTests.swift */; };
-		146B476D21EE971100CC36D9 /* libPods-geobaketoolTests.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 146B476C21EE971100CC36D9 /* libPods-geobaketoolTests.a */; };
 		146B476F21EFDB7200CC36D9 /* download.swift in Sources */ = {isa = PBXBuildFile; fileRef = 146B476E21EFDB7200CC36D9 /* download.swift */; };
 		146B477121F0F7FA00CC36D9 /* config.swift in Sources */ = {isa = PBXBuildFile; fileRef = 146B477021F0F7FA00CC36D9 /* config.swift */; };
 		146B477521F3E62400CC36D9 /* pipeline.json in CopyFiles */ = {isa = PBXBuildFile; fileRef = 146B477421F3E61700CC36D9 /* pipeline.json */; };
@@ -55,6 +53,9 @@
 		14B74E711E8FB15500849BB5 /* GeoRenderer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14B74E701E8FB15500849BB5 /* GeoRenderer.swift */; };
 		14B74E731E8FCF5E00849BB5 /* FeatureLoaderTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14B74E721E8FCF5E00849BB5 /* FeatureLoaderTests.swift */; };
 		14BB448121F8784C0029D62A /* bake.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14BB448021F8784C0029D62A /* bake.swift */; };
+		14BD72FF220E41C900CDD7D9 /* AppTypes.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14BD72FE220E41C900CDD7D9 /* AppTypes.swift */; };
+		14BD7300220E41C900CDD7D9 /* AppTypes.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14BD72FE220E41C900CDD7D9 /* AppTypes.swift */; };
+		14BD7301220E424C00CDD7D9 /* KDTree.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14657D31220758F900EF116F /* KDTree.swift */; };
 		14BDA60421EE9187004CC319 /* OperationBakeGeometry.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14F52E401FD67EBB002D3A3A /* OperationBakeGeometry.swift */; };
 		14BDA60521EE9187004CC319 /* OperationParseGeoJson.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14F52E421FD67EBB002D3A3A /* OperationParseGeoJson.swift */; };
 		14BDA60621EE9187004CC319 /* OperationTessellateRegions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14F52E411FD67EBB002D3A3A /* OperationTessellateRegions.swift */; };
@@ -180,6 +181,7 @@
 		14B74E701E8FB15500849BB5 /* GeoRenderer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = GeoRenderer.swift; sourceTree = "<group>"; };
 		14B74E721E8FCF5E00849BB5 /* FeatureLoaderTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FeatureLoaderTests.swift; sourceTree = "<group>"; };
 		14BB448021F8784C0029D62A /* bake.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = bake.swift; sourceTree = "<group>"; };
+		14BD72FE220E41C900CDD7D9 /* AppTypes.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = AppTypes.swift; path = Geography/AppTypes.swift; sourceTree = "<group>"; };
 		14BDA61321EE91B8004CC319 /* JobHelpers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JobHelpers.swift; sourceTree = "<group>"; };
 		14E0288A1EB7332900B4D515 /* geobakeuiTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = geobakeuiTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		14E0288C1EB7332900B4D515 /* geobakeuiTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = geobakeuiTests.swift; sourceTree = "<group>"; };
@@ -263,7 +265,6 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				146B476D21EE971100CC36D9 /* libPods-geobaketoolTests.a in Frameworks */,
 				CA81635E942D60D53F3B1862 /* libPods-geobaketool-geobaketoolTests.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -360,6 +361,7 @@
 		14B74E5C1E8F9BE600849BB5 /* Geography */ = {
 			isa = PBXGroup;
 			children = (
+				14BD72FE220E41C900CDD7D9 /* AppTypes.swift */,
 				14B74E5D1E8F9C1100849BB5 /* GeoRegion.swift */,
 				140C99DA20D8DC610062486A /* MapGeometry.swift */,
 				14657D31220758F900EF116F /* KDTree.swift */,
@@ -840,8 +842,8 @@
 			buildActionMask = 2147483647;
 			files = (
 				1498FE20219C2F4D006D0B78 /* UserState.swift in Sources */,
-				14657D32220758F900EF116F /* KDTree.swift in Sources */,
 				1469F5C71F02F5F4008A37B3 /* Serialization.swift in Sources */,
+				14BD72FF220E41C900CDD7D9 /* AppTypes.swift in Sources */,
 				1488E7EE201CDD9900AA00F1 /* MapRenderer.swift in Sources */,
 				14B74E711E8FB15500849BB5 /* GeoRenderer.swift in Sources */,
 				146A790D1E8F912500E2EE20 /* MapViewController.swift in Sources */,
@@ -855,6 +857,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				14BD7300220E41C900CDD7D9 /* AppTypes.swift in Sources */,
 				140C99DC20D8DC610062486A /* MapGeometry.swift in Sources */,
 				140E63F21F209645000D710E /* Serialization.swift in Sources */,
 				146A79201E8F912500E2EE20 /* tapmapTests.swift in Sources */,
@@ -913,6 +916,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				14BDA61721EE91B8004CC319 /* JobHelpers.swift in Sources */,
+				14BD7301220E424C00CDD7D9 /* KDTree.swift in Sources */,
 				14FF12F521EE8B4700AF4474 /* Serialization.swift in Sources */,
 				144A55B221FB4842001CC231 /* OperationAssembleContinents.swift in Sources */,
 				14FF12F321EE8B1400AF4474 /* GeoRegion.swift in Sources */,

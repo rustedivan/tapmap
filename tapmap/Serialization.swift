@@ -11,13 +11,13 @@ import Foundation
 extension Vertex : Codable {
 	func encode(to encoder: Encoder) throws {
 		var container = encoder.unkeyedContainer()
-		try container.encode(contentsOf: [x, y])
+		try container.encode(contentsOf: [Float(x), Float(y)])
 	}
 
 	init(from decoder: Decoder) throws {
 		var container = try decoder.unkeyedContainer()
-		x = try container.decode(Float.self)
-		y = try container.decode(Float.self)
+		x = try Vertex.Precision(container.decode(Float.self))
+		y = try Vertex.Precision(container.decode(Float.self))
 	}
 }
 

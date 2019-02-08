@@ -14,10 +14,10 @@ func silentReport(_: Double, _:String, _:Bool) {
 
 class geobaketoolTests: XCTestCase {
 	func testSimpleTessellation() {
-		let r = GeoPolygonRing(vertices: [ Vertex(x: 1.0, y: 1.5),
-																			 Vertex(x: 3.0, y: 1.5),
-																			 Vertex(x: 4.0, y: 3.0),
-																			 Vertex(x: 2.0, y: 4.5)])
+		let r = GeoPolygonRing(vertices: [ Vertex(1.0, 1.5),
+																			 Vertex(3.0, 1.5),
+																			 Vertex(4.0, 3.0),
+																			 Vertex(2.0, 4.5)])
 		let p = GeoPolygon(exteriorRing: r, interiorRings: [])
 		let f = GeoFeature(level: .Region, polygons: [p], stringProperties: [:], valueProperties: [:])
 		let tessellation = tessellate(f)!
@@ -27,10 +27,10 @@ class geobaketoolTests: XCTestCase {
 	}
 
 	func testSnapToEdge() {
-		let e = (a: Vertex(x: -1.0, y: 0.0), b: Vertex(x: 1.0, y: 0.0))
+		let e = (a: Vertex(-1.0, 0.0), b: Vertex(1.0, 0.0))
 
-		let snapPs = [Vertex(x: 0.01, y: 0.01), Vertex(x: -1.0, y: 0.5), Vertex(x: 1.0, y: -0.5)]
-		let ignorePs = [Vertex(x: 0.0, y: 2.0), Vertex(x: -2.0, y: 0.5), Vertex(x: 0.5, y: -2.0)]
+		let snapPs = [Vertex(0.01, 0.01), Vertex(-1.0, 0.5), Vertex(1.0, -0.5)]
+		let ignorePs = [Vertex(0.0, 2.0), Vertex(-2.0, 0.5), Vertex(0.5, -2.0)]
 
 		for p in snapPs {
 			let (p2, _) = snapPointToEdge(p: p, threshold: 1.0, edge: e)
@@ -44,10 +44,10 @@ class geobaketoolTests: XCTestCase {
 	}
 
 	func testFindSimilarEdges() {
-		let e1 = Edge(v0: Vertex(x:  1.0001, y: -3.0003), v1: Vertex(x: -15.0015, y: 0.0000))
-		let e2 = Edge(v0: Vertex(x:  1.0002, y: -3.0004), v1: Vertex(x: -15.0015, y: 0.0000))
-		let e3 = Edge(v0: Vertex(x:-15.0015, y:  0.0000), v1: Vertex(x:   1.0001, y: -3.0003))
-		let e4 = Edge(v0: Vertex(x:-15.0015, y:  0.0000), v1: Vertex(x:   2.0001, y: -3.0003))
+		let e1 = Edge(v0: Vertex(1.0001, -3.0003), v1: Vertex(-15.0015, 0.0000))
+		let e2 = Edge(v0: Vertex(1.0002, -3.0004), v1: Vertex(-15.0015, 0.0000))
+		let e3 = Edge(v0: Vertex(-15.0015, 0.0000), v1: Vertex(1.0001, -3.0003))
+		let e4 = Edge(v0: Vertex(-15.0015, 0.0000), v1: Vertex(2.0001, -3.0003))
 
 		XCTAssertEqual(e1, e2, "Edges should be equal")
 		XCTAssertEqual(e1, e3, "Edges should not be oriented")
@@ -55,10 +55,10 @@ class geobaketoolTests: XCTestCase {
 	}
 
 	func testEdgeHashing() {
-		let e1 = Edge(v0: Vertex(x: 110.0001, y: -300.0003), v1: Vertex(x: -150.0015, y: 0.0000))
-		let e2 = Edge(v0: Vertex(x: 110.0002, y: -300.0004), v1: Vertex(x: -150.0015, y: 0.0000))
-		let e3 = Edge(v0: Vertex(x: -150.0015, y: 0.0000), v1: Vertex(x: 110.0002, y: -300.0004))
-		let e4 = Edge(v0: Vertex(x:-15.0015, y:  0.0000), v1: Vertex(x:   2.0001, y: -3.0003))
+		let e1 = Edge(v0: Vertex(110.0001, -300.0003), v1: Vertex(-150.0015, 0.0000))
+		let e2 = Edge(v0: Vertex(110.0002, -300.0004), v1: Vertex(-150.0015, 0.0000))
+		let e3 = Edge(v0: Vertex(-150.0015, 0.0000), v1: Vertex(110.0002, -300.0004))
+		let e4 = Edge(v0: Vertex(-15.0015, 0.0000), v1: Vertex(2.0001, -3.0003))
 
 		XCTAssertEqual(e1.hashValue, e2.hashValue, "Edges should be equal")
 		XCTAssertEqual(e2.hashValue, e3.hashValue, "Flipped edges should be equal")
@@ -66,11 +66,11 @@ class geobaketoolTests: XCTestCase {
 	}
 
 	func testCountEdgeNeighbors() {
-		let v0 = Vertex(x: -5.0, y:  0.0)
-		let v1 = Vertex(x:  0.0, y:  5.0)
-		let v2 = Vertex(x:  0.0, y: -5.0)
-		let v3 = Vertex(x:  5.0, y:  0.0)
-		let v4 = Vertex(x: 10.0, y:  5.0)
+		let v0 = Vertex(-5.0, 0.0)
+		let v1 = Vertex(0.0, 5.0)
+		let v2 = Vertex(0.0, -5.0)
+		let v3 = Vertex(5.0, 0.0)
+		let v4 = Vertex(10.0, 5.0)
 
 		let ring1 = GeoPolygonRing(vertices: [v0, v1, v2])
 		let ring2 = GeoPolygonRing(vertices: [v2, v1, v3])
@@ -88,11 +88,11 @@ class geobaketoolTests: XCTestCase {
 	}
 
 	func testBuildEdgeRing() {
-		let v0 = Vertex(x:  0.0, y:  0.0)
-		let v1 = Vertex(x:  5.0, y:  5.0)
-		let v2 = Vertex(x: 10.0, y: -5.0)
-		let v3 = Vertex(x: 15.0, y: 10.0)
-		let v4 = Vertex(x: 20.0, y:-10.0)
+		let v0 = Vertex(0.0, 0.0)
+		let v1 = Vertex(5.0, 5.0)
+		let v2 = Vertex(10.0, -5.0)
+		let v3 = Vertex(15.0, 10.0)
+		let v4 = Vertex(20.0, -10.0)
 
 		let e0 = Edge(v0: v0, v1: v1)
 		let e1 = Edge(v0: v1, v1: v2)
@@ -108,55 +108,55 @@ class geobaketoolTests: XCTestCase {
 		XCTAssertEqual(orderedRing.vertices, reorderedRing.vertices)
 	}
 
-	func testBuildContourFromRings() {
-		let v0 = Vertex(x: -5.0, y:  0.0)
-		let v1 = Vertex(x:  0.0, y:  5.0)
-		let v2 = Vertex(x:  0.0, y: -5.0)
-		let v3 = Vertex(x:  5.0, y:  0.0)
-		let v4 = Vertex(x: 15.0, y:  5.0)
-
-		let ring1 = GeoPolygonRing(vertices: [v0, v1, v2])
-		let ring2 = GeoPolygonRing(vertices: [v2, v1, v3])
-		let ring3 = GeoPolygonRing(vertices: [v2, v3, v4])
-
-		let contour = buildContourOf(rings: [ring1, ring2, ring3], report: silentReport)[0]
-		XCTAssertTrue(contour.vertices.contains(v0))
-		XCTAssertTrue(contour.vertices.contains(v1))
-		XCTAssertTrue(contour.vertices.contains(v2))
-		XCTAssertTrue(contour.vertices.contains(v3))
-		XCTAssertTrue(contour.vertices.contains(v4))
-	}
-	
+//	func testBuildContourFromRings() {
+//		let v0 = Vertex(-5.0, 0.0)
+//		let v1 = Vertex(0.0, 5.0)
+//		let v2 = Vertex(0.0, -5.0)
+//		let v3 = Vertex(5.0, 0.0)
+//		let v4 = Vertex(15.0, 5.0)
+//
+//		let ring1 = GeoPolygonRing(vertices: [v0, v1, v2])
+//		let ring2 = GeoPolygonRing(vertices: [v2, v1, v3])
+//		let ring3 = GeoPolygonRing(vertices: [v2, v3, v4])
+//
+//		let contour = buildContourOf(rings: [ring1, ring2, ring3], report: silentReport)[0]
+//		XCTAssertTrue(contour.vertices.contains(v0))
+//		XCTAssertTrue(contour.vertices.contains(v1))
+//		XCTAssertTrue(contour.vertices.contains(v2))
+//		XCTAssertTrue(contour.vertices.contains(v3))
+//		XCTAssertTrue(contour.vertices.contains(v4))
+//	}
+//	
 	func testRemoveFuckery() {
 		var t : KDNode<Vertex>
-			=	kdInsert(v: Vertex(x:  0.0, y:  5.0), n: .Empty)
-		t = kdInsert(v: Vertex(x:  0.0, y:  0.0), n: t)
-		t = kdInsert(v: Vertex(x: -5.0, y:  0.0), n: t)
-		t = kdInsert(v: Vertex(x: -5.0, y: -5.0), n: t)
-		t = kdInsert(v: Vertex(x: -5.0, y:  5.0), n: t)
-		t = kdInsert(v: Vertex(x:  0.0, y: -5.0), n: t)
+			=	kdInsert(v: Vertex(0.0, 5.0), n: .Empty)
+		t = kdInsert(v: Vertex(0.0, 0.0), n: t)
+		t = kdInsert(v: Vertex(-5.0, 0.0), n: t)
+		t = kdInsert(v: Vertex(-5.0, -5.0), n: t)
+		t = kdInsert(v: Vertex(-5.0, 5.0), n: t)
+		t = kdInsert(v: Vertex(0.0, -5.0), n: t)
 
 		kdPrint(t)
-		t = kdRemove(v: Vertex(x: 0.0, y: 5.0), n: t)
+		t = kdRemove(v: Vertex(0.0, 5.0), n: t)
 		kdPrint(t)
-		let hardPointToRemove = Vertex(x: 0.0, y: -5.0)
+		let hardPointToRemove = Vertex(0.0, -5.0)
 		t = kdRemove(v: hardPointToRemove, n: t)
 		kdPrint(t)
 		
-		let startResult = (bestPoint: Vertex(x: 0.0, y: 0.0), bestDistance: 10000.0)
+		let startResult = (bestPoint: Vertex(0.0, 0.0), bestDistance: 10000.0)
 		XCTAssertNotEqual(kdFindNearest(query: hardPointToRemove, node: t,
 																		d: .x, aabb: CGRect(x: -10.0, y: -10.0, width: 20.0, height: 20.0),
 																		result: startResult).bestPoint, hardPointToRemove)
 	}
 	
 	func testBuildContoursFromIslands() {
-		let v10 = Vertex(x: -5.0, y:  0.0)
-		let v11 = Vertex(x:  0.0, y:  5.0)
-		let v12 = Vertex(x:  0.0, y: -5.0)
+		let v10 = Vertex(-5.0, 0.0)
+		let v11 = Vertex(0.0, 5.0)
+		let v12 = Vertex(0.0, -5.0)
 
-		let v20 = Vertex(x: -5.0, y:  5.0)
-		let v21 = Vertex(x:  0.0, y:  0.0)
-		let v22 = Vertex(x: -5.0, y: -5.0)
+		let v20 = Vertex(-5.0, 5.0)
+		let v21 = Vertex(0.0, 0.0)
+		let v22 = Vertex(-5.0, -5.0)
 
 		let ring1 = GeoPolygonRing(vertices: [v10, v11, v12])
 		let ring2 = GeoPolygonRing(vertices: [v20, v21, v22])

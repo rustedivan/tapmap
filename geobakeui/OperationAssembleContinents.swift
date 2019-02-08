@@ -66,8 +66,8 @@ func countEdgeCardinalities(rings: [GeoPolygonRing]) -> [Edge : Int] {
 	for r in rings {
 		for i in 0..<r.vertices.count {
 			// Construct the next edge in the ring
-			let e = Edge(v0: r.vertices[i],
-									 v1: r.vertices[(i + 1) % r.vertices.count])
+			let e = Edge(r.vertices[i],
+									 r.vertices[(i + 1) % r.vertices.count])
 
 			if cardinalities.keys.contains(e) {
 				cardinalities[e]! += 1
@@ -85,39 +85,39 @@ func buildContiguousEdgeRings(edges: [Edge], report: ProgressReport, _ reportNam
 	var workVertices: [Vertex] = []
 	
 	var kdTree : KDNode<Edge> = .Empty
-	for e in workEdges {
+	for e in edges {
 		kdTree = kdInsert(v: e, n: kdTree)
 	}
 	
 	// Select the starting vertex
-	workVertices.append(workEdges.first!.v0)
+	workVertices.append(edges.first!.v0)
 	
-	let numEdges = workEdges.count
-	var nextIndex: Array<Edge>.Index = workEdges.startIndex
-	while (!workEdges.isEmpty) {
+	let numEdges = edges.count
+	var nextIndex: Array<Edge>.Index = edges.startIndex
+	while (!edges.isEmpty) {
 		// Find the edge leading from the last vertex, assuming that it is the next index.
 		// If it isn't, do a linear search for the matching edge
-		if workEdges[nextIndex].v0 != workVertices.last {
-			if let scannedIndex = workEdges.firstIndex(where: { $0.v0 == workVertices.last }) {
+		if edges[nextIndex].v0 != workVertices.last {
+			if let scannedIndex = edges.firstIndex(where: { $0.v0 == workVertices.last }) {
 				nextIndex = scannedIndex
 			} else {
 				// If there is no edge leading away, this ring has closed. Restart.
 				rings.append(GeoPolygonRing(vertices: workVertices))
-				nextIndex = workEdges.startIndex
-				if let e0 = workEdges.first {
+				nextIndex = edges.startIndex
+				if let e0 = edges.first {
 					workVertices = [e0.v0]
 				}
 				
-				report(1.0 - (Double(workEdges.count) / Double(numEdges)), "\(reportName) (\(numEdges - workEdges.count)/\(numEdges)", false)
+				report(1.0 - (Double(edges.count) / Double(numEdges)), "\(reportName) (\(numEdges - edges.count)/\(numEdges)", false)
 				continue
 			}
 		}
 		
-		let nextEdge = workEdges[nextIndex]
+		let nextEdge = edges[nextIndex]
 		workVertices.append(nextEdge.v1)
-		workEdges.removeAll { $0 == nextEdge }
-		if nextIndex == workEdges.endIndex {
-			nextIndex = workEdges.startIndex
+//		edges.removeAll { $0 == nextEdge }
+		if nextIndex == edges.endIndex {
+			nextIndex = edges.startIndex
 		}
 	}
 	
