@@ -21,15 +21,25 @@ struct GeoColors : Codable {
 	}
 }
 
-struct Vertex : Equatable {
+struct Vertex : Equatable, Hashable, PointForm {
+	var p: Vertex { return self }
+	
 	let x: Float
 	let y: Float
 	init(x _x: Float, y _y: Float) { x = _x; y = _y }
 	init(x _x: Double, y _y: Double) { x = Float(_x); y = Float(_y) }
 	
+	var quantized : (Int64, Int64) {
+		let quant: Float = 1e-6
+		return (Int64(floor(x / quant)), Int64(floor(y / quant)))
+	}
+	
 	static func ==(lhs: Vertex, rhs: Vertex) -> Bool {
-		let accuracy : Float = 0.01
-		return fabsf(lhs.x - rhs.x) < accuracy && fabsf(lhs.y - rhs.y) < accuracy
+		return lhs.quantized == rhs.quantized
+	}
+	
+	var hashValue : Int {
+		return String("\(quantized)").hashValue
 	}
 }
 
@@ -48,19 +58,8 @@ struct Edge : Equatable, Hashable, PointForm {
 	}
 	
 	var hashValue : Int {
-		let accuracy : Float = 0.01
-		var leftToRight = (v0, v1)
-		
-		if abs(v0.x - v1.x) < accuracy {
-			if v1.y < v0.y {
-				leftToRight = (v1, v0)
-			}
-		} else if v1.x < v0.x {
-			leftToRight = (v1, v0)
-		}
-		
-		return String(format: "%.3f-%.3f|%.3f-%.3f",
-									arguments: [leftToRight.0.x, leftToRight.0.y, leftToRight.1.x, leftToRight.1.y]).hashValue
+		let orderedHashes = [v0.hashValue, v1.hashValue].sorted()
+		return String("\(orderedHashes)").hashValue
 	}
 }
 
