@@ -164,6 +164,7 @@ class OperationParseGeoJson : Operation {
 			let radius = (offset % 2 == 0) ? 1.0 : 0.6
 			return Vertex(element.x * radius, element.y * radius)
 		}
-		return GeoPolygonRing(vertices: star)
+		let positionedStar = star.map { Vertex($0.x + p.x, $0.y + p.y) }
+		return GeoPolygonRing(vertices: positionedStar)
 	}
 }
