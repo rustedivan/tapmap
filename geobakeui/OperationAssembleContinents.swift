@@ -83,41 +83,31 @@ func countEdgeCardinalities(rings: [GeoPolygonRing]) -> [Edge : Int] {
 func buildContiguousEdgeRings(edges: [Edge], report: ProgressReport, _ reportName: String = "") -> [GeoPolygonRing] {
 	var rings: [GeoPolygonRing] = []
 	var workVertices: [Vertex] = []
+	var workEdges: [Int : Edge] = [:]
 	
-	var kdTree : KDNode<Edge> = .Empty
 	for e in edges {
-		kdTree = kdInsert(v: e, n: kdTree)
+		workEdges[e.p.hashValue] = e
 	}
 	
 	// Select the starting vertex
 	workVertices.append(edges.first!.v0)
-	
 	let numEdges = edges.count
-	var nextIndex: Array<Edge>.Index = edges.startIndex
-	while (!edges.isEmpty) {
-		// Find the edge leading from the last vertex, assuming that it is the next index.
-		// If it isn't, do a linear search for the matching edge
-		if edges[nextIndex].v0 != workVertices.last {
-			if let scannedIndex = edges.firstIndex(where: { $0.v0 == workVertices.last }) {
-				nextIndex = scannedIndex
+	while (!workEdges.isEmpty) {
+		// Find the edge leading from the last vertex
+		let nextEdge = Edge(workVertices.last!, workVertices.last!)
+		if let foundEdge = workEdges[nextEdge.p.hashValue] {
+			workVertices.append(foundEdge.v1)
+			workEdges.removeValue(forKey: foundEdge.p.hashValue)
+		} else {
+			// If there is no edge leading away, this ring has closed. Restart.
+			rings.append(GeoPolygonRing(vertices: workVertices))
+			if let restartEdge = workEdges.first?.value {
+				workVertices = [restartEdge.p]
 			} else {
-				// If there is no edge leading away, this ring has closed. Restart.
-				rings.append(GeoPolygonRing(vertices: workVertices))
-				nextIndex = edges.startIndex
-				if let e0 = edges.first {
-					workVertices = [e0.v0]
-				}
-				
-				report(1.0 - (Double(edges.count) / Double(numEdges)), "\(reportName) (\(numEdges - edges.count)/\(numEdges)", false)
-				continue
+				break
 			}
-		}
-		
-		let nextEdge = edges[nextIndex]
-		workVertices.append(nextEdge.v1)
-//		edges.removeAll { $0 == nextEdge }
-		if nextIndex == edges.endIndex {
-			nextIndex = edges.startIndex
+			
+			report(1.0 - (Double(workEdges.count) / Double(numEdges)), "\(reportName) (\(numEdges - workEdges.count)/\(numEdges)", false)
 		}
 	}
 	

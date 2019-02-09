@@ -122,37 +122,15 @@ func kdRemove<T:PointForm>(v: T, n: KDNode<T>) -> KDNode<T> {
 	case .Split(let left, let a, let right, let cd):
 		if v.p == a.p {
 			if case .Split = right {
-//				print("Pulling up right branch of \(a.p)")
 				let minRight = kdFindMin(n: right, sd: cd)!
-//				print("\(cd)Min from right subtree: \(minRight.p)")
 				let newRight = kdRemove(v: minRight, n: right)
-//				print("Removed min from right subtree:")
-//				kdPrint(newRight)
-//				print("<== \(a.p)")
 				return KDNode(left: left, minRight, right: newRight, cd)
 			} else if case .Split = left {
-//				print("Pulling up left branch of \(a.p)")
 				let newLeft = right
 				let minLeft = kdFindMin(n: left, sd: cd)!
-//				print("\(cd)Min from new right subtree: \(minLeft.p)")
 				let newRight = kdRemove(v: minLeft, n: left)
-//				print("Removed min from new right subtree:")
 				return KDNode(left: newLeft, minLeft, right: newRight, cd)
-				
-				
-				
-				
-				
-//				print("Pulling up left branch of \(a.p)")
-//				let minLeft = kdFindMin(n: left, sd: cd)!
-//				print("\(cd)Min from left subtree: \(minLeft.p)")
-//				let newRight = kdRemove(v: minLeft, n: left)
-//				print("Removed min from left subtree:")
-//				kdPrint(newRight)
-//				print("<== \(a.p)")
-//				return KDNode(left: left, minLeft, right: newRight, cd)
 			} else {
-//				print("Deleting leaf")
 				return .Empty
 			}
 		} else {
