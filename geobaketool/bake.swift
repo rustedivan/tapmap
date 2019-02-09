@@ -35,23 +35,32 @@ func bakeGeometry() throws {
 	let regionData = try Data(contentsOf: PipelineConfig.shared.reshapedRegionsFilePath)
 	progressBar(7, "Regions")
 	let regionJson = try JSON(data: regionData, options: .allowFragments)
+	
+	progressBar(8, "Cities")
+	let citiesData = try Data(contentsOf: PipelineConfig.shared.reshapedCitiesFilePath)
+	progressBar(9, "Cities")
+	let citiesJson = try JSON(data: citiesData, options: .allowFragments)
+	
 	progressBar(10, "√ Loading done\n")
 	
 	print("\nBuilding geography collections...")
-	let jsonParser = OperationParseGeoJson(countries: countryJson,
-																				 regions: regionJson,
-																				 reporter: reportLoad)
+	let countryParser = OperationParseGeoJson(json: countryJson,
+																						as: .Country,
+																						reporter: reportLoad)
+	let regionParser =  OperationParseGeoJson(json: regionJson,
+																						as: .Region,
+																						reporter: reportLoad)
 	
 	let workQueue = OperationQueue()
 	workQueue.name = "Json load queue"
 	workQueue.qualityOfService = .userInitiated
-	workQueue.addOperation(jsonParser)
-	workQueue.waitUntilAllOperationsAreFinished()
+	workQueue.maxConcurrentOperationCount = 1
+	workQueue.addOperations([countryParser, regionParser], waitUntilFinished: true)
 	
-	guard let countries = jsonParser.countries else {
+	guard let countries = countryParser.features else {
 		throw GeoBakePipelineError.datasetFailed(dataset: "countries")
 	}
-	guard let regions = jsonParser.regions else {
+	guard let regions = regionParser.features else {
 		throw GeoBakePipelineError.datasetFailed(dataset: "regions")
 	}
 	

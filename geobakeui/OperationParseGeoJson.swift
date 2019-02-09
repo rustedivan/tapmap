@@ -10,31 +10,27 @@ import Foundation
 import SwiftyJSON
 
 class OperationParseGeoJson : Operation {
-	let countryJson : JSON
-	let regionJson : JSON
+	let json : JSON
 	let report : ProgressReport
-	var countries : GeoFeatureCollection?
-	var regions : GeoFeatureCollection?
-	
-	init(countries: JSON, regions: JSON, reporter: @escaping ProgressReport) {
-		countryJson = countries
-		regionJson = regions
+	let level : GeoFeature.Level
+	var features : GeoFeatureCollection?
+
+	init(json _json: JSON, as _level: GeoFeature.Level, reporter: @escaping ProgressReport) {
+		json = _json
+		level = _level
 		report = reporter
 	}
 	
 	override func main() {
 		guard !isCancelled else { print("Cancelled before starting"); return }
 		
-		report(0.0, "Parsing countries", false)
-		countries = parseFeatures(json: countryJson, dataSet: .Countries)
-		report(1.0, "Parsed countries", true)
-		report(0.0, "Parsing regions", false)
-		regions = parseFeatures(json: regionJson, dataSet: .Regions)
-		report(1.0, "Parsed regions", true)
+		report(0.0, "Parsing \(level)", false)
+		features = parseFeatures(json: json, dataSet: level)
+		report(1.0, "Parsed \(level)", true)
 	}
 	
 	fileprivate func parseFeatures(json: JSON,
-																 dataSet: Dataset) -> GeoFeatureCollection? {
+																 dataSet: GeoFeature.Level) -> GeoFeatureCollection? {
 		guard json["type"] == "FeatureCollection" else {
 			print("Root node is not multi-feature")
 			return nil
@@ -46,10 +42,9 @@ class OperationParseGeoJson : Operation {
 		
 		let numFeatures = featureArray.count
 		var loadedFeatures : Set<GeoFeature> = []
-		let featureLevel = (dataSet == .Countries) ? GeoFeature.Level.Country : GeoFeature.Level.Region
 		
 		for featureJson in featureArray {
-			if let loadedFeature = parseFeature(featureJson, into: featureLevel) {
+			if let loadedFeature = parseFeature(featureJson, into: level) {
 				loadedFeatures.insert(loadedFeature)
 				report(Double(loadedFeatures.count) / Double(numFeatures), loadedFeature.name, false)
 			}
