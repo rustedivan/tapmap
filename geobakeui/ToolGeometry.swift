@@ -85,6 +85,7 @@ struct GeoFeature : Equatable, Hashable {
 		case Continent
 		case Country
 		case Region
+		case City
 	}
 	
 	let level: Level

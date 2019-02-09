@@ -50,12 +50,15 @@ func bakeGeometry() throws {
 	let regionParser =  OperationParseGeoJson(json: regionJson,
 																						as: .Region,
 																						reporter: reportLoad)
+	let citiesParser =  OperationParseGeoJson(json: citiesJson,
+																						as: .City,
+																						reporter: reportLoad)
 	
 	let workQueue = OperationQueue()
 	workQueue.name = "Json load queue"
 	workQueue.qualityOfService = .userInitiated
 	workQueue.maxConcurrentOperationCount = 1
-	workQueue.addOperations([countryParser, regionParser], waitUntilFinished: true)
+	workQueue.addOperations([countryParser, regionParser, citiesParser], waitUntilFinished: true)
 	
 	guard let countries = countryParser.features else {
 		throw GeoBakePipelineError.datasetFailed(dataset: "countries")
@@ -63,10 +66,14 @@ func bakeGeometry() throws {
 	guard let regions = regionParser.features else {
 		throw GeoBakePipelineError.datasetFailed(dataset: "regions")
 	}
+	guard let cities = regionParser.features else {
+		throw GeoBakePipelineError.datasetFailed(dataset: "cities")
+	}
 	
 	print("\nTessellating geometry...")
 	let geoBaker = OperationBakeGeometry(countries: countries,
 																			 region: regions,
+																			 cities: cities,
 																			 saveUrl: outputUrl,
 																			 reporter: reportLoad,
 																			 errorReporter: reportError)

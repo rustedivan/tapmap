@@ -13,16 +13,19 @@ class OperationFixupHierarchy : Operation {
 	let continentList : [GeoRegion]
 	let countryList : [GeoRegion]
 	let regionList : [GeoRegion]
+	let cityList : [GeoRegion]
 	let report : ProgressReport
 	
 	init(continentCollection: [GeoRegion],
 			 countryCollection: [GeoRegion],
 			 regionCollection: [GeoRegion],
+			 cityCollection: [GeoRegion],
 			 reporter: @escaping ProgressReport) {
 		
 		continentList = continentCollection
 		countryList = countryCollection
 		regionList = regionCollection
+		cityList = cityCollection
 		report = reporter
 		
 		super.init()
