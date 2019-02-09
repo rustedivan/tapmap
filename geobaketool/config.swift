@@ -70,6 +70,7 @@ class PipelineConfig {
 	
 	var sourceCountryUrl : URL { return keyToSourceFileURL("source.countries") }
 	var sourceRegionUrl : URL { return keyToSourceFileURL("source.regions") }
+	var sourceCitiesUrl : URL { return keyToSourceFileURL("source.cities") }
 	var nodePath : String? { return dictionary.value(forKeyPath: "reshape.node") as? String }
 	var reshapeMethod : String { return configString("reshape.method") }
 	var countrySimplification : Int { return configValue("reshape.simplify-countries") }
@@ -84,6 +85,11 @@ class PipelineConfig {
 			.appendingPathComponent(PipelineConfig.sourceDirectory)
 			.appendingPathComponent(PipelineConfig.reshapedRegionsFilename)
 	}
+	var reshapedCitiesFilePath : URL {
+		return URL(fileURLWithPath: FileManager.default.currentDirectoryPath)
+			.appendingPathComponent(PipelineConfig.sourceDirectory)
+			.appendingPathComponent(PipelineConfig.reshapedCitiesFilename)
+	}
 	var selectedCountries : [String]? { return configArray("bake.countries") }
 	var selectedRegions : [String]? { return configArray("bake.regions") }
 	
@@ -97,6 +103,7 @@ class PipelineConfig {
 	static let sourceDirectory = "source-geometry"
 	static let reshapedCountriesFilename = "reshaped-countries.json"
 	static let reshapedRegionsFilename = "reshaped-regions.json"
+	static let reshapedCitiesFilename = "reshaped-cities.json"
 }
 
 typealias ProgressBar = (Int, String) -> ()

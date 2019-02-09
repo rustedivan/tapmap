@@ -24,7 +24,9 @@ func downloadFiles(params: ArraySlice<String>) throws {
 	
 	let geometryFilesPath = try prepareGeometryDirectory()
 	
-	let archiveUrls = [PipelineConfig.shared.sourceCountryUrl, PipelineConfig.shared.sourceRegionUrl]
+	let archiveUrls = [PipelineConfig.shared.sourceCountryUrl,
+										 PipelineConfig.shared.sourceRegionUrl,
+										 PipelineConfig.shared.sourceCitiesUrl]
 	let _ = try archiveUrls.map({ (url: URL) -> () in
 		let downloadTask = session.downloadTask(with: url)
 		downloadTask.resume()

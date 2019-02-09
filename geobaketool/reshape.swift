@@ -28,9 +28,13 @@ func reshapeGeometry(params: ArraySlice<String>) throws {
 	guard let regionFile = (shapeFiles.first { $0.contains("admin_1") }) else {
 		throw GeoBakeReshapeError.missingShapeFile(level: "admin_1")
 	}
+	guard let citiesFile = (shapeFiles.first { $0.contains("populated_places") }) else {
+		throw GeoBakeReshapeError.missingShapeFile(level: "populated_places")
+	}
 	
 	try reshapeFile(input: countryFile, strength: countryStrength, method: method, output: PipelineConfig.reshapedCountriesFilename)
 	try reshapeFile(input: regionFile, strength: regionStrength, method: method, output: PipelineConfig.reshapedRegionsFilename)
+	try makeJsonFile(input: citiesFile, output: PipelineConfig.reshapedCitiesFilename)
 }
 
 func reshapeFile(input: String, strength: Int, method: String, output: String) throws {
@@ -53,6 +57,27 @@ func reshapeFile(input: String, strength: Int, method: String, output: String) t
 	reshapeTask.launch()
 	reshapeTask.waitUntilExit()
 	print("Reshaped \"\(output)\".")
+}
+
+func makeJsonFile(input: String, output: String) throws {
+	let nodeInstallPath = try findMapshaperInstall()
+	let nodePath = nodeInstallPath.appendingPathComponent("node").path
+	let sourceGeoPath = FileManager.default.currentDirectoryPath.appending("/\(PipelineConfig.sourceDirectory)")
+	let fileInPath = sourceGeoPath.appending("/\(input)")
+	let fileOutPath = sourceGeoPath.appending("/\(output)")
+	
+	print("Transforming \"\(input)\" to GeoJson...")
+	
+	let reshapeTask = Process()
+	reshapeTask.currentDirectoryURL = nodeInstallPath
+	reshapeTask.launchPath = nodePath
+	reshapeTask.standardError = Pipe()
+	reshapeTask.arguments = ["mapshaper",
+													 "-i", fileInPath,
+													 "-o", fileOutPath, "format=geojson"]
+	reshapeTask.launch()
+	reshapeTask.waitUntilExit()
+	print("Transformed \"\(output)\".")
 }
 
 func findMapshaperInstall() throws -> URL {
