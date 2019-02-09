@@ -15,9 +15,9 @@ enum GeoBakeReshapeError : Error {
 }
 
 func reshapeGeometry(params: ArraySlice<String>) throws {
-	let method = PipelineConfig.shared.reshapeMethod
-	let countryStrength = PipelineConfig.shared.countrySimplification
-	let regionStrength = PipelineConfig.shared.regionSimplification
+	let method = PipelineConfig.shared.configString("reshape.method") ?? ""
+	let countryStrength = PipelineConfig.shared.configValue("reshape.simplify-countries")
+	let regionStrength = PipelineConfig.shared.configValue("reshape.simplify-regions")
 	
 	let shapeFiles = try FileManager.default.contentsOfDirectory(atPath: PipelineConfig.sourceDirectory)
 																					.filter { $0.hasSuffix(".shp") }
@@ -81,7 +81,7 @@ func makeJsonFile(input: String, output: String) throws {
 }
 
 func findMapshaperInstall() throws -> URL {
-	guard let mapshaperPath = PipelineConfig.shared.nodePath else {
+	guard let mapshaperPath = PipelineConfig.shared.configString("reshape.node") else {
 		throw GeoBakeReshapeError.noNodePath
 	}
 	let mapShaper = URL(fileURLWithPath: mapshaperPath,

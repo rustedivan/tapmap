@@ -24,10 +24,12 @@ func downloadFiles(params: ArraySlice<String>) throws {
 	
 	let geometryFilesPath = try prepareGeometryDirectory()
 	
-	let archiveUrls = [PipelineConfig.shared.sourceCountryUrl,
-										 PipelineConfig.shared.sourceRegionUrl,
-										 PipelineConfig.shared.sourceCitiesUrl]
-	let _ = try archiveUrls.map({ (url: URL) -> () in
+	// Download and unpack NaturalEarth data
+	let archiveUrls = [PipelineConfig.shared.configUrl("source.countries"),
+										 PipelineConfig.shared.configUrl("source.regions")]
+	
+	let _ = try archiveUrls.map({ (url: URL?) -> () in
+		guard let url = url else { return }
 		let downloadTask = session.downloadTask(with: url)
 		downloadTask.resume()
 		let result = semaphore.wait(timeout: DispatchTime.now() + DispatchTimeInterval.seconds(600))

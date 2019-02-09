@@ -67,8 +67,8 @@ class OperationParseGeoJson : Operation {
 		// Filter on pipeline settings before parsing JSON
 		switch level {
 		case .Continent: break
-		case .Country: guard PipelineConfig.shared.selectedCountries?.contains(featureName) ?? true else { return nil }
-		case .Region: guard PipelineConfig.shared.selectedRegions?.contains(featureName) ?? true else { return nil }
+		case .Country: guard PipelineConfig.shared.configArray("bake.countries")?.contains(featureName) ?? true else { return nil }
+		case .Region: guard PipelineConfig.shared.configArray("bake.regions")?.contains(featureName) ?? true else { return nil }
 		case .City: break
 		}
 		

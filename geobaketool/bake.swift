@@ -10,6 +10,7 @@ import Foundation
 import SwiftyJSON
 
 enum GeoBakePipelineError : Error {
+	case outputPathMissing
 	case outputPathInvalid(path: String)
 	case datasetFailed(dataset: String)
 }
@@ -19,7 +20,10 @@ func reportError(_ feature: String, _ error: String) {
 }
 
 func bakeGeometry() throws {
-	let outputUrl = PipelineConfig.shared.outputFilePath
+	guard let outputUrl = PipelineConfig.shared.outputFilePath else {
+		throw GeoBakePipelineError.outputPathMissing
+	}
+	
 	guard outputUrl.isFileURL else {
 		throw GeoBakePipelineError.outputPathInvalid(path: outputUrl.path)
 	}
