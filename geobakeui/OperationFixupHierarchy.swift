@@ -40,9 +40,10 @@ class OperationFixupHierarchy : Operation {
 				$0.admin == country.admin
 			}
 		
+			let places = Set(belongingRegions.flatMap { $0.places })
 			let newCountry = GeoCountry(geography: country,
 																	regions: belongingRegions,
-																	places: [])
+																	places: places)
 			
 			geoCountries.insert(newCountry)
 			

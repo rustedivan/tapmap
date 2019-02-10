@@ -50,13 +50,18 @@ class OperationParseOSMJson : Operation {
 	
 	fileprivate func parsePlace(_ json: JSON, asKind kind: GeoPlace.Kind) -> GeoPlace? {
 		let properties = json["tags"]
-		guard let featureName = properties["name:en"].string else {
-			print("No name in place")
+		let possibleNames = properties["name:en"].string ?? properties["name"].string
+		
+		guard let x = json["lon"].double, let y = json["lat"].double else {
+			print("Place has no lat/lon data.")
 			return nil
 		}
+		let p = Vertex(x, y)
 		
-		let p = Vertex(json["lon"].doubleValue,
-									 json["lat"].doubleValue)
+		guard let featureName = possibleNames else {
+			print("No name in place located at \(p)")
+			return nil
+		}
 		
 		return GeoPlace(location: p,
 										name: featureName,

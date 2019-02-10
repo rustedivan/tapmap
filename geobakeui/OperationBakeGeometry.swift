@@ -57,10 +57,13 @@ class OperationBakeGeometry : Operation {
 																												 places: places,
 																												 reporter: report)
 		placeDistributionJob.start()
+		let regionCollection = placeDistributionJob.regionsWithPlaces != nil
+					? Array(placeDistributionJob.regionsWithPlaces!)
+					: regionTessJob.tessellatedRegions
 		
 		let fixupJob = OperationFixupHierarchy(continentCollection: continentTessJob.tessellatedRegions,
 																					 countryCollection: countryTessJob.tessellatedRegions,
-																					 regionCollection: regionTessJob.tessellatedRegions,
+																					 regionCollection: regionCollection,
 																					 reporter: report)
 		fixupJob.start()
 		
@@ -77,6 +80,7 @@ class OperationBakeGeometry : Operation {
 		if let encoded = try? encoder.encode(bakedWorld) {
 			do {
 				try encoded.write(to: saveUrl, options: .atomicWrite)
+				print("GeoWorld baked to \(ByteCountFormatter().string(fromByteCount: Int64(encoded.count)))")
 			} catch {
 				print("Saving failed")
 			}
@@ -84,7 +88,6 @@ class OperationBakeGeometry : Operation {
 		else {
 			print("Encoding failed")
 		}
-		
 		report(1.0, "Done.", true)
 	}
 }
