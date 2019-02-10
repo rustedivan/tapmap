@@ -41,7 +41,7 @@ func bakeGeometry() throws {
 	let regionJson = try JSON(data: regionData, options: .allowFragments)
 	
 	progressBar(8, "Cities")
-	let citiesData = try Data(contentsOf: PipelineConfig.shared.reshapedCitiesFilePath)
+	let citiesData = try Data(contentsOf: PipelineConfig.shared.queriedCitiesFilePath)
 	progressBar(9, "Cities")
 	let citiesJson = try JSON(data: citiesData, options: .allowFragments)
 	

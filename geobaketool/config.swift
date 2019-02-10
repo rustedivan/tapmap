@@ -77,7 +77,7 @@ class PipelineConfig {
 			.appendingPathComponent(PipelineConfig.sourceDirectory)
 			.appendingPathComponent(PipelineConfig.reshapedRegionsFilename)
 	}
-	var reshapedCitiesFilePath : URL {
+	var queriedCitiesFilePath : URL {
 		return URL(fileURLWithPath: FileManager.default.currentDirectoryPath)
 			.appendingPathComponent(PipelineConfig.sourceDirectory)
 			.appendingPathComponent(PipelineConfig.reshapedCitiesFilename)
