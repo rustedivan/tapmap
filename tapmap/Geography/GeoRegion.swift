@@ -108,3 +108,24 @@ struct GeoContinent : Codable, Equatable, Hashable {
 struct GeoWorld : Codable {
 	let continents: Set<GeoContinent>
 }
+
+struct GeoPlace : Codable, Equatable, Hashable {
+	enum Kind: Int, Codable {
+		case City
+		case Town
+	}
+	
+	let location: Vertex
+	let name: String
+	let kind: Kind
+	
+	public static func == (lhs: GeoPlace, rhs: GeoPlace) -> Bool {
+		return lhs.name == rhs.name && lhs.location == rhs.location && lhs.kind == rhs.kind
+	}
+	
+	public var hashValue: Int {
+		return (name + "." + "(\(location.x):\(location.y))" + "." + "\(kind)").hashValue
+	}
+}
+
+typealias GeoPlaceCollection = Set<GeoPlace>

@@ -55,6 +55,7 @@ func bakeGeometry() throws {
 																						as: .Region,
 																						reporter: reportLoad)
 	let citiesParser =  OperationParseOSMJson(json: citiesJson,
+																						kind: .City,
 																						reporter: reportLoad)
 	
 	let workQueue = OperationQueue()
@@ -69,14 +70,15 @@ func bakeGeometry() throws {
 	guard let regions = regionParser.features else {
 		throw GeoBakePipelineError.datasetFailed(dataset: "regions")
 	}
-	guard let cities = citiesParser.features else {
+	guard let cities = citiesParser.places else {
 		throw GeoBakePipelineError.datasetFailed(dataset: "cities")
 	}
 	
+	let places = cities
 	print("\nTessellating geometry...")
 	let geoBaker = OperationBakeGeometry(countries: countries,
 																			 region: regions,
-																			 cities: cities,
+																			 places: places,
 																			 saveUrl: outputUrl,
 																			 reporter: reportLoad,
 																			 errorReporter: reportError)

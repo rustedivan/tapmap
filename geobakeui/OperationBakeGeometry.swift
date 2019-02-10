@@ -11,7 +11,7 @@ import Foundation
 class OperationBakeGeometry : Operation {
 	let countries : GeoFeatureCollection
 	let regions : GeoFeatureCollection
-	let cities : GeoFeatureCollection
+	let places : GeoPlaceCollection
 	let saveUrl : URL
 	let report : ProgressReport
 	let reportError : ErrorReport
@@ -19,13 +19,13 @@ class OperationBakeGeometry : Operation {
 	
 	init(countries countriesToBake: GeoFeatureCollection,
 			 region regionsToBake: GeoFeatureCollection,
-			 cities citiesToBake: GeoFeatureCollection,
+			 places placesToBake: GeoPlaceCollection,
 			 saveUrl url: URL,
 	     reporter: @escaping ProgressReport,
 	     errorReporter: @escaping ErrorReport) {
 		countries = countriesToBake
 		regions = regionsToBake
-		cities = citiesToBake
+		places = placesToBake
 		saveUrl = url
 		report = reporter
 		reportError = errorReporter
@@ -47,17 +47,15 @@ class OperationBakeGeometry : Operation {
 		let continentTessJob = OperationTessellateRegions(continentAssemblyJob.continents!, reporter: report, errorReporter: reportError)
 		let countryTessJob = OperationTessellateRegions(countries, reporter: report, errorReporter: reportError)
 		let regionTessJob = OperationTessellateRegions(regions, reporter: report, errorReporter: reportError)
-		let citiesTessJob = OperationTessellateRegions(cities, reporter: report, errorReporter: reportError)
 		
 		continentTessJob.addDependency(continentAssemblyJob)
 		
-		bakeQueue.addOperations([continentTessJob, countryTessJob, regionTessJob, citiesTessJob],
+		bakeQueue.addOperations([continentTessJob, countryTessJob, regionTessJob],
 														waitUntilFinished: true)
 		
 		let fixupJob = OperationFixupHierarchy(continentCollection: continentTessJob.tessellatedRegions,
 																					 countryCollection: countryTessJob.tessellatedRegions,
 																					 regionCollection: regionTessJob.tessellatedRegions,
-																					 cityCollection: citiesTessJob.tessellatedRegions,
 																					 reporter: report)
 		fixupJob.start()
 		
