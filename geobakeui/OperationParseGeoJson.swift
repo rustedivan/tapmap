@@ -69,7 +69,6 @@ class OperationParseGeoJson : Operation {
 		case .Continent: break
 		case .Country: guard PipelineConfig.shared.configArray("bake.countries")?.contains(featureName) ?? true else { return nil }
 		case .Region: guard PipelineConfig.shared.configArray("bake.regions")?.contains(featureName) ?? true else { return nil }
-		case .City: break
 		}
 		
 		let loadedPolygons: [GeoPolygon]

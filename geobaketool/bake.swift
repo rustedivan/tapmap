@@ -54,8 +54,7 @@ func bakeGeometry() throws {
 	let regionParser =  OperationParseGeoJson(json: regionJson,
 																						as: .Region,
 																						reporter: reportLoad)
-	let citiesParser =  OperationParseGeoJson(json: citiesJson,
-																						as: .City,
+	let citiesParser =  OperationParseOSMJson(json: citiesJson,
 																						reporter: reportLoad)
 	
 	let workQueue = OperationQueue()
@@ -70,7 +69,7 @@ func bakeGeometry() throws {
 	guard let regions = regionParser.features else {
 		throw GeoBakePipelineError.datasetFailed(dataset: "regions")
 	}
-	guard let cities = regionParser.features else {
+	guard let cities = citiesParser.features else {
 		throw GeoBakePipelineError.datasetFailed(dataset: "cities")
 	}
 	

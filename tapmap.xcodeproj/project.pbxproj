@@ -26,6 +26,8 @@
 		1452103D1E98D4F30029942F /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1452103C1E98D4F30029942F /* ViewController.swift */; };
 		1452103F1E98D4F30029942F /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 1452103E1E98D4F30029942F /* Assets.xcassets */; };
 		145210421E98D4F30029942F /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 145210401E98D4F30029942F /* Main.storyboard */; };
+		145A73EC220F5DC100BBEB82 /* OperationParseOSMJson.swift in Sources */ = {isa = PBXBuildFile; fileRef = 145A73EB220F5DC100BBEB82 /* OperationParseOSMJson.swift */; };
+		145A73ED220F5DC100BBEB82 /* OperationParseOSMJson.swift in Sources */ = {isa = PBXBuildFile; fileRef = 145A73EB220F5DC100BBEB82 /* OperationParseOSMJson.swift */; };
 		1462EED821A69B0900611C7A /* GeoRegion.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14B74E5D1E8F9C1100849BB5 /* GeoRegion.swift */; };
 		1462EED921A69B0A00611C7A /* GeoRegion.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14B74E5D1E8F9C1100849BB5 /* GeoRegion.swift */; };
 		14657D33220759A500EF116F /* KDTree.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14657D31220758F900EF116F /* KDTree.swift */; };
@@ -151,6 +153,7 @@
 		1452103E1E98D4F30029942F /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		145210411E98D4F30029942F /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
 		145210431E98D4F30029942F /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		145A73EB220F5DC100BBEB82 /* OperationParseOSMJson.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = OperationParseOSMJson.swift; sourceTree = "<group>"; };
 		14657D31220758F900EF116F /* KDTree.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KDTree.swift; sourceTree = "<group>"; };
 		1469F5C61F02F5F4008A37B3 /* Serialization.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Serialization.swift; sourceTree = "<group>"; };
 		146A79031E8F912500E2EE20 /* tapmap.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = tapmap.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -384,6 +387,7 @@
 				14F52E401FD67EBB002D3A3A /* OperationBakeGeometry.swift */,
 				144A55B021FB4842001CC231 /* OperationAssembleContinents.swift */,
 				14F52E421FD67EBB002D3A3A /* OperationParseGeoJson.swift */,
+				145A73EB220F5DC100BBEB82 /* OperationParseOSMJson.swift */,
 				14F52E411FD67EBB002D3A3A /* OperationTessellateRegions.swift */,
 				14AAD0FE21A479EC001A75C1 /* OperationCleanUpBorders.swift */,
 				143A0F2B217E6B1A008C432A /* OperationFixupHierarchy.swift */,
@@ -908,6 +912,7 @@
 				146B477121F0F7FA00CC36D9 /* config.swift in Sources */,
 				14FF12F021EE8A5F00AF4474 /* ToolGeometry.swift in Sources */,
 				14BDA60B21EE9188004CC319 /* OperationTessellateRegions.swift in Sources */,
+				145A73EC220F5DC100BBEB82 /* OperationParseOSMJson.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -918,6 +923,7 @@
 				14BDA61721EE91B8004CC319 /* JobHelpers.swift in Sources */,
 				14BD7301220E424C00CDD7D9 /* KDTree.swift in Sources */,
 				14FF12F521EE8B4700AF4474 /* Serialization.swift in Sources */,
+				145A73ED220F5DC100BBEB82 /* OperationParseOSMJson.swift in Sources */,
 				144A55B221FB4842001CC231 /* OperationAssembleContinents.swift in Sources */,
 				14FF12F321EE8B1400AF4474 /* GeoRegion.swift in Sources */,
 				14FF12F121EE8A6000AF4474 /* ToolGeometry.swift in Sources */,

@@ -92,7 +92,7 @@ class PipelineConfig {
 	static let sourceDirectory = "source-geometry"
 	static let reshapedCountriesFilename = "reshaped-countries.json"
 	static let reshapedRegionsFilename = "reshaped-regions.json"
-	static let reshapedCitiesFilename = "reshaped-cities.json"
+	static let reshapedCitiesFilename = "osm-cities.json"
 }
 
 typealias ProgressBar = (Int, String) -> ()
