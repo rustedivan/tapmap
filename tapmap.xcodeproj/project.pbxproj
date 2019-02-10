@@ -12,6 +12,8 @@
 		140C99DC20D8DC610062486A /* MapGeometry.swift in Sources */ = {isa = PBXBuildFile; fileRef = 140C99DA20D8DC610062486A /* MapGeometry.swift */; };
 		140E63F21F209645000D710E /* Serialization.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1469F5C61F02F5F4008A37B3 /* Serialization.swift */; };
 		141F25C81EA4B3B800DA808F /* GeoBakingViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 141F25C71EA4B3B800DA808F /* GeoBakingViewController.swift */; };
+		14202F2D221079D100C22C88 /* OperationDistributePlaces.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14202F2C221079D100C22C88 /* OperationDistributePlaces.swift */; };
+		14202F2E22107F9A00C22C88 /* MapGeometry.swift in Sources */ = {isa = PBXBuildFile; fileRef = 140C99DA20D8DC610062486A /* MapGeometry.swift */; };
 		1438DB722187D99D00FEB1D1 /* world.geo in Resources */ = {isa = PBXBuildFile; fileRef = 1438DB712187D99D00FEB1D1 /* world.geo */; };
 		143A0F2C217E6B1A008C432A /* OperationFixupHierarchy.swift in Sources */ = {isa = PBXBuildFile; fileRef = 143A0F2B217E6B1A008C432A /* OperationFixupHierarchy.swift */; };
 		143D06281F0811450002D3C3 /* Serialization.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1469F5C61F02F5F4008A37B3 /* Serialization.swift */; };
@@ -144,6 +146,7 @@
 /* Begin PBXFileReference section */
 		140C99DA20D8DC610062486A /* MapGeometry.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = MapGeometry.swift; path = Geography/MapGeometry.swift; sourceTree = "<group>"; };
 		141F25C71EA4B3B800DA808F /* GeoBakingViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = GeoBakingViewController.swift; sourceTree = "<group>"; };
+		14202F2C221079D100C22C88 /* OperationDistributePlaces.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OperationDistributePlaces.swift; sourceTree = "<group>"; };
 		1438DB712187D99D00FEB1D1 /* world.geo */ = {isa = PBXFileReference; lastKnownFileType = file.bplist; name = world.geo; path = Raw/world.geo; sourceTree = "<group>"; };
 		143A0F2B217E6B1A008C432A /* OperationFixupHierarchy.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OperationFixupHierarchy.swift; sourceTree = "<group>"; };
 		144A55B021FB4842001CC231 /* OperationAssembleContinents.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OperationAssembleContinents.swift; sourceTree = "<group>"; };
@@ -388,6 +391,7 @@
 				144A55B021FB4842001CC231 /* OperationAssembleContinents.swift */,
 				14F52E421FD67EBB002D3A3A /* OperationParseGeoJson.swift */,
 				145A73EB220F5DC100BBEB82 /* OperationParseOSMJson.swift */,
+				14202F2C221079D100C22C88 /* OperationDistributePlaces.swift */,
 				14F52E411FD67EBB002D3A3A /* OperationTessellateRegions.swift */,
 				14AAD0FE21A479EC001A75C1 /* OperationCleanUpBorders.swift */,
 				143A0F2B217E6B1A008C432A /* OperationFixupHierarchy.swift */,
@@ -897,6 +901,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				14BDA60921EE9188004CC319 /* OperationBakeGeometry.swift in Sources */,
+				14202F2E22107F9A00C22C88 /* MapGeometry.swift in Sources */,
 				14BDA61621EE91B8004CC319 /* JobHelpers.swift in Sources */,
 				144A55B121FB4842001CC231 /* OperationAssembleContinents.swift in Sources */,
 				14FF12F621EE8B4800AF4474 /* Serialization.swift in Sources */,
@@ -904,6 +909,7 @@
 				14BB448121F8784C0029D62A /* bake.swift in Sources */,
 				14657D33220759A500EF116F /* KDTree.swift in Sources */,
 				146B476F21EFDB7200CC36D9 /* download.swift in Sources */,
+				14202F2D221079D100C22C88 /* OperationDistributePlaces.swift in Sources */,
 				14FF12F221EE8B1400AF4474 /* GeoRegion.swift in Sources */,
 				14BDA60D21EE9188004CC319 /* OperationFixupHierarchy.swift in Sources */,
 				146B477721F47B6000CC36D9 /* reshape.swift in Sources */,

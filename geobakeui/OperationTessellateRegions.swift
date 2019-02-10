@@ -43,7 +43,8 @@ class OperationTessellateRegions : Operation {
 				return GeoRegion(name: feature.name,
 												 admin: feature.admin,
 												 continent: feature.continent,
-												 geometry: tessellation)
+												 geometry: tessellation,
+												 places: [])
 			} else {
 				reportError(feature.name, "Tesselation failed")
 				return nil

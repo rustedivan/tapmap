@@ -41,7 +41,8 @@ class OperationFixupHierarchy : Operation {
 			}
 		
 			let newCountry = GeoCountry(geography: country,
-																	regions: belongingRegions)
+																	regions: belongingRegions,
+																	places: [])
 			
 			geoCountries.insert(newCountry)
 			
@@ -63,7 +64,8 @@ class OperationFixupHierarchy : Operation {
 			}
 			
 			let newContintent = GeoContinent(geography: continent,
-																			 countries: belongingCountries)
+																			 countries: belongingCountries,
+																			 places: [])
 			geoContinents.insert(newContintent)
 			remainingCountries.subtract(belongingCountries)
 			if (numCountries > 0) {

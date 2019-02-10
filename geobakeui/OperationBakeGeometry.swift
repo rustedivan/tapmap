@@ -53,6 +53,11 @@ class OperationBakeGeometry : Operation {
 		bakeQueue.addOperations([continentTessJob, countryTessJob, regionTessJob],
 														waitUntilFinished: true)
 		
+		let placeDistributionJob = OperationDistributePlaces(regions: Set(regionTessJob.tessellatedRegions),
+																												 places: places,
+																												 reporter: report)
+		placeDistributionJob.start()
+		
 		let fixupJob = OperationFixupHierarchy(continentCollection: continentTessJob.tessellatedRegions,
 																					 countryCollection: countryTessJob.tessellatedRegions,
 																					 regionCollection: regionTessJob.tessellatedRegions,
