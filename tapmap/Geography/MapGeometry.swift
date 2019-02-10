@@ -100,9 +100,7 @@ func triangleSoupHitTest(point p: CGPoint, inVertices vertices: [Vertex], inIndi
 		let l3 = 1.0 - l1 - l2
 		
 		// p is in t if all barycentric coordinates are in 0..1
-		if 0.0 <= l1 && l1 <= 1.0 &&
-			 0.0 <= l2 && l2 <= 1.0 &&
-			 0.0 <= l3 && l3 <= 1.0 {
+		if l1 >= 0.0 && l2 >= 0.0 && (l1 + l2 + l3 <= 1.0) {
 			return true
 		}
 	}
