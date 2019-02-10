@@ -16,6 +16,7 @@ class MapViewController: GLKViewController, GLKViewControllerDelegate {
 	// Presentation
 	var geoWorld: GeoWorld!
 	var mapRenderer: MapRenderer!
+	var poiRenderer: PoiRenderer!
 	var dummyView: UIView!
 	
 	// Navigation
@@ -65,6 +66,7 @@ class MapViewController: GLKViewController, GLKViewControllerDelegate {
 		
 		EAGLContext.setCurrent(self.context)
 		mapRenderer = MapRenderer(withGeoWorld: geoWorld)!
+		poiRenderer = PoiRenderer(withGeoWorld: geoWorld)!
 	}
 	
 	override func didReceiveMemoryWarning() {
@@ -123,11 +125,14 @@ class MapViewController: GLKViewController, GLKViewControllerDelegate {
 				if let hitContinent = closedCandidateContinents.first(where: { $0.name == hitRegion.name }) {
 					mapRenderer.updatePrimitives(forGeography: hitContinent.geography,
 																			 withSubregions: Set(hitContinent.countries.map { $0.geography }))
+					poiRenderer.updatePrimitives(forRegion: hitContinent.geography,
+																			 withSubregions: Set(hitContinent.countries.map { $0.geography }))
 				} else if let hitCountry = closedCandidateCountries.first(where: { $0.name == hitRegion.name }) {
 					mapRenderer.updatePrimitives(forGeography: hitCountry.geography,
 																			 withSubregions: hitCountry.regions)
+					poiRenderer.updatePrimitives(forRegion: hitCountry.geography,
+																			 withSubregions: hitCountry.regions)
 				}
-				
 			}
 		}
 	}
@@ -154,6 +159,7 @@ class MapViewController: GLKViewController, GLKViewControllerDelegate {
 		glClear(GLbitfield(GL_COLOR_BUFFER_BIT) | GLbitfield(GL_DEPTH_BUFFER_BIT))
 		
 		mapRenderer.renderWorld(geoWorld: geoWorld, inProjection: modelViewProjectionMatrix)
+		poiRenderer.renderWorld(geoWorld: geoWorld, inProjection: modelViewProjectionMatrix)
 	}
 }
 

@@ -65,7 +65,9 @@ class OperationDistributePlaces : Operation {
 		
 		GeometryCounters.end()
 		
-		report(1.0, "Distributed \(places.count - remainingPlaces.count) places of interest.", true)
+		regionsWithPlaces = updatedRegions
+		
+		report(1.0, "Distributed \(updatedRegions.count) places of interest.", true)
 		print("             - Remaining places:  \(remainingPlaces.count)")
 		for place in remainingPlaces {
 			print("                 - \(place.name) @ \(place.location)")

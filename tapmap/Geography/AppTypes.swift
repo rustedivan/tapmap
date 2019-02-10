@@ -25,4 +25,8 @@ struct Vertex : Equatable {
 	static func ==(lhs: Vertex, rhs: Vertex) -> Bool {
 		return lhs.quantized == rhs.quantized
 	}
+	
+	static func +(lhs: Vertex, rhs: Vertex) -> Vertex {
+		return Vertex(lhs.x + rhs.x, lhs.y + rhs.y)
+	}
 }

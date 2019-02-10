@@ -14,6 +14,9 @@
 		141F25C81EA4B3B800DA808F /* GeoBakingViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 141F25C71EA4B3B800DA808F /* GeoBakingViewController.swift */; };
 		14202F2D221079D100C22C88 /* OperationDistributePlaces.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14202F2C221079D100C22C88 /* OperationDistributePlaces.swift */; };
 		14202F2E22107F9A00C22C88 /* MapGeometry.swift in Sources */ = {isa = PBXBuildFile; fileRef = 140C99DA20D8DC610062486A /* MapGeometry.swift */; };
+		14202F302210BD5E00C22C88 /* PoiRenderer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14202F2F2210BD5E00C22C88 /* PoiRenderer.swift */; };
+		14202F332210C6F500C22C88 /* PoiShader.fsh in Resources */ = {isa = PBXBuildFile; fileRef = 14202F312210C6F400C22C88 /* PoiShader.fsh */; };
+		14202F342210C6F500C22C88 /* PoiShader.vsh in Resources */ = {isa = PBXBuildFile; fileRef = 14202F322210C6F400C22C88 /* PoiShader.vsh */; };
 		1438DB722187D99D00FEB1D1 /* world.geo in Resources */ = {isa = PBXBuildFile; fileRef = 1438DB712187D99D00FEB1D1 /* world.geo */; };
 		143A0F2C217E6B1A008C432A /* OperationFixupHierarchy.swift in Sources */ = {isa = PBXBuildFile; fileRef = 143A0F2B217E6B1A008C432A /* OperationFixupHierarchy.swift */; };
 		143D06281F0811450002D3C3 /* Serialization.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1469F5C61F02F5F4008A37B3 /* Serialization.swift */; };
@@ -147,6 +150,9 @@
 		140C99DA20D8DC610062486A /* MapGeometry.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = MapGeometry.swift; path = Geography/MapGeometry.swift; sourceTree = "<group>"; };
 		141F25C71EA4B3B800DA808F /* GeoBakingViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = GeoBakingViewController.swift; sourceTree = "<group>"; };
 		14202F2C221079D100C22C88 /* OperationDistributePlaces.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OperationDistributePlaces.swift; sourceTree = "<group>"; };
+		14202F2F2210BD5E00C22C88 /* PoiRenderer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PoiRenderer.swift; sourceTree = "<group>"; };
+		14202F312210C6F400C22C88 /* PoiShader.fsh */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.glsl; name = PoiShader.fsh; path = Shaders/PoiShader.fsh; sourceTree = "<group>"; };
+		14202F322210C6F400C22C88 /* PoiShader.vsh */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.glsl; name = PoiShader.vsh; path = Shaders/PoiShader.vsh; sourceTree = "<group>"; };
 		1438DB712187D99D00FEB1D1 /* world.geo */ = {isa = PBXFileReference; lastKnownFileType = file.bplist; name = world.geo; path = Raw/world.geo; sourceTree = "<group>"; };
 		143A0F2B217E6B1A008C432A /* OperationFixupHierarchy.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OperationFixupHierarchy.swift; sourceTree = "<group>"; };
 		144A55B021FB4842001CC231 /* OperationAssembleContinents.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OperationAssembleContinents.swift; sourceTree = "<group>"; };
@@ -330,9 +336,12 @@
 				146A79061E8F912500E2EE20 /* AppDelegate.swift */,
 				146A79081E8F912500E2EE20 /* MapShader.fsh */,
 				146A790A1E8F912500E2EE20 /* MapShader.vsh */,
+				14202F312210C6F400C22C88 /* PoiShader.fsh */,
+				14202F322210C6F400C22C88 /* PoiShader.vsh */,
 				146A790C1E8F912500E2EE20 /* MapViewController.swift */,
 				14B74E701E8FB15500849BB5 /* GeoRenderer.swift */,
 				1488E7ED201CDD9900AA00F1 /* MapRenderer.swift */,
+				14202F2F2210BD5E00C22C88 /* PoiRenderer.swift */,
 				1469F5C61F02F5F4008A37B3 /* Serialization.swift */,
 				1498FE1F219C2F4D006D0B78 /* UserState.swift */,
 				14B74E5C1E8F9BE600849BB5 /* Geography */,
@@ -662,6 +671,8 @@
 			files = (
 				146A79101E8F912500E2EE20 /* Main.storyboard in Resources */,
 				146A790B1E8F912500E2EE20 /* MapShader.vsh in Resources */,
+				14202F332210C6F500C22C88 /* PoiShader.fsh in Resources */,
+				14202F342210C6F500C22C88 /* PoiShader.vsh in Resources */,
 				146A79121E8F912500E2EE20 /* Assets.xcassets in Resources */,
 				1438DB722187D99D00FEB1D1 /* world.geo in Resources */,
 				146A79151E8F912500E2EE20 /* LaunchScreen.storyboard in Resources */,
@@ -856,6 +867,7 @@
 				14B74E711E8FB15500849BB5 /* GeoRenderer.swift in Sources */,
 				146A790D1E8F912500E2EE20 /* MapViewController.swift in Sources */,
 				140C99DB20D8DC610062486A /* MapGeometry.swift in Sources */,
+				14202F302210BD5E00C22C88 /* PoiRenderer.swift in Sources */,
 				14B74E5E1E8F9C1100849BB5 /* GeoRegion.swift in Sources */,
 				146A79071E8F912500E2EE20 /* AppDelegate.swift in Sources */,
 			);
