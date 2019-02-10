@@ -87,8 +87,8 @@ func triangleSoupHitTest(point p: CGPoint, inVertices vertices: [Vertex], inIndi
 		let t22 = y1 - y2
 		
 		// Calculate elements of vector r
-		let r0 = Float(p.x) - x2
-		let r1 = Float(p.y) - y2
+		let r0 = Vertex.Precision(p.x) - x2
+		let r1 = Vertex.Precision(p.y) - y2
 		
 		// Calculate determinant of T
 		let det = (t11 * t22 - t12 * t21)
