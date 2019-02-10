@@ -30,26 +30,26 @@ class MapRenderer {
 		
 		let userState = AppDelegate.sharedUserState
 		
+		let openContinents = geoWorld.continents.filter { userState.regionOpened(r: $0.geography) }
+		let closedContinents = geoWorld.continents.subtracting(openContinents)
+		
+		let countries = Set(openContinents.flatMap { $0.countries })
+		let openCountries = countries.filter { userState.regionOpened(r: $0.geography) }
+		let closedCountries = countries.subtracting(openCountries)
+		
+		// Finally form a list of box-collided regions of opened countries
+		let regions = Set(openCountries.flatMap { $0.regions })
+		let openRegions = regions.filter { userState.regionOpened(r: $0) }
+		let closedRegions = regions.subtracting(openRegions)
+		
+		// Now we have three sets of closed geographies that we could open
+		var candidateGeographies: Set<GeoRegion> = []
+		candidateGeographies.formUnion(closedContinents.map { $0.geography })
+		candidateGeographies.formUnion(closedCountries.map { $0.geography })
+		candidateGeographies.formUnion(closedRegions)
+		
 		// Collect a flat list of all primitives and their hash keys
-		let hashedPrimitivesList = geoWorld.continents.flatMap { continent -> [(Int, RenderPrimitive)] in
-			if userState.regionOpened(r: continent.geography) {
-				// Countries in opened continents
-				return continent.countries.flatMap { country -> [(Int, RenderPrimitive)] in
-					if userState.regionOpened(r: country.geography) {
-						return country.regions.map { region -> (Int, RenderPrimitive) in
-							// All regions
-							return (region.hashValue, region.renderPrimitive())
-						}
-					} else {
-						// Closed countries
-						return [(country.hashValue, country.geography.renderPrimitive())]
-					}
-				}
-			} else {
-				// Closed continents
-				return [(continent.hashValue, continent.geography.renderPrimitive())]
-			}
-		}
+		let hashedPrimitivesList = candidateGeographies.map { ($0.hashValue, $0.renderPrimitive())}
 		
 		// Insert them into the primitive dictionary, ignoring any later duplicates
 		regionPrimitives = Dictionary(hashedPrimitivesList, uniquingKeysWith: { (l, r) in l })
