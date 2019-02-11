@@ -10,31 +10,27 @@ import Foundation
 import SwiftyJSON
 
 class OperationParseGeoJson : Operation {
-	let countryJson : JSON
-	let regionJson : JSON
+	let json : JSON
 	let report : ProgressReport
-	var countries : GeoFeatureCollection?
-	var regions : GeoFeatureCollection?
-	
-	init(countries: JSON, regions: JSON, reporter: @escaping ProgressReport) {
-		countryJson = countries
-		regionJson = regions
+	let level : GeoFeature.Level
+	var features : GeoFeatureCollection?
+
+	init(json _json: JSON, as _level: GeoFeature.Level, reporter: @escaping ProgressReport) {
+		json = _json
+		level = _level
 		report = reporter
 	}
 	
 	override func main() {
 		guard !isCancelled else { print("Cancelled before starting"); return }
 		
-		report(0.0, "Parsing countries", false)
-		countries = parseFeatures(json: countryJson, dataSet: .Countries)
-		report(1.0, "Parsed countries", true)
-		report(0.0, "Parsing regions", false)
-		regions = parseFeatures(json: regionJson, dataSet: .Regions)
-		report(1.0, "Parsed regions", true)
+		report(0.0, "Parsing \(level)", false)
+		features = parseFeatures(json: json, dataSet: level)
+		report(1.0, "Parsed \(level)", true)
 	}
 	
 	fileprivate func parseFeatures(json: JSON,
-																 dataSet: Dataset) -> GeoFeatureCollection? {
+																 dataSet: GeoFeature.Level) -> GeoFeatureCollection? {
 		guard json["type"] == "FeatureCollection" else {
 			print("Root node is not multi-feature")
 			return nil
@@ -46,10 +42,9 @@ class OperationParseGeoJson : Operation {
 		
 		let numFeatures = featureArray.count
 		var loadedFeatures : Set<GeoFeature> = []
-		let featureLevel = (dataSet == .Countries) ? GeoFeature.Level.Country : GeoFeature.Level.Region
 		
 		for featureJson in featureArray {
-			if let loadedFeature = parseFeature(featureJson, into: featureLevel) {
+			if let loadedFeature = parseFeature(featureJson, into: level) {
 				loadedFeatures.insert(loadedFeature)
 				report(Double(loadedFeatures.count) / Double(numFeatures), loadedFeature.name, false)
 			}
@@ -72,8 +67,8 @@ class OperationParseGeoJson : Operation {
 		// Filter on pipeline settings before parsing JSON
 		switch level {
 		case .Continent: break
-		case .Country: guard PipelineConfig.shared.selectedCountries?.contains(featureName) ?? true else { return nil }
-		case .Region: guard PipelineConfig.shared.selectedRegions?.contains(featureName) ?? true else { return nil }
+		case .Country: guard PipelineConfig.shared.configArray("bake.countries")?.contains(featureName) ?? true else { return nil }
+		case .Region: guard PipelineConfig.shared.configArray("bake.regions")?.contains(featureName) ?? true else { return nil }
 		}
 		
 		let loadedPolygons: [GeoPolygon]
@@ -88,6 +83,14 @@ class OperationParseGeoJson : Operation {
 					loadedPolygons = [polygon]
 				} else {
 					print("Polygon in \"\(featureName)\" has no coordinate list.")
+					loadedPolygons = []
+				}
+			case "Point":
+				let pointJson = json["geometry"]["coordinates"]
+				if let point = parsePoint(pointJson) {
+					loadedPolygons = [point]
+				} else {
+					print("Point in \"\(featureName)\" has no coordinate.")
 					loadedPolygons = []
 				}
 			default:
@@ -137,5 +140,30 @@ class OperationParseGeoJson : Operation {
 			outVertices.append(v)
 		}
 		return GeoPolygonRing(vertices: outVertices)
+	}
+
+	fileprivate func parsePoint(_ pointJson: JSON) -> GeoPolygon? {
+		guard pointJson.type == .array else {
+			print("Coordinate has unexpected internal type: \(pointJson.type)")
+			return nil
+		}
+		
+		let midpoint = Vertex(pointJson[0].doubleValue,
+													pointJson[1].doubleValue)
+		
+		let exteriorRing = makeStar(around: midpoint, radius: 0.1, points: 5)
+		return GeoPolygon(exteriorRing: exteriorRing, interiorRings: [])
+	}
+
+	fileprivate func makeStar(around p: Vertex, radius: Float, points: Int) -> GeoPolygonRing {
+		let vertices = 0..<points * 2
+		let angles = vertices.map { (Double.pi / 2.0) + Double($0) * (2.0 * Double.pi / Double(points)) }
+		let circle = angles.map { Vertex(cos($0), sin($0)) }
+		let star = circle.enumerated().map { (offset: Int, element: Vertex) -> Vertex in
+			let radius = (offset % 2 == 0) ? 1.0 : 0.6
+			return Vertex(element.x * radius, element.y * radius)
+		}
+		let positionedStar = star.map { Vertex($0.x + p.x, $0.y + p.y) }
+		return GeoPolygonRing(vertices: positionedStar)
 	}
 }

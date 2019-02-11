@@ -10,6 +10,7 @@ import Foundation
 import SwiftyJSON
 
 enum GeoBakePipelineError : Error {
+	case outputPathMissing
 	case outputPathInvalid(path: String)
 	case datasetFailed(dataset: String)
 }
@@ -19,7 +20,10 @@ func reportError(_ feature: String, _ error: String) {
 }
 
 func bakeGeometry() throws {
-	let outputUrl = PipelineConfig.shared.outputFilePath
+	guard let outputUrl = PipelineConfig.shared.outputFilePath else {
+		throw GeoBakePipelineError.outputPathMissing
+	}
+	
 	guard outputUrl.isFileURL else {
 		throw GeoBakePipelineError.outputPathInvalid(path: outputUrl.path)
 	}
@@ -35,29 +39,46 @@ func bakeGeometry() throws {
 	let regionData = try Data(contentsOf: PipelineConfig.shared.reshapedRegionsFilePath)
 	progressBar(7, "Regions")
 	let regionJson = try JSON(data: regionData, options: .allowFragments)
+	
+	progressBar(8, "Cities")
+	let citiesData = try Data(contentsOf: PipelineConfig.shared.queriedCitiesFilePath)
+	progressBar(9, "Cities")
+	let citiesJson = try JSON(data: citiesData, options: .allowFragments)
+	
 	progressBar(10, "√ Loading done\n")
 	
 	print("\nBuilding geography collections...")
-	let jsonParser = OperationParseGeoJson(countries: countryJson,
-																				 regions: regionJson,
-																				 reporter: reportLoad)
+	let countryParser = OperationParseGeoJson(json: countryJson,
+																						as: .Country,
+																						reporter: reportLoad)
+	let regionParser =  OperationParseGeoJson(json: regionJson,
+																						as: .Region,
+																						reporter: reportLoad)
+	let citiesParser =  OperationParseOSMJson(json: citiesJson,
+																						kind: .City,
+																						reporter: reportLoad)
 	
 	let workQueue = OperationQueue()
 	workQueue.name = "Json load queue"
 	workQueue.qualityOfService = .userInitiated
-	workQueue.addOperation(jsonParser)
-	workQueue.waitUntilAllOperationsAreFinished()
+	workQueue.maxConcurrentOperationCount = 1
+	workQueue.addOperations([countryParser, regionParser, citiesParser], waitUntilFinished: true)
 	
-	guard let countries = jsonParser.countries else {
+	guard let countries = countryParser.features else {
 		throw GeoBakePipelineError.datasetFailed(dataset: "countries")
 	}
-	guard let regions = jsonParser.regions else {
+	guard let regions = regionParser.features else {
 		throw GeoBakePipelineError.datasetFailed(dataset: "regions")
 	}
+	guard let cities = citiesParser.places else {
+		throw GeoBakePipelineError.datasetFailed(dataset: "cities")
+	}
 	
+	let places = cities
 	print("\nTessellating geometry...")
 	let geoBaker = OperationBakeGeometry(countries: countries,
 																			 region: regions,
+																			 places: places,
 																			 saveUrl: outputUrl,
 																			 reporter: reportLoad,
 																			 errorReporter: reportError)

@@ -29,25 +29,26 @@ class PipelineConfig {
 		dictionary = [:]
 	}
 	
-	fileprivate func sourceUrl(_ filename: String, forKey key: String) -> URL {
+	func configUrl(_ key: String) -> URL? {
+		guard let filename = configString(key) else { return nil }
 		if let url = URL(string: filename) {
 			return url
 		} else {
-			print("Pipeline configuration error: value for \"\(key)\" is not a valid URL.")
-			exit(1)
+			print("Pipeline configuration warning: value for \"\(key)\" is not a valid URL.")
+			return nil
 		}
 	}
 	
-	fileprivate func configString(_ key : String) -> String {
+	func configString(_ key : String) -> String? {
 		if let string = dictionary.value(forKeyPath: key) as? String {
 			return string
 		} else {
-			print("Pipeline configuration error: Could not find value for \"\(key)\".")
-			exit(1)
+			print("Pipeline configuration warning: Could not find value for \"\(key)\".")
+			return nil
 		}
 	}
 	
-	fileprivate func configValue(_ key : String, fallback: Int = 0) -> Int {
+	func configValue(_ key : String, fallback: Int = 0) -> Int {
 		guard let val = dictionary.value(forKeyPath: key) else {
 			return fallback
 		}
@@ -58,7 +59,7 @@ class PipelineConfig {
 		return confInt
 	}
 	
-	fileprivate func configArray(_ key : String) -> [String]? {
+	func configArray(_ key : String) -> [String]? {
 		var out : [String]? = nil
 		if let arr = dictionary.value(forKeyPath: key) as? NSArray {
 			out = arr as? [String]
@@ -66,14 +67,6 @@ class PipelineConfig {
 		return out
 	}
 	
-	fileprivate func keyToSourceFileURL(_ key: String) -> URL { return sourceUrl(configString(key), forKey: key) }
-	
-	var sourceCountryUrl : URL { return keyToSourceFileURL("source.countries") }
-	var sourceRegionUrl : URL { return keyToSourceFileURL("source.regions") }
-	var nodePath : String? { return dictionary.value(forKeyPath: "reshape.node") as? String }
-	var reshapeMethod : String { return configString("reshape.method") }
-	var countrySimplification : Int { return configValue("reshape.simplify-countries") }
-	var regionSimplification : Int { return configValue("reshape.simplify-regions") }
 	var reshapedCountriesFilePath : URL {
 		return URL(fileURLWithPath: FileManager.default.currentDirectoryPath)
 			.appendingPathComponent(PipelineConfig.sourceDirectory)
@@ -84,12 +77,14 @@ class PipelineConfig {
 			.appendingPathComponent(PipelineConfig.sourceDirectory)
 			.appendingPathComponent(PipelineConfig.reshapedRegionsFilename)
 	}
-	var selectedCountries : [String]? { return configArray("bake.countries") }
-	var selectedRegions : [String]? { return configArray("bake.regions") }
+	var queriedCitiesFilePath : URL {
+		return URL(fileURLWithPath: FileManager.default.currentDirectoryPath)
+			.appendingPathComponent(PipelineConfig.sourceDirectory)
+			.appendingPathComponent(PipelineConfig.reshapedCitiesFilename)
+	}
 	
-	
-	var outputFilePath : URL {
-		let setting = configString("output")
+	var outputFilePath : URL? {
+		guard let setting = configString("output") else { return nil }
 		return URL(fileURLWithPath: setting, relativeTo: FileManager.default.homeDirectoryForCurrentUser)
 	}
 	
@@ -97,6 +92,7 @@ class PipelineConfig {
 	static let sourceDirectory = "source-geometry"
 	static let reshapedCountriesFilename = "reshaped-countries.json"
 	static let reshapedRegionsFilename = "reshaped-regions.json"
+	static let reshapedCitiesFilename = "osm-cities.json"
 }
 
 typealias ProgressBar = (Int, String) -> ()

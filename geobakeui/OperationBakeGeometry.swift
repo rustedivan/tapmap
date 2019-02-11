@@ -11,6 +11,7 @@ import Foundation
 class OperationBakeGeometry : Operation {
 	let countries : GeoFeatureCollection
 	let regions : GeoFeatureCollection
+	let places : GeoPlaceCollection
 	let saveUrl : URL
 	let report : ProgressReport
 	let reportError : ErrorReport
@@ -18,11 +19,13 @@ class OperationBakeGeometry : Operation {
 	
 	init(countries countriesToBake: GeoFeatureCollection,
 			 region regionsToBake: GeoFeatureCollection,
+			 places placesToBake: GeoPlaceCollection,
 			 saveUrl url: URL,
 	     reporter: @escaping ProgressReport,
 	     errorReporter: @escaping ErrorReport) {
 		countries = countriesToBake
 		regions = regionsToBake
+		places = placesToBake
 		saveUrl = url
 		report = reporter
 		reportError = errorReporter
@@ -50,9 +53,17 @@ class OperationBakeGeometry : Operation {
 		bakeQueue.addOperations([continentTessJob, countryTessJob, regionTessJob],
 														waitUntilFinished: true)
 		
+		let placeDistributionJob = OperationDistributePlaces(regions: Set(regionTessJob.tessellatedRegions),
+																												 places: places,
+																												 reporter: report)
+		placeDistributionJob.start()
+		let regionCollection = placeDistributionJob.regionsWithPlaces != nil
+					? Array(placeDistributionJob.regionsWithPlaces!)
+					: regionTessJob.tessellatedRegions
+		
 		let fixupJob = OperationFixupHierarchy(continentCollection: continentTessJob.tessellatedRegions,
 																					 countryCollection: countryTessJob.tessellatedRegions,
-																					 regionCollection: regionTessJob.tessellatedRegions,
+																					 regionCollection: regionCollection,
 																					 reporter: report)
 		fixupJob.start()
 		
@@ -69,6 +80,7 @@ class OperationBakeGeometry : Operation {
 		if let encoded = try? encoder.encode(bakedWorld) {
 			do {
 				try encoded.write(to: saveUrl, options: .atomicWrite)
+				print("GeoWorld baked to \(ByteCountFormatter().string(fromByteCount: Int64(encoded.count)))")
 			} catch {
 				print("Saving failed")
 			}
@@ -76,7 +88,6 @@ class OperationBakeGeometry : Operation {
 		else {
 			print("Encoding failed")
 		}
-		
 		report(1.0, "Done.", true)
 	}
 }

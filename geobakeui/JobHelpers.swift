@@ -8,8 +8,3 @@
 
 typealias ProgressReport = (Double, String, Bool) -> ()
 typealias ErrorReport = (String, String) -> ()
-
-enum Dataset {
-	case Countries
-	case Regions
-}

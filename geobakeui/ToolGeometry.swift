@@ -18,7 +18,7 @@ struct Vertex : Equatable, Hashable, PointForm {
 	init(_ _x: Precision, _ _y: Precision) { x = _x; y = _y }
 	
 	var quantized : (Int64, Int64) {
-		let quant: Double = 1e-6
+		let quant: Precision = 1e-6
 		return (Int64(floor(x / quant)), Int64(floor(y / quant)))
 	}
 	

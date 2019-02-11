@@ -12,6 +12,11 @@
 		140C99DC20D8DC610062486A /* MapGeometry.swift in Sources */ = {isa = PBXBuildFile; fileRef = 140C99DA20D8DC610062486A /* MapGeometry.swift */; };
 		140E63F21F209645000D710E /* Serialization.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1469F5C61F02F5F4008A37B3 /* Serialization.swift */; };
 		141F25C81EA4B3B800DA808F /* GeoBakingViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 141F25C71EA4B3B800DA808F /* GeoBakingViewController.swift */; };
+		14202F2D221079D100C22C88 /* OperationDistributePlaces.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14202F2C221079D100C22C88 /* OperationDistributePlaces.swift */; };
+		14202F2E22107F9A00C22C88 /* MapGeometry.swift in Sources */ = {isa = PBXBuildFile; fileRef = 140C99DA20D8DC610062486A /* MapGeometry.swift */; };
+		14202F302210BD5E00C22C88 /* PoiRenderer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14202F2F2210BD5E00C22C88 /* PoiRenderer.swift */; };
+		14202F332210C6F500C22C88 /* PoiShader.fsh in Resources */ = {isa = PBXBuildFile; fileRef = 14202F312210C6F400C22C88 /* PoiShader.fsh */; };
+		14202F342210C6F500C22C88 /* PoiShader.vsh in Resources */ = {isa = PBXBuildFile; fileRef = 14202F322210C6F400C22C88 /* PoiShader.vsh */; };
 		1438DB722187D99D00FEB1D1 /* world.geo in Resources */ = {isa = PBXBuildFile; fileRef = 1438DB712187D99D00FEB1D1 /* world.geo */; };
 		143A0F2C217E6B1A008C432A /* OperationFixupHierarchy.swift in Sources */ = {isa = PBXBuildFile; fileRef = 143A0F2B217E6B1A008C432A /* OperationFixupHierarchy.swift */; };
 		143D06281F0811450002D3C3 /* Serialization.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1469F5C61F02F5F4008A37B3 /* Serialization.swift */; };
@@ -26,6 +31,8 @@
 		1452103D1E98D4F30029942F /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1452103C1E98D4F30029942F /* ViewController.swift */; };
 		1452103F1E98D4F30029942F /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 1452103E1E98D4F30029942F /* Assets.xcassets */; };
 		145210421E98D4F30029942F /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 145210401E98D4F30029942F /* Main.storyboard */; };
+		145A73EC220F5DC100BBEB82 /* OperationParseOSMJson.swift in Sources */ = {isa = PBXBuildFile; fileRef = 145A73EB220F5DC100BBEB82 /* OperationParseOSMJson.swift */; };
+		145A73ED220F5DC100BBEB82 /* OperationParseOSMJson.swift in Sources */ = {isa = PBXBuildFile; fileRef = 145A73EB220F5DC100BBEB82 /* OperationParseOSMJson.swift */; };
 		1462EED821A69B0900611C7A /* GeoRegion.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14B74E5D1E8F9C1100849BB5 /* GeoRegion.swift */; };
 		1462EED921A69B0A00611C7A /* GeoRegion.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14B74E5D1E8F9C1100849BB5 /* GeoRegion.swift */; };
 		14657D33220759A500EF116F /* KDTree.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14657D31220758F900EF116F /* KDTree.swift */; };
@@ -142,6 +149,10 @@
 /* Begin PBXFileReference section */
 		140C99DA20D8DC610062486A /* MapGeometry.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = MapGeometry.swift; path = Geography/MapGeometry.swift; sourceTree = "<group>"; };
 		141F25C71EA4B3B800DA808F /* GeoBakingViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = GeoBakingViewController.swift; sourceTree = "<group>"; };
+		14202F2C221079D100C22C88 /* OperationDistributePlaces.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OperationDistributePlaces.swift; sourceTree = "<group>"; };
+		14202F2F2210BD5E00C22C88 /* PoiRenderer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PoiRenderer.swift; sourceTree = "<group>"; };
+		14202F312210C6F400C22C88 /* PoiShader.fsh */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.glsl; name = PoiShader.fsh; path = Shaders/PoiShader.fsh; sourceTree = "<group>"; };
+		14202F322210C6F400C22C88 /* PoiShader.vsh */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.glsl; name = PoiShader.vsh; path = Shaders/PoiShader.vsh; sourceTree = "<group>"; };
 		1438DB712187D99D00FEB1D1 /* world.geo */ = {isa = PBXFileReference; lastKnownFileType = file.bplist; name = world.geo; path = Raw/world.geo; sourceTree = "<group>"; };
 		143A0F2B217E6B1A008C432A /* OperationFixupHierarchy.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OperationFixupHierarchy.swift; sourceTree = "<group>"; };
 		144A55B021FB4842001CC231 /* OperationAssembleContinents.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OperationAssembleContinents.swift; sourceTree = "<group>"; };
@@ -151,6 +162,7 @@
 		1452103E1E98D4F30029942F /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		145210411E98D4F30029942F /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
 		145210431E98D4F30029942F /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		145A73EB220F5DC100BBEB82 /* OperationParseOSMJson.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = OperationParseOSMJson.swift; sourceTree = "<group>"; };
 		14657D31220758F900EF116F /* KDTree.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KDTree.swift; sourceTree = "<group>"; };
 		1469F5C61F02F5F4008A37B3 /* Serialization.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Serialization.swift; sourceTree = "<group>"; };
 		146A79031E8F912500E2EE20 /* tapmap.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = tapmap.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -324,9 +336,12 @@
 				146A79061E8F912500E2EE20 /* AppDelegate.swift */,
 				146A79081E8F912500E2EE20 /* MapShader.fsh */,
 				146A790A1E8F912500E2EE20 /* MapShader.vsh */,
+				14202F312210C6F400C22C88 /* PoiShader.fsh */,
+				14202F322210C6F400C22C88 /* PoiShader.vsh */,
 				146A790C1E8F912500E2EE20 /* MapViewController.swift */,
 				14B74E701E8FB15500849BB5 /* GeoRenderer.swift */,
 				1488E7ED201CDD9900AA00F1 /* MapRenderer.swift */,
+				14202F2F2210BD5E00C22C88 /* PoiRenderer.swift */,
 				1469F5C61F02F5F4008A37B3 /* Serialization.swift */,
 				1498FE1F219C2F4D006D0B78 /* UserState.swift */,
 				14B74E5C1E8F9BE600849BB5 /* Geography */,
@@ -384,6 +399,8 @@
 				14F52E401FD67EBB002D3A3A /* OperationBakeGeometry.swift */,
 				144A55B021FB4842001CC231 /* OperationAssembleContinents.swift */,
 				14F52E421FD67EBB002D3A3A /* OperationParseGeoJson.swift */,
+				145A73EB220F5DC100BBEB82 /* OperationParseOSMJson.swift */,
+				14202F2C221079D100C22C88 /* OperationDistributePlaces.swift */,
 				14F52E411FD67EBB002D3A3A /* OperationTessellateRegions.swift */,
 				14AAD0FE21A479EC001A75C1 /* OperationCleanUpBorders.swift */,
 				143A0F2B217E6B1A008C432A /* OperationFixupHierarchy.swift */,
@@ -654,6 +671,8 @@
 			files = (
 				146A79101E8F912500E2EE20 /* Main.storyboard in Resources */,
 				146A790B1E8F912500E2EE20 /* MapShader.vsh in Resources */,
+				14202F332210C6F500C22C88 /* PoiShader.fsh in Resources */,
+				14202F342210C6F500C22C88 /* PoiShader.vsh in Resources */,
 				146A79121E8F912500E2EE20 /* Assets.xcassets in Resources */,
 				1438DB722187D99D00FEB1D1 /* world.geo in Resources */,
 				146A79151E8F912500E2EE20 /* LaunchScreen.storyboard in Resources */,
@@ -848,6 +867,7 @@
 				14B74E711E8FB15500849BB5 /* GeoRenderer.swift in Sources */,
 				146A790D1E8F912500E2EE20 /* MapViewController.swift in Sources */,
 				140C99DB20D8DC610062486A /* MapGeometry.swift in Sources */,
+				14202F302210BD5E00C22C88 /* PoiRenderer.swift in Sources */,
 				14B74E5E1E8F9C1100849BB5 /* GeoRegion.swift in Sources */,
 				146A79071E8F912500E2EE20 /* AppDelegate.swift in Sources */,
 			);
@@ -893,6 +913,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				14BDA60921EE9188004CC319 /* OperationBakeGeometry.swift in Sources */,
+				14202F2E22107F9A00C22C88 /* MapGeometry.swift in Sources */,
 				14BDA61621EE91B8004CC319 /* JobHelpers.swift in Sources */,
 				144A55B121FB4842001CC231 /* OperationAssembleContinents.swift in Sources */,
 				14FF12F621EE8B4800AF4474 /* Serialization.swift in Sources */,
@@ -900,6 +921,7 @@
 				14BB448121F8784C0029D62A /* bake.swift in Sources */,
 				14657D33220759A500EF116F /* KDTree.swift in Sources */,
 				146B476F21EFDB7200CC36D9 /* download.swift in Sources */,
+				14202F2D221079D100C22C88 /* OperationDistributePlaces.swift in Sources */,
 				14FF12F221EE8B1400AF4474 /* GeoRegion.swift in Sources */,
 				14BDA60D21EE9188004CC319 /* OperationFixupHierarchy.swift in Sources */,
 				146B477721F47B6000CC36D9 /* reshape.swift in Sources */,
@@ -908,6 +930,7 @@
 				146B477121F0F7FA00CC36D9 /* config.swift in Sources */,
 				14FF12F021EE8A5F00AF4474 /* ToolGeometry.swift in Sources */,
 				14BDA60B21EE9188004CC319 /* OperationTessellateRegions.swift in Sources */,
+				145A73EC220F5DC100BBEB82 /* OperationParseOSMJson.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -918,6 +941,7 @@
 				14BDA61721EE91B8004CC319 /* JobHelpers.swift in Sources */,
 				14BD7301220E424C00CDD7D9 /* KDTree.swift in Sources */,
 				14FF12F521EE8B4700AF4474 /* Serialization.swift in Sources */,
+				145A73ED220F5DC100BBEB82 /* OperationParseOSMJson.swift in Sources */,
 				144A55B221FB4842001CC231 /* OperationAssembleContinents.swift in Sources */,
 				14FF12F321EE8B1400AF4474 /* GeoRegion.swift in Sources */,
 				14FF12F121EE8A6000AF4474 /* ToolGeometry.swift in Sources */,

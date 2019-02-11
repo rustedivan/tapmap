@@ -30,7 +30,7 @@ class OperationFixupHierarchy : Operation {
 	
 	override func main() {
 		guard !isCancelled else { print("Cancelled before starting"); return }
-		
+
 		// Collect regions into their countries
 		var remainingRegions = Set<GeoRegion>(regionList)
 		var geoCountries = Set<GeoCountry>()
@@ -39,13 +39,16 @@ class OperationFixupHierarchy : Operation {
 			let belongingRegions = remainingRegions.filter {
 				$0.admin == country.admin
 			}
-			
+		
+			let places = Set(belongingRegions.flatMap { $0.places })
 			let newCountry = GeoCountry(geography: country,
-																	regions: belongingRegions)
+																	regions: belongingRegions,
+																	places: places)
 			
 			geoCountries.insert(newCountry)
 			
 			remainingRegions.subtract(belongingRegions)
+			
 			if (numRegions > 0) {
 				report(1.0 - (Double(remainingRegions.count) / Double(numRegions)), country.name, false)
 			}
@@ -62,7 +65,8 @@ class OperationFixupHierarchy : Operation {
 			}
 			
 			let newContintent = GeoContinent(geography: continent,
-																			 countries: belongingCountries)
+																			 countries: belongingCountries,
+																			 places: [])
 			geoContinents.insert(newContintent)
 			remainingCountries.subtract(belongingCountries)
 			if (numCountries > 0) {

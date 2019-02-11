@@ -87,8 +87,8 @@ func triangleSoupHitTest(point p: CGPoint, inVertices vertices: [Vertex], inIndi
 		let t22 = y1 - y2
 		
 		// Calculate elements of vector r
-		let r0 = Float(p.x) - x2
-		let r1 = Float(p.y) - y2
+		let r0 = Vertex.Precision(p.x) - x2
+		let r1 = Vertex.Precision(p.y) - y2
 		
 		// Calculate determinant of T
 		let det = (t11 * t22 - t12 * t21)
@@ -100,9 +100,7 @@ func triangleSoupHitTest(point p: CGPoint, inVertices vertices: [Vertex], inIndi
 		let l3 = 1.0 - l1 - l2
 		
 		// p is in t if all barycentric coordinates are in 0..1
-		if 0.0 <= l1 && l1 <= 1.0 &&
-			 0.0 <= l2 && l2 <= 1.0 &&
-			 0.0 <= l3 && l3 <= 1.0 {
+		if l1 >= 0.0 && l2 >= 0.0 && (l1 + l2 + l3 <= 1.0) {
 			return true
 		}
 	}

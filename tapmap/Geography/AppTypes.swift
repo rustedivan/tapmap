@@ -8,7 +8,7 @@
 
 import Foundation
 
-struct Vertex {
+struct Vertex : Equatable {
 	typealias Precision = Float
 	var p: Vertex { return self }
 	
@@ -16,4 +16,17 @@ struct Vertex {
 	let y: Precision
 	init(_ _x: Precision, _ _y: Precision) { x = _x; y = _y }
 	init(_ _x: Double, _ _y: Double) { x = Precision(_x); y = Precision(_y) }
+	
+	var quantized : (Int64, Int64) {
+		let quant: Precision = 1e-6
+		return (Int64(floor(x / quant)), Int64(floor(y / quant)))
+	}
+	
+	static func ==(lhs: Vertex, rhs: Vertex) -> Bool {
+		return lhs.quantized == rhs.quantized
+	}
+	
+	static func +(lhs: Vertex, rhs: Vertex) -> Vertex {
+		return Vertex(lhs.x + rhs.x, lhs.y + rhs.y)
+	}
 }

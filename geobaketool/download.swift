@@ -12,20 +12,28 @@ import Dispatch
 enum GeoBakeDownloadError : Error {
 	case timedOut(host: String)
 	case downloadFailed(key: String)
+	case queryFailed(message: String)
+	case invalidConfig(message: String)
 	case unpackFailed
 }
 
 func downloadFiles(params: ArraySlice<String>) throws {
 	let semaphore = DispatchSemaphore(value: 0)
 	let reporter = URLDownloadReporter(doneSemaphore: semaphore)
-	let session = URLSession(configuration: URLSessionConfiguration.ephemeral,
+	let configuration = URLSessionConfiguration.ephemeral
+	configuration.timeoutIntervalForRequest = 600
+	let session = URLSession(configuration: configuration,
 													 delegate: reporter,
 													 delegateQueue: nil)
 	
 	let geometryFilesPath = try prepareGeometryDirectory()
 	
-	let archiveUrls = [PipelineConfig.shared.sourceCountryUrl, PipelineConfig.shared.sourceRegionUrl]
-	let _ = try archiveUrls.map({ (url: URL) -> () in
+	// Download and unpack NaturalEarth data
+	let archiveUrls = [PipelineConfig.shared.configUrl("source.countries"),
+										 PipelineConfig.shared.configUrl("source.regions")]
+	
+	let _ = try archiveUrls.map({ (url: URL?) -> () in
+		guard let url = url else { return }
 		let downloadTask = session.downloadTask(with: url)
 		downloadTask.resume()
 		let result = semaphore.wait(timeout: DispatchTime.now() + DispatchTimeInterval.seconds(600))
@@ -33,11 +41,33 @@ func downloadFiles(params: ArraySlice<String>) throws {
 			throw GeoBakeDownloadError.timedOut(host: url.host ?? "No host")
 		}
 		guard let archiveTempPath = reporter.tempFilePath else {
-			throw GeoBakeDownloadError.downloadFailed(key: "source.countries")
+			throw GeoBakeDownloadError.downloadFailed(key: url.lastPathComponent)
 		}
-	
+
 		let geometryTempPath = try unpackFile(archiveUrl: archiveTempPath)
 		try pickGeometryFiles(from: geometryTempPath, to: geometryFilesPath)
+	})
+
+	// Download and move OpenStreetMap data
+	let osmQueries = [(PipelineConfig.shared.configUrl("source.osmCitiesUrl"), "osm-cities.json"),
+										(PipelineConfig.shared.configUrl("source.osmTownsUrl"), "osm-towns.json")]
+	
+	let _ = try osmQueries.map({ (url: URL?, dst: String) -> () in
+		guard let url = url else { return }
+		let downloadTask = session.downloadTask(with: url)
+		downloadTask.resume()
+		
+		reportLoad(0.0, "Waiting for Overpass server to build result for \"\(dst)\"...", false)
+		
+		let result = semaphore.wait(timeout: DispatchTime.now() + DispatchTimeInterval.seconds(600))
+		guard result == DispatchTimeoutResult.success else {
+			throw GeoBakeDownloadError.timedOut(host: url.host ?? "No host")
+		}
+		guard let queryTempPath = reporter.tempFilePath else {
+			throw GeoBakeDownloadError.queryFailed(message: dst)
+		}
+		
+		try pickJsonFiles(from: queryTempPath, named: dst, to: geometryFilesPath)
 	})
 }
 
@@ -97,12 +127,10 @@ func unpackFile(archiveUrl: URL) throws -> URL {
 func prepareGeometryDirectory() throws -> URL {
 	let path = FileManager.default.currentDirectoryPath + "/source-geometry"
 
-	if FileManager.default.fileExists(atPath: path) {
-		do { try FileManager.default.removeItem(atPath: path)	}
-		catch { }
+	if !FileManager.default.fileExists(atPath: path) {
+		try FileManager.default.createDirectory(atPath: path, withIntermediateDirectories: false, attributes: nil)
 	}
 	
-	try FileManager.default.createDirectory(atPath: path, withIntermediateDirectories: false, attributes: nil)
 	return URL(fileURLWithPath: path)
 }
 
@@ -111,9 +139,26 @@ func pickGeometryFiles(from src: URL, to dst: URL) throws {
 	let usefulFiles = allFiles.filter { $0.pathExtension == "shp" || $0.pathExtension == "dbf" }
 	
 	_ = try usefulFiles.map {
+		let target = dst.appendingPathComponent($0.lastPathComponent)
+		if FileManager.default.fileExists(atPath: target.absoluteString) {
+			do { try FileManager.default.removeItem(atPath: target.absoluteString)	}
+			catch { }
+		}
 		try FileManager.default.moveItem(at: $0,
-																		 to: dst.appendingPathComponent($0.lastPathComponent))
+																		 to: target)
 	}
+}
+
+func pickJsonFiles(from src: URL, named filename: String, to dst: URL) throws {
+	let target = dst.appendingPathComponent(filename)
+	
+	if FileManager.default.fileExists(atPath: target.absoluteString) {
+		do { try FileManager.default.removeItem(atPath: target.absoluteString)	}
+		catch { }
+	}
+	
+	try FileManager.default.moveItem(at: src,
+																	 to: target)
 }
 	
 
