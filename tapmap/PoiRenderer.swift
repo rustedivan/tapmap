@@ -25,14 +25,14 @@ class PoiRenderer {
 		
 		let userState = AppDelegate.sharedUserState
 		
-		let openContinents = geoWorld.continents.filter { userState.regionOpened(r: $0.geography) }
+		let openContinents = geoWorld.continents.filter { userState.placeVisited($0.geography) }
 		
 		let countries = Set(openContinents.flatMap { $0.countries })
-		let openCountries = countries.filter { userState.regionOpened(r: $0.geography) }
+		let openCountries = countries.filter { userState.placeVisited($0.geography) }
 		let closedCountries = countries.subtracting(openCountries)
 		
 		let regions = Set(openCountries.flatMap { $0.regions })
-		let openRegions = regions.filter { userState.regionOpened(r: $0) }
+		let openRegions = regions.filter { userState.placeVisited($0) }
 		let closedRegions = regions.subtracting(openRegions)
 		
 		let visibleCountryPoiPlanes = closedCountries.map { ($0.hashValue, createPoiPlane($0.places, debugName: $0.name)) }
@@ -50,7 +50,7 @@ class PoiRenderer {
 	}
 	
 	func updatePrimitives(forRegion region: GeoRegion, withSubregions regions: Set<GeoRegion>) {
-		if AppDelegate.sharedUserState.regionOpened(r: region) {
+		if AppDelegate.sharedUserState.placeVisited(region) {
 			regionPrimitives.removeValue(forKey: region.hashValue)
 			
 			let hashedPrimitives = regions.map { ($0.hashValue, createPoiPlane($0.places, debugName: $0.name)) }

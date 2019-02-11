@@ -25,16 +25,16 @@ class MapRenderer {
 		
 		let userState = AppDelegate.sharedUserState
 		
-		let openContinents = geoWorld.continents.filter { userState.regionOpened(r: $0.geography) }
+		let openContinents = geoWorld.continents.filter { userState.placeVisited($0.geography) }
 		let closedContinents = geoWorld.continents.subtracting(openContinents)
 		
 		let countries = Set(openContinents.flatMap { $0.countries })
-		let openCountries = countries.filter { userState.regionOpened(r: $0.geography) }
+		let openCountries = countries.filter { userState.placeVisited($0.geography) }
 		let closedCountries = countries.subtracting(openCountries)
 		
 		// Finally form a list of box-collided regions of opened countries
 		let regions = Set(openCountries.flatMap { $0.regions })
-		let openRegions = regions.filter { userState.regionOpened(r: $0) }
+		let openRegions = regions.filter { userState.placeVisited($0) }
 		let closedRegions = regions.subtracting(openRegions)
 		
 		// Now we have three sets of closed geographies that we could open
@@ -57,7 +57,7 @@ class MapRenderer {
 	}
 	
 	func updatePrimitives(forGeography geography: GeoRegion, withSubregions regions: Set<GeoRegion>) {
-		if AppDelegate.sharedUserState.regionOpened(r: geography) {
+		if AppDelegate.sharedUserState.placeVisited(geography) {
 			regionPrimitives.removeValue(forKey: geography.hashValue)
 			
 			let hashedPrimitives = regions.map {

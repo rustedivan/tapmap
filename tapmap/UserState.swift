@@ -9,13 +9,13 @@
 import Foundation
 
 class UserState {
-	var openedRegions: [Int : Bool] = [:]
+	var visitedPlaces: [Int : Bool] = [:]
 
-	func regionOpened(r: GeoRegion) -> Bool {
-		return openedRegions[r.hashValue] ?? false
+	func placeVisited<T:Hashable>(_ p: T) -> Bool {
+		return visitedPlaces[p.hashValue] ?? false
 	}
 	
-	func openRegion(_ r: GeoRegion) {
-		openedRegions[r.hashValue] = true
+	func visitPlace<T:Hashable>(_ p: T) {
+		visitedPlaces[p.hashValue] = true
 	}
 }

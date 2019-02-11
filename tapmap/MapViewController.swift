@@ -97,19 +97,19 @@ class MapViewController: GLKViewController, GLKViewControllerDelegate {
 			
 			// First split box-collided continents into open and closed sets
 			let candidateContinents = geoWorld.continents.filter { aabbHitTest(p: mapP, in: $0.geography) }
-			let openCandidateContinents = candidateContinents.filter { userState.regionOpened(r: $0.geography) }
+			let openCandidateContinents = candidateContinents.filter { userState.placeVisited($0.geography) }
 			let closedCandidateContinents = candidateContinents.subtracting(openCandidateContinents)
 			
 			// Form array of box-collided countries in the opened continents, and split into opened/closed sets
 			let candidateCountries = Set(openCandidateContinents.flatMap { $0.countries })
 																													.filter { aabbHitTest(p: mapP, in: $0.geography) }
-			let openCandidateCountries = candidateCountries.filter { userState.regionOpened(r: $0.geography) }
+			let openCandidateCountries = candidateCountries.filter { userState.placeVisited($0.geography) }
 			let closedCandidateCountries = candidateCountries.subtracting(openCandidateCountries)
 			
 			// Finally form a list of box-collided regions of opened countries
 			let candidateRegions = Set(openCandidateCountries.flatMap { $0.regions })
 																											.filter { aabbHitTest(p: mapP, in: $0) }
-			let openCandidateRegions = candidateRegions.filter { userState.regionOpened(r: $0) }
+			let openCandidateRegions = candidateRegions.filter { userState.placeVisited($0) }
 			let closedCandidateRegions = candidateRegions.subtracting(openCandidateRegions)
 			
 			// Now we have three sets of closed geographies that we could open
@@ -120,7 +120,7 @@ class MapViewController: GLKViewController, GLKViewControllerDelegate {
 			
 			if let hitRegion = pickFromRegions(p: mapP, regions: candidateGeographies) {
 				placeName.text = hitRegion.name
-				userState.openRegion(hitRegion)
+				userState.visitPlace(hitRegion)
 				
 				if let hitContinent = closedCandidateContinents.first(where: { $0.name == hitRegion.name }) {
 					mapRenderer.updatePrimitives(forGeography: hitContinent.geography,
