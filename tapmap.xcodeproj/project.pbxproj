@@ -11,6 +11,7 @@
 		140C99DB20D8DC610062486A /* MapGeometry.swift in Sources */ = {isa = PBXBuildFile; fileRef = 140C99DA20D8DC610062486A /* MapGeometry.swift */; };
 		140C99DC20D8DC610062486A /* MapGeometry.swift in Sources */ = {isa = PBXBuildFile; fileRef = 140C99DA20D8DC610062486A /* MapGeometry.swift */; };
 		140E63F21F209645000D710E /* Serialization.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1469F5C61F02F5F4008A37B3 /* Serialization.swift */; };
+		1413B5D722135E5400D51AAA /* nullrenderer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1413B5D622135E5400D51AAA /* nullrenderer.swift */; };
 		141F25C81EA4B3B800DA808F /* GeoBakingViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 141F25C71EA4B3B800DA808F /* GeoBakingViewController.swift */; };
 		14202F2D221079D100C22C88 /* OperationDistributePlaces.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14202F2C221079D100C22C88 /* OperationDistributePlaces.swift */; };
 		14202F2E22107F9A00C22C88 /* MapGeometry.swift in Sources */ = {isa = PBXBuildFile; fileRef = 140C99DA20D8DC610062486A /* MapGeometry.swift */; };
@@ -148,6 +149,7 @@
 
 /* Begin PBXFileReference section */
 		140C99DA20D8DC610062486A /* MapGeometry.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = MapGeometry.swift; path = Geography/MapGeometry.swift; sourceTree = "<group>"; };
+		1413B5D622135E5400D51AAA /* nullrenderer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = nullrenderer.swift; sourceTree = "<group>"; };
 		141F25C71EA4B3B800DA808F /* GeoBakingViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = GeoBakingViewController.swift; sourceTree = "<group>"; };
 		14202F2C221079D100C22C88 /* OperationDistributePlaces.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OperationDistributePlaces.swift; sourceTree = "<group>"; };
 		14202F2F2210BD5E00C22C88 /* PoiRenderer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PoiRenderer.swift; sourceTree = "<group>"; };
@@ -396,14 +398,14 @@
 		14F148A61EA3830C00D419AB /* Background jobs */ = {
 			isa = PBXGroup;
 			children = (
-				14F52E401FD67EBB002D3A3A /* OperationBakeGeometry.swift */,
-				144A55B021FB4842001CC231 /* OperationAssembleContinents.swift */,
 				14F52E421FD67EBB002D3A3A /* OperationParseGeoJson.swift */,
 				145A73EB220F5DC100BBEB82 /* OperationParseOSMJson.swift */,
 				14202F2C221079D100C22C88 /* OperationDistributePlaces.swift */,
+				144A55B021FB4842001CC231 /* OperationAssembleContinents.swift */,
 				14F52E411FD67EBB002D3A3A /* OperationTessellateRegions.swift */,
-				14AAD0FE21A479EC001A75C1 /* OperationCleanUpBorders.swift */,
 				143A0F2B217E6B1A008C432A /* OperationFixupHierarchy.swift */,
+				14AAD0FE21A479EC001A75C1 /* OperationCleanUpBorders.swift */,
+				14F52E401FD67EBB002D3A3A /* OperationBakeGeometry.swift */,
 				14BDA61321EE91B8004CC319 /* JobHelpers.swift */,
 			);
 			name = "Background jobs";
@@ -417,6 +419,7 @@
 				146B476E21EFDB7200CC36D9 /* download.swift */,
 				146B477621F47B6000CC36D9 /* reshape.swift */,
 				14BB448021F8784C0029D62A /* bake.swift */,
+				1413B5D622135E5400D51AAA /* nullrenderer.swift */,
 				146B477421F3E61700CC36D9 /* pipeline.json */,
 			);
 			path = geobaketool;
@@ -931,6 +934,7 @@
 				14FF12F021EE8A5F00AF4474 /* ToolGeometry.swift in Sources */,
 				14BDA60B21EE9188004CC319 /* OperationTessellateRegions.swift in Sources */,
 				145A73EC220F5DC100BBEB82 /* OperationParseOSMJson.swift in Sources */,
+				1413B5D722135E5400D51AAA /* nullrenderer.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

@@ -96,54 +96,47 @@ class MapViewController: GLKViewController, GLKViewControllerDelegate {
 			defer { GeometryCounters.end() }
 			
 			// First split box-collided continents into open and closed sets
-			let candidateContinents = geoWorld.continents.filter { aabbHitTest(p: mapP, in: $0.geography) }
-			let openCandidateContinents = candidateContinents.filter { userState.placeVisited($0.geography) }
+			let candidateContinents = geoWorld.children.filter { aabbHitTest(p: mapP, aabb: $0.aabb) }
+			let openCandidateContinents = candidateContinents.filter { userState.placeVisited($0) }
 			let closedCandidateContinents = candidateContinents.subtracting(openCandidateContinents)
 			
 			// Form array of box-collided countries in the opened continents, and split into opened/closed sets
-			let candidateCountries = Set(openCandidateContinents.flatMap { $0.countries })
-																													.filter { aabbHitTest(p: mapP, in: $0.geography) }
-			let openCandidateCountries = candidateCountries.filter { userState.placeVisited($0.geography) }
+			let candidateCountries = Set(openCandidateContinents.flatMap { $0.children })
+																													.filter { aabbHitTest(p: mapP, aabb: $0.aabb) }
+			let openCandidateCountries = candidateCountries.filter { userState.placeVisited($0) }
 			let closedCandidateCountries = candidateCountries.subtracting(openCandidateCountries)
 			
 			// Finally form a list of box-collided regions of opened countries
-			let candidateRegions = Set(openCandidateCountries.flatMap { $0.regions })
-																											.filter { aabbHitTest(p: mapP, in: $0) }
-			let openCandidateRegions = candidateRegions.filter { userState.placeVisited($0) }
-			let closedCandidateRegions = candidateRegions.subtracting(openCandidateRegions)
+			let candidateRegions = Set(openCandidateCountries.flatMap { $0.children })
+																											.filter { aabbHitTest(p: mapP, aabb: $0.aabb) }
+			// let openCandidateRegions = candidateRegions.filter { userState.placeVisited($0) }
+			// let closedCandidateRegions = candidateRegions.subtracting(openCandidateRegions)
 			
-			// Now we have three sets of closed geographies that we could open
-			var candidateGeographies: Set<GeoRegion> = []
-			candidateGeographies.formUnion(closedCandidateContinents.map { $0.geography })
-			candidateGeographies.formUnion(closedCandidateCountries.map { $0.geography })
-			candidateGeographies.formUnion(closedCandidateRegions)
-			
-			if let hitRegion = pickFromRegions(p: mapP, regions: candidateGeographies) {
-				placeName.text = hitRegion.name
-				userState.visitPlace(hitRegion)
+			// Perform three different checks for the three different Kinds
+			if let hitContinent = pickFromTessellations(p: mapP, candidates: closedCandidateContinents) {
+				print("Hit continent: \(hitContinent.name) with \(hitContinent.children.count) countries")
+				userState.visitPlace(hitContinent)
+				placeName.text = hitContinent.name
 				
-				if let hitContinent = closedCandidateContinents.first(where: { $0.name == hitRegion.name }) {
-					mapRenderer.updatePrimitives(forGeography: hitContinent.geography,
-																			 withSubregions: Set(hitContinent.countries.map { $0.geography }))
-					poiRenderer.updatePrimitives(forRegion: hitContinent.geography,
-																			 withSubregions: Set(hitContinent.countries.map { $0.geography }))
-				} else if let hitCountry = closedCandidateCountries.first(where: { $0.name == hitRegion.name }) {
-					mapRenderer.updatePrimitives(forGeography: hitCountry.geography,
-																			 withSubregions: hitCountry.regions)
-					poiRenderer.updatePrimitives(forRegion: hitCountry.geography,
-																			 withSubregions: hitCountry.regions)
-				}
+				mapRenderer.updatePrimitives(for: hitContinent,
+																		 with: hitContinent.children)
+				poiRenderer.updatePrimitives(for: hitContinent,
+																		 with: hitContinent.children)
+			} else if let hitCountry = pickFromTessellations(p: mapP, candidates: closedCandidateCountries) {
+				print("Hit country: \(hitCountry.name) with \(hitCountry.children.count) countries")
+				userState.visitPlace(hitCountry)
+				placeName.text = hitCountry.name
+				
+				mapRenderer.updatePrimitives(for: hitCountry,
+																		 with: hitCountry.children)
+				poiRenderer.updatePrimitives(for: hitCountry,
+																		 with: hitCountry.children)
+			} else if let hitRegion = pickFromTessellations(p: mapP, candidates: candidateRegions) {
+				print("Hit region: \(hitRegion.name)")
+				userState.visitPlace(hitRegion)
+				placeName.text = hitRegion.name
 			}
 		}
-	}
-	
-	func pickFromRegions(p: CGPoint, regions: Set<GeoRegion>) -> GeoRegion? {
-		for region in regions {
-			if triangleSoupHitTest(point: p, inVertices: region.geometry.vertices, inIndices: region.geometry.indices) {
-				return region
-			}
-		}
-		return nil
 	}
 
 	// MARK: - GLKView and GLKViewController delegate methods

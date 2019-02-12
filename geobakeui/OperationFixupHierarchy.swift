@@ -36,14 +36,25 @@ class OperationFixupHierarchy : Operation {
 		var geoCountries = Set<GeoCountry>()
 		let numRegions = remainingRegions.count
 		for country in countryList {
-			let belongingRegions = remainingRegions.filter {
-				$0.admin == country.admin
+			let countryAabb = country.aabb
+			let candidateRegions = remainingRegions.filter {
+				let regionCenter = CGPoint(x: $0.aabb.midpoint.x, y: $0.aabb.midpoint.y)
+				return aabbHitTest(p: regionCenter, aabb: countryAabb)
 			}
-		
+			let belongingRegions = candidateRegions.filter {
+				let regionCenter = CGPoint(x: $0.aabb.midpoint.x, y: $0.aabb.midpoint.y)
+				return pickFromTessellations(p: regionCenter, candidates: Set([country])) != nil
+			}
+			
+			print(country.name)
+			print(belongingRegions.map { $0.name }.joined(separator: ", "))
+			
 			let places = Set(belongingRegions.flatMap { $0.places })
-			let newCountry = GeoCountry(geography: country,
-																	regions: belongingRegions,
-																	places: places)
+			
+			let newCountry = GeoCountry(name: country.name,
+																	children: belongingRegions,
+																	places: places,
+																	geometry: country.geometry)
 			
 			geoCountries.insert(newCountry)
 			
@@ -60,13 +71,17 @@ class OperationFixupHierarchy : Operation {
 		var geoContinents = Set<GeoContinent>()
 		let numCountries = remainingCountries.count
 		for continent in continentList {
+			let continentAabb = continent.aabb
 			let belongingCountries = remainingCountries.filter {
-				$0.continent == continent.name
+				let countryCenter = CGPoint(x: $0.aabb.midpoint.x, y: $0.aabb.midpoint.y)
+				return aabbHitTest(p: countryCenter, aabb: continentAabb) &&
+							 pickFromTessellations(p: countryCenter, candidates: Set([continent])) != nil
 			}
 			
-			let newContintent = GeoContinent(geography: continent,
-																			 countries: belongingCountries,
-																			 places: [])
+			let newContintent = GeoContinent(name: continent.name,
+																			 children: belongingCountries,
+																			 geometry: continent.geometry)
+			
 			geoContinents.insert(newContintent)
 			remainingCountries.subtract(belongingCountries)
 			if (numCountries > 0) {
@@ -75,7 +90,9 @@ class OperationFixupHierarchy : Operation {
 		}
 		report(1.0, "Collected \(geoCountries.count) countries into \(geoContinents.count) continents", true)
 
-		world = GeoWorld(continents: geoContinents)
+		world = GeoWorld(name: "Earth",
+										 children: geoContinents)
+		
 		report(1.0, "Assembled completed world.", true)
 		print("             - Continent regions:  \(continentList.count)")
 		print("             - Country regions:  \(countryList.count)")
@@ -83,12 +100,12 @@ class OperationFixupHierarchy : Operation {
 		
 		if !remainingRegions.isEmpty {
 			print("Remaining countries:")
-			print(remainingCountries.map { "\($0.name) in \($0.admin)" })
+			print(remainingCountries.map { "\($0.name)" })
 		}
 
 		if !remainingRegions.isEmpty {
 			print("Remaining regions:")
-			print(remainingRegions.map { "\($0.name) in \($0.admin)" })
+			print(remainingRegions.map { "\($0.name)" })
 		}
 		
 		print("\n")

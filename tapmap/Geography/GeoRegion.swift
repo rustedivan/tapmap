@@ -45,6 +45,9 @@ struct Aabb : Equatable, Codable {
 		maxY = hiY
 	}
 	
+	var midpoint: Vertex { return Vertex(Vertex.Precision(minX + (maxX - minX) / 2.0),
+																			 Vertex.Precision(minY + (maxY - minY) / 2.0)) }
+	
 	static func ==(lhs: Aabb, rhs: Aabb) -> Bool {
 		return	lhs.minX == rhs.minX &&
 						lhs.maxX == rhs.maxX &&
@@ -59,57 +62,89 @@ struct GeoTessellation : Codable {
 	let aabb: Aabb
 }
 
-struct GeoRegion : Codable, Equatable, Hashable {
+protocol Renderable {
+	func renderPrimitive() -> RenderPrimitive
+}
+
+protocol GeoIdentifiable : Hashable {
+	var name : String { get }
+	var aabb : Aabb { get }
+}
+
+protocol GeoPlaceHaver {
+	var places : Set<GeoPlace> { get }
+	func placesRenderPlane() -> RenderPrimitive
+}
+
+protocol GeoTessellationHaver : Renderable {
+	var geometry : GeoTessellation { get }
+}
+
+protocol GeoNode : GeoIdentifiable {
+	associatedtype SubType : GeoIdentifiable & Renderable
+	var children : Set<SubType> { get }
+}
+
+
+struct GeoRegion : GeoIdentifiable, GeoPlaceHaver, GeoTessellationHaver, Codable, Equatable {
 	let name: String
-	let admin: String
-	let continent: String
-	let geometry: GeoTessellation
+	var geometry: GeoTessellation
 	let places: Set<GeoPlace>
+	var aabb : Aabb { return geometry.aabb }
 	
 	public static func == (lhs: GeoRegion, rhs: GeoRegion) -> Bool {
-		return lhs.name == rhs.name && lhs.admin == rhs.admin
+		return lhs.name == rhs.name && lhs.aabb.midpoint == rhs.aabb.midpoint
 	}
 	
 	public var hashValue: Int {
-		return (name + "." + admin).hashValue
+		return ("\(name)@\(aabb.midpoint.quantized)").hashValue
 	}
 }
 
-struct GeoCountry : Codable, Equatable, Hashable {
-	let geography: GeoRegion
-	let regions: Set<GeoRegion>
+struct GeoCountry : GeoNode, GeoPlaceHaver, GeoTessellationHaver, Codable, Equatable {
+	typealias SubType = GeoRegion
+	var name: String
+	let children: Set<GeoRegion>
 	let places: Set<GeoPlace>
-	var name: String { get { return geography.name } }
-	var admin: String { get { return geography.admin } }
-	var continent: String { get { return geography.continent } }
+	
+	let geometry: GeoTessellation
+	var aabb : Aabb { return geometry.aabb }
+	
 	
 	public static func == (lhs: GeoCountry, rhs: GeoCountry) -> Bool {
-		return lhs.geography == rhs.geography
+		return lhs.name == rhs.name && lhs.aabb.midpoint == rhs.aabb.midpoint
 	}
 	
 	public var hashValue: Int {
-		return geography.hashValue
+		return ("\(name)@\(aabb.midpoint.quantized)").hashValue
 	}
 }
 
-struct GeoContinent : Codable, Equatable, Hashable {
-	let geography: GeoRegion
-	let countries: Set<GeoCountry>
-	let places: Set<GeoPlace>
+struct GeoContinent : GeoNode, GeoTessellationHaver, Codable, Equatable, Hashable {
+	typealias SubType = GeoCountry
 	
-	var name: String { get { return geography.name } }
+	var name: String
+	
+	let children: Set<GeoCountry>
+	let geometry: GeoTessellation
+	var aabb : Aabb { return geometry.aabb }
 	
 	public static func == (lhs: GeoContinent, rhs: GeoContinent) -> Bool {
-		return lhs.geography == rhs.geography
+		return lhs.name == rhs.name
 	}
 	
 	public var hashValue: Int {
-		return geography.hashValue
+		return name.hashValue
 	}
 }
 
-struct GeoWorld : Codable {
-	let continents: Set<GeoContinent>
+struct GeoWorld : GeoNode, Codable {
+	typealias SubType = GeoContinent
+	
+	let name: String
+	var aabb : Aabb { return Aabb(loX: -180.0, loY: -85.0, hiX: 180.0, hiY: 85.0) }
+	
+	let children: Set<GeoContinent>
 }
 
 struct GeoPlace : Codable, Equatable, Hashable {

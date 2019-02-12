@@ -25,29 +25,26 @@ class MapRenderer {
 		
 		let userState = AppDelegate.sharedUserState
 		
-		let openContinents = geoWorld.continents.filter { userState.placeVisited($0.geography) }
-		let closedContinents = geoWorld.continents.subtracting(openContinents)
+		let openContinents = geoWorld.children.filter { userState.placeVisited($0) }
+		let closedContinents = geoWorld.children.subtracting(openContinents)
 		
-		let countries = Set(openContinents.flatMap { $0.countries })
-		let openCountries = countries.filter { userState.placeVisited($0.geography) }
+		let countries = Set(openContinents.flatMap { $0.children })
+		let openCountries = countries.filter { userState.placeVisited($0) }
 		let closedCountries = countries.subtracting(openCountries)
 		
 		// Finally form a list of box-collided regions of opened countries
-		let regions = Set(openCountries.flatMap { $0.regions })
+		let regions = Set(openCountries.flatMap { $0.children })
 		let openRegions = regions.filter { userState.placeVisited($0) }
 		let closedRegions = regions.subtracting(openRegions)
 		
 		// Now we have three sets of closed geographies that we could open
-		var candidateGeographies: Set<GeoRegion> = []
-		candidateGeographies.formUnion(closedContinents.map { $0.geography })
-		candidateGeographies.formUnion(closedCountries.map { $0.geography })
-		candidateGeographies.formUnion(closedRegions)
-		
 		// Collect a flat list of all primitives and their hash keys
-		let hashedPrimitivesList = candidateGeographies.map { ($0.hashValue, $0.renderPrimitive())}
+		let hashedPrimitivesList = closedContinents.map { ($0.hashValue, $0.renderPrimitive()) } +
+															 closedCountries.map { ($0.hashValue, $0.renderPrimitive()) } +
+															 closedRegions.map { ($0.hashValue, $0.renderPrimitive()) }
 		
 		// Insert them into the primitive dictionary, ignoring any later duplicates
-		regionPrimitives = Dictionary(hashedPrimitivesList, uniquingKeysWith: { (l, r) in l })
+		regionPrimitives = Dictionary(hashedPrimitivesList, uniquingKeysWith: { (l, r) in print("Inserting bad"); return l })
 	}
 	
 	deinit {
@@ -56,14 +53,14 @@ class MapRenderer {
 		}
 	}
 	
-	func updatePrimitives(forGeography geography: GeoRegion, withSubregions regions: Set<GeoRegion>) {
-		if AppDelegate.sharedUserState.placeVisited(geography) {
-			regionPrimitives.removeValue(forKey: geography.hashValue)
-			
-			let hashedPrimitives = regions.map {
+	func updatePrimitives<T:GeoNode>(for node: T, with subRegions: Set<T.SubType>) {
+		if AppDelegate.sharedUserState.placeVisited(node) {
+			regionPrimitives.removeValue(forKey: node.hashValue)
+
+			let hashedPrimitives = subRegions.map {
 				($0.hashValue, $0.renderPrimitive())
 			}
-			regionPrimitives.merge(hashedPrimitives, uniquingKeysWith: { (l, r) in l })
+			regionPrimitives.merge(hashedPrimitives, uniquingKeysWith: { (l, r) in print("Replacing"); return l })
 		}
 	}
 	

@@ -41,8 +41,6 @@ class OperationTessellateRegions : Operation {
 				let shortName = feature.name.prefix(16)
 				report(progress, "\(totalTris) triangles @ \(shortName)", false)
 				return GeoRegion(name: feature.name,
-												 admin: feature.admin,
-												 continent: feature.continent,
 												 geometry: tessellation,
 												 places: [])
 			} else {

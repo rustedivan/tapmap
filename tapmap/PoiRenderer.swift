@@ -25,18 +25,18 @@ class PoiRenderer {
 		
 		let userState = AppDelegate.sharedUserState
 		
-		let openContinents = geoWorld.continents.filter { userState.placeVisited($0.geography) }
+		let openContinents = geoWorld.children.filter { userState.placeVisited($0) }
 		
-		let countries = Set(openContinents.flatMap { $0.countries })
-		let openCountries = countries.filter { userState.placeVisited($0.geography) }
+		let countries = Set(openContinents.flatMap { $0.children })
+		let openCountries = countries.filter { userState.placeVisited($0) }
 		let closedCountries = countries.subtracting(openCountries)
 		
-		let regions = Set(openCountries.flatMap { $0.regions })
+		let regions = Set(openCountries.flatMap { $0.children })
 		let openRegions = regions.filter { userState.placeVisited($0) }
 		let closedRegions = regions.subtracting(openRegions)
 		
-		let visibleCountryPoiPlanes = closedCountries.map { ($0.hashValue, createPoiPlane($0.places, debugName: $0.name)) }
-		let visibleRegionPoiPlanes = closedRegions.map { ($0.hashValue, createPoiPlane($0.places, debugName: $0.name)) }
+		let visibleCountryPoiPlanes = closedCountries.map { ($0.hashValue, $0.placesRenderPlane()) }
+		let visibleRegionPoiPlanes = closedRegions.map { ($0.hashValue, $0.placesRenderPlane()) }
 		let visiblePoiPlanes = visibleCountryPoiPlanes + visibleRegionPoiPlanes
 		
 		// Insert them into the primitive dictionary, ignoring any later duplicates
@@ -49,11 +49,11 @@ class PoiRenderer {
 		}
 	}
 	
-	func updatePrimitives(forRegion region: GeoRegion, withSubregions regions: Set<GeoRegion>) {
-		if AppDelegate.sharedUserState.placeVisited(region) {
-			regionPrimitives.removeValue(forKey: region.hashValue)
-			
-			let hashedPrimitives = regions.map { ($0.hashValue, createPoiPlane($0.places, debugName: $0.name)) }
+	func updatePrimitives<T:GeoNode>(for node: T, with subRegions: Set<T.SubType>) where T.SubType : GeoPlaceHaver{
+		if AppDelegate.sharedUserState.placeVisited(node) {
+			regionPrimitives.removeValue(forKey: node.hashValue)
+
+			let hashedPrimitives = subRegions.map { ($0.hashValue, $0.placesRenderPlane()) }
 			regionPrimitives.merge(hashedPrimitives, uniquingKeysWith: { (l, r) in l })
 		}
 	}
@@ -80,29 +80,4 @@ class PoiRenderer {
 		}
 		glPopGroupMarkerEXT()
 	}
-}
-
-fileprivate func createPoiPlane(_ places: Set<GeoPlace>, debugName: String) -> RenderPrimitive {
-	let vertices = places.reduce([]) { (accumulator: [Vertex], place: GeoPlace) in
-		let size = 0.2 / 2.0
-		let v0 = Vertex(0.0, size)
-		let v1 = Vertex(size, 0.0)
-		let v2 = Vertex(0.0, -size)
-		let v3 = Vertex(-size, 0.0)
-		let verts = [v0, v1, v2, v3].map { $0 + place.location }
-		return accumulator + verts
-	}
-	
-	let triangleRange = 0..<UInt32(places.count * 2)
-	let indices = triangleRange.reduce([]) { (accumulator: [UInt32], triIndex: UInt32) in
-		let quadIndices: [UInt32] = [0, 2, 1, 0, 3, 2]	// Build two triangles from the four quad vertices
-		let vertexOffset = triIndex * 4
-		let offsetIndices = quadIndices.map { $0 + vertexOffset }
-		return accumulator + offsetIndices
-	}
-	
-	return RenderPrimitive(vertices: vertices,
-												 indices: indices,
-												 color: (r: 1.0, g: 0.0, b: 0.0, a: 0.7),
-												 debugName: debugName)
 }

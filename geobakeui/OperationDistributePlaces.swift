@@ -34,7 +34,7 @@ class OperationDistributePlaces : Operation {
 			// Find all places that fit into the region's aabb
 			let candidatePlaces = remainingPlaces.filter {
 				aabbHitTest(p: CGPoint(x: $0.location.x,
-															 y: $0.location.y), in: region)
+															 y: $0.location.y), aabb: region.aabb)
 			}
 			
 			// Perform point-in-triangle tests
@@ -47,8 +47,6 @@ class OperationDistributePlaces : Operation {
 			
 			// Recreate the GeoRegion with place set
 			let updatedRegion = GeoRegion(name: region.name,
-																		admin: region.admin,
-																		continent: region.continent,
 																		geometry: region.geometry,
 																		places: Set(belongingPlaces))
 			

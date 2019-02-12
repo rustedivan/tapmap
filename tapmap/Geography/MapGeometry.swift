@@ -31,15 +31,24 @@ func mapPoint(_ p: CGPoint, from a: CGRect, to b: CGRect) -> CGPoint {
 	return CGPoint(x: u, y: v)
 }
 
-func aabbHitTest(p: CGPoint, in region: GeoRegion) -> Bool{
-	let aabb = region.geometry.aabb
-	
+func aabbHitTest(p: CGPoint, aabb: Aabb) -> Bool {
 	// $ Replace aabb with CGRect directly.
 	let rect = CGRect(x: Double(aabb.minX), y: Double(aabb.minY), width: Double(aabb.maxX - aabb.minX), height: Double(aabb.maxY - aabb.minY))
 	
 	GeometryCounters.aabbHitCount += 1
 	
 	return rect.contains(p)
+}
+
+func pickFromTessellations<T:GeoTessellationHaver>(p: CGPoint, candidates: Set<T>) -> T? {
+	for tessellation in candidates {
+		if triangleSoupHitTest(point: p,
+													 inVertices: tessellation.geometry.vertices,
+													 inIndices: tessellation.geometry.indices) {
+			return tessellation
+		}
+	}
+	return nil
 }
 
 // Assumes triangles is CCW GL_TRIANGLES mode (consecutive triplets form triangles)
@@ -97,10 +106,10 @@ func triangleSoupHitTest(point p: CGPoint, inVertices vertices: [Vertex], inIndi
 		// to find L vector and the implicit l3.
 		let l1 = ( t22 * r0 + -t12 * r1) / det
 		let l2 = (-t21 * r0 +  t11 * r1) / det
-		let l3 = 1.0 - l1 - l2
+//		let l3 = 1.0 - l1 - l2
 		
 		// p is in t if all barycentric coordinates are in 0..1
-		if l1 >= 0.0 && l2 >= 0.0 && (l1 + l2 + l3 <= 1.0) {
+		if l1 >= 0.0 && l2 >= 0.0 && (l1 + l2 <= 1.0) {
 			return true
 		}
 	}

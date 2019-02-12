@@ -56,7 +56,7 @@ class OperationBakeGeometry : Operation {
 		let placeDistributionJob = OperationDistributePlaces(regions: Set(regionTessJob.tessellatedRegions),
 																												 places: places,
 																												 reporter: report)
-		placeDistributionJob.start()
+//		placeDistributionJob.start()
 		let regionCollection = placeDistributionJob.regionsWithPlaces != nil
 					? Array(placeDistributionJob.regionsWithPlaces!)
 					: regionTessJob.tessellatedRegions
