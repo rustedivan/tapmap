@@ -45,8 +45,8 @@ struct Aabb : Equatable, Codable {
 		maxY = hiY
 	}
 	
-	var midpoint: Vertex { return Vertex(Vertex.Precision(minX + (maxX - minX) / 2.0),
-																			 Vertex.Precision(minY + (maxY - minY) / 2.0)) }
+	var midpoint: Vertex { return Vertex(Vertex.Precision(minX + ((maxX - minX) / 2.0)),
+																			 Vertex.Precision(minY + ((maxY - minY) / 2.0))) }
 	
 	static func ==(lhs: Aabb, rhs: Aabb) -> Bool {
 		return	lhs.minX == rhs.minX &&
