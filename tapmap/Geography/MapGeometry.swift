@@ -106,10 +106,12 @@ func triangleSoupHitTest(point p: CGPoint, inVertices vertices: [Vertex], inIndi
 		// to find L vector and the implicit l3.
 		let l1 = ( t22 * r0 + -t12 * r1) / det
 		let l2 = (-t21 * r0 +  t11 * r1) / det
-//		let l3 = 1.0 - l1 - l2
+		let l3 = 1.0 - l1 - l2
 		
 		// p is in t if all barycentric coordinates are in 0..1
-		if l1 >= 0.0 && l2 >= 0.0 && (l1 + l2 <= 1.0) {
+		if l1 >= 0.0 && l1 <= 1.0 &&
+			 l2 >= 0.0 && l2 <= 1.0 &&
+			 l3 >= 0.0 && l3 <= 1.0 {
 			return true
 		}
 	}
