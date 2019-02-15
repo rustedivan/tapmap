@@ -26,6 +26,7 @@
 		1448236121754A3000FFBBEB /* GeoBakingViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 141F25C71EA4B3B800DA808F /* GeoBakingViewController.swift */; };
 		1448236221754A3000FFBBEB /* RegionOutlineView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14F148A91EA383CC00D419AB /* RegionOutlineView.swift */; };
 		1448236321754A3000FFBBEB /* ToolGeometry.swift in Sources */ = {isa = PBXBuildFile; fileRef = 149E2EDF1FCFDC47008387A2 /* ToolGeometry.swift */; };
+		1448CCD122153BBA0015C711 /* nullrenderer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1413B5D622135E5400D51AAA /* nullrenderer.swift */; };
 		144A55B121FB4842001CC231 /* OperationAssembleContinents.swift in Sources */ = {isa = PBXBuildFile; fileRef = 144A55B021FB4842001CC231 /* OperationAssembleContinents.swift */; };
 		144A55B221FB4842001CC231 /* OperationAssembleContinents.swift in Sources */ = {isa = PBXBuildFile; fileRef = 144A55B021FB4842001CC231 /* OperationAssembleContinents.swift */; };
 		1452103B1E98D4F30029942F /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1452103A1E98D4F30029942F /* AppDelegate.swift */; };
@@ -946,6 +947,7 @@
 				14BD7301220E424C00CDD7D9 /* KDTree.swift in Sources */,
 				14FF12F521EE8B4700AF4474 /* Serialization.swift in Sources */,
 				145A73ED220F5DC100BBEB82 /* OperationParseOSMJson.swift in Sources */,
+				1448CCD122153BBA0015C711 /* nullrenderer.swift in Sources */,
 				144A55B221FB4842001CC231 /* OperationAssembleContinents.swift in Sources */,
 				14FF12F321EE8B1400AF4474 /* GeoRegion.swift in Sources */,
 				14FF12F121EE8A6000AF4474 /* ToolGeometry.swift in Sources */,
