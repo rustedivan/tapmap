@@ -9,6 +9,7 @@
 import Foundation
 import LibTessSwift
 
+// MARK: Structures
 struct Vertex : Equatable, Hashable, PointForm {
 	typealias Precision = Double
 	var p: Vertex { return self }
@@ -79,6 +80,8 @@ struct Polygon {
 						 interiorRings.reduce(0) { $0 + $1.vertices.count }
 	}
 }
+
+// MARK: Algorithms
 
 func snapPointToEdge(p: Vertex, threshold: Double, edge: (a : Vertex, b : Vertex)) -> (Vertex, Double) {
 	let a = edge.a

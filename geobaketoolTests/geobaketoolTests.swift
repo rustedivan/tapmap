@@ -14,12 +14,12 @@ func silentReport(_: Double, _:String, _:Bool) {
 
 class geobaketoolTests: XCTestCase {
 	func testSimpleTessellation() {
-		let r = GeoPolygonRing(vertices: [ Vertex(1.0, 1.5),
+		let r = VertexRing(vertices: [ Vertex(1.0, 1.5),
 																			 Vertex(3.0, 1.5),
 																			 Vertex(4.0, 3.0),
 																			 Vertex(2.0, 4.5)])
-		let p = GeoPolygon(exteriorRing: r, interiorRings: [])
-		let f = GeoFeature(level: .Region, polygons: [p], stringProperties: [:], valueProperties: [:])
+		let p = Polygon(exteriorRing: r, interiorRings: [])
+		let f = ToolGeoFeature(level: .Region, polygons: [p], stringProperties: [:], valueProperties: [:])
 		let tessellation = tessellate(f)!
 		let b = Aabb(loX: 1.0, loY: 1.5, hiX: 4.0, hiY: 4.5)
 		XCTAssertEqual(tessellation.indices, [0, 1, 2, 1, 0, 3])
@@ -84,9 +84,9 @@ class geobaketoolTests: XCTestCase {
 		let v3 = Vertex(5.0, 0.0)
 		let v4 = Vertex(10.0, 5.0)
 
-		let ring1 = GeoPolygonRing(vertices: [v0, v1, v2])
-		let ring2 = GeoPolygonRing(vertices: [v2, v1, v3])
-		let ring3 = GeoPolygonRing(vertices: [v2, v3, v4])
+		let ring1 = VertexRing(vertices: [v0, v1, v2])
+		let ring2 = VertexRing(vertices: [v2, v1, v3])
+		let ring3 = VertexRing(vertices: [v2, v3, v4])
 
 		let edgeCardinalities = countEdgeCardinalities(rings: [ring1, ring2, ring3])
 
@@ -112,7 +112,7 @@ class geobaketoolTests: XCTestCase {
 		print(v3.hashValue)
 		print(v4.hashValue)
 		
-		let ring1 = GeoPolygonRing(vertices: [v0, v1, v2, v3, v4])
+		let ring1 = VertexRing(vertices: [v0, v1, v2, v3, v4])
 		let edgeCardinalities = countEdgeCardinalities(rings: [ring1])
 		XCTAssertEqual(edgeCardinalities.count, 5)
 	}
@@ -130,7 +130,7 @@ class geobaketoolTests: XCTestCase {
 		let e3 = Edge(v3, v4)
 		let e4 = Edge(v4, v0)
 
-		let orderedRing = GeoPolygonRing(edges: [e0, e1, e2, e3, e4])
+		let orderedRing = VertexRing(edges: [e0, e1, e2, e3, e4])
 		XCTAssertEqual(orderedRing.vertices, [v0, v1, v2, v3, v4])
 		let unorderedEdges = [e0, e3, e1, e2, e4]
 		let reorderedRing = buildContiguousEdgeRings(edges: unorderedEdges, report: silentReport)[0]
@@ -145,9 +145,9 @@ class geobaketoolTests: XCTestCase {
 		let v3 = Vertex(5.0, 0.0)
 		let v4 = Vertex(15.0, 5.0)
 
-		let ring1 = GeoPolygonRing(vertices: [v0, v1, v2])
-		let ring2 = GeoPolygonRing(vertices: [v2, v1, v3])
-		let ring3 = GeoPolygonRing(vertices: [v2, v3, v4])
+		let ring1 = VertexRing(vertices: [v0, v1, v2])
+		let ring2 = VertexRing(vertices: [v2, v1, v3])
+		let ring3 = VertexRing(vertices: [v2, v3, v4])
 
 		let contour = buildContourOf(rings: [ring1, ring2, ring3], report: silentReport)[0]
 		XCTAssertTrue(contour.vertices.contains(v0))
@@ -183,7 +183,7 @@ class geobaketoolTests: XCTestCase {
 		let v3 = Vertex( 0.000005,  0.000000)
 		let v4 = Vertex( 0.000015,  0.000005)
 		
-		let ring1 = GeoPolygonRing(vertices: [v0, v1, v2, v3, v4])
+		let ring1 = VertexRing(vertices: [v0, v1, v2, v3, v4])
 		
 		let contour = buildContourOf(rings: [ring1], report: silentReport)[0]
 		XCTAssertTrue(contour.vertices.contains(v0))
@@ -202,8 +202,8 @@ class geobaketoolTests: XCTestCase {
 		let v21 = Vertex(0.0, 0.0)
 		let v22 = Vertex(-5.0, -5.0)
 
-		let ring1 = GeoPolygonRing(vertices: [v10, v11, v12])
-		let ring2 = GeoPolygonRing(vertices: [v20, v21, v22])
+		let ring1 = VertexRing(vertices: [v10, v11, v12])
+		let ring2 = VertexRing(vertices: [v20, v21, v22])
 
 		let contour = buildContourOf(rings: [ring1, ring2], report: silentReport)
 		XCTAssertEqual(contour.count, 2)
