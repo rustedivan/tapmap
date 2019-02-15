@@ -13,11 +13,11 @@ import simd
 class OperationCleanUpBorders : Operation {
 	let report : ProgressReport
 	let distanceThresholdSqr = 0.1 * 0.1
-	let country : GeoFeature
+	let country : ToolGeoFeature
 	let regions : GeoFeatureCollection
 	var snappedRegions : GeoFeatureCollection?
 	
-	init(country _country : GeoFeature, regions _regions : GeoFeatureCollection, reporter: @escaping ProgressReport) {
+	init(country _country : ToolGeoFeature, regions _regions : GeoFeatureCollection, reporter: @escaping ProgressReport) {
 		report = reporter
 		country = _country
 		regions = _regions
@@ -30,7 +30,7 @@ class OperationCleanUpBorders : Operation {
 		snappedRegions = cleanUpRegionBorders(country: country, regions: regions)
 	}
 	
-	func cleanUpRegionBorders(country: GeoFeature, regions: GeoFeatureCollection) -> GeoFeatureCollection {
+	func cleanUpRegionBorders(country: ToolGeoFeature, regions: GeoFeatureCollection) -> GeoFeatureCollection {
 		var snappedRegions = GeoFeatureCollection(features: [])
 		var countryEdges : [(a : Vertex, b : Vertex)] = []
 		

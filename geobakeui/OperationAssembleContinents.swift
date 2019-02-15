@@ -25,7 +25,7 @@ class OperationAssembleContinents : Operation {
 		guard !isCancelled else { print("Cancelled before starting"); return }
 		
 		print("Assembling continents")
-		var continentCountries = [String : Set<GeoFeature>]()
+		var continentCountries = [String : Set<ToolGeoFeature>]()
 		for country in countries.features {
 			if continentCountries[country.continent] == nil {
 				continentCountries[country.continent] = []
@@ -39,14 +39,14 @@ class OperationAssembleContinents : Operation {
 		}
 		
 		print("Building continent contours...")
-		var continentFeatures = Set<GeoFeature>()
+		var continentFeatures = Set<ToolGeoFeature>()
 		for countryList in continentCountries {
 			let contourRings = countryList.value.flatMap { $0.polygons.map { $0.exteriorRing } }
 			
 			let continentRings = buildContourOf(rings: contourRings, report: report, countryList.key)
 			print("Collected \(contourRings.count) country rings into \(continentRings.count) continent rings.")
-			let geometry = continentRings.map { GeoPolygon(exteriorRing: $0, interiorRings: []) }
-			let continent = GeoFeature(level: .Continent,
+			let geometry = continentRings.map { Polygon(exteriorRing: $0, interiorRings: []) }
+			let continent = ToolGeoFeature(level: .Continent,
 																 polygons: geometry,
 																 stringProperties: ["name" : countryList.key],
 																 valueProperties: [:])
@@ -60,7 +60,7 @@ class OperationAssembleContinents : Operation {
 }
 
 
-func countEdgeCardinalities(rings: [GeoPolygonRing]) -> [Edge : Int] {
+func countEdgeCardinalities(rings: [VertexRing]) -> [Edge : Int] {
 	var cardinalities: [Edge : Int] = [:]
 
 	for r in rings {
@@ -80,8 +80,8 @@ func countEdgeCardinalities(rings: [GeoPolygonRing]) -> [Edge : Int] {
 	return cardinalities
 }
 
-func buildContiguousEdgeRings(edges: [Edge], report: ProgressReport, _ reportName: String = "") -> [GeoPolygonRing] {
-	var rings: [GeoPolygonRing] = []
+func buildContiguousEdgeRings(edges: [Edge], report: ProgressReport, _ reportName: String = "") -> [VertexRing] {
+	var rings: [VertexRing] = []
 	var workVertices: [Vertex] = []
 	var workEdges: [Int : Edge] = [:]
 	
@@ -100,7 +100,7 @@ func buildContiguousEdgeRings(edges: [Edge], report: ProgressReport, _ reportNam
 			workEdges.removeValue(forKey: foundEdge.p.hashValue)
 		} else {
 			// If there is no edge leading away, this ring has closed. Restart.
-			rings.append(GeoPolygonRing(vertices: workVertices))
+			rings.append(VertexRing(vertices: workVertices))
 			if let restartEdge = workEdges.first?.value {
 				workVertices = [restartEdge.p]
 			} else {
@@ -112,13 +112,13 @@ func buildContiguousEdgeRings(edges: [Edge], report: ProgressReport, _ reportNam
 	}
 	
 	// Insert the last ring too
-	rings.append(GeoPolygonRing(vertices: workVertices))
+	rings.append(VertexRing(vertices: workVertices))
 	report(1.0, "\(reportName) (\(rings.count) rings)", true)
 	
 	return rings
 }
 
-func buildContourOf(rings: [GeoPolygonRing], report: ProgressReport, _ reportName: String = "") -> [GeoPolygonRing] {
+func buildContourOf(rings: [VertexRing], report: ProgressReport, _ reportName: String = "") -> [VertexRing] {
 	let edgeCardinalities = countEdgeCardinalities(rings: rings)
 	let contourEdges = edgeCardinalities
 		.filter{ $0.1 == 1 }

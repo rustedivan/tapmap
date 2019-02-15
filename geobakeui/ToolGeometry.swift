@@ -52,7 +52,7 @@ struct Edge : Equatable, Hashable, PointForm {
 	}
 }
 
-struct GeoPolygonRing {
+struct VertexRing {
 	var vertices: [Vertex]
 	var contour : [CVector3] {
 		return vertices.map { CVector3(x: Float($0.x), y: Float($0.y), z: 0.0) }
@@ -70,58 +70,13 @@ struct GeoPolygonRing {
 	}
 }
 
-struct GeoPolygon {
-	var exteriorRing: GeoPolygonRing
-	var interiorRings: [GeoPolygonRing]
+struct Polygon {
+	var exteriorRing: VertexRing
+	var interiorRings: [VertexRing]
 	
 	func totalVertexCount() -> Int {
 			return exteriorRing.vertices.count +
 						 interiorRings.reduce(0) { $0 + $1.vertices.count }
-	}
-}
-
-struct GeoFeature : Equatable, Hashable {
-	enum Level {
-		case Continent
-		case Country
-		case Region
-	}
-	
-	let level: Level
-	let polygons: [GeoPolygon]
-	let stringProperties: [String : String]
-	let valueProperties: [String : Double]
-	
-	var name : String {
-		return stringProperties["name"] ?? stringProperties["NAME"] ?? "Unnamed"
-	}
-	
-	var admin : String {
-		return stringProperties["adm0_a3"] ?? stringProperties["ADM0_A3"] ?? "No admin"
-	}
-	
-	var continent : String {
-		return stringProperties["continent"] ?? stringProperties["CONTINENT"] ?? "No continent"
-	}
-	
-	func totalVertexCount() -> Int {
-		return polygons.reduce(0) { $0 + $1.totalVertexCount() }
-	}
-	
-	public static func == (lhs: GeoFeature, rhs: GeoFeature) -> Bool {
-		return lhs.level == rhs.level && lhs.name == rhs.name && lhs.admin == rhs.admin
-	}
-	
-	public var hashValue: Int {
-		return level.hashValue ^ name.hashValue ^ admin.hashValue
-	}
-}
-
-struct GeoFeatureCollection {
-	let features: Set<GeoFeature>
-	
-	func totalVertexCount() -> Int {
-		return features.reduce(0) { $0 + $1.totalVertexCount() }
 	}
 }
 
@@ -148,7 +103,7 @@ func snapPointToEdge(p: Vertex, threshold: Double, edge: (a : Vertex, b : Vertex
 	return (p, Double.greatestFiniteMagnitude)
 }
 
-func tessellate(_ feature: GeoFeature) -> GeoTessellation? {
+func tessellate(_ feature: ToolGeoFeature) -> GeoTessellation? {
 	guard let tess = TessC() else {
 		print("Could not init TessC")
 		return nil
