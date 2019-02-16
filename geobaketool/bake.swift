@@ -64,13 +64,13 @@ func bakeGeometry() throws {
 	workQueue.maxConcurrentOperationCount = 1
 	workQueue.addOperations([countryParser, regionParser, citiesParser], waitUntilFinished: true)
 	
-	guard let countries = countryParser.features else {
+	guard let countries = countryParser.output else {
 		throw GeoBakePipelineError.datasetFailed(dataset: "countries")
 	}
-	guard let regions = regionParser.features else {
+	guard let regions = regionParser.output else {
 		throw GeoBakePipelineError.datasetFailed(dataset: "regions")
 	}
-	guard let cities = citiesParser.places else {
+	guard let cities = citiesParser.output else {
 		throw GeoBakePipelineError.datasetFailed(dataset: "cities")
 	}
 	

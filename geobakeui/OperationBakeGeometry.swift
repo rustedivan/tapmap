@@ -9,16 +9,16 @@
 import Foundation
 
 class OperationBakeGeometry : Operation {
-	let countries : ToolGeoFeatureCollection
-	let regions : ToolGeoFeatureCollection
+	let countries : Set<ToolGeoFeature>
+	let regions : Set<ToolGeoFeature>
 	let places : GeoPlaceCollection
 	let saveUrl : URL
 	let report : ProgressReport
 	let reportError : ErrorReport
 	var error : Error?
 	
-	init(countries countriesToBake: ToolGeoFeatureCollection,
-			 region regionsToBake: ToolGeoFeatureCollection,
+	init(countries countriesToBake: Set<ToolGeoFeature>,
+			 region regionsToBake: Set<ToolGeoFeature>,
 			 places placesToBake: GeoPlaceCollection,
 			 saveUrl url: URL,
 	     reporter: @escaping ProgressReport,
@@ -44,7 +44,12 @@ class OperationBakeGeometry : Operation {
 		bakeQueue.addOperation(continentAssemblyJob)
 		bakeQueue.waitUntilAllOperationsAreFinished()
 		
-		let continentTessJob = OperationTessellateRegions(continentAssemblyJob.continents!, reporter: report, errorReporter: reportError)
+		guard let generatedContinents = continentAssemblyJob.output else {
+			print("Continent assembly failed")
+			return
+		}
+		
+		let continentTessJob = OperationTessellateRegions(generatedContinents, reporter: report, errorReporter: reportError)
 		let countryTessJob = OperationTessellateRegions(countries, reporter: report, errorReporter: reportError)
 		let regionTessJob = OperationTessellateRegions(regions, reporter: report, errorReporter: reportError)
 		
@@ -53,14 +58,32 @@ class OperationBakeGeometry : Operation {
 		bakeQueue.addOperations([continentTessJob, countryTessJob, regionTessJob],
 														waitUntilFinished: true)
 		
-		let placeDistributionJob = OperationDistributePlaces(regions: regionTessJob.output,
+		guard let continents = continentTessJob.output else {
+			print("Continent tessellation failed.")
+			return
+		}
+		guard let countries = countryTessJob.output else {
+			print("Country tessellation failed.")
+			return
+		}
+		guard let regions = regionTessJob.output else {
+			print("Region tessellation failed.")
+			return
+		}
+		
+		let placeDistributionJob = OperationDistributePlaces(regions: regions,
 																												 places: places,
 																												 reporter: report)
-//		placeDistributionJob.start()
+		placeDistributionJob.start()
 		
-		let fixupJob = OperationFixupHierarchy(continentCollection: continentTessJob.output,
-																					 countryCollection: countryTessJob.output,
-																					 regionCollection: placeDistributionJob.output,
+		guard let regionsWithPlaces = placeDistributionJob.output else {
+			print("Place distribution into regions failed.")
+			return
+		}
+		
+		let fixupJob = OperationFixupHierarchy(continentCollection: continents,
+																					 countryCollection: countries,
+																					 regionCollection: regionsWithPlaces,
 																					 reporter: report)
 		fixupJob.start()
 		

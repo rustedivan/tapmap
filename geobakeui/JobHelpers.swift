@@ -20,7 +20,7 @@ struct ToolGeoFeature : Equatable, Hashable {
 	let polygons: [Polygon]
 	let tessellation: GeoTessellation?
 	let places: GeoPlaceCollection?
-	let children: ToolGeoFeatureCollection?
+	let children: Set<ToolGeoFeature>?
 	
 	let stringProperties: [String : String]
 	let valueProperties: [String : Double]
@@ -47,13 +47,5 @@ struct ToolGeoFeature : Equatable, Hashable {
 	
 	public var hashValue: Int {
 		return level.hashValue ^ name.hashValue ^ admin.hashValue
-	}
-}
-
-struct ToolGeoFeatureCollection {
-	let features: Set<ToolGeoFeature>
-	
-	func totalVertexCount() -> Int {
-		return features.reduce(0) { $0 + $1.totalVertexCount() }
 	}
 }

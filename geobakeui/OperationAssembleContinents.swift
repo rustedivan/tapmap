@@ -9,14 +9,15 @@
 import Foundation
 
 class OperationAssembleContinents : Operation {
-	let countries : ToolGeoFeatureCollection
-	var continents : ToolGeoFeatureCollection?
+	let input : Set<ToolGeoFeature>
+	var output : Set<ToolGeoFeature>?
 	let report : ProgressReport
 	
-	init(countries countriesOfContinent: ToolGeoFeatureCollection,
+	init(countries countriesOfContinent: Set<ToolGeoFeature>,
 			 reporter: @escaping ProgressReport) {
-		countries = countriesOfContinent
+		input = countriesOfContinent
 		report = reporter
+		output = input
 		
 		super.init()
 	}
@@ -26,7 +27,7 @@ class OperationAssembleContinents : Operation {
 		
 		print("Assembling continents")
 		var continentCountries = [String : Set<ToolGeoFeature>]()
-		for country in countries.features {
+		for country in input {
 			if continentCountries[country.continent] == nil {
 				continentCountries[country.continent] = []
 			}
@@ -56,7 +57,7 @@ class OperationAssembleContinents : Operation {
 			continentFeatures.insert(continent)
 		}
 		
-		continents = ToolGeoFeatureCollection(features: continentFeatures)
+		output = continentFeatures
 		
 		report(1.0, "Done.", true)
 	}

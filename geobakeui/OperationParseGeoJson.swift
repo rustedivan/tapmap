@@ -10,13 +10,13 @@ import Foundation
 import SwiftyJSON
 
 class OperationParseGeoJson : Operation {
-	let json : JSON
+	let input : JSON
 	let report : ProgressReport
 	let level : ToolGeoFeature.Level
-	var features : ToolGeoFeatureCollection?
+	var output : Set<ToolGeoFeature>?
 
 	init(json _json: JSON, as _level: ToolGeoFeature.Level, reporter: @escaping ProgressReport) {
-		json = _json
+		input = _json
 		level = _level
 		report = reporter
 	}
@@ -25,12 +25,12 @@ class OperationParseGeoJson : Operation {
 		guard !isCancelled else { print("Cancelled before starting"); return }
 		
 		report(0.0, "Parsing \(level)", false)
-		features = parseFeatures(json: json, dataSet: level)
+		output = parseFeatures(json: input, dataSet: level)
 		report(1.0, "Parsed \(level)", true)
 	}
 	
 	fileprivate func parseFeatures(json: JSON,
-																 dataSet: ToolGeoFeature.Level) -> ToolGeoFeatureCollection? {
+																 dataSet: ToolGeoFeature.Level) -> Set<ToolGeoFeature>? {
 		guard json["type"] == "FeatureCollection" else {
 			print("Root node is not multi-feature")
 			return nil
@@ -50,7 +50,7 @@ class OperationParseGeoJson : Operation {
 			}
 		}
 		
-		return ToolGeoFeatureCollection(features: loadedFeatures)
+		return loadedFeatures
 	}
 	
 	fileprivate func parseFeature(_ json: JSON, into level: ToolGeoFeature.Level) -> ToolGeoFeature? {

@@ -14,10 +14,10 @@ class OperationCleanUpBorders : Operation {
 	let report : ProgressReport
 	let distanceThresholdSqr = 0.1 * 0.1
 	let country : ToolGeoFeature
-	let regions : ToolGeoFeatureCollection
-	var snappedRegions : ToolGeoFeatureCollection?
+	let regions : Set<ToolGeoFeature>
+	var snappedRegions : Set<ToolGeoFeature>?
 	
-	init(country _country : ToolGeoFeature, regions _regions : ToolGeoFeatureCollection, reporter: @escaping ProgressReport) {
+	init(country _country : ToolGeoFeature, regions _regions : Set<ToolGeoFeature>, reporter: @escaping ProgressReport) {
 		report = reporter
 		country = _country
 		regions = _regions
@@ -30,8 +30,8 @@ class OperationCleanUpBorders : Operation {
 		snappedRegions = cleanUpRegionBorders(country: country, regions: regions)
 	}
 	
-	func cleanUpRegionBorders(country: ToolGeoFeature, regions: ToolGeoFeatureCollection) -> ToolGeoFeatureCollection {
-		var snappedRegions = ToolGeoFeatureCollection(features: [])
+	func cleanUpRegionBorders(country: ToolGeoFeature, regions: Set<ToolGeoFeature>) -> Set<ToolGeoFeature> {
+		var snappedRegions = Set<ToolGeoFeature>()
 		var countryEdges : [(a : Vertex, b : Vertex)] = []
 		
 		for p in country.polygons {
@@ -41,7 +41,7 @@ class OperationCleanUpBorders : Operation {
 			}
 		}
 		
-		for f in regions.features {
+		for f in regions {
 			var snappedRegion = f
 			for p in f.polygons {
 				var snappedVertices : [Vertex] = []

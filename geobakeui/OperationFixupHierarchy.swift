@@ -9,16 +9,16 @@
 import Foundation
 
 class OperationFixupHierarchy : Operation {
-	let continentList : ToolGeoFeatureCollection
-	let countryList : ToolGeoFeatureCollection
-	let regionList : ToolGeoFeatureCollection
+	let continentList : Set<ToolGeoFeature>
+	let countryList : Set<ToolGeoFeature>
+	let regionList : Set<ToolGeoFeature>
 	
-	var output : ToolGeoFeatureCollection
+	var output : Set<ToolGeoFeature>?
 	let report : ProgressReport
 	
-	init(continentCollection: ToolGeoFeatureCollection,
-			 countryCollection: ToolGeoFeatureCollection,
-			 regionCollection: ToolGeoFeatureCollection,
+	init(continentCollection: Set<ToolGeoFeature>,
+			 countryCollection: Set<ToolGeoFeature>,
+			 regionCollection: Set<ToolGeoFeature>,
 			 reporter: @escaping ProgressReport) {
 		
 		continentList = continentCollection
@@ -26,7 +26,7 @@ class OperationFixupHierarchy : Operation {
 		regionList = regionCollection
 		report = reporter
 		
-		output = ToolGeoFeatureCollection(features: [])
+		output = []
 		
 		super.init()
 	}
@@ -35,10 +35,10 @@ class OperationFixupHierarchy : Operation {
 		guard !isCancelled else { print("Cancelled before starting"); return }
 
 		// Collect regions into their countries
-		var remainingRegions = regionList.features
+		var remainingRegions = regionList
 		var geoCountries = Set<ToolGeoFeature>()
 		let numRegions = remainingRegions.count
-		for country in countryList.features {
+		for country in countryList {
 			let belongingRegions = remainingRegions.filter {	$0.admin == country.admin	}
 			let places = Set(belongingRegions.flatMap { $0.places ?? [] })
 			
@@ -46,7 +46,7 @@ class OperationFixupHierarchy : Operation {
 																			polygons: country.polygons,
 																			tessellation: country.tessellation,
 																			places: places,
-																			children: ToolGeoFeatureCollection(features: belongingRegions),
+																			children: belongingRegions,
 																			stringProperties: country.stringProperties,
 																			valueProperties: country.valueProperties)
 			
@@ -64,14 +64,14 @@ class OperationFixupHierarchy : Operation {
 		var remainingCountries = geoCountries
 		var geoContinents = Set<ToolGeoFeature>()
 		let numCountries = remainingCountries.count
-		for continent in continentList.features {
+		for continent in continentList {
 			let belongingCountries = remainingCountries.filter { $0.continent == continent.name }
 			
 			let newContinent = ToolGeoFeature(level: .Continent,
 																				polygons: continent.polygons,
 																				tessellation: continent.tessellation,
 																				places: nil,
-																				children: ToolGeoFeatureCollection(features: belongingCountries),
+																				children: belongingCountries,
 																				stringProperties: continent.stringProperties,
 																				valueProperties: continent.valueProperties)
 			
@@ -83,12 +83,12 @@ class OperationFixupHierarchy : Operation {
 		}
 		report(1.0, "Collected \(geoCountries.count) countries into \(geoContinents.count) continents", true)
 
-		output = ToolGeoFeatureCollection(features: geoContinents)
+		output = geoContinents
 		
 		report(1.0, "Assembled completed world.", true)
-		print("             - Continent regions:  \(continentList.features.count)")
-		print("             - Country regions:  \(countryList.features.count)")
-		print("             - Province regions: \(regionList.features.count)")
+		print("             - Continent regions:  \(continentList.count)")
+		print("             - Country regions:  \(countryList.count)")
+		print("             - Province regions: \(regionList.count)")
 		
 		if !remainingRegions.isEmpty {
 			print("Remaining countries:")

@@ -10,13 +10,13 @@ import Foundation
 import SwiftyJSON
 
 class OperationParseOSMJson : Operation {
-	let json : JSON
+	let input : JSON
 	let kind : GeoPlace.Kind
 	let report : ProgressReport
-	var places : GeoPlaceCollection?
+	var output : GeoPlaceCollection?
 
 	init(json _json: JSON, kind _kind: GeoPlace.Kind, reporter: @escaping ProgressReport) {
-		json = _json
+		input = _json
 		kind = _kind
 		report = reporter
 	}
@@ -25,7 +25,7 @@ class OperationParseOSMJson : Operation {
 		guard !isCancelled else { print("Cancelled before starting"); return }
 		
 		report(0.0, "Parsing places", false)
-		places = parsePlaces(json: json, asKind: kind)
+		output = parsePlaces(json: input, asKind: kind)
 		report(1.0, "Parsed places", true)
 	}
 	
