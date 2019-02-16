@@ -48,12 +48,12 @@ class OperationAssembleContinents : Operation {
 			print("Collected \(contourRings.count) country rings into \(continentRings.count) continent rings.")
 			let geometry = continentRings.map { Polygon(exteriorRing: $0, interiorRings: []) }
 			let continent = ToolGeoFeature(level: .Continent,
-																 polygons: geometry,
-																 tessellation: nil,
-																 places: nil,
-																 children: nil,
-																 stringProperties: ["name" : countryList.key],
-																 valueProperties: [:])
+																		 polygons: geometry,
+																		 tessellation: nil,
+																		 places: nil,
+																		 children: nil,
+																		 stringProperties: ["name" : countryList.key],
+																		 valueProperties: [:])
 			continentFeatures.insert(continent)
 		}
 		

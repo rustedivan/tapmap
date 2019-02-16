@@ -18,9 +18,9 @@ struct ToolGeoFeature : Equatable, Hashable {
 	
 	let level: Level
 	let polygons: [Polygon]
-	let tessellation: GeoTessellation?
-	let places: GeoPlaceCollection?
-	let children: Set<ToolGeoFeature>?
+	var tessellation: GeoTessellation?
+	var places: GeoPlaceCollection?
+	var children: Set<ToolGeoFeature>?
 	
 	let stringProperties: [String : String]
 	let valueProperties: [String : Double]

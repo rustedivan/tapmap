@@ -48,16 +48,8 @@ class OperationDistributePlaces : Operation {
 														inIndices: regionTessellation.indices)
 			}
 			
-			// Recreate the GeoRegion with place set
-			let updatedFeature = ToolGeoFeature(level: region.level,
-																					polygons: region.polygons,
-																					tessellation: region.tessellation,
-																					places: belongingPlaces,
-																					children: nil,
-																					stringProperties: region.stringProperties,
-																					valueProperties: region.valueProperties)
-			
-			// Insert and move on
+			var updatedFeature = region
+			updatedFeature.places = belongingPlaces
 			updatedFeatures.insert(updatedFeature)
 			
 			remainingPlaces = remainingPlaces.subtracting(belongingPlaces)
