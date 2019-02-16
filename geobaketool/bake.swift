@@ -28,6 +28,7 @@ func bakeGeometry() throws {
 		throw GeoBakePipelineError.outputPathInvalid(path: outputUrl.path)
 	}
 	
+	// MARK: Load JSON souce files
 	print("Loading...")
 	
 	progressBar(1, "Countries")
@@ -74,11 +75,69 @@ func bakeGeometry() throws {
 		throw GeoBakePipelineError.datasetFailed(dataset: "cities")
 	}
 	
-	let places = cities
+	// MARK: Continent assembly
+	let bakeQueue = OperationQueue()
+	bakeQueue.name = "Baking queue"
+	
+	let continentAssemblyJob = OperationAssembleContinents(countries: countries, reporter: reportLoad)
+	
+	bakeQueue.addOperation(continentAssemblyJob)
+	bakeQueue.waitUntilAllOperationsAreFinished()
+	
+	guard let generatedContinents = continentAssemblyJob.output else {
+		print("Continent assembly failed")
+		return
+	}
+	
+	// MARK: Tessellate geometry
+	
+	let continentTessJob = OperationTessellateRegions(generatedContinents, reporter: reportLoad, errorReporter: reportError)
+	let countryTessJob = OperationTessellateRegions(countries, reporter: reportLoad, errorReporter: reportError)
+	let regionTessJob = OperationTessellateRegions(regions, reporter: reportLoad, errorReporter: reportError)
+	
+	continentTessJob.addDependency(continentAssemblyJob)
+	
+	bakeQueue.addOperations([continentTessJob, countryTessJob, regionTessJob],
+													waitUntilFinished: true)
+	
+	guard let tessellatedContinents = continentTessJob.output else {
+		print("Continent tessellation failed.")
+		return
+	}
+	guard let tessellatedCountries = countryTessJob.output else {
+		print("Country tessellation failed.")
+		return
+	}
+	guard let tessellatedRegions = regionTessJob.output else {
+		print("Region tessellation failed.")
+		return
+	}
+	
+	// MARK: Distribute places of interest
+	let placeDistributionJob = OperationDistributePlaces(regions: tessellatedRegions,
+																											 places: cities,
+																											 reporter: reportLoad)
+	placeDistributionJob.start()
+	
+	guard let tessellatedRegionsWithPlaces = placeDistributionJob.output else {
+		print("Place distribution into regions failed.")
+		return
+	}
+	
+	let fixupJob = OperationFixupHierarchy(continentCollection: tessellatedContinents,
+																				 countryCollection: tessellatedCountries,
+																				 regionCollection: tessellatedRegionsWithPlaces,
+																				 reporter: reportLoad)
+	fixupJob.start()
+	
+	guard let world = fixupJob.output else {
+		print("World hierarchy failed to connect")
+		return
+	}
+	
+	// MARK: Bake and write
 	print("\nTessellating geometry...")
-	let geoBaker = OperationBakeGeometry(countries: countries,
-																			 region: regions,
-																			 places: places,
+	let geoBaker = OperationBakeGeometry(world: world,
 																			 saveUrl: outputUrl,
 																			 reporter: reportLoad,
 																			 errorReporter: reportError)

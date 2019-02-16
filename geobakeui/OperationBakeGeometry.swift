@@ -9,23 +9,16 @@
 import Foundation
 
 class OperationBakeGeometry : Operation {
-	let countries : Set<ToolGeoFeature>
-	let regions : Set<ToolGeoFeature>
-	let places : GeoPlaceCollection
+	let input : Set<ToolGeoFeature>
 	let saveUrl : URL
 	let report : ProgressReport
 	let reportError : ErrorReport
-	var error : Error?
 	
-	init(countries countriesToBake: Set<ToolGeoFeature>,
-			 region regionsToBake: Set<ToolGeoFeature>,
-			 places placesToBake: GeoPlaceCollection,
+	init(world worldToBake: Set<ToolGeoFeature>,
 			 saveUrl url: URL,
 	     reporter: @escaping ProgressReport,
 	     errorReporter: @escaping ErrorReport) {
-		countries = countriesToBake
-		regions = regionsToBake
-		places = placesToBake
+		input = worldToBake
 		saveUrl = url
 		report = reporter
 		reportError = errorReporter
@@ -36,63 +29,8 @@ class OperationBakeGeometry : Operation {
 	override func main() {
 		guard !isCancelled else { print("Cancelled before starting"); return }
 		
-		let bakeQueue = OperationQueue()
-		bakeQueue.name = "Baking queue"
-		
-		let continentAssemblyJob = OperationAssembleContinents(countries: countries, reporter: report)
-		
-		bakeQueue.addOperation(continentAssemblyJob)
-		bakeQueue.waitUntilAllOperationsAreFinished()
-		
-		guard let generatedContinents = continentAssemblyJob.output else {
-			print("Continent assembly failed")
-			return
-		}
-		
-		let continentTessJob = OperationTessellateRegions(generatedContinents, reporter: report, errorReporter: reportError)
-		let countryTessJob = OperationTessellateRegions(countries, reporter: report, errorReporter: reportError)
-		let regionTessJob = OperationTessellateRegions(regions, reporter: report, errorReporter: reportError)
-		
-		continentTessJob.addDependency(continentAssemblyJob)
-		
-		bakeQueue.addOperations([continentTessJob, countryTessJob, regionTessJob],
-														waitUntilFinished: true)
-		
-		guard let continents = continentTessJob.output else {
-			print("Continent tessellation failed.")
-			return
-		}
-		guard let countries = countryTessJob.output else {
-			print("Country tessellation failed.")
-			return
-		}
-		guard let regions = regionTessJob.output else {
-			print("Region tessellation failed.")
-			return
-		}
-		
-		let placeDistributionJob = OperationDistributePlaces(regions: regions,
-																												 places: places,
-																												 reporter: report)
-		placeDistributionJob.start()
-		
-		guard let regionsWithPlaces = placeDistributionJob.output else {
-			print("Place distribution into regions failed.")
-			return
-		}
-		
-		let fixupJob = OperationFixupHierarchy(continentCollection: continents,
-																					 countryCollection: countries,
-																					 regionCollection: regionsWithPlaces,
-																					 reporter: report)
-		fixupJob.start()
-		
 		// Bake job should only do this conversion and save
-		let bakedWorld: GeoWorld? = GeoWorld(name: "temp", children: [])
-		guard bakedWorld != nil else {
-			print("Failed")
-			return
-		}
+		let bakedWorld = buildWorld(from: input)
 		
 		print("\n")
 		report(0.1, "Writing world to \(saveUrl.lastPathComponent)...", false)
@@ -111,5 +49,53 @@ class OperationBakeGeometry : Operation {
 			print("Encoding failed")
 		}
 		report(1.0, "Done.", true)
+	}
+	
+	func buildWorld(from: Set<ToolGeoFeature>) -> GeoWorld {
+		var worldResult = Set<GeoContinent>()
+		
+		// Build continents
+		for continent in input {
+			guard let continentTessellation = continent.tessellation else {
+				print("\(continent.name) has no tessellation - skipping...")
+				continue
+			}
+			
+			// Build countries
+			var countryResult = Set<GeoCountry>()
+			for country in continent.children ?? [] {
+				
+				// Build regions
+				var regionResult = Set<GeoRegion>()
+				for region in country.children ?? [] {
+					guard let regionTessellation = region.tessellation else {
+						print("\(region.name) has no tessellation - skipping...")
+						continue
+					}
+					
+					let geoRegion = GeoRegion(name: region.name,
+																		geometry: regionTessellation,
+																		places: region.places ?? [])
+					regionResult.insert(geoRegion)
+				}
+				
+				guard let countryTessellation = country.tessellation else {
+					print("\(country.name) has no tessellation - skipping...")
+					continue
+				}
+				
+				let geoCountry = GeoCountry(name: country.name,
+																		children: regionResult,
+																		places: country.places ?? [],
+																		geometry: countryTessellation)
+				countryResult.insert(geoCountry)
+			}
+			
+			let geoContinent = GeoContinent(name: continent.name,
+																			children: countryResult,
+																			geometry: continentTessellation)
+			worldResult.insert(geoContinent)
+		}
+		return GeoWorld(name: "Earth", children: worldResult)
 	}
 }
