@@ -298,8 +298,6 @@
 				14B21D841E9FEA5200D27F1E /* GeoLoadingViewController.swift */,
 				141F25C71EA4B3B800DA808F /* GeoBakingViewController.swift */,
 				14F148A91EA383CC00D419AB /* RegionOutlineView.swift */,
-				149E2EDF1FCFDC47008387A2 /* ToolGeometry.swift */,
-				14F148A61EA3830C00D419AB /* Background jobs */,
 				1452103E1E98D4F30029942F /* Assets.xcassets */,
 				145210401E98D4F30029942F /* Main.storyboard */,
 				145210431E98D4F30029942F /* Info.plist */,
@@ -416,9 +414,10 @@
 			path = geobakeuiTests;
 			sourceTree = "<group>";
 		};
-		14F148A61EA3830C00D419AB /* Background jobs */ = {
+		14F148A61EA3830C00D419AB /* Tool Operations */ = {
 			isa = PBXGroup;
 			children = (
+				149E2EDF1FCFDC47008387A2 /* ToolGeometry.swift */,
 				14F52E421FD67EBB002D3A3A /* OperationParseGeoJson.swift */,
 				145A73EB220F5DC100BBEB82 /* OperationParseOSMJson.swift */,
 				14202F2C221079D100C22C88 /* OperationDistributePlaces.swift */,
@@ -429,7 +428,8 @@
 				14F52E401FD67EBB002D3A3A /* OperationBakeGeometry.swift */,
 				14BDA61321EE91B8004CC319 /* JobHelpers.swift */,
 			);
-			name = "Background jobs";
+			name = "Tool Operations";
+			path = ../geobakeui;
 			sourceTree = "<group>";
 		};
 		14FF12D821EE889300AF4474 /* geobaketool */ = {
@@ -441,6 +441,7 @@
 				146B477621F47B6000CC36D9 /* reshape.swift */,
 				14BB448021F8784C0029D62A /* bake.swift */,
 				1413B5D622135E5400D51AAA /* nullrenderer.swift */,
+				14F148A61EA3830C00D419AB /* Tool Operations */,
 				146B477421F3E61700CC36D9 /* pipeline.json */,
 			);
 			path = geobaketool;
