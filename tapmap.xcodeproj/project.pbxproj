@@ -8,8 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		126BE469FD0199F504DDC9B2 /* Pods_tapmapTests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F05B99D0F4FA91C879CC0D23 /* Pods_tapmapTests.framework */; };
-		140C99DB20D8DC610062486A /* MapGeometry.swift in Sources */ = {isa = PBXBuildFile; fileRef = 140C99DA20D8DC610062486A /* MapGeometry.swift */; };
-		140C99DC20D8DC610062486A /* MapGeometry.swift in Sources */ = {isa = PBXBuildFile; fileRef = 140C99DA20D8DC610062486A /* MapGeometry.swift */; };
+		140C99DB20D8DC610062486A /* ViewCalculations.swift in Sources */ = {isa = PBXBuildFile; fileRef = 140C99DA20D8DC610062486A /* ViewCalculations.swift */; };
 		140E63F21F209645000D710E /* Serialization.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1469F5C61F02F5F4008A37B3 /* Serialization.swift */; };
 		1413B5D722135E5400D51AAA /* nullrenderer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1413B5D622135E5400D51AAA /* nullrenderer.swift */; };
 		141F25C81EA4B3B800DA808F /* GeoBakingViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 141F25C71EA4B3B800DA808F /* GeoBakingViewController.swift */; };
@@ -152,13 +151,13 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
-		140C99DA20D8DC610062486A /* MapGeometry.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = MapGeometry.swift; path = Geography/MapGeometry.swift; sourceTree = "<group>"; };
+		140C99DA20D8DC610062486A /* ViewCalculations.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = ViewCalculations.swift; path = Geography/ViewCalculations.swift; sourceTree = "<group>"; };
 		1413B5D622135E5400D51AAA /* nullrenderer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = nullrenderer.swift; sourceTree = "<group>"; };
 		141F25C71EA4B3B800DA808F /* GeoBakingViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = GeoBakingViewController.swift; sourceTree = "<group>"; };
 		14202F2C221079D100C22C88 /* OperationDistributePlaces.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OperationDistributePlaces.swift; sourceTree = "<group>"; };
 		14202F2F2210BD5E00C22C88 /* PoiRenderer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PoiRenderer.swift; sourceTree = "<group>"; };
-		14202F312210C6F400C22C88 /* PoiShader.fsh */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.glsl; name = PoiShader.fsh; path = Shaders/PoiShader.fsh; sourceTree = "<group>"; };
-		14202F322210C6F400C22C88 /* PoiShader.vsh */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.glsl; name = PoiShader.vsh; path = Shaders/PoiShader.vsh; sourceTree = "<group>"; };
+		14202F312210C6F400C22C88 /* PoiShader.fsh */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.glsl; path = PoiShader.fsh; sourceTree = "<group>"; };
+		14202F322210C6F400C22C88 /* PoiShader.vsh */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.glsl; path = PoiShader.vsh; sourceTree = "<group>"; };
 		1438DB712187D99D00FEB1D1 /* world.geo */ = {isa = PBXFileReference; lastKnownFileType = file.bplist; name = world.geo; path = Raw/world.geo; sourceTree = "<group>"; };
 		143A0F2B217E6B1A008C432A /* OperationFixupHierarchy.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OperationFixupHierarchy.swift; sourceTree = "<group>"; };
 		1448CCD3221691A70015C711 /* Geometry.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Geometry.swift; sourceTree = "<group>"; };
@@ -174,8 +173,8 @@
 		1469F5C61F02F5F4008A37B3 /* Serialization.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Serialization.swift; sourceTree = "<group>"; };
 		146A79031E8F912500E2EE20 /* tapmap.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = tapmap.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		146A79061E8F912500E2EE20 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
-		146A79081E8F912500E2EE20 /* MapShader.fsh */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.glsl; name = MapShader.fsh; path = Shaders/MapShader.fsh; sourceTree = "<group>"; };
-		146A790A1E8F912500E2EE20 /* MapShader.vsh */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.glsl; name = MapShader.vsh; path = Shaders/MapShader.vsh; sourceTree = "<group>"; };
+		146A79081E8F912500E2EE20 /* MapShader.fsh */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.glsl; path = MapShader.fsh; sourceTree = "<group>"; };
+		146A790A1E8F912500E2EE20 /* MapShader.vsh */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.glsl; path = MapShader.vsh; sourceTree = "<group>"; };
 		146A790C1E8F912500E2EE20 /* MapViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MapViewController.swift; sourceTree = "<group>"; };
 		146A790F1E8F912500E2EE20 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
 		146A79111E8F912500E2EE20 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
@@ -341,20 +340,11 @@
 			isa = PBXGroup;
 			children = (
 				146A79061E8F912500E2EE20 /* AppDelegate.swift */,
-				146A79081E8F912500E2EE20 /* MapShader.fsh */,
-				146A790A1E8F912500E2EE20 /* MapShader.vsh */,
-				14202F312210C6F400C22C88 /* PoiShader.fsh */,
-				14202F322210C6F400C22C88 /* PoiShader.vsh */,
-				146A790C1E8F912500E2EE20 /* MapViewController.swift */,
-				14B74E701E8FB15500849BB5 /* GeoRenderer.swift */,
-				1488E7ED201CDD9900AA00F1 /* MapRenderer.swift */,
-				14202F2F2210BD5E00C22C88 /* PoiRenderer.swift */,
 				1469F5C61F02F5F4008A37B3 /* Serialization.swift */,
-				1498FE1F219C2F4D006D0B78 /* UserState.swift */,
 				14B74E5C1E8F9BE600849BB5 /* Geography */,
-				146A790E1E8F912500E2EE20 /* Main.storyboard */,
+				149CBCB82218879300E2AE2D /* Rendering */,
+				149CBCB9221887DD00E2AE2D /* UI */,
 				146A79111E8F912500E2EE20 /* Assets.xcassets */,
-				146A79131E8F912500E2EE20 /* LaunchScreen.storyboard */,
 				146A79161E8F912500E2EE20 /* Info.plist */,
 				146A792C1E8F931B00E2EE20 /* Raw */,
 			);
@@ -380,13 +370,38 @@
 			name = Raw;
 			sourceTree = "<group>";
 		};
+		149CBCB82218879300E2AE2D /* Rendering */ = {
+			isa = PBXGroup;
+			children = (
+				14B74E701E8FB15500849BB5 /* GeoRenderer.swift */,
+				1488E7ED201CDD9900AA00F1 /* MapRenderer.swift */,
+				14202F2F2210BD5E00C22C88 /* PoiRenderer.swift */,
+				146A79081E8F912500E2EE20 /* MapShader.fsh */,
+				146A790A1E8F912500E2EE20 /* MapShader.vsh */,
+				14202F312210C6F400C22C88 /* PoiShader.fsh */,
+				14202F322210C6F400C22C88 /* PoiShader.vsh */,
+			);
+			name = Rendering;
+			sourceTree = "<group>";
+		};
+		149CBCB9221887DD00E2AE2D /* UI */ = {
+			isa = PBXGroup;
+			children = (
+				146A790C1E8F912500E2EE20 /* MapViewController.swift */,
+				1498FE1F219C2F4D006D0B78 /* UserState.swift */,
+				140C99DA20D8DC610062486A /* ViewCalculations.swift */,
+				146A790E1E8F912500E2EE20 /* Main.storyboard */,
+				146A79131E8F912500E2EE20 /* LaunchScreen.storyboard */,
+			);
+			name = UI;
+			sourceTree = "<group>";
+		};
 		14B74E5C1E8F9BE600849BB5 /* Geography */ = {
 			isa = PBXGroup;
 			children = (
 				14BD72FE220E41C900CDD7D9 /* AppTypes.swift */,
 				1448CCD3221691A70015C711 /* Geometry.swift */,
 				14B74E5D1E8F9C1100849BB5 /* GeoRegion.swift */,
-				140C99DA20D8DC610062486A /* MapGeometry.swift */,
 				14657D31220758F900EF116F /* KDTree.swift */,
 			);
 			name = Geography;
@@ -876,7 +891,7 @@
 				1488E7EE201CDD9900AA00F1 /* MapRenderer.swift in Sources */,
 				14B74E711E8FB15500849BB5 /* GeoRenderer.swift in Sources */,
 				146A790D1E8F912500E2EE20 /* MapViewController.swift in Sources */,
-				140C99DB20D8DC610062486A /* MapGeometry.swift in Sources */,
+				140C99DB20D8DC610062486A /* ViewCalculations.swift in Sources */,
 				14202F302210BD5E00C22C88 /* PoiRenderer.swift in Sources */,
 				14B74E5E1E8F9C1100849BB5 /* GeoRegion.swift in Sources */,
 				146A79071E8F912500E2EE20 /* AppDelegate.swift in Sources */,
@@ -888,7 +903,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				14BD7300220E41C900CDD7D9 /* AppTypes.swift in Sources */,
-				140C99DC20D8DC610062486A /* MapGeometry.swift in Sources */,
 				140E63F21F209645000D710E /* Serialization.swift in Sources */,
 				146A79201E8F912500E2EE20 /* tapmapTests.swift in Sources */,
 				14B74E731E8FCF5E00849BB5 /* FeatureLoaderTests.swift in Sources */,
