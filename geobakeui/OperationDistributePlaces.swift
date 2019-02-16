@@ -10,12 +10,13 @@ import Foundation
 
 class OperationDistributePlaces : Operation {
 	let report : ProgressReport
-	let regions: Set<GeoRegion>
+	let input: ToolGeoFeatureCollection
+	var output: ToolGeoFeatureCollection
 	let places: GeoPlaceCollection
-	var regionsWithPlaces: Set<GeoRegion>?
 	
-	init(regions _regions: Set<GeoRegion>, places _places: GeoPlaceCollection, reporter: @escaping ProgressReport) {
-		regions = _regions
+	init(regions _regions: ToolGeoFeatureCollection, places _places: GeoPlaceCollection, reporter: @escaping ProgressReport) {
+		input = _regions
+		output = _regions
 		places = _places
 		report = reporter
 		super.init()
@@ -27,31 +28,38 @@ class OperationDistributePlaces : Operation {
 		GeometryCounters.begin()
 		
 		var remainingPlaces = Set<GeoPlace>(places)
-		var updatedRegions = Set<GeoRegion>()
+		var updatedFeatures = Set<ToolGeoFeature>()
 		let numPlaces = remainingPlaces.count
-		for region in regions {
-			
+		for region in input.features {
+			guard let regionTessellation = region.tessellation else {
+				print("Missing tessellation in \(region.name)")
+				continue
+			}
 			// Find all places that fit into the region's aabb
 			let candidatePlaces = remainingPlaces.filter {
 				aabbHitTest(p: CGPoint(x: $0.location.x,
-															 y: $0.location.y), aabb: region.aabb)
+															 y: $0.location.y), aabb: regionTessellation.aabb)
 			}
 			
 			// Perform point-in-triangle tests
 			let belongingPlaces = candidatePlaces.filter {
 				triangleSoupHitTest(point: CGPoint(x: $0.location.x,
 																					 y: $0.location.y),
-														inVertices: region.geometry.vertices,
-														inIndices: region.geometry.indices)
+														inVertices: regionTessellation.vertices,
+														inIndices: regionTessellation.indices)
 			}
 			
 			// Recreate the GeoRegion with place set
-			let updatedRegion = GeoRegion(name: region.name,
-																		geometry: region.geometry,
-																		places: Set(belongingPlaces))
+			let updatedFeature = ToolGeoFeature(level: region.level,
+																					polygons: region.polygons,
+																					tessellation: region.tessellation,
+																					places: belongingPlaces,
+																					children: nil,
+																					stringProperties: region.stringProperties,
+																					valueProperties: region.valueProperties)
 			
 			// Insert and move on
-			updatedRegions.insert(updatedRegion)
+			updatedFeatures.insert(updatedFeature)
 			
 			remainingPlaces = remainingPlaces.subtracting(belongingPlaces)
 			
@@ -63,9 +71,9 @@ class OperationDistributePlaces : Operation {
 		
 		GeometryCounters.end()
 		
-		regionsWithPlaces = updatedRegions
+		output = ToolGeoFeatureCollection(features: updatedFeatures)
 		
-		report(1.0, "Distributed \(updatedRegions.count) places of interest.", true)
+		report(1.0, "Distributed \(updatedFeatures.count) places of interest.", true)
 		print("             - Remaining places:  \(remainingPlaces.count)")
 		for place in remainingPlaces {
 			print("                 - \(place.name) @ \(place.location)")

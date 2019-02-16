@@ -106,7 +106,13 @@ class OperationParseGeoJson : Operation {
 					.filter { $0.value.type == .number }
 					.mapValues { $0.doubleValue }
 		
-		return ToolGeoFeature(level: level, polygons: loadedPolygons, stringProperties: stringProps, valueProperties: valueProps)
+		return ToolGeoFeature(level: level,
+													polygons: loadedPolygons,
+													tessellation: nil,
+													places: nil,
+													children: nil,
+													stringProperties: stringProps,
+													valueProperties: valueProps)
 	}
 	
 	fileprivate func parsePolygon(_ polygonJson: JSON) -> Polygon? {

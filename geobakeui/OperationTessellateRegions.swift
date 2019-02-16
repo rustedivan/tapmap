@@ -11,17 +11,17 @@ import LibTessSwift
 import simd
 
 class OperationTessellateRegions : Operation {
-	var world : ToolGeoFeatureCollection
+	let input : ToolGeoFeatureCollection
+	var output : ToolGeoFeatureCollection
 	let report : ProgressReport
 	let reportError : ErrorReport
-	var tessellatedRegions : [GeoRegion]
 	var error : Error?
 	
 	init(_ featuresToTessellate: ToolGeoFeatureCollection, reporter: @escaping ProgressReport, errorReporter: @escaping ErrorReport) {
-        world = featuresToTessellate
+		input = featuresToTessellate
+		output = input
 		report = reporter
 		reportError = errorReporter
-		tessellatedRegions = []
 		super.init()
 	}
 	
@@ -30,9 +30,9 @@ class OperationTessellateRegions : Operation {
 		
 		var totalTris = 0
 		
-		let numFeatures = world.features.count
+		let numFeatures = input.features.count
 		var doneFeatures = 0
-		tessellatedRegions = world.features.compactMap { feature -> GeoRegion? in
+		let tessellationResult = input.features.compactMap { feature -> ToolGeoFeature? in
 			if let tessellation = tessellate(feature) {
 				totalTris += tessellation.vertices.count
 				doneFeatures += 1
@@ -40,14 +40,20 @@ class OperationTessellateRegions : Operation {
 				let progress = Double(doneFeatures) / Double(numFeatures)
 				let shortName = feature.name.prefix(16)
 				report(progress, "\(totalTris) triangles @ \(shortName)", false)
-				return GeoRegion(name: feature.name,
-												 geometry: tessellation,
-												 places: [])
+				return ToolGeoFeature(level: feature.level,
+															polygons: feature.polygons,
+															tessellation: tessellation,
+															places: nil,
+															children: nil,
+															stringProperties: feature.stringProperties,
+															valueProperties: feature.valueProperties)
 			} else {
 				reportError(feature.name, "Tesselation failed")
 				return nil
 			}
 		}
+		
+		output = ToolGeoFeatureCollection(features: Set(tessellationResult))
 		
 		report(1.0, "Tessellated \(totalTris) triangles.", true)
 	}

@@ -53,21 +53,20 @@ class OperationBakeGeometry : Operation {
 		bakeQueue.addOperations([continentTessJob, countryTessJob, regionTessJob],
 														waitUntilFinished: true)
 		
-		let placeDistributionJob = OperationDistributePlaces(regions: Set(regionTessJob.tessellatedRegions),
+		let placeDistributionJob = OperationDistributePlaces(regions: regionTessJob.output,
 																												 places: places,
 																												 reporter: report)
 //		placeDistributionJob.start()
-		let regionCollection = placeDistributionJob.regionsWithPlaces != nil
-					? Array(placeDistributionJob.regionsWithPlaces!)
-					: regionTessJob.tessellatedRegions
 		
-		let fixupJob = OperationFixupHierarchy(continentCollection: continentTessJob.tessellatedRegions,
-																					 countryCollection: countryTessJob.tessellatedRegions,
-																					 regionCollection: regionCollection,
+		let fixupJob = OperationFixupHierarchy(continentCollection: continentTessJob.output,
+																					 countryCollection: countryTessJob.output,
+																					 regionCollection: placeDistributionJob.output,
 																					 reporter: report)
 		fixupJob.start()
 		
-		guard let bakedWorld = fixupJob.world else {
+		// Bake job should only do this conversion and save
+		let bakedWorld: GeoWorld? = GeoWorld(name: "temp", children: [])
+		guard bakedWorld != nil else {
 			print("Failed")
 			return
 		}
