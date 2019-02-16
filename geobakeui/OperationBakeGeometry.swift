@@ -93,6 +93,7 @@ class OperationBakeGeometry : Operation {
 			
 			let geoContinent = GeoContinent(name: continent.name,
 																			children: countryResult,
+																			places: continent.places ?? [],
 																			geometry: continentTessellation)
 			worldResult.insert(geoContinent)
 		}
