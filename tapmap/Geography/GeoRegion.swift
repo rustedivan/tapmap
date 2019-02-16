@@ -118,9 +118,10 @@ struct GeoCountry : GeoNode, GeoPlaceContainer, GeoTessellated, Codable, Equatab
 	}
 }
 
-struct GeoContinent : GeoNode, GeoTessellated, Codable, Equatable, Hashable {
+struct GeoContinent : GeoNode, GeoTessellated, GeoPlaceContainer, Codable, Equatable, Hashable {
 	let name: String
 	let children: Set<GeoCountry>
+	let places: Set<GeoPlace>
 	let geometry: GeoTessellation
 	var aabb : Aabb { return geometry.aabb }
 	
@@ -141,6 +142,7 @@ struct GeoWorld : GeoNode, Codable {
 
 struct GeoPlace : Codable, Equatable, Hashable {
 	enum Kind: Int, Codable {
+		case Capital
 		case City
 		case Town
 	}

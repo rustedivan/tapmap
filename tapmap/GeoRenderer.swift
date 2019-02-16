@@ -81,13 +81,13 @@ extension GeoRegion : Renderable {
 		let g = Float(hashKey % 1000) / 1000.0
 		let b = Float(hashKey % 1000) / 1000.0
 
-		let c = (r: 0.1 * r as Float, g: 0.6 * g as Float, b: 0.3 * b as Float, a: 1.0 as Float)
+		let c = (r: 0.5 * r as Float, g: 0.8 * g as Float, b: 0.3 * b as Float, a: 1.0 as Float)
 		return RenderPrimitive(vertices: geometry.vertices, indices: geometry.indices, color: c, debugName: "Region: \(name)")
 	}
 	
 	func placesRenderPlane() -> RenderPrimitive {
 		let vertices = places.reduce([]) { (accumulator: [Vertex], place: GeoPlace) in
-			let size = 0.2 / 2.0
+			let size = 0.3 / 2.0
 			let v0 = Vertex(0.0, size)
 			let v1 = Vertex(size, 0.0)
 			let v2 = Vertex(0.0, -size)
@@ -106,7 +106,7 @@ extension GeoRegion : Renderable {
 		
 		return RenderPrimitive(vertices: vertices,
 													 indices: indices,
-													 color: (r: 1.0, g: 0.0, b: 0.0, a: 0.7),
+													 color: (r: 0.7, g: 0.7, b: 0.7, a: 1.0),
 													 debugName: name)
 	}
 }
@@ -122,13 +122,13 @@ extension GeoCountry : Renderable {
 		let g = Float(hashKey % 1000) / 1000.0
 		let b = Float(hashKey % 1000) / 1000.0
 		
-		let c = (r: 0.1 * r as Float, g: 0.6 * g as Float, b: 0.3 * b as Float, a: 1.0 as Float)
+		let c = (r: 0.4 * r as Float, g: 0.6 * g as Float, b: 0.4 * b as Float, a: 1.0 as Float)
 		return RenderPrimitive(vertices: geometry.vertices, indices: geometry.indices, color: c, debugName: "Country: \(name)")
 	}
 	
 	func placesRenderPlane() -> RenderPrimitive {
 		let vertices = places.reduce([]) { (accumulator: [Vertex], place: GeoPlace) in
-			let size = 0.2 / 2.0
+			let size = 0.4 / 2.0
 			let v0 = Vertex(0.0, size)
 			let v1 = Vertex(size, 0.0)
 			let v2 = Vertex(0.0, -size)
@@ -147,7 +147,7 @@ extension GeoCountry : Renderable {
 		
 		return RenderPrimitive(vertices: vertices,
 													 indices: indices,
-													 color: (r: 1.0, g: 0.0, b: 0.0, a: 0.7),
+													 color: (r: 0.8, g: 0.3, b: 0.0, a: 1.0),
 													 debugName: name)
 	}
 }
@@ -163,8 +163,33 @@ extension GeoContinent : Renderable {
 		let g = Float(hashKey % 1000) / 1000.0
 		let b = Float(hashKey % 1000) / 1000.0
 		
-		let c = (r: 0.1 * r as Float, g: 0.6 * g as Float, b: 0.3 * b as Float, a: 1.0 as Float)
+		let c = (r: 0.4 * r as Float, g: 0.5 * g as Float, b: 0.1 * b as Float, a: 1.0 as Float)
 		return RenderPrimitive(vertices: geometry.vertices, indices: geometry.indices, color: c, debugName: "Continent \(name)")
+	}
+	
+	func placesRenderPlane() -> RenderPrimitive {
+		let vertices = places.reduce([]) { (accumulator: [Vertex], place: GeoPlace) in
+			let size = 1.0 / 2.0
+			let v0 = Vertex(0.0, size)
+			let v1 = Vertex(size, 0.0)
+			let v2 = Vertex(0.0, -size)
+			let v3 = Vertex(-size, 0.0)
+			let verts = [v0, v1, v2, v3].map { $0 + place.location }
+			return accumulator + verts
+		}
+		
+		let triangleRange = 0..<UInt32(places.count * 2)
+		let indices = triangleRange.reduce([]) { (accumulator: [UInt32], triIndex: UInt32) in
+			let quadIndices: [UInt32] = [0, 2, 1, 0, 3, 2]	// Build two triangles from the four quad vertices
+			let vertexOffset = triIndex * 4
+			let offsetIndices = quadIndices.map { $0 + vertexOffset }
+			return accumulator + offsetIndices
+		}
+		
+		return RenderPrimitive(vertices: vertices,
+													 indices: indices,
+													 color: (r: 1.0, g: 0.5, b: 0.5, a: 1.0),
+													 debugName: name)
 	}
 }
 

@@ -35,4 +35,8 @@ extension GeoContinent : Renderable {
 	func renderPrimitive() -> RenderPrimitive {
 		return RenderPrimitive()
 	}
+	
+	func placesRenderPlane() -> RenderPrimitive {
+		return RenderPrimitive()
+	}
 }

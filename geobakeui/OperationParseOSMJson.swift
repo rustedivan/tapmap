@@ -51,6 +51,8 @@ class OperationParseOSMJson : Operation {
 	fileprivate func parsePlace(_ json: JSON, asKind kind: GeoPlace.Kind) -> GeoPlace? {
 		let properties = json["tags"]
 		let possibleNames = properties["name:en"].string ?? properties["name"].string
+		let knownCapital = (properties["capital"].stringValue == "yes")
+		let largeCity = (properties["admin_level"].intValue <= 1)
 		
 		guard let x = json["lon"].double, let y = json["lat"].double else {
 			print("Place has no lat/lon data.")
@@ -63,8 +65,16 @@ class OperationParseOSMJson : Operation {
 			return nil
 		}
 		
+		let decoratedPlaceKind: GeoPlace.Kind
+		switch (kind, knownCapital, largeCity) {
+			case (.City, true, _): decoratedPlaceKind = .Capital
+			case (.City, false, true): decoratedPlaceKind = .City
+			case (.City, false, false): decoratedPlaceKind = .Town
+			default: decoratedPlaceKind = kind
+		}
+		
 		return GeoPlace(location: p,
 										name: featureName,
-										kind: kind)
+										kind: decoratedPlaceKind)
 	}
 }

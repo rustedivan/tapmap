@@ -26,6 +26,7 @@ class PoiRenderer {
 		let userState = AppDelegate.sharedUserState
 		
 		let openContinents = geoWorld.children.filter { userState.placeVisited($0) }
+		let closedContinents = geoWorld.children.subtracting(openContinents)
 		
 		let countries = Set(openContinents.flatMap { $0.children })
 		let openCountries = countries.filter { userState.placeVisited($0) }
@@ -35,9 +36,10 @@ class PoiRenderer {
 		let openRegions = regions.filter { userState.placeVisited($0) }
 		let closedRegions = regions.subtracting(openRegions)
 		
+		let visibleContinentPoiPlanes = closedContinents.map { ($0.hashValue, $0.placesRenderPlane()) }
 		let visibleCountryPoiPlanes = closedCountries.map { ($0.hashValue, $0.placesRenderPlane()) }
 		let visibleRegionPoiPlanes = closedRegions.map { ($0.hashValue, $0.placesRenderPlane()) }
-		let visiblePoiPlanes = visibleCountryPoiPlanes + visibleRegionPoiPlanes
+		let visiblePoiPlanes = visibleContinentPoiPlanes + visibleCountryPoiPlanes + visibleRegionPoiPlanes
 		
 		// Insert them into the primitive dictionary, ignoring any later duplicates
 		regionPrimitives = Dictionary(visiblePoiPlanes, uniquingKeysWith: { (l, r) in l } )

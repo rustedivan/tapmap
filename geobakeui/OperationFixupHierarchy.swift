@@ -40,7 +40,10 @@ class OperationFixupHierarchy : Operation {
 		let numRegions = remainingRegions.count
 		for country in countryList {
 			let belongingRegions = remainingRegions.filter {	$0.countryKey == country.countryKey	}
-			let belongingPlaces = Set(belongingRegions.flatMap { $0.places ?? [] })
+			let belongingPlaces = Set(belongingRegions
+				.flatMap { $0.places ?? [] }
+				.filter { $0.kind != .Town }
+			)
 			
 			var updatedCountry = country
 			updatedCountry.children = belongingRegions
@@ -62,9 +65,14 @@ class OperationFixupHierarchy : Operation {
 		let numCountries = remainingCountries.count
 		for continent in continentList {
 			let belongingCountries = remainingCountries.filter { $0.continentKey == continent.name }
+			let belongingPlaces = Set(belongingCountries
+				.flatMap { $0.places ?? [] }
+				.filter { $0.kind == .Capital }
+			)
 			
 			var updatedContinent = continent
 			updatedContinent.children = belongingCountries
+			updatedContinent.places = belongingPlaces
 			geoContinents.insert(updatedContinent)
 			
 			remainingCountries.subtract(belongingCountries)
