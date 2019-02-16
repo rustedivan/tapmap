@@ -19,7 +19,7 @@ struct GeometryCounters {
 	}
 	
 	static func end() {
-		print("Performed \(GeometryCounters.aabbHitCount) box tests and \(GeometryCounters.triHitCount) triangle tests.")
+//		print("Performed \(GeometryCounters.aabbHitCount) box tests and \(GeometryCounters.triHitCount) triangle tests.")
 	}
 }
 

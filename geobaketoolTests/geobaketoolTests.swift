@@ -19,7 +19,13 @@ class geobaketoolTests: XCTestCase {
 																			 Vertex(4.0, 3.0),
 																			 Vertex(2.0, 4.5)])
 		let p = Polygon(exteriorRing: r, interiorRings: [])
-		let f = ToolGeoFeature(level: .Region, polygons: [p], stringProperties: [:], valueProperties: [:])
+		let f = ToolGeoFeature(level: .Region,
+													 polygons: [p],
+													 tessellation: nil,
+													 places: nil,
+													 children: nil,
+													 stringProperties: [:],
+													 valueProperties: [:])
 		let tessellation = tessellate(f)!
 		let b = Aabb(loX: 1.0, loY: 1.5, hiX: 4.0, hiY: 4.5)
 		XCTAssertEqual(tessellation.indices, [0, 1, 2, 1, 0, 3])

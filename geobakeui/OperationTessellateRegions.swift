@@ -15,7 +15,6 @@ class OperationTessellateRegions : Operation {
 	var output : Set<ToolGeoFeature>?
 	let report : ProgressReport
 	let reportError : ErrorReport
-	var error : Error?
 	
 	init(_ featuresToTessellate: Set<ToolGeoFeature>, reporter: @escaping ProgressReport, errorReporter: @escaping ErrorReport) {
 		input = featuresToTessellate

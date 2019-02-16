@@ -28,10 +28,10 @@ class OperationAssembleContinents : Operation {
 		print("Assembling continents")
 		var continentCountries = [String : Set<ToolGeoFeature>]()
 		for country in input {
-			if continentCountries[country.continent] == nil {
-				continentCountries[country.continent] = []
+			if continentCountries[country.continentKey] == nil {
+				continentCountries[country.continentKey] = []
 			}
-			continentCountries[country.continent]!.insert(country)
+			continentCountries[country.continentKey]!.insert(country)
 		}
 		
 		print("Continents:")

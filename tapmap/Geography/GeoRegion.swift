@@ -88,7 +88,7 @@ protocol GeoNode : GeoIdentifiable {
 
 struct GeoRegion : GeoIdentifiable, GeoPlaceContainer, GeoTessellated, Codable, Equatable {
 	let name: String
-	var geometry: GeoTessellation
+	let geometry: GeoTessellation
 	let places: Set<GeoPlace>
 	var aabb : Aabb { return geometry.aabb }
 	
@@ -102,11 +102,9 @@ struct GeoRegion : GeoIdentifiable, GeoPlaceContainer, GeoTessellated, Codable, 
 }
 
 struct GeoCountry : GeoNode, GeoPlaceContainer, GeoTessellated, Codable, Equatable {
-	typealias SubType = GeoRegion
-	var name: String
+	let name: String
 	let children: Set<GeoRegion>
 	let places: Set<GeoPlace>
-	
 	let geometry: GeoTessellation
 	var aabb : Aabb { return geometry.aabb }
 	
@@ -121,10 +119,7 @@ struct GeoCountry : GeoNode, GeoPlaceContainer, GeoTessellated, Codable, Equatab
 }
 
 struct GeoContinent : GeoNode, GeoTessellated, Codable, Equatable, Hashable {
-	typealias SubType = GeoCountry
-	
-	var name: String
-	
+	let name: String
 	let children: Set<GeoCountry>
 	let geometry: GeoTessellation
 	var aabb : Aabb { return geometry.aabb }
@@ -139,11 +134,8 @@ struct GeoContinent : GeoNode, GeoTessellated, Codable, Equatable, Hashable {
 }
 
 struct GeoWorld : GeoNode, Codable {
-	typealias SubType = GeoContinent
-	
 	let name: String
 	var aabb : Aabb { return Aabb(loX: -180.0, loY: -85.0, hiX: 180.0, hiY: 85.0) }
-	
 	let children: Set<GeoContinent>
 }
 

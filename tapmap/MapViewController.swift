@@ -114,7 +114,6 @@ class MapViewController: GLKViewController, GLKViewControllerDelegate {
 			
 			// Perform three different checks for the three different Kinds
 			if let hitContinent = pickFromTessellations(p: mapP, candidates: closedCandidateContinents) {
-				print("Hit continent: \(hitContinent.name) with \(hitContinent.children.count) countries")
 				userState.visitPlace(hitContinent)
 				placeName.text = hitContinent.name
 				
@@ -123,7 +122,6 @@ class MapViewController: GLKViewController, GLKViewControllerDelegate {
 				poiRenderer.updatePrimitives(for: hitContinent,
 																		 with: hitContinent.children)
 			} else if let hitCountry = pickFromTessellations(p: mapP, candidates: closedCandidateCountries) {
-				print("Hit country: \(hitCountry.name) with \(hitCountry.children.count) countries")
 				userState.visitPlace(hitCountry)
 				placeName.text = hitCountry.name
 				
@@ -132,7 +130,6 @@ class MapViewController: GLKViewController, GLKViewControllerDelegate {
 				poiRenderer.updatePrimitives(for: hitCountry,
 																		 with: hitCountry.children)
 			} else if let hitRegion = pickFromTessellations(p: mapP, candidates: candidateRegions) {
-				print("Hit region: \(hitRegion.name)")
 				userState.visitPlace(hitRegion)
 				placeName.text = hitRegion.name
 			}

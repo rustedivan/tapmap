@@ -29,11 +29,11 @@ struct ToolGeoFeature : Equatable, Hashable {
 		return stringProperties["name"] ?? stringProperties["NAME"] ?? "Unnamed"
 	}
 	
-	var admin : String {
+	var countryKey : String {
 		return stringProperties["adm0_a3"] ?? stringProperties["ADM0_A3"] ?? "No admin"
 	}
 	
-	var continent : String {
+	var continentKey : String {
 		return stringProperties["continent"] ?? stringProperties["CONTINENT"] ?? "No continent"
 	}
 	
@@ -42,10 +42,10 @@ struct ToolGeoFeature : Equatable, Hashable {
 	}
 	
 	public static func == (lhs: ToolGeoFeature, rhs: ToolGeoFeature) -> Bool {
-		return lhs.level == rhs.level && lhs.name == rhs.name && lhs.admin == rhs.admin
+		return lhs.level == rhs.level && lhs.name == rhs.name && lhs.countryKey == rhs.countryKey
 	}
 	
 	public var hashValue: Int {
-		return level.hashValue ^ name.hashValue ^ admin.hashValue
+		return level.hashValue ^ name.hashValue ^ countryKey.hashValue
 	}
 }

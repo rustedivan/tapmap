@@ -39,7 +39,7 @@ class OperationFixupHierarchy : Operation {
 		var geoCountries = Set<ToolGeoFeature>()
 		let numRegions = remainingRegions.count
 		for country in countryList {
-			let belongingRegions = remainingRegions.filter {	$0.admin == country.admin	}
+			let belongingRegions = remainingRegions.filter {	$0.countryKey == country.countryKey	}
 			let belongingPlaces = Set(belongingRegions.flatMap { $0.places ?? [] })
 			
 			var updatedCountry = country
@@ -61,7 +61,7 @@ class OperationFixupHierarchy : Operation {
 		var geoContinents = Set<ToolGeoFeature>()
 		let numCountries = remainingCountries.count
 		for continent in continentList {
-			let belongingCountries = remainingCountries.filter { $0.continent == continent.name }
+			let belongingCountries = remainingCountries.filter { $0.continentKey == continent.name }
 			
 			var updatedContinent = continent
 			updatedContinent.children = belongingCountries
@@ -83,12 +83,12 @@ class OperationFixupHierarchy : Operation {
 		
 		if !remainingRegions.isEmpty {
 			print("Remaining countries:")
-			print(remainingCountries.map { "\($0.name)" })
+			print(remainingCountries.map { "\($0.name) - \($0.continentKey)" })
 		}
 
 		if !remainingRegions.isEmpty {
 			print("Remaining regions:")
-			print(remainingRegions.map { "\($0.name)" })
+			print(remainingRegions.map { "\($0.name) - \($0.countryKey)" })
 		}
 		
 		print("\n")
