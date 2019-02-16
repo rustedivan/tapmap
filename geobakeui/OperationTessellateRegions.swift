@@ -11,13 +11,13 @@ import LibTessSwift
 import simd
 
 class OperationTessellateRegions : Operation {
-	var world : GeoFeatureCollection
+	var world : ToolGeoFeatureCollection
 	let report : ProgressReport
 	let reportError : ErrorReport
 	var tessellatedRegions : [GeoRegion]
 	var error : Error?
 	
-	init(_ featuresToTessellate: GeoFeatureCollection, reporter: @escaping ProgressReport, errorReporter: @escaping ErrorReport) {
+	init(_ featuresToTessellate: ToolGeoFeatureCollection, reporter: @escaping ProgressReport, errorReporter: @escaping ErrorReport) {
         world = featuresToTessellate
 		report = reporter
 		reportError = errorReporter

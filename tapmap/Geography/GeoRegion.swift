@@ -71,12 +71,12 @@ protocol GeoIdentifiable : Hashable {
 	var aabb : Aabb { get }
 }
 
-protocol GeoPlaceHaver {
+protocol GeoPlaceContainer {
 	var places : Set<GeoPlace> { get }
 	func placesRenderPlane() -> RenderPrimitive
 }
 
-protocol GeoTessellationHaver : Renderable {
+protocol GeoTessellated : Renderable {
 	var geometry : GeoTessellation { get }
 }
 
@@ -86,7 +86,7 @@ protocol GeoNode : GeoIdentifiable {
 }
 
 
-struct GeoRegion : GeoIdentifiable, GeoPlaceHaver, GeoTessellationHaver, Codable, Equatable {
+struct GeoRegion : GeoIdentifiable, GeoPlaceContainer, GeoTessellated, Codable, Equatable {
 	let name: String
 	var geometry: GeoTessellation
 	let places: Set<GeoPlace>
@@ -101,7 +101,7 @@ struct GeoRegion : GeoIdentifiable, GeoPlaceHaver, GeoTessellationHaver, Codable
 	}
 }
 
-struct GeoCountry : GeoNode, GeoPlaceHaver, GeoTessellationHaver, Codable, Equatable {
+struct GeoCountry : GeoNode, GeoPlaceContainer, GeoTessellated, Codable, Equatable {
 	typealias SubType = GeoRegion
 	var name: String
 	let children: Set<GeoRegion>
@@ -120,7 +120,7 @@ struct GeoCountry : GeoNode, GeoPlaceHaver, GeoTessellationHaver, Codable, Equat
 	}
 }
 
-struct GeoContinent : GeoNode, GeoTessellationHaver, Codable, Equatable, Hashable {
+struct GeoContinent : GeoNode, GeoTessellated, Codable, Equatable, Hashable {
 	typealias SubType = GeoCountry
 	
 	var name: String

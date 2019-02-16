@@ -9,11 +9,11 @@
 import Foundation
 
 class OperationAssembleContinents : Operation {
-	let countries : GeoFeatureCollection
-	var continents : GeoFeatureCollection?
+	let countries : ToolGeoFeatureCollection
+	var continents : ToolGeoFeatureCollection?
 	let report : ProgressReport
 	
-	init(countries countriesOfContinent: GeoFeatureCollection,
+	init(countries countriesOfContinent: ToolGeoFeatureCollection,
 			 reporter: @escaping ProgressReport) {
 		countries = countriesOfContinent
 		report = reporter
@@ -53,7 +53,7 @@ class OperationAssembleContinents : Operation {
 			continentFeatures.insert(continent)
 		}
 		
-		continents = GeoFeatureCollection(features: continentFeatures)
+		continents = ToolGeoFeatureCollection(features: continentFeatures)
 		
 		report(1.0, "Done.", true)
 	}

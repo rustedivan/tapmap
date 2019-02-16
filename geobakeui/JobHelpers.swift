@@ -46,7 +46,7 @@ struct ToolGeoFeature : Equatable, Hashable {
 	}
 }
 
-struct GeoFeatureCollection {
+struct ToolGeoFeatureCollection {
 	let features: Set<ToolGeoFeature>
 	
 	func totalVertexCount() -> Int {

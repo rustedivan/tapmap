@@ -49,7 +49,7 @@ class PoiRenderer {
 		}
 	}
 	
-	func updatePrimitives<T:GeoNode>(for node: T, with subRegions: Set<T.SubType>) where T.SubType : GeoPlaceHaver{
+	func updatePrimitives<T:GeoNode>(for node: T, with subRegions: Set<T.SubType>) where T.SubType : GeoPlaceContainer {
 		if AppDelegate.sharedUserState.placeVisited(node) {
 			regionPrimitives.removeValue(forKey: node.hashValue)
 

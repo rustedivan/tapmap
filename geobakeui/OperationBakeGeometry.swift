@@ -9,16 +9,16 @@
 import Foundation
 
 class OperationBakeGeometry : Operation {
-	let countries : GeoFeatureCollection
-	let regions : GeoFeatureCollection
+	let countries : ToolGeoFeatureCollection
+	let regions : ToolGeoFeatureCollection
 	let places : GeoPlaceCollection
 	let saveUrl : URL
 	let report : ProgressReport
 	let reportError : ErrorReport
 	var error : Error?
 	
-	init(countries countriesToBake: GeoFeatureCollection,
-			 region regionsToBake: GeoFeatureCollection,
+	init(countries countriesToBake: ToolGeoFeatureCollection,
+			 region regionsToBake: ToolGeoFeatureCollection,
 			 places placesToBake: GeoPlaceCollection,
 			 saveUrl url: URL,
 	     reporter: @escaping ProgressReport,

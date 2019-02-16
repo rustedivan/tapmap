@@ -13,7 +13,7 @@ class OperationParseGeoJson : Operation {
 	let json : JSON
 	let report : ProgressReport
 	let level : ToolGeoFeature.Level
-	var features : GeoFeatureCollection?
+	var features : ToolGeoFeatureCollection?
 
 	init(json _json: JSON, as _level: ToolGeoFeature.Level, reporter: @escaping ProgressReport) {
 		json = _json
@@ -30,7 +30,7 @@ class OperationParseGeoJson : Operation {
 	}
 	
 	fileprivate func parseFeatures(json: JSON,
-																 dataSet: ToolGeoFeature.Level) -> GeoFeatureCollection? {
+																 dataSet: ToolGeoFeature.Level) -> ToolGeoFeatureCollection? {
 		guard json["type"] == "FeatureCollection" else {
 			print("Root node is not multi-feature")
 			return nil
@@ -50,7 +50,7 @@ class OperationParseGeoJson : Operation {
 			}
 		}
 		
-		return GeoFeatureCollection(features: loadedFeatures)
+		return ToolGeoFeatureCollection(features: loadedFeatures)
 	}
 	
 	fileprivate func parseFeature(_ json: JSON, into level: ToolGeoFeature.Level) -> ToolGeoFeature? {

@@ -32,7 +32,7 @@ func aabbHitTest(p: CGPoint, aabb: Aabb) -> Bool {
 	return rect.contains(p)
 }
 
-func pickFromTessellations<T:GeoTessellationHaver>(p: CGPoint, candidates: Set<T>) -> T? {
+func pickFromTessellations<T:GeoTessellated>(p: CGPoint, candidates: Set<T>) -> T? {
 	for tessellation in candidates {
 		if triangleSoupHitTest(point: p,
 													 inVertices: tessellation.geometry.vertices,
