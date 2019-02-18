@@ -1,99 +1,64 @@
-# 2019 work branches
+# Road to Final
 
-## CLI pipeline (2d)
-- Create geobakecli as new target
-- Link util code
-- Investigate moving to SPM
-- Link Rainbow library
-- Parse bake.json file
--- NE soure data files
--- geojson source data files + simplicity rate + name/hierarchy keys
-- Download NE data files command
--- use URLSession, don't bother linking Alamofire
--- do initial geojson parse step?
-- Bake command
--- Verify that mapshaper is installed
--- Verify shapefiles exist
--- Run the baking and tessellation operations as usual
--- Output to json-defined location
+## POI rendering
+- progressive POI plane rendering
+- alpha based on distance to POI type
+- sprite sheet support
 
-## Continent collation (2d)
+## Labels
+- composite UIView over GLKView
+- what framerate at full dataset?
+-
 
-## Edge cleanup (5d)
-
-## Cities (3d)
-
-## POIs and POI types (3d)
-
-## Region labelling (4d)
-
-## Region closing (1d)
-
-## POI labels (2d)
+## Region rendering
+- barycentrics to render edges
+- generate UVs to control coordinate traversal
+- generate shard overlay
 
 
 
+## User journey
+### Insights
+- need a selection state separate from opening
+-- which means "visited" and "opened" are two different states
+- cities are used to navigate, especially at detailed levels
+-- which means cities must be visible on any closed region
 
+### First boot
+U launches tapmap and is met by an overview of the world.
+There is only land and sea. U taps the landmass. The borders around
+the continents highlight, and the name "Earth" is displayed.
+Also, a small circle appears, an inviting tap-to-select.
+Tapping there, U marks Earth as visited.
+U long-presses the landmass, and the cracks quickly spread out around U's finger.
 
-# Geobaking
-- ingest both country and region files
--+ select two files
--+ run two parse jobs
--+ parse into two GeoFeatureCollections
--- run two tessellation jobs
--- at this point we have two collections of GeoRegions
--+ run the hierarchy fixup job
-- figure out a way to not nestle jobs so goddamn deep
--- run the load jobs synchronously inside an async job that finishes up with the fixup op
-- build up full continent->region hierarchy
--- put everything in Universe for now
-- fixup parent links
--- countries linkup to continents
--+ provinces linkup to countries
-- calculate continents
--- add a third tessellation job
--- make sure all barycenters lie inside the parent
+When the cracks have spread to the edges of the landmass, it fractures
+and reveals the continents underneath. The capitals of the world are marked
+by little stars.
 
-# Data
-- make sure all regions have at least one polygon
-- change "admin" to "sovereign", and use adm0/3 as hash key
+U has been to Europe, and taps it to mark it as visited.
+U then long-presses Europe.
+Europe splits apart to reveal the countries underneath.
+The countries are labeled and tinted in their national
+colours so they can be easily found.
 
-# Rendering
-+ Recreate maprenderer when open/close states change
+At this point, U expects to be able to mark countries U has visited.
+However, every opened country splits apart into their constituent regions.
 
+The world fractures into a beautiful jagged mess of regions and
+provinces, with names few have noticed. Gone is the "went to Thailand",
+and instead U went to Nayok, Si Thammarat, Surat Thani and Ranong.
 
-# Correctness
-- make all geography types conform to Equatable
-+ make GeoFeatureCollection hold sets of features...
-+ ...so it is easy to knock out collected features
+### Covering history
+U now starts going over past journeys. U keeps going through
+Europe, drilling into countries. U leaves some of them marked
+as visited but will come back later to sort out the provinces.
 
+U makes a simple mistake by tapping Switzerland instead of Austria.
+By tapping again, Switzerland is no longer marked as visited.
+Had U also opened Switzerland, a simple pinch would have closed
+Switzerland again, and closed all its cantons too.
 
-
-
-// FIXME: very drawcall-heavy. Can be done in one drawcall with fatter vertices.
-// Possible to draw each region with barycenter and national colors in vertex buffer.
-// Can run vertex transforms from that barycenter and a progression in uniforms
-
-// Rendering overview:
-
-The GeoRegion is the rendering primitive from the app's viewpoint. When packing, GeoMultiFeatures list GeoFeatures. The tesselation job ingests an array of GeoMultiFeatures, and produces an array of GeoRegions, which get put into the archive. A single GeoRegion contains a border outline and a complete tessellation and can render all its features (exterior and interior rings considered). GeoMultiFeatures are a part of the baking tool, not the actual runtime.
-
-At runtime, a mix of continents, countries and regions are all rendered as a flat array of GeoRegion tessellations. These tessellations are concatenated into one drawcall with fat vertices for color separation. Additionally, each GeoRegion provides its primary outline (the set of all exterior rings as line segments). By replacing "opened" continents, countries and regions with GeoRegions, all active parts can be written into a separate picking buffer and used for pixel-perfect tapping.
-
-1. Fix the parser: the parser should generate GeoMultiFeatures instead of GeoRegions. Pull coordinates into the GMFs. Names are set on the GMFs.
-2. Fix the tessellator job: ([GeoMultiFeature] -> [GeoRegion]). Throw away the vertex arrays; keep the tessellation. Copy over the names outside the tessellator job.
-
-
-
-Regions outlines are single drawcalls, ~250 of them. Possible to pack all border
-vertices into one buffer and run _LINES instead of _LINE_LOOP. That would roughly
-double the index count, but save almost a frame's worth of draw call.
-
-Region fills could also be crushed into 1+1 drawcalls (separate handling of interacted
-region.
-
-That would get us down from ~500 drawcalls to ~5. At that point, it might actually be
-viable to run with the full 250ktri dataset, or at least close to it. It leaves plenty
-of space for POI markers and better shading, especially with aabb culling.
-
-
+Soon U reaches less familiar regions. U is not sure whether the
+visit to Munich means Bavaria or Thüringen. By zooming in a bit,
+cities are named by labels.
