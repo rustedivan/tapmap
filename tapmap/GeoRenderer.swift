@@ -10,8 +10,6 @@ import Foundation
 import OpenGLES
 import GLKit
 
-// FIXME: very drawcall-heavy. Can be done in one drawcall with fatter vertices.
-
 func BUFFER_OFFSET(_ i: UInt32) -> UnsafeRawPointer? {
 	return UnsafeRawPointer(bitPattern: Int(i))
 }
@@ -80,6 +78,28 @@ func render(primitive: RenderPrimitive) {
 								 BUFFER_OFFSET(0))
 }
 
+func buildPlaceMarkers(places: Set<GeoPlace>, markerSize: Float) -> ([Vertex], [UInt32]) {
+	let vertices = places.reduce([]) { (accumulator: [Vertex], place: GeoPlace) in
+		let size = markerSize / 2.0
+		let v0 = Vertex(0.0, size)
+		let v1 = Vertex(size, 0.0)
+		let v2 = Vertex(0.0, -size)
+		let v3 = Vertex(-size, 0.0)
+		let verts = [v0, v1, v2, v3].map { $0 + place.location }
+		return accumulator + verts
+	}
+
+	let triangleRange = 0..<UInt32(places.count * 2)
+	let indices = triangleRange.reduce([]) { (accumulator: [UInt32], triIndex: UInt32) in
+		let quadIndices: [UInt32] = [0, 2, 1, 0, 3, 2]	// Build two triangles from the four quad vertices
+		let vertexOffset = triIndex * 4
+		let offsetIndices = quadIndices.map { $0 + vertexOffset }
+		return accumulator + offsetIndices
+	}
+	
+	return (vertices, indices)
+}
+
 extension GeoRegion : Renderable {
 	func renderPrimitive() -> RenderPrimitive {
 		let c = hashColor(for: name, 0.5, 0.8, 0.3)
@@ -87,28 +107,12 @@ extension GeoRegion : Renderable {
 	}
 	
 	func placesRenderPlane() -> RenderPrimitive {
-		let vertices = places.reduce([]) { (accumulator: [Vertex], place: GeoPlace) in
-			let size = 0.3 / 2.0
-			let v0 = Vertex(0.0, size)
-			let v1 = Vertex(size, 0.0)
-			let v2 = Vertex(0.0, -size)
-			let v3 = Vertex(-size, 0.0)
-			let verts = [v0, v1, v2, v3].map { $0 + place.location }
-			return accumulator + verts
-		}
-		
-		let triangleRange = 0..<UInt32(places.count * 2)
-		let indices = triangleRange.reduce([]) { (accumulator: [UInt32], triIndex: UInt32) in
-			let quadIndices: [UInt32] = [0, 2, 1, 0, 3, 2]	// Build two triangles from the four quad vertices
-			let vertexOffset = triIndex * 4
-			let offsetIndices = quadIndices.map { $0 + vertexOffset }
-			return accumulator + offsetIndices
-		}
+		let (vertices, indices) = buildPlaceMarkers(places: places, markerSize: 0.3)
 		
 		return RenderPrimitive(vertices: vertices,
 													 indices: indices,
 													 color: (r: 0.7, g: 0.7, b: 0.7, a: 1.0),
-													 debugName: name)
+													 debugName: "Region: \(name) - poi plane")
 	}
 }
 
@@ -119,28 +123,12 @@ extension GeoCountry : Renderable {
 	}
 	
 	func placesRenderPlane() -> RenderPrimitive {
-		let vertices = places.reduce([]) { (accumulator: [Vertex], place: GeoPlace) in
-			let size = 0.4 / 2.0
-			let v0 = Vertex(0.0, size)
-			let v1 = Vertex(size, 0.0)
-			let v2 = Vertex(0.0, -size)
-			let v3 = Vertex(-size, 0.0)
-			let verts = [v0, v1, v2, v3].map { $0 + place.location }
-			return accumulator + verts
-		}
-		
-		let triangleRange = 0..<UInt32(places.count * 2)
-		let indices = triangleRange.reduce([]) { (accumulator: [UInt32], triIndex: UInt32) in
-			let quadIndices: [UInt32] = [0, 2, 1, 0, 3, 2]	// Build two triangles from the four quad vertices
-			let vertexOffset = triIndex * 4
-			let offsetIndices = quadIndices.map { $0 + vertexOffset }
-			return accumulator + offsetIndices
-		}
+		let (vertices, indices) = buildPlaceMarkers(places: places, markerSize: 0.4)
 		
 		return RenderPrimitive(vertices: vertices,
 													 indices: indices,
 													 color: (r: 0.8, g: 0.3, b: 0.0, a: 1.0),
-													 debugName: name)
+													 debugName: "Country: \(name) - poi plane")
 	}
 }
 
@@ -151,28 +139,11 @@ extension GeoContinent : Renderable {
 	}
 	
 	func placesRenderPlane() -> RenderPrimitive {
-		let vertices = places.reduce([]) { (accumulator: [Vertex], place: GeoPlace) in
-			let size = 1.0 / 2.0
-			let v0 = Vertex(0.0, size)
-			let v1 = Vertex(size, 0.0)
-			let v2 = Vertex(0.0, -size)
-			let v3 = Vertex(-size, 0.0)
-			let verts = [v0, v1, v2, v3].map { $0 + place.location }
-			return accumulator + verts
-		}
-		
-		let triangleRange = 0..<UInt32(places.count * 2)
-		let indices = triangleRange.reduce([]) { (accumulator: [UInt32], triIndex: UInt32) in
-			let quadIndices: [UInt32] = [0, 2, 1, 0, 3, 2]	// Build two triangles from the four quad vertices
-			let vertexOffset = triIndex * 4
-			let offsetIndices = quadIndices.map { $0 + vertexOffset }
-			return accumulator + offsetIndices
-		}
-		
+		let (vertices, indices) = buildPlaceMarkers(places: places, markerSize: 1.0)
 		return RenderPrimitive(vertices: vertices,
 													 indices: indices,
 													 color: (r: 1.0, g: 0.5, b: 0.5, a: 1.0),
-													 debugName: name)
+													 debugName: "Continent: \(name) - poi plane")
 	}
 }
 
