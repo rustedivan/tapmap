@@ -12,6 +12,18 @@
 
 ## Region rendering
 - barycentrics to render edges
+- the below reasoning is invalid (must do straight drawarrays, but that is fine I believe)
+-- should be possible to color every tri in the tessellation
+   to express edges. Every exterior edge should be able to
+   interpolate from 0 to 0 along one barycentric dimension.
+-- three exterior edges: (1 0 0)-(0 1 0)-(0 0 1)
+-- two exterior edges:   (1 0 0)-(1 0 0)-(0 1 0)
+-- one exterior edge: 	 (1 0 0)-(1 1 0)-(0 1 1)
+-- Ah, not as simple: two consecutive exterior edges might belong to the
+   same triangle, and the third vertex must then be different from both.
+   That fixates the coordinate of the third vertex, but that third vertex
+   might be shared by another similar triangle that has different dimensions
+   on the outer border.
 - generate UVs to control coordinate traversal
 - generate shard overlay
 
@@ -30,6 +42,7 @@ There is only land and sea. U taps the landmass. The borders around
 the continents highlight, and the name "Earth" is displayed.
 Also, a small circle appears, an inviting tap-to-select.
 Tapping there, U marks Earth as visited.
+?? How does the difference between selection and opening look?
 U long-presses the landmass, and the cracks quickly spread out around U's finger.
 
 When the cracks have spread to the edges of the landmass, it fractures
@@ -46,10 +59,10 @@ At this point, U expects to be able to mark countries U has visited.
 However, every opened country splits apart into their constituent regions.
 
 The world fractures into a beautiful jagged mess of regions and
-provinces, with names few have noticed. Gone is the "went to Thailand",
-and instead U went to Nayok, Si Thammarat, Surat Thani and Ranong.
+provinces, with names few have noticed. Gone is the "went to Germany",
+and instead U went to Bavaria, Thüringen and Brandenburg.
 
-### Covering history
+### Covering U's travel history
 U now starts going over past journeys. U keeps going through
 Europe, drilling into countries. U leaves some of them marked
 as visited but will come back later to sort out the provinces.
@@ -59,6 +72,14 @@ By tapping again, Switzerland is no longer marked as visited.
 Had U also opened Switzerland, a simple pinch would have closed
 Switzerland again, and closed all its cantons too.
 
-Soon U reaches less familiar regions. U is not sure whether the
-visit to Munich means Bavaria or Thüringen. By zooming in a bit,
-cities are named by labels.
+Soon U reaches the less familiar region level. U is not sure whether the
+visit to Bangkok means Samut Prakan or Samut Sakhon. By zooming in a bit,
+cities are named by labels. U finds the Bangkok Metropolis area, and presses
+the circle to mark it as visited.
+
+### Making something from the data
+U has marked and opened the parts of the world U has visited.
+There is a button on the map, that flips it around to the backside.
+On the backside is a wealth of presentation modes
+
+
