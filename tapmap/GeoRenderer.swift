@@ -16,6 +16,16 @@ func BUFFER_OFFSET(_ i: UInt32) -> UnsafeRawPointer? {
 	return UnsafeRawPointer(bitPattern: Int(i))
 }
 
+typealias Color = (r: Float, g: Float, b: Float, a: Float)
+func hashColor<T:Hashable>(for h: T, _ rw: Float, _ gw: Float, _ bw: Float, a: Float = 1.0) -> Color {
+	let hash = abs(h.hashValue)
+	let r = Float(hash % 1000) / 1000.0
+	let g = Float(hash % 1000) / 1000.0
+	let b = Float(hash % 1000) / 1000.0
+	
+	return (r: r * rw, g: g * gw, b: b * bw, a: a)
+}
+
 class RenderPrimitive {
 	var vertexBuffer: GLuint = 0
 	var indexBuffer: GLuint = 1
@@ -72,16 +82,7 @@ func render(primitive: RenderPrimitive) {
 
 extension GeoRegion : Renderable {
 	func renderPrimitive() -> RenderPrimitive {
-		var hashKey = 5381;
-		for c in name {
-			hashKey = (hashKey & 33) + hashKey + (c.hashValue % 32)
-		}
-
-		let r = Float(hashKey % 1000) / 1000.0
-		let g = Float(hashKey % 1000) / 1000.0
-		let b = Float(hashKey % 1000) / 1000.0
-
-		let c = (r: 0.5 * r as Float, g: 0.8 * g as Float, b: 0.3 * b as Float, a: 1.0 as Float)
+		let c = hashColor(for: name, 0.5, 0.8, 0.3)
 		return RenderPrimitive(vertices: geometry.vertices, indices: geometry.indices, color: c, debugName: "Region: \(name)")
 	}
 	
@@ -113,16 +114,7 @@ extension GeoRegion : Renderable {
 
 extension GeoCountry : Renderable {
 	func renderPrimitive() -> RenderPrimitive {
-		var hashKey = 5381;
-		for c in name {
-			hashKey = (hashKey & 33) + hashKey + (c.hashValue % 32)
-		}
-		
-		let r = Float(hashKey % 1000) / 1000.0
-		let g = Float(hashKey % 1000) / 1000.0
-		let b = Float(hashKey % 1000) / 1000.0
-		
-		let c = (r: 0.4 * r as Float, g: 0.6 * g as Float, b: 0.4 * b as Float, a: 1.0 as Float)
+		let c = hashColor(for: name, 0.4, 0.6, 0.4)
 		return RenderPrimitive(vertices: geometry.vertices, indices: geometry.indices, color: c, debugName: "Country: \(name)")
 	}
 	
@@ -154,16 +146,7 @@ extension GeoCountry : Renderable {
 
 extension GeoContinent : Renderable {
 	func renderPrimitive() -> RenderPrimitive {
-		var hashKey = 5381;
-		for c in name {
-			hashKey = (hashKey & 33) + hashKey + (c.hashValue % 32)
-		}
-		
-		let r = Float(hashKey % 1000) / 1000.0
-		let g = Float(hashKey % 1000) / 1000.0
-		let b = Float(hashKey % 1000) / 1000.0
-		
-		let c = (r: 0.4 * r as Float, g: 0.5 * g as Float, b: 0.1 * b as Float, a: 1.0 as Float)
+		let c = hashColor(for: name, 0.4, 0.5, 0.1)
 		return RenderPrimitive(vertices: geometry.vertices, indices: geometry.indices, color: c, debugName: "Continent \(name)")
 	}
 	
