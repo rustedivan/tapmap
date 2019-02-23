@@ -89,10 +89,10 @@ func buildPlaceMarkers(places: Set<GeoPlace>, markerSize: Float) -> ([Vertex], [
 		return accumulator + verts
 	}
 
-	let triangleRange = 0..<UInt32(places.count * 2)
-	let indices = triangleRange.reduce([]) { (accumulator: [UInt32], triIndex: UInt32) in
+	let quadRange = 0..<UInt32(places.count)
+	let indices = quadRange.reduce([]) { (accumulator: [UInt32], quadIndex: UInt32) in
 		let quadIndices: [UInt32] = [0, 2, 1, 0, 3, 2]	// Build two triangles from the four quad vertices
-		let vertexOffset = triIndex * 4
+		let vertexOffset = quadIndex * 4
 		let offsetIndices = quadIndices.map { $0 + vertexOffset }
 		return accumulator + offsetIndices
 	}
