@@ -44,8 +44,7 @@ class OperationDistributePlaces : Operation {
 			let belongingPlaces = candidatePlaces.filter {
 				triangleSoupHitTest(point: CGPoint(x: $0.location.x,
 																					 y: $0.location.y),
-														inVertices: regionTessellation.vertices,
-														inIndices: regionTessellation.indices)
+														inVertices: regionTessellation.vertices)
 			}
 			
 			var updatedFeature = region

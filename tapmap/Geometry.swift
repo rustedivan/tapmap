@@ -35,8 +35,7 @@ func aabbHitTest(p: CGPoint, aabb: Aabb) -> Bool {
 func pickFromTessellations<T:GeoTessellated>(p: CGPoint, candidates: Set<T>) -> T? {
 	for tessellation in candidates {
 		if triangleSoupHitTest(point: p,
-													 inVertices: tessellation.geometry.vertices,
-													 inIndices: tessellation.geometry.indices) {
+													 inVertices: tessellation.geometry.vertices) {
 			return tessellation
 		}
 	}
@@ -44,17 +43,14 @@ func pickFromTessellations<T:GeoTessellated>(p: CGPoint, candidates: Set<T>) -> 
 }
 
 // Assumes triangles is CCW GL_TRIANGLES mode (consecutive triplets form triangles)
-func triangleSoupHitTest(point p: CGPoint, inVertices vertices: [Vertex], inIndices indices: [UInt32]) -> Bool {
-	for i in stride(from: 0, to: indices.count, by: 3) {
+func triangleSoupHitTest(point p: CGPoint, inVertices vertices: [Vertex]) -> Bool {
+	for i in stride(from: 0, to: vertices.count, by: 3) {
 		GeometryCounters.triHitCount += 1
 		
 		// Pick up the corners of the triangle
-		let i0 = Int(indices[i+0])
-		let i1 = Int(indices[i+1])
-		let i2 = Int(indices[i+2])
-		let x0 = vertices[i0].x, y0 = vertices[i0].y
-		let x1 = vertices[i1].x, y1 = vertices[i1].y
-		let x2 = vertices[i2].x, y2 = vertices[i2].y
+		let x0 = vertices[i + 0].x, y0 = vertices[i + 0].y
+		let x1 = vertices[i + 1].x, y1 = vertices[i + 1].y
+		let x2 = vertices[i + 2].x, y2 = vertices[i + 2].y
 		
 		// Triangle hits are resolved using barycentric coordinates.
 		// The point is expressed in barycentric coordinates, that is,

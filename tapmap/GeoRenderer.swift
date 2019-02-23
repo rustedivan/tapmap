@@ -25,57 +25,119 @@ func hashColor<T:Hashable>(for h: T, _ rw: Float, _ gw: Float, _ bw: Float, a: F
 }
 
 class RenderPrimitive {
+	enum DrawMode {
+		case Indexed
+		case Arrayed
+	}
+	
+	let mode: DrawMode
 	var vertexBuffer: GLuint = 0
-	var indexBuffer: GLuint = 1
-	let indexCount: GLsizei
+	let elementCount: GLsizei
+
+	// Only for indexed drawmode
+	var indexBuffer: GLuint = 0
+	
 	let color: (r: GLfloat, g: GLfloat, b: GLfloat, a: GLfloat)
 	let name: String
 	
+	// Indexed draw mode
 	init(vertices: [Vertex], indices: [UInt32], color c: (r: Float, g: Float, b: Float, a: Float), debugName: String) {
+		mode = .Indexed
 		color = c
+		
+		name = debugName
+		glLabelObjectEXT(GLenum(GL_BUFFER_OBJECT_EXT), vertexBuffer, 0, "\(debugName).vertices")
+		glLabelObjectEXT(GLenum(GL_BUFFER_OBJECT_EXT), indexBuffer, 0, "\(debugName).indices")
+		
+		guard !indices.isEmpty else {
+			elementCount = 0
+			return
+		}
 		
 		glGenBuffers(1, &vertexBuffer)
 		glBindBuffer(GLenum(GL_ARRAY_BUFFER), vertexBuffer)
 		
 		glBufferData(GLenum(GL_ARRAY_BUFFER),
-		             GLsizeiptr(MemoryLayout<Vertex>.size * vertices.count),
+		             GLsizeiptr(MemoryLayout<Vertex>.stride * vertices.count),
 								 vertices,
 		             GLenum(GL_STATIC_DRAW))
 		
-		indexCount = GLsizei(indices.count)
 		glGenBuffers(1, &indexBuffer)
 		glBindBuffer(GLenum(GL_ELEMENT_ARRAY_BUFFER), indexBuffer)
 		glBufferData(GLenum(GL_ELEMENT_ARRAY_BUFFER),
-		             GLsizeiptr(MemoryLayout<GLint>.size * indices.count),
+		             GLsizeiptr(MemoryLayout<UInt32>.stride * indices.count),
 								 indices,
 		             GLenum(GL_STATIC_DRAW))
-		
-		glLabelObjectEXT(GLenum(GL_BUFFER_OBJECT_EXT), vertexBuffer, 0, "\(debugName).vertices")
-		glLabelObjectEXT(GLenum(GL_BUFFER_OBJECT_EXT), indexBuffer, 0, "\(debugName).indices")
+		elementCount = GLsizei(indices.count)
+	}
+	
+	// Arrayed draw mode
+	init(vertices: [Vertex], color c: (r: Float, g: Float, b: Float, a: Float), debugName: String) {
+		mode = .Arrayed
+		color = c
 		name = debugName
+		glLabelObjectEXT(GLenum(GL_BUFFER_OBJECT_EXT), vertexBuffer, 0, "\(debugName).vertices")
+		
+		guard !vertices.isEmpty else {
+			elementCount = 0
+			return
+		}
+		
+		glGenBuffers(1, &vertexBuffer)
+		glBindBuffer(GLenum(GL_ARRAY_BUFFER), vertexBuffer)
+		glBindBuffer(GLenum(GL_ELEMENT_ARRAY_BUFFER), 0)
+		
+		glBufferData(GLenum(GL_ARRAY_BUFFER),
+								 GLsizeiptr(MemoryLayout<Vertex>.stride * vertices.count),
+								 vertices,
+								 GLenum(GL_STATIC_DRAW))
+		elementCount = GLsizei(vertices.count)
 	}
 	
 	deinit {
-		glDeleteBuffers(1, &indexBuffer)
+		if case .Indexed = mode {
+			glDeleteBuffers(1, &indexBuffer)
+		}
 		glDeleteBuffers(1, &vertexBuffer)
 	}
 }
 
 func render(primitive: RenderPrimitive) {
-	glEnableClientState(GLenum(GL_VERTEX_ARRAY))
-	glEnableVertexAttribArray(GLuint(GLKVertexAttrib.position.rawValue))
+	guard primitive.elementCount > 0 else {
+		return
+	}
 	
-	glBindBuffer(GLenum(GL_ELEMENT_ARRAY_BUFFER), primitive.indexBuffer)
-	glBindBuffer(GLenum(GL_ARRAY_BUFFER), primitive.vertexBuffer)
-	
-	glVertexAttribPointer(GLuint(GLKVertexAttrib.position.rawValue), 2,
-												GLenum(GL_FLOAT), GLboolean(GL_FALSE),
-												8, BUFFER_OFFSET(0))
-	
-	glDrawElements(GLenum(GL_TRIANGLES),
-								 primitive.indexCount,
-								 GLenum(GL_UNSIGNED_INT),
-								 BUFFER_OFFSET(0))
+	switch primitive.mode {
+	case .Indexed:
+		glEnableClientState(GLenum(GL_VERTEX_ARRAY))
+		glEnableVertexAttribArray(GLuint(GLKVertexAttrib.position.rawValue))	// FIXME: don't use GLKVertexAttrib values, make own mapping
+		
+		glBindBuffer(GLenum(GL_ELEMENT_ARRAY_BUFFER), primitive.indexBuffer)
+		glBindBuffer(GLenum(GL_ARRAY_BUFFER), primitive.vertexBuffer)
+		
+		glVertexAttribPointer(GLuint(GLKVertexAttrib.position.rawValue), 2,
+													GLenum(GL_FLOAT), GLboolean(GL_FALSE),
+													GLsizei(MemoryLayout<Vertex>.stride), BUFFER_OFFSET(0))
+		
+		glDrawElements(GLenum(GL_TRIANGLES),
+									 primitive.elementCount,
+									 GLenum(GL_UNSIGNED_INT),
+									 BUFFER_OFFSET(0))
+	case .Arrayed:
+		glEnableClientState(GLenum(GL_VERTEX_ARRAY))
+		glEnableVertexAttribArray(GLuint(GLKVertexAttrib.position.rawValue))
+		
+		glBindBuffer(GLenum(GL_ARRAY_BUFFER), primitive.vertexBuffer)
+		glBindBuffer(GLenum(GL_ELEMENT_ARRAY_BUFFER), 0)
+		
+		glVertexAttribPointer(GLuint(GLKVertexAttrib.position.rawValue), 2,
+													GLenum(GL_FLOAT), GLboolean(GL_FALSE),
+													GLsizei(MemoryLayout<Vertex>.stride), BUFFER_OFFSET(0))
+		
+		glDrawArrays(GLenum(GL_TRIANGLES),
+								 0,
+								 primitive.elementCount)
+	}
 }
 
 func buildPlaceMarkers(places: Set<GeoPlace>, markerSize: Float) -> ([Vertex], [UInt32]) {
@@ -103,7 +165,7 @@ func buildPlaceMarkers(places: Set<GeoPlace>, markerSize: Float) -> ([Vertex], [
 extension GeoRegion : Renderable {
 	func renderPrimitive() -> RenderPrimitive {
 		let c = hashColor(for: name, 0.5, 0.8, 0.3)
-		return RenderPrimitive(vertices: geometry.vertices, indices: geometry.indices, color: c, debugName: "Region: \(name)")
+		return RenderPrimitive(vertices: geometry.vertices, color: c, debugName: "Region: \(name)")
 	}
 	
 	func placesRenderPlane() -> RenderPrimitive {
@@ -119,7 +181,7 @@ extension GeoRegion : Renderable {
 extension GeoCountry : Renderable {
 	func renderPrimitive() -> RenderPrimitive {
 		let c = hashColor(for: name, 0.4, 0.6, 0.4)
-		return RenderPrimitive(vertices: geometry.vertices, indices: geometry.indices, color: c, debugName: "Country: \(name)")
+		return RenderPrimitive(vertices: geometry.vertices, color: c, debugName: "Country: \(name)")
 	}
 	
 	func placesRenderPlane() -> RenderPrimitive {
@@ -135,7 +197,7 @@ extension GeoCountry : Renderable {
 extension GeoContinent : Renderable {
 	func renderPrimitive() -> RenderPrimitive {
 		let c = hashColor(for: name, 0.4, 0.5, 0.1)
-		return RenderPrimitive(vertices: geometry.vertices, indices: geometry.indices, color: c, debugName: "Continent \(name)")
+		return RenderPrimitive(vertices: geometry.vertices, color: c, debugName: "Continent \(name)")
 	}
 	
 	func placesRenderPlane() -> RenderPrimitive {

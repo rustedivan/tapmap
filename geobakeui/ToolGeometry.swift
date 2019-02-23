@@ -138,7 +138,12 @@ func tessellate(_ feature: ToolGeoFeature) -> GeoTessellation? {
 			return out
 		}
 		
-		return GeoTessellation(vertices: regionVertices, indices: indices, aabb: aabb)
+		let expandedVertices = indices.reduce([]) { (accumulator, index) -> [Vertex] in
+			let indexedVertex = regionVertices[Int(index)]
+			return accumulator + [indexedVertex]
+		}
+		
+		return GeoTessellation(vertices: expandedVertices, aabb: aabb)
 	} catch {
 		return nil
 	}

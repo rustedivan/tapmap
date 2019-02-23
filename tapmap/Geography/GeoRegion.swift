@@ -58,7 +58,6 @@ struct Aabb : Equatable, Codable {
 
 struct GeoTessellation : Codable {
 	let vertices: [Vertex]
-	let indices: [UInt32]
 	let aabb: Aabb
 }
 
