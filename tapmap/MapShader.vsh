@@ -7,6 +7,7 @@
 //
 
 attribute vec4 position;
+attribute vec4 barycentric;
 
 varying lowp vec4 colorVarying;
 
@@ -15,6 +16,6 @@ uniform lowp vec4 regionColor;
 
 void main()
 {
-		colorVarying = regionColor;
+		colorVarying = barycentric;
     gl_Position = modelViewProjectionMatrix * position;
 }

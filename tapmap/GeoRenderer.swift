@@ -36,6 +36,7 @@ class RenderPrimitive {
 	
 	let mode: DrawMode
 	var vertexBuffer: GLuint = 0
+	var attribBuffer: GLuint = 0
 	let elementCount: GLsizei
 
 	// Only for indexed drawmode
@@ -50,8 +51,6 @@ class RenderPrimitive {
 		color = c
 		
 		name = debugName
-		glLabelObjectEXT(GLenum(GL_BUFFER_OBJECT_EXT), vertexBuffer, 0, "\(debugName).vertices")
-		glLabelObjectEXT(GLenum(GL_BUFFER_OBJECT_EXT), indexBuffer, 0, "\(debugName).indices")
 		
 		guard !indices.isEmpty else {
 			elementCount = 0
@@ -73,29 +72,50 @@ class RenderPrimitive {
 								 indices,
 		             GLenum(GL_STATIC_DRAW))
 		elementCount = GLsizei(indices.count)
+
+		glLabelObjectEXT(GLenum(GL_BUFFER_OBJECT_EXT), vertexBuffer, 0, "\(debugName).vertices")
+		glLabelObjectEXT(GLenum(GL_BUFFER_OBJECT_EXT), indexBuffer, 0, "\(debugName).indices")
 	}
 	
 	// Arrayed draw mode
-	init(vertices: [Vertex], color c: (r: Float, g: Float, b: Float, a: Float), debugName: String) {
+	init(vertices: [Vertex], attribs: [Vertex], color c: (r: Float, g: Float, b: Float, a: Float), debugName: String) {
 		mode = .Arrayed
 		color = c
 		name = debugName
-		glLabelObjectEXT(GLenum(GL_BUFFER_OBJECT_EXT), vertexBuffer, 0, "\(debugName).vertices")
 		
 		guard !vertices.isEmpty else {
 			elementCount = 0
 			return
 		}
 		
+		guard attribs.count == vertices.count || attribs.isEmpty else {
+			print("Vertex and attrib arrays are of differing lengths: \(vertices.count) != \(attribs.count)")
+			elementCount = 0
+			return
+		}
+		
 		glGenBuffers(1, &vertexBuffer)
 		glBindBuffer(GLenum(GL_ARRAY_BUFFER), vertexBuffer)
-		glBindBuffer(GLenum(GL_ELEMENT_ARRAY_BUFFER), 0)
-		
 		glBufferData(GLenum(GL_ARRAY_BUFFER),
 								 GLsizeiptr(MemoryLayout<Vertex>.stride * vertices.count),
 								 vertices,
 								 GLenum(GL_STATIC_DRAW))
+		
+		if !attribs.isEmpty {
+			glGenBuffers(1, &attribBuffer)
+			glBindBuffer(GLenum(GL_ARRAY_BUFFER), attribBuffer)
+			glBufferData(GLenum(GL_ARRAY_BUFFER),
+									 GLsizeiptr(MemoryLayout<Vertex>.stride * attribs.count),
+									 attribs,
+									 GLenum(GL_STATIC_DRAW))
+		}
+		
+		glBindBuffer(GLenum(GL_ELEMENT_ARRAY_BUFFER), 0)
+		
 		elementCount = GLsizei(vertices.count)
+		
+		glLabelObjectEXT(GLenum(GL_BUFFER_OBJECT_EXT), vertexBuffer, 0, "\(debugName).vertices")
+		glLabelObjectEXT(GLenum(GL_BUFFER_OBJECT_EXT), attribBuffer, 0, "\(debugName).attribs")
 	}
 	
 	deinit {
@@ -130,11 +150,16 @@ func render(primitive: RenderPrimitive) {
 	case .Arrayed:
 		glEnableClientState(GLenum(GL_VERTEX_ARRAY))
 		glEnableVertexAttribArray(RenderPrimitive.Attribs.position.rawValue)
+		glEnableVertexAttribArray(RenderPrimitive.Attribs.barycentric.rawValue)
 		
 		glBindBuffer(GLenum(GL_ELEMENT_ARRAY_BUFFER), 0)
 		
 		glBindBuffer(GLenum(GL_ARRAY_BUFFER), primitive.vertexBuffer)
 		glVertexAttribPointer(RenderPrimitive.Attribs.position.rawValue, 2,
+													GLenum(GL_FLOAT), GLboolean(GL_FALSE),
+													GLsizei(MemoryLayout<Vertex>.stride), BUFFER_OFFSET(0))
+		glBindBuffer(GLenum(GL_ARRAY_BUFFER), primitive.attribBuffer)
+		glVertexAttribPointer(RenderPrimitive.Attribs.barycentric.rawValue, 2,
 													GLenum(GL_FLOAT), GLboolean(GL_FALSE),
 													GLsizei(MemoryLayout<Vertex>.stride), BUFFER_OFFSET(0))
 		glDrawArrays(GLenum(GL_TRIANGLES),
@@ -168,7 +193,11 @@ func buildPlaceMarkers(places: Set<GeoPlace>, markerSize: Float) -> ([Vertex], [
 extension GeoRegion : Renderable {
 	func renderPrimitive() -> RenderPrimitive {
 		let c = hashColor(for: name, 0.5, 0.8, 0.3)
-		return RenderPrimitive(vertices: geometry.vertices, color: c, debugName: "Region: \(name)")
+		let triAttribs = (0..<(geometry.vertices.count/3)).reduce([]) { (accumulator, value) -> [Vertex] in
+			let v = Vertex(0.2, Float(value % 10) / 10.0)
+			return accumulator + [v, v, v]
+		}
+		return RenderPrimitive(vertices: geometry.vertices, attribs: triAttribs, color: c, debugName: "Region: \(name)")
 	}
 	
 	func placesRenderPlane() -> RenderPrimitive {
@@ -184,7 +213,11 @@ extension GeoRegion : Renderable {
 extension GeoCountry : Renderable {
 	func renderPrimitive() -> RenderPrimitive {
 		let c = hashColor(for: name, 0.4, 0.6, 0.4)
-		return RenderPrimitive(vertices: geometry.vertices, color: c, debugName: "Country: \(name)")
+		let triAttribs = (0..<(geometry.vertices.count / 3)).reduce([]) { (accumulator, value) -> [Vertex] in
+			let v = Vertex(Float(value % 10) / 10.0, 0.4)
+			return accumulator + [v, v, v]
+		}
+		return RenderPrimitive(vertices: geometry.vertices, attribs: triAttribs, color: c, debugName: "Country: \(name)")
 	}
 	
 	func placesRenderPlane() -> RenderPrimitive {
@@ -200,7 +233,11 @@ extension GeoCountry : Renderable {
 extension GeoContinent : Renderable {
 	func renderPrimitive() -> RenderPrimitive {
 		let c = hashColor(for: name, 0.4, 0.5, 0.1)
-		return RenderPrimitive(vertices: geometry.vertices, color: c, debugName: "Continent \(name)")
+		let triAttribs = (0..<(geometry.vertices.count / 3)).reduce([]) { (accumulator, value) -> [Vertex] in
+			let v = Vertex(0.5, Float(value % 10) / 10.0)
+			return accumulator + [v, v, v]
+		}
+		return RenderPrimitive(vertices: geometry.vertices, attribs: triAttribs, color: c, debugName: "Continent \(name)")
 	}
 	
 	func placesRenderPlane() -> RenderPrimitive {
@@ -243,6 +280,7 @@ func loadShaders(shaderName: String) -> GLuint {
 	// Bind attribute locations.
 	// This needs to be done prior to linking.
 	glBindAttribLocation(program, RenderPrimitive.Attribs.position.rawValue, "position")
+	glBindAttribLocation(program, RenderPrimitive.Attribs.barycentric.rawValue, "barycentric")
 	
 	// Link program.
 	if !linkProgram(program) {
