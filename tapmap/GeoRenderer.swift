@@ -8,7 +8,6 @@
 
 import Foundation
 import OpenGLES
-import GLKit
 
 func BUFFER_OFFSET(_ i: UInt32) -> UnsafeRawPointer? {
 	return UnsafeRawPointer(bitPattern: Int(i))
@@ -28,6 +27,11 @@ class RenderPrimitive {
 	enum DrawMode {
 		case Indexed
 		case Arrayed
+	}
+	
+	enum Attribs: GLuint {
+		case position = 1
+		case barycentric = 2
 	}
 	
 	let mode: DrawMode
@@ -110,12 +114,12 @@ func render(primitive: RenderPrimitive) {
 	switch primitive.mode {
 	case .Indexed:
 		glEnableClientState(GLenum(GL_VERTEX_ARRAY))
-		glEnableVertexAttribArray(GLuint(GLKVertexAttrib.position.rawValue))	// FIXME: don't use GLKVertexAttrib values, make own mapping
+		glEnableVertexAttribArray(RenderPrimitive.Attribs.position.rawValue)
 		
 		glBindBuffer(GLenum(GL_ELEMENT_ARRAY_BUFFER), primitive.indexBuffer)
 		glBindBuffer(GLenum(GL_ARRAY_BUFFER), primitive.vertexBuffer)
 		
-		glVertexAttribPointer(GLuint(GLKVertexAttrib.position.rawValue), 2,
+		glVertexAttribPointer(RenderPrimitive.Attribs.position.rawValue, 2,
 													GLenum(GL_FLOAT), GLboolean(GL_FALSE),
 													GLsizei(MemoryLayout<Vertex>.stride), BUFFER_OFFSET(0))
 		
@@ -125,15 +129,14 @@ func render(primitive: RenderPrimitive) {
 									 BUFFER_OFFSET(0))
 	case .Arrayed:
 		glEnableClientState(GLenum(GL_VERTEX_ARRAY))
-		glEnableVertexAttribArray(GLuint(GLKVertexAttrib.position.rawValue))
+		glEnableVertexAttribArray(RenderPrimitive.Attribs.position.rawValue)
 		
-		glBindBuffer(GLenum(GL_ARRAY_BUFFER), primitive.vertexBuffer)
 		glBindBuffer(GLenum(GL_ELEMENT_ARRAY_BUFFER), 0)
 		
-		glVertexAttribPointer(GLuint(GLKVertexAttrib.position.rawValue), 2,
+		glBindBuffer(GLenum(GL_ARRAY_BUFFER), primitive.vertexBuffer)
+		glVertexAttribPointer(RenderPrimitive.Attribs.position.rawValue, 2,
 													GLenum(GL_FLOAT), GLboolean(GL_FALSE),
 													GLsizei(MemoryLayout<Vertex>.stride), BUFFER_OFFSET(0))
-		
 		glDrawArrays(GLenum(GL_TRIANGLES),
 								 0,
 								 primitive.elementCount)
@@ -239,7 +242,7 @@ func loadShaders(shaderName: String) -> GLuint {
 	
 	// Bind attribute locations.
 	// This needs to be done prior to linking.
-	glBindAttribLocation(program, GLuint(GLKVertexAttrib.position.rawValue), "position")
+	glBindAttribLocation(program, RenderPrimitive.Attribs.position.rawValue, "position")
 	
 	// Link program.
 	if !linkProgram(program) {
