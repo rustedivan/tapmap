@@ -78,7 +78,7 @@ class RenderPrimitive {
 	}
 	
 	// Arrayed draw mode
-	init(vertices: [Vertex], attribs: [Vertex], color c: (r: Float, g: Float, b: Float, a: Float), debugName: String) {
+	init(vertices: [Vertex], attribs: [Float], color c: (r: Float, g: Float, b: Float, a: Float), debugName: String) {
 		mode = .Arrayed
 		color = c
 		name = debugName
@@ -88,7 +88,7 @@ class RenderPrimitive {
 			return
 		}
 		
-		guard attribs.count == vertices.count || attribs.isEmpty else {
+		guard attribs.count == vertices.count * 3 || attribs.isEmpty else {
 			print("Vertex and attrib arrays are of differing lengths: \(vertices.count) != \(attribs.count)")
 			elementCount = 0
 			return
@@ -105,7 +105,7 @@ class RenderPrimitive {
 			glGenBuffers(1, &attribBuffer)
 			glBindBuffer(GLenum(GL_ARRAY_BUFFER), attribBuffer)
 			glBufferData(GLenum(GL_ARRAY_BUFFER),
-									 GLsizeiptr(MemoryLayout<Vertex>.stride * attribs.count),
+									 GLsizeiptr(MemoryLayout<Float>.stride * attribs.count),
 									 attribs,
 									 GLenum(GL_STATIC_DRAW))
 		}
@@ -159,9 +159,9 @@ func render(primitive: RenderPrimitive) {
 													GLenum(GL_FLOAT), GLboolean(GL_FALSE),
 													GLsizei(MemoryLayout<Vertex>.stride), BUFFER_OFFSET(0))
 		glBindBuffer(GLenum(GL_ARRAY_BUFFER), primitive.attribBuffer)
-		glVertexAttribPointer(RenderPrimitive.Attribs.barycentric.rawValue, 2,
+		glVertexAttribPointer(RenderPrimitive.Attribs.barycentric.rawValue, 3,
 													GLenum(GL_FLOAT), GLboolean(GL_FALSE),
-													GLsizei(MemoryLayout<Vertex>.stride), BUFFER_OFFSET(0))
+													GLsizei(MemoryLayout<Float>.stride * 3), BUFFER_OFFSET(0))
 		glDrawArrays(GLenum(GL_TRIANGLES),
 								 0,
 								 primitive.elementCount)
