@@ -12,12 +12,16 @@ extension Vertex : Codable {
 	func encode(to encoder: Encoder) throws {
 		var container = encoder.unkeyedContainer()
 		try container.encode(contentsOf: [Float(x), Float(y)])
+		try container.encode(contentsOf: [attrib.0, attrib.1, attrib.2])
 	}
 
 	init(from decoder: Decoder) throws {
 		var container = try decoder.unkeyedContainer()
 		x = try Vertex.Precision(container.decode(Float.self))
 		y = try Vertex.Precision(container.decode(Float.self))
+		attrib.0 = try Float(container.decode(Float.self))
+		attrib.1 = try Float(container.decode(Float.self))
+		attrib.2 = try Float(container.decode(Float.self))
 	}
 }
 

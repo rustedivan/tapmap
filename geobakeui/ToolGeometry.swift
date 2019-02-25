@@ -141,9 +141,20 @@ func tessellate(_ feature: ToolGeoFeature) -> GeoTessellation? {
 			return out
 		}
 		
+		var triIndex = 0
 		let expandedVertices = indices.reduce([]) { (accumulator, index) -> [Vertex] in
 			let indexedVertex = regionVertices[Int(index)]
-			return accumulator + [indexedVertex]
+			triIndex = (triIndex + 1) % 3
+			
+			let edgeFlag: (Float, Float, Float)
+			switch triIndex {
+			case 0: edgeFlag = (1.0, 0.0, 0.0)
+			case 1: edgeFlag = (0.0, 1.0, 0.0)
+			case 2: edgeFlag = (0.0, 0.0, 1.0)
+			default: edgeFlag = (0.0, 0.0, 0.0)
+			}
+			let attributedVertex = Vertex(indexedVertex.x, indexedVertex.y, attrib: edgeFlag)
+			return accumulator + [attributedVertex]
 		}
 		
 		return GeoTessellation(vertices: expandedVertices, aabb: aabb)
