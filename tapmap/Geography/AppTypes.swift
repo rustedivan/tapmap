@@ -14,8 +14,10 @@ struct Vertex : Equatable {
 	
 	let x: Precision
 	let y: Precision
-	init(_ _x: Precision, _ _y: Precision) { x = _x; y = _y }
-	init(_ _x: Double, _ _y: Double) { x = Precision(_x); y = Precision(_y) }
+	let attrib: (Float, Float, Float)
+	
+	init(_ _x: Precision, _ _y: Precision) { x = _x; y = _y; attrib = (0.0, 0.0, 0.0) }
+	init(_ _x: Double, _ _y: Double, attrib attr: (Float, Float, Float)) { x = Precision(_x); y = Precision(_y); attrib = attr }
 	
 	var quantized : (Int64, Int64) {
 		let quant: Precision = 1e-6

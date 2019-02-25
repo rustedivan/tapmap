@@ -36,7 +36,6 @@ class RenderPrimitive {
 	
 	let mode: DrawMode
 	var vertexBuffer: GLuint = 0
-	var attribBuffer: GLuint = 0
 	let elementCount: GLsizei
 
 	// Only for indexed drawmode
@@ -78,18 +77,12 @@ class RenderPrimitive {
 	}
 	
 	// Arrayed draw mode
-	init(vertices: [Vertex], attribs: [Float], color c: (r: Float, g: Float, b: Float, a: Float), debugName: String) {
+	init(vertices: [Vertex], color c: (r: Float, g: Float, b: Float, a: Float), debugName: String) {
 		mode = .Arrayed
 		color = c
 		name = debugName
 		
 		guard !vertices.isEmpty else {
-			elementCount = 0
-			return
-		}
-		
-		guard attribs.count == vertices.count * 3 || attribs.isEmpty else {
-			print("Vertex and attrib arrays are of differing lengths: \(vertices.count) != \(attribs.count)")
 			elementCount = 0
 			return
 		}
@@ -101,21 +94,11 @@ class RenderPrimitive {
 								 vertices,
 								 GLenum(GL_STATIC_DRAW))
 		
-		if !attribs.isEmpty {
-			glGenBuffers(1, &attribBuffer)
-			glBindBuffer(GLenum(GL_ARRAY_BUFFER), attribBuffer)
-			glBufferData(GLenum(GL_ARRAY_BUFFER),
-									 GLsizeiptr(MemoryLayout<Float>.stride * attribs.count),
-									 attribs,
-									 GLenum(GL_STATIC_DRAW))
-		}
-		
 		glBindBuffer(GLenum(GL_ELEMENT_ARRAY_BUFFER), 0)
 		
 		elementCount = GLsizei(vertices.count)
 		
 		glLabelObjectEXT(GLenum(GL_BUFFER_OBJECT_EXT), vertexBuffer, 0, "\(debugName).vertices")
-		glLabelObjectEXT(GLenum(GL_BUFFER_OBJECT_EXT), attribBuffer, 0, "\(debugName).attribs")
 	}
 	
 	deinit {
@@ -155,13 +138,15 @@ func render(primitive: RenderPrimitive) {
 		glBindBuffer(GLenum(GL_ELEMENT_ARRAY_BUFFER), 0)
 		
 		glBindBuffer(GLenum(GL_ARRAY_BUFFER), primitive.vertexBuffer)
+		// Point out vertex positions
 		glVertexAttribPointer(RenderPrimitive.Attribs.position.rawValue, 2,
 													GLenum(GL_FLOAT), GLboolean(GL_FALSE),
 													GLsizei(MemoryLayout<Vertex>.stride), BUFFER_OFFSET(0))
-		glBindBuffer(GLenum(GL_ARRAY_BUFFER), primitive.attribBuffer)
+		// Point out vertex attribs (offset by position)
 		glVertexAttribPointer(RenderPrimitive.Attribs.barycentric.rawValue, 3,
 													GLenum(GL_FLOAT), GLboolean(GL_FALSE),
-													GLsizei(MemoryLayout<Float>.stride * 3), BUFFER_OFFSET(0))
+													GLsizei(MemoryLayout<Vertex>.stride), BUFFER_OFFSET(UInt32(MemoryLayout<Float>.stride * 2)))
+
 		glDrawArrays(GLenum(GL_TRIANGLES),
 								 0,
 								 primitive.elementCount)
@@ -193,11 +178,7 @@ func buildPlaceMarkers(places: Set<GeoPlace>, markerSize: Float) -> ([Vertex], [
 extension GeoRegion : Renderable {
 	func renderPrimitive() -> RenderPrimitive {
 		let c = hashColor(for: name, 0.5, 0.8, 0.3)
-		let triAttribs = (0..<(geometry.vertices.count/3)).reduce([]) { (accumulator, value) -> [Vertex] in
-			let v = Vertex(0.2, Float(value % 10) / 10.0)
-			return accumulator + [v, v, v]
-		}
-		return RenderPrimitive(vertices: geometry.vertices, attribs: triAttribs, color: c, debugName: "Region: \(name)")
+		return RenderPrimitive(vertices: geometry.vertices, color: c, debugName: "Region: \(name)")
 	}
 	
 	func placesRenderPlane() -> RenderPrimitive {
@@ -213,11 +194,7 @@ extension GeoRegion : Renderable {
 extension GeoCountry : Renderable {
 	func renderPrimitive() -> RenderPrimitive {
 		let c = hashColor(for: name, 0.4, 0.6, 0.4)
-		let triAttribs = (0..<(geometry.vertices.count / 3)).reduce([]) { (accumulator, value) -> [Vertex] in
-			let v = Vertex(Float(value % 10) / 10.0, 0.4)
-			return accumulator + [v, v, v]
-		}
-		return RenderPrimitive(vertices: geometry.vertices, attribs: triAttribs, color: c, debugName: "Country: \(name)")
+		return RenderPrimitive(vertices: geometry.vertices, color: c, debugName: "Country: \(name)")
 	}
 	
 	func placesRenderPlane() -> RenderPrimitive {
@@ -233,11 +210,7 @@ extension GeoCountry : Renderable {
 extension GeoContinent : Renderable {
 	func renderPrimitive() -> RenderPrimitive {
 		let c = hashColor(for: name, 0.4, 0.5, 0.1)
-		let triAttribs = (0..<(geometry.vertices.count / 3)).reduce([]) { (accumulator, value) -> [Vertex] in
-			let v = Vertex(0.5, Float(value % 10) / 10.0)
-			return accumulator + [v, v, v]
-		}
-		return RenderPrimitive(vertices: geometry.vertices, attribs: triAttribs, color: c, debugName: "Continent \(name)")
+		return RenderPrimitive(vertices: geometry.vertices, color: c, debugName: "Continent \(name)")
 	}
 	
 	func placesRenderPlane() -> RenderPrimitive {

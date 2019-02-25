@@ -16,7 +16,10 @@ struct Vertex : Equatable, Hashable, PointForm {
 	
 	let x: Precision
 	let y: Precision
-	init(_ _x: Precision, _ _y: Precision) { x = _x; y = _y }
+	let attrib: (Float, Float, Float)
+	
+	init(_ _x: Precision, _ _y: Precision) { x = _x; y = _y; attrib = (0.0, 0.0, 0.0) }
+	init(_ _x: Precision, _ _y: Precision, attrib attr: (Float, Float, Float)) { x = _x; y = _y; attrib = attr }
 	
 	var quantized : (Int64, Int64) {
 		let quant: Precision = 1e-6
