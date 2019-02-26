@@ -11,7 +11,7 @@
 varying mediump vec4 colorVar;
 varying mediump vec4 barycentricVar;
 
-mediump float edgeWidth = 1.0;
+mediump float edgeWidth = 3.0;
 
 // Via Florian Boesch @ codeflow.org
 mediump float edgeSelect() {

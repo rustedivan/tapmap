@@ -16,13 +16,13 @@ struct Vertex : Equatable, Hashable, PointForm {
 	
 	let x: Precision
 	let y: Precision
-	let attrib: (Float, Float, Float)
+	var attrib: (Float, Float, Float)
 	
 	init(_ _x: Precision, _ _y: Precision) { x = _x; y = _y; attrib = (0.0, 0.0, 0.0) }
 	init(_ _x: Precision, _ _y: Precision, attrib attr: (Float, Float, Float)) { x = _x; y = _y; attrib = attr }
 	
 	var quantized : (Int64, Int64) {
-		let quant: Precision = 1e-6
+		let quant: Precision = 1e-3
 		return (Int64(floor(x / quant)), Int64(floor(y / quant)))
 	}
 	
@@ -109,12 +109,21 @@ func snapPointToEdge(p: Vertex, threshold: Double, edge: (a : Vertex, b : Vertex
 	return (p, Double.greatestFiniteMagnitude)
 }
 
+struct EdgeIndices : Hashable {
+	let lo, hi: Int
+	init(_ i0: UInt32, _ i1: UInt32) {
+		lo = Int(min(i0, i1))
+		hi = Int(max(i0, i1))
+	}
+}
+
 func tessellate(_ feature: ToolGeoFeature) -> GeoTessellation? {
 	guard let tess = TessC() else {
 		print("Could not init TessC")
 		return nil
 	}
 	
+	var contourEdges: [Edge] = []
 	for polygon in feature.polygons {
 		let exterior = polygon.exteriorRing.contour
 		tess.addContour(exterior)
@@ -122,43 +131,96 @@ func tessellate(_ feature: ToolGeoFeature) -> GeoTessellation? {
 		for interior in interiorContours {
 			tess.addContour(interior)
 		}
+		
+		for i in 0..<polygon.exteriorRing.vertices.count {
+			contourEdges.append(Edge(polygon.exteriorRing.vertices[i],
+															 polygon.exteriorRing.vertices[(i + 1) % polygon.exteriorRing.vertices.count]))
+		}
 	}
 	
+	let t: (vertices: [CVector3], indices: [Int])
 	do {
-		let t = try tess.tessellate(windingRule: .evenOdd,
-																elementType: ElementType.polygons,
-																polySize: 3,
-																vertexSize: .vertex2)
-		let regionVertices = t.vertices.map {
-			Vertex(Double($0.x), Double($0.y))
-		}
-		let indices = t.indices.map { UInt32($0) }
-		let aabb = regionVertices.reduce(Aabb()) { aabb, v in
-			let out = Aabb(loX: min(Float(v.x), aabb.minX),
-										 loY: min(Float(v.y), aabb.minY),
-										 hiX: max(Float(v.x), aabb.maxX),
-										 hiY: max(Float(v.y), aabb.maxY))
-			return out
-		}
-		
-		var triIndex = 0
-		let expandedVertices = indices.reduce([]) { (accumulator, index) -> [Vertex] in
-			let indexedVertex = regionVertices[Int(index)]
-			triIndex = (triIndex + 1) % 3
-			
-			let edgeFlag: (Float, Float, Float)
-			switch triIndex {
-			case 0: edgeFlag = (1.0, 0.0, 0.0)
-			case 1: edgeFlag = (0.0, 1.0, 0.0)
-			case 2: edgeFlag = (0.0, 0.0, 1.0)
-			default: edgeFlag = (0.0, 0.0, 0.0)
-			}
-			let attributedVertex = Vertex(indexedVertex.x, indexedVertex.y, attrib: edgeFlag)
-			return accumulator + [attributedVertex]
-		}
-		
-		return GeoTessellation(vertices: expandedVertices, aabb: aabb)
+		t = try tess.tessellate(windingRule: .evenOdd,
+														elementType: ElementType.polygons,
+														polySize: 3,
+														vertexSize: .vertex2)
 	} catch {
 		return nil
 	}
+
+	var aabb = Aabb()
+	let regionVertices = t.vertices.map { (v: CVector3) -> Vertex in
+		// Calculate the aabb while we're passing through
+		aabb = Aabb(loX: min(Float(v.x), aabb.minX),
+								loY: min(Float(v.y), aabb.minY),
+								hiX: max(Float(v.x), aabb.maxX),
+								hiY: max(Float(v.y), aabb.maxY))
+		return Vertex(Double(v.x), Double(v.y))
+	}
+	
+	let indices = t.indices.map { UInt32($0) }
+	var edgeCardinalities : [EdgeIndices : Int] = [:]
+	for i in stride(from: 0, to: indices.count, by: 3) {
+		let e0 = EdgeIndices(indices[i + 0], indices[(i + 1)])
+		let e1 = EdgeIndices(indices[i + 1], indices[(i + 2)])
+		let e2 = EdgeIndices(indices[i + 2], indices[(i + 0)])
+		
+		for e in [e0, e1, e2] {
+			if edgeCardinalities.keys.contains(e) {
+				edgeCardinalities[e]! += 1
+			} else {
+				edgeCardinalities[e] = 1
+			}
+		}
+	}
+	let contourEdgeIndices = Set(edgeCardinalities.filter { $0.value == 1 }.map { $0.key })
+
+	var edgeFlaggedVertices: [Vertex] = []
+	for i in stride(from: 0, to: indices.count, by: 3) {
+		let i0 = indices[i + 0]
+		let i1 = indices[i + 1]
+		let i2 = indices[i + 2]
+		
+		// Figure out which edges to render/hide
+		let e0 = EdgeIndices(i1, i2)
+		let e1 = EdgeIndices(i2, i0)
+		let e2 = EdgeIndices(i0, i1)
+		let drawE0 = contourEdgeIndices.contains(e0)
+		let drawE1 = contourEdgeIndices.contains(e1)
+		let drawE2 = contourEdgeIndices.contains(e2)
+		
+		// Default to draw all edges
+		var attrib0: (Float, Float, Float) = (1.0, 0.0, 0.0)
+		var attrib1: (Float, Float, Float) = (0.0, 1.0, 0.0)
+		var attrib2: (Float, Float, Float) = (0.0, 0.0, 1.0)
+		
+		// To hide edge n, weight its vertices towards vertex n
+		if !drawE0 {
+			attrib1.0 = 1.0
+			attrib2.0 = 1.0
+		}
+		
+		if !drawE1 {
+			attrib0.1 = 1.0
+			attrib2.1 = 1.0
+		}
+		
+		if !drawE2 {
+			attrib0.2 = 1.0
+			attrib1.2 = 1.0
+		}
+		
+		// Expand the index-based vertices into straight arrays
+		var v0 = regionVertices[Int(i0)]
+		var v1 = regionVertices[Int(i1)]
+		var v2 = regionVertices[Int(i2)]
+		
+		v0.attrib = attrib0
+		v1.attrib = attrib1
+		v2.attrib = attrib2
+		
+		edgeFlaggedVertices.append(contentsOf: [v0, v1, v2])
+	}
+
+	return GeoTessellation(vertices: edgeFlaggedVertices, aabb: aabb)
 }
