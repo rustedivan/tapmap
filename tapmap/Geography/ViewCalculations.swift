@@ -17,13 +17,15 @@ func mapPoint(_ p: CGPoint, from a: CGRect, to b: CGRect) -> CGPoint {
 }
 
 func buildProjectionMatrix(viewSize: CGSize, mapSize: CGSize, centeredOn center: CGPoint, zoomedTo zoom: Float) -> GLKMatrix4 {
-	let projectionMatrix = GLKMatrix4MakeOrtho(0.0, Float(mapSize.width),
-																						 Float(mapSize.height), 0.0,
+	let viewAspect = viewSize.height / viewSize.width
+	let fittedMapSize = CGSize(width: mapSize.width, height: mapSize.width * viewAspect)
+	let projectionMatrix = GLKMatrix4MakeOrtho(0.0, Float(fittedMapSize.width),
+																						 Float(fittedMapSize.height), 0.0,
 																						 0.1, 2.0)
-	let lng = Float((center.x / viewSize.width) * mapSize.width)
-	let lat = Float((center.y / viewSize.height) * mapSize.height)
-	let lngOffset = Float(mapSize.width / 2.0)
-	let latOffset = Float(mapSize.height / 2.0)
+	let lng = Float((center.x / viewSize.width) * fittedMapSize.width)
+	let lat = Float((center.y / viewSize.height) * fittedMapSize.height)
+	let lngOffset = Float(fittedMapSize.width / 2.0)
+	let latOffset = Float(fittedMapSize.height / 2.0)
 	
 	// Compute the model view matrix for the object rendered with GLKit
 	// (Z = -1.0 to position between the clipping planes)
@@ -38,4 +40,9 @@ func buildProjectionMatrix(viewSize: CGSize, mapSize: CGSize, centeredOn center:
 	modelViewMatrix = GLKMatrix4Translate(modelViewMatrix, lngOffset, -latOffset, 0.0)
 	
 	return GLKMatrix4Multiply(projectionMatrix, modelViewMatrix)
+}
+
+func mapZoomLimits(viewSize: CGSize, mapSize: CGSize) -> (CGFloat, CGFloat) {
+	let height = viewSize.height / UIScreen.main.scale
+	return (height / mapSize.height, 15.0)
 }

@@ -62,6 +62,11 @@ class MapViewController: GLKViewController, GLKViewControllerDelegate {
 		scrollView.addSubview(dummyView)
 		dummyView.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(handleTap)))
 		
+		let zoomLimits = mapZoomLimits(viewSize: view.frame.size, mapSize: mapSpace.size)
+		scrollView.minimumZoomScale = zoomLimits.0
+		scrollView.zoomScale = zoomLimits.0
+		scrollView.maximumZoomScale = zoomLimits.1
+		
 		delegate = self
 		
 		EAGLContext.setCurrent(self.context)
