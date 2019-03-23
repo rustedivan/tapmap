@@ -23,6 +23,7 @@ class MapViewController: GLKViewController, GLKViewControllerDelegate {
 	var zoom: Float = 1.0
 	var offset: CGPoint = .zero
 	let mapSpace = CGRect(x: -180.0, y: -80.0, width: 360.0, height: 160.0)
+	var mapFrame = CGRect.zero
 	
 	// Rendering
 	var modelViewProjectionMatrix: GLKMatrix4 = GLKMatrix4Identity
@@ -67,6 +68,10 @@ class MapViewController: GLKViewController, GLKViewControllerDelegate {
 		scrollView.zoomScale = zoomLimits.0
 		scrollView.maximumZoomScale = zoomLimits.1
 		
+		// Calculate view-space frame of the map (scale map to fit in view, calculate the vertical offset to center it)
+		let heightDiff = dummyView.bounds.height - (mapSpace.height / (mapSpace.width / dummyView.bounds.width))
+		mapFrame = dummyView.bounds.insetBy(dx: 0.0, dy: heightDiff / 2.0)
+		
 		delegate = self
 		
 		EAGLContext.setCurrent(self.context)
@@ -92,7 +97,8 @@ class MapViewController: GLKViewController, GLKViewControllerDelegate {
 			let viewP = sender.location(in: dummyView)
 			var mapP = mapPoint(viewP,
 													from: dummyView.bounds,
-													to: mapSpace)
+													to: mapFrame,
+													space: mapSpace)
 			mapP.y = -mapP.y
 			
 			let userState = AppDelegate.sharedUserState

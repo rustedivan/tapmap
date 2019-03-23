@@ -10,9 +10,13 @@ import Foundation
 import CoreGraphics.CGGeometry
 import GLKit
 
-func mapPoint(_ p: CGPoint, from a: CGRect, to b: CGRect) -> CGPoint {
-	let u = (b.width) * (p.x - a.minX) / (a.width) + b.minX
-	let v = (b.height) * (p.y - a.minY) / (a.height) + b.minY
+func mapPoint(_ p: CGPoint, from view: CGRect, to subView: CGRect, space: CGRect) -> CGPoint {
+	let x = (p.x - view.minX) - subView.minX
+	let u = (x / subView.width) * space.width + space.minX
+	
+	let y = (p.y - view.minY) - subView.minY
+	let v = (y / subView.height) * space.height + space.minY
+
 	return CGPoint(x: u, y: v)
 }
 
