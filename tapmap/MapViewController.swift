@@ -143,6 +143,8 @@ class MapViewController: GLKViewController, GLKViewControllerDelegate {
 			} else if let hitRegion = pickFromTessellations(p: mapP, candidates: candidateRegions) {
 				userState.visitPlace(hitRegion)
 				placeName.text = hitRegion.name
+			} else {
+				placeName.text = ""
 			}
 		}
 	}
