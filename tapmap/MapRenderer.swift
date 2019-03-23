@@ -12,7 +12,7 @@ import GLKit
 class MapRenderer {
 	var regionPrimitives : [Int : RenderPrimitive]
 	let mapProgram: GLuint
-	let mapUniforms : (modelViewMatrix: GLint, color: GLint)
+	let mapUniforms : (modelViewMatrix: GLint, color: GLint, highlighted: GLint, time: GLint)
 	
 	init?(withGeoWorld geoWorld: GeoWorld) {
 		mapProgram = loadShaders(shaderName: "MapShader")
@@ -20,8 +20,11 @@ class MapRenderer {
 			print("Failed to load map shaders")
 			return nil
 		}
+		
 		mapUniforms.modelViewMatrix = glGetUniformLocation(mapProgram, "modelViewProjectionMatrix")
 		mapUniforms.color = glGetUniformLocation(mapProgram, "regionColor")
+		mapUniforms.highlighted = glGetUniformLocation(mapProgram, "highlighted")
+		mapUniforms.time = glGetUniformLocation(mapProgram, "time")
 		
 		let userState = AppDelegate.sharedUserState
 		
@@ -75,6 +78,8 @@ class MapRenderer {
 			})
 		})
 		
+		glUniform1f(mapUniforms.time, 0.0)
+		
 		for primitive in regionPrimitives.values {
 			var components : [GLfloat] = [primitive.color.r, primitive.color.g, primitive.color.b, 1.0]
 			glUniform4f(mapUniforms.color,
@@ -82,6 +87,7 @@ class MapRenderer {
 									GLfloat(components[1]),
 									GLfloat(components[2]),
 									GLfloat(components[3]))
+			glUniform1i(mapUniforms.highlighted, GLint(primitive.name == "Country: Sweden" ? 1 : 0))
 			render(primitive: primitive)
 		}
 		glPopGroupMarkerEXT()
