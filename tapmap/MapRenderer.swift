@@ -87,7 +87,9 @@ class MapRenderer {
 									GLfloat(components[1]),
 									GLfloat(components[2]),
 									GLfloat(components[3]))
-			glUniform1i(mapUniforms.highlighted, GLint(primitive.name == "Country: Sweden" ? 1 : 0))
+			
+			let selected = AppDelegate.sharedUIState.selected(primitive.ownerHash)
+			glUniform1i(mapUniforms.highlighted, GLint(selected ? 1 : 0))
 			render(primitive: primitive)
 		}
 		glPopGroupMarkerEXT()

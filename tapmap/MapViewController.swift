@@ -102,6 +102,7 @@ class MapViewController: GLKViewController, GLKViewControllerDelegate {
 			mapP.y = -mapP.y
 			
 			let userState = AppDelegate.sharedUserState
+			let uiState = AppDelegate.sharedUIState
 			
 			GeometryCounters.begin()
 			defer { GeometryCounters.end() }
@@ -125,7 +126,12 @@ class MapViewController: GLKViewController, GLKViewControllerDelegate {
 			
 			// Perform three different checks for the three different Kinds
 			if let hitContinent = pickFromTessellations(p: mapP, candidates: closedCandidateContinents) {
-				userState.visitPlace(hitContinent)
+				if uiState.selected(hitContinent) {
+					userState.visitPlace(hitContinent)
+				} else {
+					uiState.selectRegion(hitContinent)
+				}
+				
 				placeName.text = hitContinent.name
 				
 				mapRenderer.updatePrimitives(for: hitContinent,
@@ -133,7 +139,12 @@ class MapViewController: GLKViewController, GLKViewControllerDelegate {
 				poiRenderer.updatePrimitives(for: hitContinent,
 																		 with: hitContinent.children)
 			} else if let hitCountry = pickFromTessellations(p: mapP, candidates: closedCandidateCountries) {
-				userState.visitPlace(hitCountry)
+				if uiState.selected(hitCountry) {
+					userState.visitPlace(hitCountry)
+				} else {
+					uiState.selectRegion(hitCountry)
+				}
+				
 				placeName.text = hitCountry.name
 				
 				mapRenderer.updatePrimitives(for: hitCountry,
@@ -141,8 +152,14 @@ class MapViewController: GLKViewController, GLKViewControllerDelegate {
 				poiRenderer.updatePrimitives(for: hitCountry,
 																		 with: hitCountry.children)
 			} else if let hitRegion = pickFromTessellations(p: mapP, candidates: candidateRegions) {
-				userState.visitPlace(hitRegion)
+				if uiState.selected(hitRegion) {
+					userState.visitPlace(hitRegion)
+				} else {
+					uiState.selectRegion(hitRegion)
+				}
 				placeName.text = hitRegion.name
+			} else {
+				uiState.clearSelection()
 			}
 		}
 	}
