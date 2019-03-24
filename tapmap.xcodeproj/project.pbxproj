@@ -61,6 +61,9 @@
 		149E2EE01FCFDC47008387A2 /* ToolGeometry.swift in Sources */ = {isa = PBXBuildFile; fileRef = 149E2EDF1FCFDC47008387A2 /* ToolGeometry.swift */; };
 		14AAD0FF21A479EC001A75C1 /* OperationCleanUpBorders.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14AAD0FE21A479EC001A75C1 /* OperationCleanUpBorders.swift */; };
 		14B21D851E9FEA5200D27F1E /* GeoLoadingViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14B21D841E9FEA5200D27F1E /* GeoLoadingViewController.swift */; };
+		14B6547C224769C900B8E49B /* EffectRenderer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14B6547B224769C900B8E49B /* EffectRenderer.swift */; };
+		14B6547E22476FBB00B8E49B /* OpeningShader.vsh in Resources */ = {isa = PBXBuildFile; fileRef = 14B6547D22476FBB00B8E49B /* OpeningShader.vsh */; };
+		14B654802247700200B8E49B /* OpeningShader.fsh in Resources */ = {isa = PBXBuildFile; fileRef = 14B6547F2247700200B8E49B /* OpeningShader.fsh */; };
 		14B74E5E1E8F9C1100849BB5 /* GeoRegion.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14B74E5D1E8F9C1100849BB5 /* GeoRegion.swift */; };
 		14B74E711E8FB15500849BB5 /* GeoRenderer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14B74E701E8FB15500849BB5 /* GeoRenderer.swift */; };
 		14B74E731E8FCF5E00849BB5 /* FeatureLoaderTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14B74E721E8FCF5E00849BB5 /* FeatureLoaderTests.swift */; };
@@ -197,6 +200,9 @@
 		149E2EDF1FCFDC47008387A2 /* ToolGeometry.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ToolGeometry.swift; sourceTree = "<group>"; };
 		14AAD0FE21A479EC001A75C1 /* OperationCleanUpBorders.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OperationCleanUpBorders.swift; sourceTree = "<group>"; };
 		14B21D841E9FEA5200D27F1E /* GeoLoadingViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = GeoLoadingViewController.swift; sourceTree = "<group>"; };
+		14B6547B224769C900B8E49B /* EffectRenderer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EffectRenderer.swift; sourceTree = "<group>"; };
+		14B6547D22476FBB00B8E49B /* OpeningShader.vsh */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.glsl; path = OpeningShader.vsh; sourceTree = "<group>"; };
+		14B6547F2247700200B8E49B /* OpeningShader.fsh */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.glsl; path = OpeningShader.fsh; sourceTree = "<group>"; };
 		14B74E5D1E8F9C1100849BB5 /* GeoRegion.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = GeoRegion.swift; path = Geography/GeoRegion.swift; sourceTree = "<group>"; };
 		14B74E701E8FB15500849BB5 /* GeoRenderer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = GeoRenderer.swift; sourceTree = "<group>"; };
 		14B74E721E8FCF5E00849BB5 /* FeatureLoaderTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FeatureLoaderTests.swift; sourceTree = "<group>"; };
@@ -376,8 +382,11 @@
 				14B74E701E8FB15500849BB5 /* GeoRenderer.swift */,
 				1488E7ED201CDD9900AA00F1 /* MapRenderer.swift */,
 				14202F2F2210BD5E00C22C88 /* PoiRenderer.swift */,
+				14B6547B224769C900B8E49B /* EffectRenderer.swift */,
 				146A79081E8F912500E2EE20 /* MapShader.fsh */,
 				146A790A1E8F912500E2EE20 /* MapShader.vsh */,
+				14B6547D22476FBB00B8E49B /* OpeningShader.vsh */,
+				14B6547F2247700200B8E49B /* OpeningShader.fsh */,
 				14202F312210C6F400C22C88 /* PoiShader.fsh */,
 				14202F322210C6F400C22C88 /* PoiShader.vsh */,
 			);
@@ -698,9 +707,11 @@
 			buildActionMask = 2147483647;
 			files = (
 				146A79101E8F912500E2EE20 /* Main.storyboard in Resources */,
+				14B6547E22476FBB00B8E49B /* OpeningShader.vsh in Resources */,
 				146A790B1E8F912500E2EE20 /* MapShader.vsh in Resources */,
 				14202F332210C6F500C22C88 /* PoiShader.fsh in Resources */,
 				14202F342210C6F500C22C88 /* PoiShader.vsh in Resources */,
+				14B654802247700200B8E49B /* OpeningShader.fsh in Resources */,
 				146A79121E8F912500E2EE20 /* Assets.xcassets in Resources */,
 				1438DB722187D99D00FEB1D1 /* world.geo in Resources */,
 				146A79151E8F912500E2EE20 /* LaunchScreen.storyboard in Resources */,
@@ -898,6 +909,7 @@
 				140C99DB20D8DC610062486A /* ViewCalculations.swift in Sources */,
 				14202F302210BD5E00C22C88 /* PoiRenderer.swift in Sources */,
 				14B74E5E1E8F9C1100849BB5 /* GeoRegion.swift in Sources */,
+				14B6547C224769C900B8E49B /* EffectRenderer.swift in Sources */,
 				146A79071E8F912500E2EE20 /* AppDelegate.swift in Sources */,
 				147EC84F2244FFFC008F5BED /* UIState.swift in Sources */,
 			);

@@ -17,6 +17,7 @@ class MapViewController: GLKViewController, GLKViewControllerDelegate {
 	var geoWorld: GeoWorld!
 	var mapRenderer: MapRenderer!
 	var poiRenderer: PoiRenderer!
+	var effectRenderer: EffectRenderer!
 	var dummyView: UIView!
 	
 	// Navigation
@@ -77,6 +78,7 @@ class MapViewController: GLKViewController, GLKViewControllerDelegate {
 		EAGLContext.setCurrent(self.context)
 		mapRenderer = MapRenderer(withGeoWorld: geoWorld)!
 		poiRenderer = PoiRenderer(withGeoWorld: geoWorld)!
+		effectRenderer = EffectRenderer()
 	}
 	
 	override func didReceiveMemoryWarning() {
@@ -134,10 +136,10 @@ class MapViewController: GLKViewController, GLKViewControllerDelegate {
 				
 				placeName.text = hitContinent.name
 				
-				mapRenderer.updatePrimitives(for: hitContinent,
-																		 with: hitContinent.children)
-				poiRenderer.updatePrimitives(for: hitContinent,
-																		 with: hitContinent.children)
+				if let toAnimate = mapRenderer.updatePrimitives(for: hitContinent, with: hitContinent.children) {
+					effectRenderer.addOpeningEffect(for: toAnimate)
+				}
+				poiRenderer.updatePrimitives(for: hitContinent, with: hitContinent.children)
 			} else if let hitCountry = pickFromTessellations(p: mapP, candidates: closedCandidateCountries) {
 				if uiState.selected(hitCountry) {
 					userState.visitPlace(hitCountry)
@@ -147,10 +149,10 @@ class MapViewController: GLKViewController, GLKViewControllerDelegate {
 				
 				placeName.text = hitCountry.name
 				
-				mapRenderer.updatePrimitives(for: hitCountry,
-																		 with: hitCountry.children)
-				poiRenderer.updatePrimitives(for: hitCountry,
-																		 with: hitCountry.children)
+				if let toAnimate = mapRenderer.updatePrimitives(for: hitCountry, with: hitCountry.children) {
+					effectRenderer.addOpeningEffect(for: toAnimate)
+				}
+				poiRenderer.updatePrimitives(for: hitCountry, with: hitCountry.children)
 			} else if let hitRegion = pickFromTessellations(p: mapP, candidates: candidateRegions) {
 				if uiState.selected(hitRegion) {
 					userState.visitPlace(hitRegion)
@@ -170,6 +172,7 @@ class MapViewController: GLKViewController, GLKViewControllerDelegate {
 																											mapSize: mapSpace.size,
 																											centeredOn: offset,
 																											zoomedTo: zoom)
+		effectRenderer.updatePrimitives()
 	}
 	
 	override func glkView(_ view: GLKView, drawIn rect: CGRect) {
@@ -178,6 +181,7 @@ class MapViewController: GLKViewController, GLKViewControllerDelegate {
 		
 		mapRenderer.renderWorld(geoWorld: geoWorld, inProjection: modelViewProjectionMatrix)
 		poiRenderer.renderWorld(geoWorld: geoWorld, inProjection: modelViewProjectionMatrix)
+		effectRenderer.renderWorld(geoWorld: geoWorld, inProjection: modelViewProjectionMatrix)
 	}
 }
 
