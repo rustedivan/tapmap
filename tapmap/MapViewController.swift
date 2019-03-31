@@ -137,7 +137,7 @@ class MapViewController: GLKViewController, GLKViewControllerDelegate {
 				placeName.text = hitContinent.name
 				
 				if let toAnimate = mapRenderer.updatePrimitives(for: hitContinent, with: hitContinent.children) {
-					effectRenderer.addOpeningEffect(for: toAnimate)
+					effectRenderer.addOpeningEffect(for: toAnimate, at: hitContinent.geometry.midpoint)
 				}
 				poiRenderer.updatePrimitives(for: hitContinent, with: hitContinent.children)
 			} else if let hitCountry = pickFromTessellations(p: mapP, candidates: closedCandidateCountries) {
@@ -150,7 +150,7 @@ class MapViewController: GLKViewController, GLKViewControllerDelegate {
 				placeName.text = hitCountry.name
 				
 				if let toAnimate = mapRenderer.updatePrimitives(for: hitCountry, with: hitCountry.children) {
-					effectRenderer.addOpeningEffect(for: toAnimate)
+					effectRenderer.addOpeningEffect(for: toAnimate, at: hitCountry.geometry.midpoint)
 				}
 				poiRenderer.updatePrimitives(for: hitCountry, with: hitCountry.children)
 			} else if let hitRegion = pickFromTessellations(p: mapP, candidates: candidateRegions) {

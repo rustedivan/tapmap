@@ -149,14 +149,19 @@ func tessellate(_ feature: ToolGeoFeature) -> GeoTessellation? {
 	}
 
 	var aabb = Aabb()
+	var midpoint: (Vertex.Precision, Vertex.Precision) = (0.0, 0.0)
 	let regionVertices = t.vertices.map { (v: CVector3) -> Vertex in
 		// Calculate the aabb while we're passing through
 		aabb = Aabb(loX: min(Float(v.x), aabb.minX),
 								loY: min(Float(v.y), aabb.minY),
 								hiX: max(Float(v.x), aabb.maxX),
 								hiY: max(Float(v.y), aabb.maxY))
-		return Vertex(Double(v.x), Double(v.y))
+		midpoint.0 += Vertex.Precision(v.x)
+		midpoint.1 += Vertex.Precision(v.y)
+		return Vertex(Vertex.Precision(v.x), Vertex.Precision(v.y))
 	}
+	midpoint.0 /= Double(regionVertices.count)
+	midpoint.1 /= Double(regionVertices.count)
 	
 	let indices = t.indices.map { UInt32($0) }
 	var edgeCardinalities : [EdgeIndices : Int] = [:]
@@ -222,5 +227,5 @@ func tessellate(_ feature: ToolGeoFeature) -> GeoTessellation? {
 		edgeFlaggedVertices.append(contentsOf: [v0, v1, v2])
 	}
 
-	return GeoTessellation(vertices: edgeFlaggedVertices, aabb: aabb)
+	return GeoTessellation(vertices: edgeFlaggedVertices, aabb: aabb, midpoint: Vertex(midpoint.0, midpoint.1))
 }

@@ -59,6 +59,7 @@ struct Aabb : Equatable, Codable {
 struct GeoTessellation : Codable {
 	let vertices: [Vertex]
 	let aabb: Aabb
+	let midpoint: Vertex
 }
 
 protocol Renderable {

@@ -11,6 +11,7 @@ import GLKit
 
 struct RegionEffect {
 	let primitive: RenderPrimitive
+	let center: Vertex
 	let startTime: Date
 	let duration: TimeInterval
 	var progress : Double {
@@ -21,7 +22,7 @@ struct RegionEffect {
 class EffectRenderer {
 	var runningEffects : [RegionEffect]
 	let openingProgram: GLuint
-	let effectUniforms : (modelViewMatrix: GLint, color: GLint, progress: GLint)
+	let effectUniforms : (modelViewMatrix: GLint, color: GLint, center: GLint, progress: GLint)
 	
 	init?() {
 		openingProgram = loadShaders(shaderName: "OpeningShader")
@@ -32,6 +33,7 @@ class EffectRenderer {
 		
 		effectUniforms.modelViewMatrix = glGetUniformLocation(openingProgram, "modelViewProjectionMatrix")
 		effectUniforms.color = glGetUniformLocation(openingProgram, "regionColor")
+		effectUniforms.center = glGetUniformLocation(openingProgram, "center")
 		effectUniforms.progress = glGetUniformLocation(openingProgram, "progress")
 		
 		runningEffects = []
@@ -43,8 +45,8 @@ class EffectRenderer {
 		}
 	}
 	
-	func addOpeningEffect(for primitive: RenderPrimitive) {
-		runningEffects.append(RegionEffect(primitive: primitive, startTime: Date(), duration: 0.15))
+	func addOpeningEffect(for primitive: RenderPrimitive, at midpoint: Vertex) {
+		runningEffects.append(RegionEffect(primitive: primitive, center: midpoint, startTime: Date(), duration: 1.0))
 	}
 	
 	func updatePrimitives() {
@@ -76,6 +78,7 @@ class EffectRenderer {
 									GLfloat(components[2]),
 									GLfloat(components[3]))
 			glUniform1f(effectUniforms.progress, GLfloat(effect.progress))
+			glUniform4f(effectUniforms.center, GLfloat(effect.center.x), GLfloat(effect.center.y), 0.0, 0.0)
 			
 			render(primitive: primitive)
 		}
