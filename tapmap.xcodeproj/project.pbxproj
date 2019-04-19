@@ -87,6 +87,7 @@
 		14BDA61721EE91B8004CC319 /* JobHelpers.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14BDA61321EE91B8004CC319 /* JobHelpers.swift */; };
 		14E0288D1EB7332900B4D515 /* geobakeuiTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14E0288C1EB7332900B4D515 /* geobakeuiTests.swift */; };
 		14E09E6F1EB722CA00468792 /* GeoRegion.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14B74E5D1E8F9C1100849BB5 /* GeoRegion.swift */; };
+		14EBF16F225A20BD00D9A7AE /* ColoredHash.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14EEC95C225A1F1D00383F6B /* ColoredHash.swift */; };
 		14F148AA1EA383CC00D419AB /* RegionOutlineView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14F148A91EA383CC00D419AB /* RegionOutlineView.swift */; };
 		14F52E431FD67EBB002D3A3A /* OperationBakeGeometry.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14F52E401FD67EBB002D3A3A /* OperationBakeGeometry.swift */; };
 		14F52E441FD67EBB002D3A3A /* OperationTessellateRegions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14F52E411FD67EBB002D3A3A /* OperationTessellateRegions.swift */; };
@@ -212,6 +213,7 @@
 		14E0288A1EB7332900B4D515 /* geobakeuiTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = geobakeuiTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		14E0288C1EB7332900B4D515 /* geobakeuiTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = geobakeuiTests.swift; sourceTree = "<group>"; };
 		14E0288E1EB7332900B4D515 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		14EEC95C225A1F1D00383F6B /* ColoredHash.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ColoredHash.swift; sourceTree = "<group>"; };
 		14F148A51EA3826B00D419AB /* dotplan */ = {isa = PBXFileReference; lastKnownFileType = text; name = dotplan; path = geobakeui/dotplan; sourceTree = "<group>"; };
 		14F148A91EA383CC00D419AB /* RegionOutlineView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RegionOutlineView.swift; sourceTree = "<group>"; };
 		14F52E401FD67EBB002D3A3A /* OperationBakeGeometry.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = OperationBakeGeometry.swift; sourceTree = "<group>"; };
@@ -400,6 +402,7 @@
 				147EC84E2244FFFC008F5BED /* UIState.swift */,
 				1498FE1F219C2F4D006D0B78 /* UserState.swift */,
 				140C99DA20D8DC610062486A /* ViewCalculations.swift */,
+				14EEC95C225A1F1D00383F6B /* ColoredHash.swift */,
 				146A790E1E8F912500E2EE20 /* Main.storyboard */,
 				146A79131E8F912500E2EE20 /* LaunchScreen.storyboard */,
 			);
@@ -899,6 +902,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				14EBF16F225A20BD00D9A7AE /* ColoredHash.swift in Sources */,
 				1498FE20219C2F4D006D0B78 /* UserState.swift in Sources */,
 				1469F5C71F02F5F4008A37B3 /* Serialization.swift in Sources */,
 				14BD72FF220E41C900CDD7D9 /* AppTypes.swift in Sources */,

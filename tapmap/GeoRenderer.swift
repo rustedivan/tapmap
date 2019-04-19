@@ -7,6 +7,7 @@
 //
 
 import Foundation
+import UIKit.UIColor
 import OpenGLES
 
 func BUFFER_OFFSET(_ i: UInt32) -> UnsafeRawPointer? {
@@ -14,13 +15,12 @@ func BUFFER_OFFSET(_ i: UInt32) -> UnsafeRawPointer? {
 }
 
 typealias Color = (r: Float, g: Float, b: Float, a: Float)
-func hashColor<T:Hashable>(for h: T, _ rw: Float, _ gw: Float, _ bw: Float, a: Float = 1.0) -> Color {
-	let hash = abs(h.hashValue)
-	let r = Float(hash % 1000) / 1000.0
-	let g = Float(hash % 1000) / 1000.0
-	let b = Float(hash % 1000) / 1000.0
-	
-	return (r: r * rw, g: g * gw, b: b * bw, a: a)
+extension UIColor {
+	func tuple() -> Color {
+		var out: (r: CGFloat, g: CGFloat, b: CGFloat) = (0.0, 0.0, 0.0)
+		getRed(&out.r, green: &out.g, blue: &out.b, alpha: nil)
+		return Color(r: Float(out.r), g: Float(out.g), b: Float(out.b), a: 1.0)
+	}
 }
 
 class RenderPrimitive {
@@ -182,7 +182,7 @@ func buildPlaceMarkers(places: Set<GeoPlace>, markerSize: Float) -> ([Vertex], [
 
 extension GeoRegion : Renderable {
 	func renderPrimitive() -> RenderPrimitive {
-		let c = hashColor(for: name, 0.5, 0.8, 0.3)
+		let c = hashColor.tuple()
 		return RenderPrimitive(vertices: geometry.vertices, color: c, ownerHash: hashValue, debugName: "Region: \(name)")
 	}
 	
@@ -199,7 +199,7 @@ extension GeoRegion : Renderable {
 
 extension GeoCountry : Renderable {
 	func renderPrimitive() -> RenderPrimitive {
-		let c = hashColor(for: name, 0.4, 0.6, 0.4)
+		let c = hashColor.tuple()
 		return RenderPrimitive(vertices: geometry.vertices, color: c, ownerHash: hashValue, debugName: "Country: \(name)")
 	}
 	
@@ -216,7 +216,7 @@ extension GeoCountry : Renderable {
 
 extension GeoContinent : Renderable {
 	func renderPrimitive() -> RenderPrimitive {
-		let c = hashColor(for: name, 0.4, 0.5, 0.1)
+		let c = hashColor.tuple()
 		return RenderPrimitive(vertices: geometry.vertices, color: c, ownerHash: hashValue, debugName: "Continent \(name)")
 	}
 	
