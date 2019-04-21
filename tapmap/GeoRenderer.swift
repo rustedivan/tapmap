@@ -182,7 +182,7 @@ func buildPlaceMarkers(places: Set<GeoPlace>, markerSize: Float) -> ([Vertex], [
 
 extension GeoRegion : Renderable {
 	func renderPrimitive() -> RenderPrimitive {
-		let c = hashColor.tuple()
+		let c = hashColor(ofHash: parentHash, childHash: hashValue).tuple()
 		return RenderPrimitive(vertices: geometry.vertices, color: c, ownerHash: hashValue, debugName: "Region: \(name)")
 	}
 	

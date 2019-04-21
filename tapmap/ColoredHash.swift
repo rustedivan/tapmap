@@ -1,6 +1,25 @@
 import UIKit.UIColor
 
 extension Hashable {
+	var hashColor: UIColor {
+		return hashColor(ofHash: hashValue, childHash: 0)
+	}
+	
+	func hashColor<T:Hashable>(withChild child: T) -> UIColor {
+		return hashColor(withChildHash: child.hashValue)
+	}
+	
+	func hashColor(withChildHash childHash: Int) -> UIColor {
+		return hashColor(ofHash: hashValue, childHash: childHash)
+	}
+	
+	func hashColor(ofHash hash: Int, childHash: Int) -> UIColor {
+		let hue = bucketHash(hash, intoBuckets: 36, withSubhash: childHash)
+		let saturation = bucketHash(childHash, intoBuckets: 10)
+		let clampedSaturation = min(max(saturation, 0.4), 0.8)
+		return UIColor(hue: hue, saturation: clampedSaturation, brightness: 0.8,	alpha: 1.0)
+	}
+	
 	private func bucketHash(_ hashValue: Int,
 													intoBuckets buckets: Int,
 													withSubhash subhash: Int = 0) -> CGFloat {
@@ -13,17 +32,5 @@ extension Hashable {
 		let subNormal = Double(subIndex - (subBuckets / 2)) / Double(subBuckets)
 		let offset = subNormal * width
 		return CGFloat(abs(normal + offset))
-	}
-	
-	var hashColor: UIColor {
-		let hue = bucketHash(hashValue, intoBuckets: 36)
-		return UIColor(hue: hue,	saturation: 0.8, brightness: 0.8,	alpha: 1.0)
-	}
-	
-	func hashColor<T:Hashable>(withChild child: T) -> UIColor {
-		let hue = bucketHash(hashValue, intoBuckets: 36, withSubhash: child.hashValue)
-		let saturation = bucketHash(child.hashValue, intoBuckets: 10)
-		let clampedSaturation = min(max(saturation, 0.2), 0.6)
-		return UIColor(hue: hue, saturation: clampedSaturation, brightness: 0.8,	alpha: 1.0)
 	}
 }
