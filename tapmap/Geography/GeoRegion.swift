@@ -69,6 +69,7 @@ protocol Renderable {
 protocol GeoIdentifiable : Hashable {
 	var name : String { get }
 	var aabb : Aabb { get }
+	var parentHash: Int { get }
 }
 
 protocol GeoPlaceContainer {
@@ -90,6 +91,7 @@ struct GeoRegion : GeoIdentifiable, GeoPlaceContainer, GeoTessellated, Codable, 
 	let name: String
 	let geometry: GeoTessellation
 	let places: Set<GeoPlace>
+	let parentHash: Int
 	var aabb : Aabb { return geometry.aabb }
 	
 	public static func == (lhs: GeoRegion, rhs: GeoRegion) -> Bool {
@@ -106,6 +108,7 @@ struct GeoCountry : GeoNode, GeoPlaceContainer, GeoTessellated, Codable, Equatab
 	let children: Set<GeoRegion>
 	let places: Set<GeoPlace>
 	let geometry: GeoTessellation
+	let parentHash: Int
 	var aabb : Aabb { return geometry.aabb }
 	
 	
@@ -123,6 +126,7 @@ struct GeoContinent : GeoNode, GeoTessellated, GeoPlaceContainer, Codable, Equat
 	let children: Set<GeoCountry>
 	let places: Set<GeoPlace>
 	let geometry: GeoTessellation
+	let parentHash: Int
 	var aabb : Aabb { return geometry.aabb }
 	
 	public static func == (lhs: GeoContinent, rhs: GeoContinent) -> Bool {
@@ -138,6 +142,7 @@ struct GeoWorld : GeoNode, Codable {
 	let name: String
 	var aabb : Aabb { return Aabb(loX: -180.0, loY: -85.0, hiX: 180.0, hiY: 85.0) }
 	let children: Set<GeoContinent>
+	let parentHash: Int
 }
 
 struct GeoPlace : Codable, Equatable, Hashable {
