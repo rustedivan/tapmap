@@ -22,7 +22,7 @@ struct RegionEffect {
 class EffectRenderer {
 	var runningEffects : [RegionEffect]
 	let openingProgram: GLuint
-	let effectUniforms : (modelViewMatrix: GLint, color: GLint, center: GLint, progress: GLint)
+	let effectUniforms : (modelViewMatrix: GLint, color: GLint, progress: GLint, scaleInPlaceMatrix: GLint)
 	
 	init?() {
 		openingProgram = loadShaders(shaderName: "OpeningShader")
@@ -33,8 +33,8 @@ class EffectRenderer {
 		
 		effectUniforms.modelViewMatrix = glGetUniformLocation(openingProgram, "modelViewProjectionMatrix")
 		effectUniforms.color = glGetUniformLocation(openingProgram, "regionColor")
-		effectUniforms.center = glGetUniformLocation(openingProgram, "center")
 		effectUniforms.progress = glGetUniformLocation(openingProgram, "progress")
+		effectUniforms.scaleInPlaceMatrix = glGetUniformLocation(openingProgram, "scaleInPlaceMatrix")
 		
 		runningEffects = []
 	}
@@ -77,8 +77,20 @@ class EffectRenderer {
 									GLfloat(components[1]),
 									GLfloat(components[2]),
 									GLfloat(components[3]))
+			
 			glUniform1f(effectUniforms.progress, GLfloat(effect.progress))
-			glUniform4f(effectUniforms.center, GLfloat(effect.center.x), GLfloat(effect.center.y), 0.0, 0.0)
+			
+			// Construct matrix for scaling in place on top of `center`
+			let scale = Float(1.0 + effect.progress * 0.5);
+			var scaleInPlaceMatrix = GLKMatrix4Identity;
+			scaleInPlaceMatrix = GLKMatrix4Translate(scaleInPlaceMatrix, effect.center.x, effect.center.y, 0.0)
+			scaleInPlaceMatrix = GLKMatrix4Scale(scaleInPlaceMatrix, scale, scale, 0.0)
+			scaleInPlaceMatrix = GLKMatrix4Translate(scaleInPlaceMatrix, -effect.center.x, -effect.center.y, 0.0)
+			withUnsafePointer(to: &scaleInPlaceMatrix, {
+				$0.withMemoryRebound(to: Float.self, capacity: 16, {
+					glUniformMatrix4fv(effectUniforms.scaleInPlaceMatrix, 1, 0, $0)
+				})
+			})
 			
 			render(primitive: primitive)
 		}
