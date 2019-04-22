@@ -7,6 +7,7 @@
 //
 
 import Foundation
+import UIKit.UIColor
 import OpenGLES
 
 func BUFFER_OFFSET(_ i: UInt32) -> UnsafeRawPointer? {
@@ -14,13 +15,12 @@ func BUFFER_OFFSET(_ i: UInt32) -> UnsafeRawPointer? {
 }
 
 typealias Color = (r: Float, g: Float, b: Float, a: Float)
-func hashColor<T:Hashable>(for h: T, _ rw: Float, _ gw: Float, _ bw: Float, a: Float = 1.0) -> Color {
-	let hash = abs(h.hashValue)
-	let r = Float(hash % 1000) / 1000.0
-	let g = Float(hash % 1000) / 1000.0
-	let b = Float(hash % 1000) / 1000.0
-	
-	return (r: r * rw, g: g * gw, b: b * bw, a: a)
+extension UIColor {
+	func tuple() -> Color {
+		var out: (r: CGFloat, g: CGFloat, b: CGFloat) = (0.0, 0.0, 0.0)
+		getRed(&out.r, green: &out.g, blue: &out.b, alpha: nil)
+		return Color(r: Float(out.r), g: Float(out.g), b: Float(out.b), a: 1.0)
+	}
 }
 
 class RenderPrimitive {
@@ -35,6 +35,8 @@ class RenderPrimitive {
 	}
 	
 	let mode: DrawMode
+	let ownerHash: Int
+	
 	var vertexBuffer: GLuint = 0
 	let elementCount: GLsizei
 
@@ -45,10 +47,11 @@ class RenderPrimitive {
 	let name: String
 	
 	// Indexed draw mode
-	init(vertices: [Vertex], indices: [UInt32], color c: (r: Float, g: Float, b: Float, a: Float), debugName: String) {
+	init(vertices: [Vertex], indices: [UInt32], color c: (r: Float, g: Float, b: Float, a: Float), ownerHash hash: Int, debugName: String) {
 		mode = .Indexed
 		color = c
 		
+		ownerHash = hash
 		name = debugName
 		
 		guard !indices.isEmpty else {
@@ -77,9 +80,11 @@ class RenderPrimitive {
 	}
 	
 	// Arrayed draw mode
-	init(vertices: [Vertex], color c: (r: Float, g: Float, b: Float, a: Float), debugName: String) {
+	init(vertices: [Vertex], color c: (r: Float, g: Float, b: Float, a: Float), ownerHash hash: Int, debugName: String) {
 		mode = .Arrayed
 		color = c
+		
+		ownerHash = hash
 		name = debugName
 		
 		guard !vertices.isEmpty else {
@@ -177,8 +182,8 @@ func buildPlaceMarkers(places: Set<GeoPlace>, markerSize: Float) -> ([Vertex], [
 
 extension GeoRegion : Renderable {
 	func renderPrimitive() -> RenderPrimitive {
-		let c = hashColor(for: name, 0.5, 0.8, 0.3)
-		return RenderPrimitive(vertices: geometry.vertices, color: c, debugName: "Region: \(name)")
+		let c = hashColor(ofHash: parentHash, childHash: hashValue).tuple()
+		return RenderPrimitive(vertices: geometry.vertices, color: c, ownerHash: hashValue, debugName: "Region: \(name)")
 	}
 	
 	func placesRenderPlane() -> RenderPrimitive {
@@ -187,14 +192,15 @@ extension GeoRegion : Renderable {
 		return RenderPrimitive(vertices: vertices,
 													 indices: indices,
 													 color: (r: 0.7, g: 0.7, b: 0.7, a: 1.0),
+													 ownerHash: hashValue,
 													 debugName: "Region: \(name) - poi plane")
 	}
 }
 
 extension GeoCountry : Renderable {
 	func renderPrimitive() -> RenderPrimitive {
-		let c = hashColor(for: name, 0.4, 0.6, 0.4)
-		return RenderPrimitive(vertices: geometry.vertices, color: c, debugName: "Country: \(name)")
+		let c = hashColor.tuple()
+		return RenderPrimitive(vertices: geometry.vertices, color: c, ownerHash: hashValue, debugName: "Country: \(name)")
 	}
 	
 	func placesRenderPlane() -> RenderPrimitive {
@@ -203,14 +209,15 @@ extension GeoCountry : Renderable {
 		return RenderPrimitive(vertices: vertices,
 													 indices: indices,
 													 color: (r: 0.8, g: 0.3, b: 0.0, a: 1.0),
+													 ownerHash: hashValue,
 													 debugName: "Country: \(name) - poi plane")
 	}
 }
 
 extension GeoContinent : Renderable {
 	func renderPrimitive() -> RenderPrimitive {
-		let c = hashColor(for: name, 0.4, 0.5, 0.1)
-		return RenderPrimitive(vertices: geometry.vertices, color: c, debugName: "Continent \(name)")
+		let c = hashColor.tuple()
+		return RenderPrimitive(vertices: geometry.vertices, color: c, ownerHash: hashValue, debugName: "Continent \(name)")
 	}
 	
 	func placesRenderPlane() -> RenderPrimitive {
@@ -218,6 +225,7 @@ extension GeoContinent : Renderable {
 		return RenderPrimitive(vertices: vertices,
 													 indices: indices,
 													 color: (r: 1.0, g: 0.5, b: 0.5, a: 1.0),
+													 ownerHash: hashValue,
 													 debugName: "Continent: \(name) - poi plane")
 	}
 }

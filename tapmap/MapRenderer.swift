@@ -12,7 +12,7 @@ import GLKit
 class MapRenderer {
 	var regionPrimitives : [Int : RenderPrimitive]
 	let mapProgram: GLuint
-	let mapUniforms : (modelViewMatrix: GLint, color: GLint)
+	let mapUniforms : (modelViewMatrix: GLint, color: GLint, highlighted: GLint, time: GLint)
 	
 	init?(withGeoWorld geoWorld: GeoWorld) {
 		mapProgram = loadShaders(shaderName: "MapShader")
@@ -20,8 +20,11 @@ class MapRenderer {
 			print("Failed to load map shaders")
 			return nil
 		}
+		
 		mapUniforms.modelViewMatrix = glGetUniformLocation(mapProgram, "modelViewProjectionMatrix")
 		mapUniforms.color = glGetUniformLocation(mapProgram, "regionColor")
+		mapUniforms.highlighted = glGetUniformLocation(mapProgram, "highlighted")
+		mapUniforms.time = glGetUniformLocation(mapProgram, "time")
 		
 		let userState = AppDelegate.sharedUserState
 		
@@ -53,15 +56,18 @@ class MapRenderer {
 		}
 	}
 	
-	func updatePrimitives<T:GeoNode>(for node: T, with subRegions: Set<T.SubType>) {
+	func updatePrimitives<T:GeoNode>(for node: T, with subRegions: Set<T.SubType>) -> RenderPrimitive? {
 		if AppDelegate.sharedUserState.placeVisited(node) {
-			regionPrimitives.removeValue(forKey: node.hashValue)
+			let removedPrimitive = regionPrimitives.removeValue(forKey: node.hashValue)
 
 			let hashedPrimitives = subRegions.map {
 				($0.hashValue, $0.renderPrimitive())
 			}
 			regionPrimitives.merge(hashedPrimitives, uniquingKeysWith: { (l, r) in print("Replacing"); return l })
+			return removedPrimitive
 		}
+		
+		return nil
 	}
 	
 	func renderWorld(geoWorld: GeoWorld, inProjection projection: GLKMatrix4) {
@@ -75,6 +81,8 @@ class MapRenderer {
 			})
 		})
 		
+		glUniform1f(mapUniforms.time, 0.0)
+		
 		for primitive in regionPrimitives.values {
 			var components : [GLfloat] = [primitive.color.r, primitive.color.g, primitive.color.b, 1.0]
 			glUniform4f(mapUniforms.color,
@@ -82,6 +90,9 @@ class MapRenderer {
 									GLfloat(components[1]),
 									GLfloat(components[2]),
 									GLfloat(components[3]))
+			
+			let selected = AppDelegate.sharedUIState.selected(primitive.ownerHash)
+			glUniform1i(mapUniforms.highlighted, GLint(selected ? 1 : 0))
 			render(primitive: primitive)
 		}
 		glPopGroupMarkerEXT()

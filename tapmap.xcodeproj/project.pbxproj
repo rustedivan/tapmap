@@ -54,12 +54,16 @@
 		146B477121F0F7FA00CC36D9 /* config.swift in Sources */ = {isa = PBXBuildFile; fileRef = 146B477021F0F7FA00CC36D9 /* config.swift */; };
 		146B477521F3E62400CC36D9 /* pipeline.json in CopyFiles */ = {isa = PBXBuildFile; fileRef = 146B477421F3E61700CC36D9 /* pipeline.json */; };
 		146B477721F47B6000CC36D9 /* reshape.swift in Sources */ = {isa = PBXBuildFile; fileRef = 146B477621F47B6000CC36D9 /* reshape.swift */; };
+		147EC84F2244FFFC008F5BED /* UIState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 147EC84E2244FFFC008F5BED /* UIState.swift */; };
 		1488E7EE201CDD9900AA00F1 /* MapRenderer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1488E7ED201CDD9900AA00F1 /* MapRenderer.swift */; };
 		1495AB1220D500C00025A2DD /* GeometryTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1495AB1120D500C00025A2DD /* GeometryTests.swift */; };
 		1498FE20219C2F4D006D0B78 /* UserState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1498FE1F219C2F4D006D0B78 /* UserState.swift */; };
 		149E2EE01FCFDC47008387A2 /* ToolGeometry.swift in Sources */ = {isa = PBXBuildFile; fileRef = 149E2EDF1FCFDC47008387A2 /* ToolGeometry.swift */; };
 		14AAD0FF21A479EC001A75C1 /* OperationCleanUpBorders.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14AAD0FE21A479EC001A75C1 /* OperationCleanUpBorders.swift */; };
 		14B21D851E9FEA5200D27F1E /* GeoLoadingViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14B21D841E9FEA5200D27F1E /* GeoLoadingViewController.swift */; };
+		14B6547C224769C900B8E49B /* EffectRenderer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14B6547B224769C900B8E49B /* EffectRenderer.swift */; };
+		14B6547E22476FBB00B8E49B /* OpeningShader.vsh in Resources */ = {isa = PBXBuildFile; fileRef = 14B6547D22476FBB00B8E49B /* OpeningShader.vsh */; };
+		14B654802247700200B8E49B /* OpeningShader.fsh in Resources */ = {isa = PBXBuildFile; fileRef = 14B6547F2247700200B8E49B /* OpeningShader.fsh */; };
 		14B74E5E1E8F9C1100849BB5 /* GeoRegion.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14B74E5D1E8F9C1100849BB5 /* GeoRegion.swift */; };
 		14B74E711E8FB15500849BB5 /* GeoRenderer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14B74E701E8FB15500849BB5 /* GeoRenderer.swift */; };
 		14B74E731E8FCF5E00849BB5 /* FeatureLoaderTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14B74E721E8FCF5E00849BB5 /* FeatureLoaderTests.swift */; };
@@ -83,6 +87,7 @@
 		14BDA61721EE91B8004CC319 /* JobHelpers.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14BDA61321EE91B8004CC319 /* JobHelpers.swift */; };
 		14E0288D1EB7332900B4D515 /* geobakeuiTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14E0288C1EB7332900B4D515 /* geobakeuiTests.swift */; };
 		14E09E6F1EB722CA00468792 /* GeoRegion.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14B74E5D1E8F9C1100849BB5 /* GeoRegion.swift */; };
+		14EBF16F225A20BD00D9A7AE /* ColoredHash.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14EEC95C225A1F1D00383F6B /* ColoredHash.swift */; };
 		14F148AA1EA383CC00D419AB /* RegionOutlineView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14F148A91EA383CC00D419AB /* RegionOutlineView.swift */; };
 		14F52E431FD67EBB002D3A3A /* OperationBakeGeometry.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14F52E401FD67EBB002D3A3A /* OperationBakeGeometry.swift */; };
 		14F52E441FD67EBB002D3A3A /* OperationTessellateRegions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14F52E411FD67EBB002D3A3A /* OperationTessellateRegions.swift */; };
@@ -189,12 +194,16 @@
 		146B477021F0F7FA00CC36D9 /* config.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = config.swift; sourceTree = "<group>"; };
 		146B477421F3E61700CC36D9 /* pipeline.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = pipeline.json; sourceTree = "<group>"; };
 		146B477621F47B6000CC36D9 /* reshape.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = reshape.swift; sourceTree = "<group>"; };
+		147EC84E2244FFFC008F5BED /* UIState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UIState.swift; sourceTree = "<group>"; };
 		1488E7ED201CDD9900AA00F1 /* MapRenderer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MapRenderer.swift; sourceTree = "<group>"; };
 		1495AB1120D500C00025A2DD /* GeometryTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GeometryTests.swift; sourceTree = "<group>"; };
 		1498FE1F219C2F4D006D0B78 /* UserState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserState.swift; sourceTree = "<group>"; };
 		149E2EDF1FCFDC47008387A2 /* ToolGeometry.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ToolGeometry.swift; sourceTree = "<group>"; };
 		14AAD0FE21A479EC001A75C1 /* OperationCleanUpBorders.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OperationCleanUpBorders.swift; sourceTree = "<group>"; };
 		14B21D841E9FEA5200D27F1E /* GeoLoadingViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = GeoLoadingViewController.swift; sourceTree = "<group>"; };
+		14B6547B224769C900B8E49B /* EffectRenderer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EffectRenderer.swift; sourceTree = "<group>"; };
+		14B6547D22476FBB00B8E49B /* OpeningShader.vsh */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.glsl; path = OpeningShader.vsh; sourceTree = "<group>"; };
+		14B6547F2247700200B8E49B /* OpeningShader.fsh */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.glsl; path = OpeningShader.fsh; sourceTree = "<group>"; };
 		14B74E5D1E8F9C1100849BB5 /* GeoRegion.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = GeoRegion.swift; path = Geography/GeoRegion.swift; sourceTree = "<group>"; };
 		14B74E701E8FB15500849BB5 /* GeoRenderer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = GeoRenderer.swift; sourceTree = "<group>"; };
 		14B74E721E8FCF5E00849BB5 /* FeatureLoaderTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FeatureLoaderTests.swift; sourceTree = "<group>"; };
@@ -204,6 +213,7 @@
 		14E0288A1EB7332900B4D515 /* geobakeuiTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = geobakeuiTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		14E0288C1EB7332900B4D515 /* geobakeuiTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = geobakeuiTests.swift; sourceTree = "<group>"; };
 		14E0288E1EB7332900B4D515 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		14EEC95C225A1F1D00383F6B /* ColoredHash.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ColoredHash.swift; sourceTree = "<group>"; };
 		14F148A51EA3826B00D419AB /* dotplan */ = {isa = PBXFileReference; lastKnownFileType = text; name = dotplan; path = geobakeui/dotplan; sourceTree = "<group>"; };
 		14F148A91EA383CC00D419AB /* RegionOutlineView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RegionOutlineView.swift; sourceTree = "<group>"; };
 		14F52E401FD67EBB002D3A3A /* OperationBakeGeometry.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = OperationBakeGeometry.swift; sourceTree = "<group>"; };
@@ -374,8 +384,11 @@
 				14B74E701E8FB15500849BB5 /* GeoRenderer.swift */,
 				1488E7ED201CDD9900AA00F1 /* MapRenderer.swift */,
 				14202F2F2210BD5E00C22C88 /* PoiRenderer.swift */,
+				14B6547B224769C900B8E49B /* EffectRenderer.swift */,
 				146A79081E8F912500E2EE20 /* MapShader.fsh */,
 				146A790A1E8F912500E2EE20 /* MapShader.vsh */,
+				14B6547D22476FBB00B8E49B /* OpeningShader.vsh */,
+				14B6547F2247700200B8E49B /* OpeningShader.fsh */,
 				14202F312210C6F400C22C88 /* PoiShader.fsh */,
 				14202F322210C6F400C22C88 /* PoiShader.vsh */,
 			);
@@ -386,8 +399,10 @@
 			isa = PBXGroup;
 			children = (
 				146A790C1E8F912500E2EE20 /* MapViewController.swift */,
+				147EC84E2244FFFC008F5BED /* UIState.swift */,
 				1498FE1F219C2F4D006D0B78 /* UserState.swift */,
 				140C99DA20D8DC610062486A /* ViewCalculations.swift */,
+				14EEC95C225A1F1D00383F6B /* ColoredHash.swift */,
 				146A790E1E8F912500E2EE20 /* Main.storyboard */,
 				146A79131E8F912500E2EE20 /* LaunchScreen.storyboard */,
 			);
@@ -695,9 +710,11 @@
 			buildActionMask = 2147483647;
 			files = (
 				146A79101E8F912500E2EE20 /* Main.storyboard in Resources */,
+				14B6547E22476FBB00B8E49B /* OpeningShader.vsh in Resources */,
 				146A790B1E8F912500E2EE20 /* MapShader.vsh in Resources */,
 				14202F332210C6F500C22C88 /* PoiShader.fsh in Resources */,
 				14202F342210C6F500C22C88 /* PoiShader.vsh in Resources */,
+				14B654802247700200B8E49B /* OpeningShader.fsh in Resources */,
 				146A79121E8F912500E2EE20 /* Assets.xcassets in Resources */,
 				1438DB722187D99D00FEB1D1 /* world.geo in Resources */,
 				146A79151E8F912500E2EE20 /* LaunchScreen.storyboard in Resources */,
@@ -885,6 +902,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				14EBF16F225A20BD00D9A7AE /* ColoredHash.swift in Sources */,
 				1498FE20219C2F4D006D0B78 /* UserState.swift in Sources */,
 				1469F5C71F02F5F4008A37B3 /* Serialization.swift in Sources */,
 				14BD72FF220E41C900CDD7D9 /* AppTypes.swift in Sources */,
@@ -895,7 +913,9 @@
 				140C99DB20D8DC610062486A /* ViewCalculations.swift in Sources */,
 				14202F302210BD5E00C22C88 /* PoiRenderer.swift in Sources */,
 				14B74E5E1E8F9C1100849BB5 /* GeoRegion.swift in Sources */,
+				14B6547C224769C900B8E49B /* EffectRenderer.swift in Sources */,
 				146A79071E8F912500E2EE20 /* AppDelegate.swift in Sources */,
+				147EC84F2244FFFC008F5BED /* UIState.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
