@@ -1,33 +1,33 @@
 # Road to Final
 
+## Simpleshapes.geojson
+
 ## POI rendering
 - progressive POI plane rendering
-- alpha based on distance to POI type
-- sprite sheet support
+-- each POI plane has a feature level
+-- aggressive box culling
+--- culled with its GeoRegion
+-- each POI plane renders its alpha at relation to global zoom
+--- country POI plane ramps in over 1.5x-1.6x; region POI plane ramps in over 3x-4x
+--- this info and conf should sit in the POI renderer
+-- POIs scale, but very slowly (~0.1x)
 
 ## Labels
 - composite UIView over GLKView
-- what framerate at full dataset?
--
+-- transparent UIView (visual and touch)
+-- render groups of labels based on
+- alpha based on distance to label
 
-## Region rendering
-- barycentrics to render edges
-- the below reasoning is invalid (must do straight drawarrays, but that is fine I believe)
--- should be possible to color every tri in the tessellation
-   to express edges. Every exterior edge should be able to
-   interpolate from 0 to 0 along one barycentric dimension.
--- three exterior edges: (1 0 0)-(0 1 0)-(0 0 1)
--- two exterior edges:   (1 0 0)-(1 0 0)-(0 1 0)
--- one exterior edge: 	 (1 0 0)-(1 1 0)-(0 1 1)
--- Ah, not as simple: two consecutive exterior edges might belong to the
-   same triangle, and the third vertex must then be different from both.
-   That fixates the coordinate of the third vertex, but that third vertex
-   might be shared by another similar triangle that has different dimensions
-   on the outer border.
-- generate UVs to control coordinate traversal
-- generate shard overlay
+## Dataset economy
+- Swift bitfields?
+- Fixed-point floats
 
+## Persistence
 
+## UI
+- visited viewstate
+- close regions
+- interaction markers
 
 ## User journey
 ### Insights
