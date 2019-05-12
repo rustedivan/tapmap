@@ -30,8 +30,9 @@ struct Vertex : Equatable, Hashable, PointForm {
 		return lhs.quantized == rhs.quantized
 	}
 	
-	var hashValue : Int {
-		return String("\(quantized)").hashValue
+	func hash(into hasher: inout Hasher) {
+		hasher.combine(quantized.0)
+		hasher.combine(quantized.1)
 	}
 }
 
@@ -50,9 +51,9 @@ struct Edge : Equatable, Hashable, PointForm {
 		return (lhs.v0 == rhs.v0 && lhs.v1 == rhs.v1) || (lhs.v0 == rhs.v1 && lhs.v1 == rhs.v0)
 	}
 	
-	var hashValue : Int {
+	func hash(into hasher: inout Hasher) {
 		let orderedHashes = [v0.hashValue, v1.hashValue].sorted()
-		return String("\(orderedHashes)").hashValue
+		hasher.combine(orderedHashes)
 	}
 }
 

@@ -45,7 +45,9 @@ struct ToolGeoFeature : Equatable, Hashable {
 		return lhs.level == rhs.level && lhs.name == rhs.name && lhs.countryKey == rhs.countryKey
 	}
 	
-	public var hashValue: Int {
-		return level.hashValue ^ name.hashValue ^ countryKey.hashValue
+	public func hash(into hasher: inout Hasher) {
+		hasher.combine(level)
+		hasher.combine(name)
+		hasher.combine(countryKey)
 	}
 }

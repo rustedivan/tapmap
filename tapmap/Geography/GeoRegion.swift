@@ -98,8 +98,10 @@ struct GeoRegion : GeoIdentifiable, GeoPlaceContainer, GeoTessellated, Codable, 
 		return lhs.name == rhs.name && lhs.aabb.midpoint == rhs.aabb.midpoint
 	}
 	
-	public var hashValue: Int {
-		return ("\(name)@\(aabb.midpoint.quantized)").hashValue
+	func hash(into hasher: inout Hasher) {
+		hasher.combine(name)
+		hasher.combine(aabb.midpoint.quantized.0)
+		hasher.combine(aabb.midpoint.quantized.1)
 	}
 }
 
@@ -116,8 +118,10 @@ struct GeoCountry : GeoNode, GeoPlaceContainer, GeoTessellated, Codable, Equatab
 		return lhs.name == rhs.name && lhs.aabb.midpoint == rhs.aabb.midpoint
 	}
 	
-	public var hashValue: Int {
-		return ("\(name)@\(aabb.midpoint.quantized)").hashValue
+	public func hash(into hasher: inout Hasher) {
+		hasher.combine(name)
+		hasher.combine(aabb.midpoint.quantized.0)
+		hasher.combine(aabb.midpoint.quantized.1)
 	}
 }
 
@@ -133,8 +137,8 @@ struct GeoContinent : GeoNode, GeoTessellated, GeoPlaceContainer, Codable, Equat
 		return lhs.name == rhs.name
 	}
 	
-	public var hashValue: Int {
-		return name.hashValue
+	func hash(into hasher: inout Hasher) {
+		hasher.combine(name)
 	}
 }
 
@@ -160,8 +164,11 @@ struct GeoPlace : Codable, Equatable, Hashable {
 		return lhs.name == rhs.name && lhs.location == rhs.location && lhs.kind == rhs.kind
 	}
 	
-	public var hashValue: Int {
-		return (name + "." + "(\(location.x):\(location.y))" + "." + "\(kind)").hashValue
+	public func hash(into hasher: inout Hasher) {
+		hasher.combine(name)
+		hasher.combine(location.quantized.0)
+		hasher.combine(location.quantized.1)
+		hasher.combine(kind)
 	}
 }
 
