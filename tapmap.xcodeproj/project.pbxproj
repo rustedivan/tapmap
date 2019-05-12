@@ -674,7 +674,7 @@
 			};
 			buildConfigurationList = 146A78FE1E8F912400E2EE20 /* Build configuration list for PBXProject "tapmap" */;
 			compatibilityVersion = "Xcode 3.2";
-			developmentRegion = English;
+			developmentRegion = en;
 			hasScannedForEncodings = 0;
 			knownRegions = (
 				en,
