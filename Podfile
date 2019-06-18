@@ -1,7 +1,6 @@
-# Uncomment the next line to define a global platform for your project
-# platform :ios, '9.0'
 
 target 'tapmap' do
+	platform :ios, '11.4'
   use_frameworks!
 
   # Pods for tapmap
@@ -10,17 +9,9 @@ target 'tapmap' do
   end
 end	
 
-target 'geobakeui' do
-  use_frameworks!
-
-  pod 'SwiftyJSON'
-  pod 'LibTessSwift'
-	target 'geobakeuiTests' do
-		inherit! :search_paths
-	end
-end
-
 target 'geobaketool' do
+	platform :osx, '10.14'
+
 	pod 'SwiftyJSON'
 	pod 'LibTessSwift'
 	target 'geobaketoolTests' do

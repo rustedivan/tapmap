@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Scheme
-   LastUpgradeVersion = "1010"
+   LastUpgradeVersion = "1020"
    version = "1.3">
    <BuildAction
       parallelizeBuildables = "YES"
@@ -14,9 +14,23 @@
             buildForAnalyzing = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "14FF12D621EE889300AF4474"
+               BlueprintIdentifier = "14C6658122B97DF70054D7F2"
                BuildableName = "geobaketool"
                BlueprintName = "geobaketool"
+               ReferencedContainer = "container:tapmap.xcodeproj">
+            </BuildableReference>
+         </BuildActionEntry>
+         <BuildActionEntry
+            buildForTesting = "YES"
+            buildForRunning = "NO"
+            buildForProfiling = "NO"
+            buildForArchiving = "NO"
+            buildForAnalyzing = "NO">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "14C6658C22B97E130054D7F2"
+               BuildableName = "geobaketoolTests.xctest"
+               BlueprintName = "geobaketoolTests"
                ReferencedContainer = "container:tapmap.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
@@ -32,7 +46,7 @@
             skipped = "NO">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "14FF12E521EE897300AF4474"
+               BlueprintIdentifier = "14C6658C22B97E130054D7F2"
                BuildableName = "geobaketoolTests.xctest"
                BlueprintName = "geobaketoolTests"
                ReferencedContainer = "container:tapmap.xcodeproj">
@@ -42,7 +56,7 @@
       <MacroExpansion>
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "14FF12D621EE889300AF4474"
+            BlueprintIdentifier = "14C6658122B97DF70054D7F2"
             BuildableName = "geobaketool"
             BlueprintName = "geobaketool"
             ReferencedContainer = "container:tapmap.xcodeproj">
@@ -65,7 +79,7 @@
          runnableDebuggingMode = "0">
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "14FF12D621EE889300AF4474"
+            BlueprintIdentifier = "14C6658122B97DF70054D7F2"
             BuildableName = "geobaketool"
             BlueprintName = "geobaketool"
             ReferencedContainer = "container:tapmap.xcodeproj">
@@ -74,11 +88,11 @@
       <CommandLineArguments>
          <CommandLineArgument
             argument = "download"
-            isEnabled = "NO">
+            isEnabled = "YES">
          </CommandLineArgument>
          <CommandLineArgument
             argument = "reshape"
-            isEnabled = "NO">
+            isEnabled = "YES">
          </CommandLineArgument>
          <CommandLineArgument
             argument = "bake"
@@ -98,7 +112,7 @@
          runnableDebuggingMode = "0">
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "14FF12D621EE889300AF4474"
+            BlueprintIdentifier = "14C6658122B97DF70054D7F2"
             BuildableName = "geobaketool"
             BlueprintName = "geobaketool"
             ReferencedContainer = "container:tapmap.xcodeproj">
