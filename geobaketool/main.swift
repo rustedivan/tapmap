@@ -10,38 +10,34 @@ import Foundation
 
 let commands = CommandLine.arguments.dropFirst()
 
-for command in commands {
-	switch command {
-	case "download":
-		do {
+do {
+	for command in commands {
+		switch command {
+		case "download":
 			try downloadFiles(params: commands.dropFirst())
-		} catch GeoBakeDownloadError.timedOut(let host) {
-			print("Connection to \(host) timed out after 60 seconds")
-		} catch GeoBakeDownloadError.downloadFailed(let key) {
-			print("Could not download url referenced in \"\(key)\" in pipeline.json")
-		} catch GeoBakeDownloadError.unpackFailed {
-			print("Could not unzip the downloaded geometry file archive.")
-		}
-	case "reshape":
-		do {
+		case "reshape":
 			try reshapeGeometry(params: commands.dropFirst())
-		} catch GeoBakeReshapeError.noNodePath {
-			print("No mapshaper path set in pipeline.config. Please set user-relative path to mapshaper in \"reshape.mapshaper\".")
-		} catch GeoBakeReshapeError.noMapshaperInstall {
-			print("No mapshaper install available on PATH. Please run 'npm install -g mapshaper'")
-		} catch GeoBakeReshapeError.missingShapeFile(let level) {
-			print("Could not find a \"\(level)\"-level shapefile. Please re-download.")
-		}
-	case "bake":
-		do {
+		case "bake":
 			try bakeGeometry()
-		} catch GeoBakePipelineError.datasetFailed(let dataset) {
-			print("Could not bake the \"\(dataset)\" dataset.")
-		} catch {
-			print("Could not bake geometry: \(error.localizedDescription)")
+		default: print("Usage")
 		}
-		
-	default: print("Usage")
 	}
+} catch GeoBakeDownloadError.timedOut(let host) {
+		print("Connection to \(host) timed out after 60 seconds")
+} catch GeoBakeDownloadError.downloadFailed(let key) {
+	print("Could not download url referenced in \"\(key)\" in pipeline.json")
+} catch GeoBakeDownloadError.unpackFailed {
+	print("Could not unzip the downloaded geometry file archive.")
+} catch GeoBakeReshapeError.noNodePath {
+	print("No mapshaper path set in pipeline.config. Please set user-relative path to mapshaper in \"reshape.mapshaper\".")
+} catch GeoBakeReshapeError.noMapshaperInstall {
+	print("No mapshaper install available on PATH. Please run 'npm install -g mapshaper'")
+} catch GeoBakeReshapeError.missingShapeFile(let level) {
+	print("Could not find a \"\(level)\"-level shapefile. Please re-download.")
+} catch GeoBakeReshapeError.noShapeFiles {
+	print("Could not find any shapefiles. Please re-download.")
+} catch GeoBakePipelineError.datasetFailed(let dataset) {
+	print("Could not bake the \"\(dataset)\" dataset.")
+} catch {
+	print("Could not bake geometry: \(error.localizedDescription)")
 }
-
