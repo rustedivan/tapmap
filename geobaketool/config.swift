@@ -67,19 +67,29 @@ class PipelineConfig {
 		return out
 	}
 	
+	fileprivate let appIdentifier = "se.rusted.tapmap"
+	fileprivate var applicationSupportUrl : URL {
+		return try! FileManager.default.url(for: .applicationSupportDirectory,
+																				in: .userDomainMask,
+																				appropriateFor: nil,
+																				create: true)
+		.appendingPathComponent(appIdentifier);
+	}
+	
+	var sourceGeometryUrl: URL {
+		return PipelineConfig.shared.applicationSupportUrl
+	}
+	
 	var reshapedCountriesFilePath : URL {
-		return URL(fileURLWithPath: FileManager.default.currentDirectoryPath)
-			.appendingPathComponent(PipelineConfig.sourceDirectory)
+		return applicationSupportUrl
 			.appendingPathComponent(PipelineConfig.reshapedCountriesFilename)
 	}
 	var reshapedRegionsFilePath : URL {
-		return URL(fileURLWithPath: FileManager.default.currentDirectoryPath)
-			.appendingPathComponent(PipelineConfig.sourceDirectory)
+		return applicationSupportUrl
 			.appendingPathComponent(PipelineConfig.reshapedRegionsFilename)
 	}
 	var queriedCitiesFilePath : URL {
-		return URL(fileURLWithPath: FileManager.default.currentDirectoryPath)
-			.appendingPathComponent(PipelineConfig.sourceDirectory)
+		return applicationSupportUrl
 			.appendingPathComponent(PipelineConfig.reshapedCitiesFilename)
 	}
 	
@@ -89,7 +99,6 @@ class PipelineConfig {
 	}
 	
 	// Constants
-	static let sourceDirectory = "source-geometry"
 	static let reshapedCountriesFilename = "reshaped-countries.json"
 	static let reshapedRegionsFilename = "reshaped-regions.json"
 	static let reshapedCitiesFilename = "osm-cities.json"

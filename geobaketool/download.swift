@@ -125,13 +125,10 @@ func unpackFile(archiveUrl: URL) throws -> URL {
 }
 
 func prepareGeometryDirectory() throws -> URL {
-	let path = FileManager.default.currentDirectoryPath + "/source-geometry"
-
-	if !FileManager.default.fileExists(atPath: path) {
-		try FileManager.default.createDirectory(atPath: path, withIntermediateDirectories: false, attributes: nil)
-	}
-	
-	return URL(fileURLWithPath: path)
+	let url = PipelineConfig.shared.sourceGeometryUrl
+	try FileManager.default.createDirectory(at: url,
+																					withIntermediateDirectories: true)
+	return url
 }
 
 func pickGeometryFiles(from src: URL, to dst: URL) throws {

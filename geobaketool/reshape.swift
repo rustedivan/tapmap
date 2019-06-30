@@ -12,6 +12,7 @@ enum GeoBakeReshapeError : Error {
 	case noNodePath
 	case noMapshaperInstall
 	case missingShapeFile(level: String)
+	case noShapeFiles
 }
 
 func reshapeGeometry(params: ArraySlice<String>) throws {
@@ -19,13 +20,19 @@ func reshapeGeometry(params: ArraySlice<String>) throws {
 	let countryStrength = PipelineConfig.shared.configValue("reshape.simplify-countries")
 	let regionStrength = PipelineConfig.shared.configValue("reshape.simplify-regions")
 	
-	let shapeFiles = try FileManager.default.contentsOfDirectory(atPath: PipelineConfig.sourceDirectory)
-																					.filter { $0.hasSuffix(".shp") }
-	
-	guard let countryFile = (shapeFiles.first { $0.contains("admin_0") }) else {
+	guard let shapeFiles = try? FileManager.default.contentsOfDirectory(at: PipelineConfig.shared.sourceGeometryUrl,
+			includingPropertiesForKeys: nil,
+			options: [])
+		.filter({ $0.pathExtension == "shp" }) else {
+			throw GeoBakeReshapeError.noShapeFiles
+	}
+	guard !shapeFiles.isEmpty else {
+		throw GeoBakeReshapeError.noShapeFiles
+	}
+	guard let countryFile = (shapeFiles.first { $0.absoluteString.contains("admin_0") }) else {
 		throw GeoBakeReshapeError.missingShapeFile(level: "admin_0")
 	}
-	guard let regionFile = (shapeFiles.first { $0.contains("admin_1") }) else {
+	guard let regionFile = (shapeFiles.first { $0.absoluteString.contains("admin_1") }) else {
 		throw GeoBakeReshapeError.missingShapeFile(level: "admin_1")
 	}
 	
@@ -33,23 +40,21 @@ func reshapeGeometry(params: ArraySlice<String>) throws {
 	try reshapeFile(input: regionFile, strength: regionStrength, method: method, output: PipelineConfig.reshapedRegionsFilename)
 }
 
-func reshapeFile(input: String, strength: Int, method: String, output: String) throws {
+func reshapeFile(input: URL, strength: Int, method: String, output: String) throws {
 	let nodeInstallPath = try findMapshaperInstall()
 	let nodePath = nodeInstallPath.appendingPathComponent("node").path
-	let sourceGeoPath = FileManager.default.currentDirectoryPath.appending("/\(PipelineConfig.sourceDirectory)")
-	let fileInPath = sourceGeoPath.appending("/\(input)")
-	let fileOutPath = sourceGeoPath.appending("/\(output)")
+	let fileOutUrl = PipelineConfig.shared.sourceGeometryUrl
+		.appendingPathComponent("\(output)")
 
-	print("Reshaping \"\(input)\" with \(method) @ \(strength)%...")
-	
+	print("Reshaping \"\(input.lastPathComponent)\" with \(method) @ \(strength)%...")
 	let reshapeTask = Process()
 	reshapeTask.currentDirectoryURL = nodeInstallPath
 	reshapeTask.launchPath = nodePath
 	reshapeTask.standardError = Pipe()
 	reshapeTask.arguments = ["mapshaper",
-													 "-i", fileInPath,
+													 "-i", input.path,
 													 "-simplify", method, "keep-shapes", "\(strength)%",
-													 "-o", fileOutPath, "format=geojson"]
+													 "-o", fileOutUrl.path, "format=geojson"]
 	reshapeTask.launch()
 	reshapeTask.waitUntilExit()
 	print("Reshaped \"\(output)\".")
