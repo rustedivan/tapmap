@@ -81,16 +81,15 @@ class PipelineConfig {
 	}
 	
 	var reshapedCountriesFilePath : URL {
-		return applicationSupportUrl
-			.appendingPathComponent(PipelineConfig.reshapedCountriesFilename)
+		return applicationSupportUrl.appendingPathComponent(PipelineConfig.shared.reshapedCountriesFilename)
 	}
-	var reshapedRegionsFilePath : URL {
-		return applicationSupportUrl
-			.appendingPathComponent(PipelineConfig.reshapedRegionsFilename)
+	var reshapedRegionsFilePath : URL? {
+		guard let file = PipelineConfig.shared.reshapedRegionsFilename else { return nil }
+		return applicationSupportUrl.appendingPathComponent(file)
 	}
-	var queriedCitiesFilePath : URL {
-		return applicationSupportUrl
-			.appendingPathComponent(PipelineConfig.reshapedCitiesFilename)
+	var queriedCitiesFilePath : URL? {
+		guard let file = PipelineConfig.shared.reshapedCitiesFilename else { return nil }
+		return applicationSupportUrl.appendingPathComponent(file)
 	}
 	
 	var outputFilePath : URL? {
@@ -99,9 +98,9 @@ class PipelineConfig {
 	}
 	
 	// Constants
-	static let reshapedCountriesFilename = "reshaped-countries.json"
-	static let reshapedRegionsFilename = "reshaped-regions.json"
-	static let reshapedCitiesFilename = "osm-cities.json"
+	var reshapedCountriesFilename: String { return configString("input-countries")! }
+	var reshapedRegionsFilename: String? { return configString("input-regions") }
+	var reshapedCitiesFilename: String? { return configString("input-cities") }
 }
 
 typealias ProgressBar = (Int, String) -> ()

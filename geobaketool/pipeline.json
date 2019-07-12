@@ -11,5 +11,6 @@
 		"simplify-countries" : 20,
 		"simplify-regions" : 30
 	},
+	"input-countries": "reshaped-countries.json",
 	"output": "Development/tapmap/tapmap/Raw/world.geo"
 }

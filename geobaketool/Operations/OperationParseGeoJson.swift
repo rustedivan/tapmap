@@ -32,16 +32,16 @@ class OperationParseGeoJson : Operation {
 	fileprivate func parseFeatures(json: JSON,
 																 dataSet: ToolGeoFeature.Level) -> Set<ToolGeoFeature>? {
 		guard json["type"] == "FeatureCollection" else {
-			print("Root node is not multi-feature")
-			return nil
+			print("Warning: Root node is not multi-feature")
+			return Set<ToolGeoFeature>()	// This is OK.
 		}
 		guard let featureArray = json["features"].array else {
-			print("Did not find the \"features\" array")
+			print("Error: Did not find the \"features\" array")
 			return nil
 		}
 		
-		let numFeatures = featureArray.count
 		var loadedFeatures : Set<ToolGeoFeature> = []
+		let numFeatures = featureArray.count
 		
 		for featureJson in featureArray {
 			if let loadedFeature = parseFeature(featureJson, into: level) {
