@@ -36,8 +36,8 @@ func reshapeGeometry(params: ArraySlice<String>) throws {
 		throw GeoBakeReshapeError.missingShapeFile(level: "admin_1")
 	}
 	
-	try reshapeFile(input: countryFile, strength: countryStrength, method: method, output: PipelineConfig.reshapedCountriesFilename)
-	try reshapeFile(input: regionFile, strength: regionStrength, method: method, output: PipelineConfig.reshapedRegionsFilename)
+	try reshapeFile(input: countryFile, strength: countryStrength, method: method, output: PipelineConfig.shared.reshapedCountriesFilename)
+	try reshapeFile(input: regionFile, strength: regionStrength, method: method, output: PipelineConfig.shared.reshapedRegionsFilename!)
 }
 
 func reshapeFile(input: URL, strength: Int, method: String, output: String) throws {

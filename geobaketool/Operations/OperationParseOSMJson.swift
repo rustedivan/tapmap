@@ -32,7 +32,7 @@ class OperationParseOSMJson : Operation {
 	fileprivate func parsePlaces(json: JSON, asKind kind: GeoPlace.Kind) -> GeoPlaceCollection? {
 		guard let placeArray = json["elements"].array else {
 			print("Did not find the \"elements\" array")
-			return nil
+			return GeoPlaceCollection()
 		}
 		
 		let numPlaces = placeArray.count
