@@ -8,7 +8,6 @@
 
 /* Begin PBXBuildFile section */
 		140835BC22B98F89004697FB /* pipeline.json in CopyFiles */ = {isa = PBXBuildFile; fileRef = 140835BB22B98F76004697FB /* pipeline.json */; };
-		140835BF22B991BA004697FB /* world.geo in Resources */ = {isa = PBXBuildFile; fileRef = 140835BE22B991BA004697FB /* world.geo */; };
 		148937F522B97FDF009278A0 /* Geometry.swift in Sources */ = {isa = PBXBuildFile; fileRef = 148937DF22B97FDF009278A0 /* Geometry.swift */; };
 		148937F622B97FDF009278A0 /* AppTypes.swift in Sources */ = {isa = PBXBuildFile; fileRef = 148937E022B97FDF009278A0 /* AppTypes.swift */; };
 		148937F722B97FDF009278A0 /* ViewCalculations.swift in Sources */ = {isa = PBXBuildFile; fileRef = 148937E122B97FDF009278A0 /* ViewCalculations.swift */; };
@@ -500,7 +499,6 @@
 				1489380022B97FDF009278A0 /* PoiShader.vsh in Resources */,
 				148937FD22B97FDF009278A0 /* MapShader.fsh in Resources */,
 				1489380122B97FDF009278A0 /* OpeningShader.fsh in Resources */,
-				140835BF22B991BA004697FB /* world.geo in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
