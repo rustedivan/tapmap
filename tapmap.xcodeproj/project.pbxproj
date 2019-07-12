@@ -8,7 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		140835BC22B98F89004697FB /* pipeline.json in CopyFiles */ = {isa = PBXBuildFile; fileRef = 140835BB22B98F76004697FB /* pipeline.json */; };
-		140835BF22B991BA004697FB /* world.geo in Resources */ = {isa = PBXBuildFile; fileRef = 140835BE22B991BA004697FB /* world.geo */; };
+		144B5D5522D9DF3E001E2A85 /* world.geo in Resources */ = {isa = PBXBuildFile; fileRef = 144B5D5422D9DF3E001E2A85 /* world.geo */; };
 		148937F522B97FDF009278A0 /* Geometry.swift in Sources */ = {isa = PBXBuildFile; fileRef = 148937DF22B97FDF009278A0 /* Geometry.swift */; };
 		148937F622B97FDF009278A0 /* AppTypes.swift in Sources */ = {isa = PBXBuildFile; fileRef = 148937E022B97FDF009278A0 /* AppTypes.swift */; };
 		148937F722B97FDF009278A0 /* ViewCalculations.swift in Sources */ = {isa = PBXBuildFile; fileRef = 148937E122B97FDF009278A0 /* ViewCalculations.swift */; };
@@ -106,7 +106,7 @@
 /* Begin PBXFileReference section */
 		08719FBC70EA1D5C3EAA5D98 /* Pods-tapmapTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-tapmapTests.release.xcconfig"; path = "Target Support Files/Pods-tapmapTests/Pods-tapmapTests.release.xcconfig"; sourceTree = "<group>"; };
 		140835BB22B98F76004697FB /* pipeline.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = pipeline.json; sourceTree = "<group>"; };
-		140835BE22B991BA004697FB /* world.geo */ = {isa = PBXFileReference; lastKnownFileType = file.bplist; path = world.geo; sourceTree = "<group>"; };
+		144B5D5422D9DF3E001E2A85 /* world.geo */ = {isa = PBXFileReference; lastKnownFileType = file.bplist; name = world.geo; path = Raw/world.geo; sourceTree = "<group>"; };
 		148937DF22B97FDF009278A0 /* Geometry.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Geometry.swift; sourceTree = "<group>"; };
 		148937E022B97FDF009278A0 /* AppTypes.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AppTypes.swift; sourceTree = "<group>"; };
 		148937E122B97FDF009278A0 /* ViewCalculations.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ViewCalculations.swift; sourceTree = "<group>"; };
@@ -282,7 +282,7 @@
 				14C6656522B97D8A0054D7F2 /* Assets.xcassets */,
 				14C6656722B97D8A0054D7F2 /* LaunchScreen.storyboard */,
 				14C6656A22B97D8A0054D7F2 /* Info.plist */,
-				140835BE22B991BA004697FB /* world.geo */,
+				144B5D5422D9DF3E001E2A85 /* world.geo */,
 			);
 			path = tapmap;
 			sourceTree = "<group>";
@@ -499,8 +499,8 @@
 				1489380222B97FDF009278A0 /* MapShader.vsh in Resources */,
 				1489380022B97FDF009278A0 /* PoiShader.vsh in Resources */,
 				148937FD22B97FDF009278A0 /* MapShader.fsh in Resources */,
+				144B5D5522D9DF3E001E2A85 /* world.geo in Resources */,
 				1489380122B97FDF009278A0 /* OpeningShader.fsh in Resources */,
-				140835BF22B991BA004697FB /* world.geo in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
