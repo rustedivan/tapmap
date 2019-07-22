@@ -56,7 +56,7 @@ class EffectRenderer {
 	}
 	
 	func renderWorld(geoWorld: GeoWorld, inProjection projection: GLKMatrix4) {
-		glPushGroupMarkerEXT(0, "Render world")
+		glPushGroupMarkerEXT(0, "Render opening effect")
 		glUseProgram(openingProgram)
 		
 		var mutableProjection = projection // The 'let' argument is not safe to pass into withUnsafePointer. No copy, since copy-on-write.
