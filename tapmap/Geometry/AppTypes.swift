@@ -30,3 +30,7 @@ struct Vertex : Equatable {
 		return Vertex(lhs.x + rhs.x, lhs.y + rhs.y)
 	}
 }
+
+struct VertexRing : Codable {
+	var vertices: [Vertex]
+}

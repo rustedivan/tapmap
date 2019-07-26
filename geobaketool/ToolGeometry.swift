@@ -52,7 +52,7 @@ struct Edge : Equatable, Hashable {
 	}
 }
 
-struct VertexRing {
+struct VertexRing : Codable {
 	var vertices: [Vertex]
 	var contour : [CVector3] {
 		return vertices.map { CVector3(x: Float($0.x), y: Float($0.y), z: 0.0) }
