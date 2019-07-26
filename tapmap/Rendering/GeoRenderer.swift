@@ -31,7 +31,6 @@ class RenderPrimitive {
 	
 	enum Attribs: GLuint {
 		case position = 1
-		case barycentric = 2
 	}
 	
 	let mode: DrawMode
@@ -138,7 +137,6 @@ func render(primitive: RenderPrimitive) {
 	case .Arrayed:
 		glEnableClientState(GLenum(GL_VERTEX_ARRAY))
 		glEnableVertexAttribArray(RenderPrimitive.Attribs.position.rawValue)
-		glEnableVertexAttribArray(RenderPrimitive.Attribs.barycentric.rawValue)
 		
 		glBindBuffer(GLenum(GL_ELEMENT_ARRAY_BUFFER), 0)
 		
@@ -147,11 +145,7 @@ func render(primitive: RenderPrimitive) {
 		glVertexAttribPointer(RenderPrimitive.Attribs.position.rawValue, 2,
 													GLenum(GL_FLOAT), GLboolean(GL_FALSE),
 													GLsizei(MemoryLayout<Vertex>.stride), BUFFER_OFFSET(0))
-		// Point out vertex attribs (offset by position)
-		glVertexAttribPointer(RenderPrimitive.Attribs.barycentric.rawValue, 3,
-													GLenum(GL_FLOAT), GLboolean(GL_FALSE),
-													GLsizei(MemoryLayout<Vertex>.stride), BUFFER_OFFSET(UInt32(MemoryLayout<Float>.stride * 2)))
-
+		
 		glDrawArrays(GLenum(GL_TRIANGLES),
 								 0,
 								 primitive.elementCount)
@@ -261,7 +255,6 @@ func loadShaders(shaderName: String) -> GLuint {
 	// Bind attribute locations.
 	// This needs to be done prior to linking.
 	glBindAttribLocation(program, RenderPrimitive.Attribs.position.rawValue, "position")
-	glBindAttribLocation(program, RenderPrimitive.Attribs.barycentric.rawValue, "barycentric")
 	
 	// Link program.
 	if !linkProgram(program) {

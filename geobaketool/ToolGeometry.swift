@@ -15,10 +15,8 @@ struct Vertex : Equatable, Hashable {
 	
 	let x: Precision
 	let y: Precision
-	var attrib: (Float, Float, Float)
 	
-	init(_ _x: Precision, _ _y: Precision) { x = _x; y = _y; attrib = (0.0, 0.0, 0.0) }
-	init(_ _x: Precision, _ _y: Precision, attrib attr: (Float, Float, Float)) { x = _x; y = _y; attrib = attr }
+	init(_ _x: Precision, _ _y: Precision) { x = _x; y = _y; }
 	
 	var quantized : (Int64, Int64) {
 		let quant: Precision = 1e-3
@@ -162,68 +160,20 @@ func tessellate(_ feature: ToolGeoFeature) -> GeoTessellation? {
 	midpoint.1 /= Double(regionVertices.count)
 	
 	let indices = t.indices.map { UInt32($0) }
-	var edgeCardinalities : [EdgeIndices : Int] = [:]
-	for i in stride(from: 0, to: indices.count, by: 3) {
-		let e0 = EdgeIndices(indices[i + 0], indices[(i + 1)])
-		let e1 = EdgeIndices(indices[i + 1], indices[(i + 2)])
-		let e2 = EdgeIndices(indices[i + 2], indices[(i + 0)])
-		
-		for e in [e0, e1, e2] {
-			if edgeCardinalities.keys.contains(e) {
-				edgeCardinalities[e]! += 1
-			} else {
-				edgeCardinalities[e] = 1
-			}
-		}
-	}
-	let contourEdgeIndices = Set(edgeCardinalities.filter { $0.value == 1 }.map { $0.key })
-
-	var edgeFlaggedVertices: [Vertex] = []
+	
+	var flattenedVertices: [Vertex] = []
 	for i in stride(from: 0, to: indices.count, by: 3) {
 		let i0 = indices[i + 0]
 		let i1 = indices[i + 1]
 		let i2 = indices[i + 2]
 		
-		// Figure out which edges to render/hide
-		let e0 = EdgeIndices(i1, i2)
-		let e1 = EdgeIndices(i2, i0)
-		let e2 = EdgeIndices(i0, i1)
-		let drawE0 = contourEdgeIndices.contains(e0)
-		let drawE1 = contourEdgeIndices.contains(e1)
-		let drawE2 = contourEdgeIndices.contains(e2)
-		
-		// Default to draw all edges
-		var attrib0: (Float, Float, Float) = (1.0, 0.0, 0.0)
-		var attrib1: (Float, Float, Float) = (0.0, 1.0, 0.0)
-		var attrib2: (Float, Float, Float) = (0.0, 0.0, 1.0)
-		
-		// To hide edge n, weight its vertices towards vertex n
-		if !drawE0 {
-			attrib1.0 = 1.0
-			attrib2.0 = 1.0
-		}
-		
-		if !drawE1 {
-			attrib0.1 = 1.0
-			attrib2.1 = 1.0
-		}
-		
-		if !drawE2 {
-			attrib0.2 = 1.0
-			attrib1.2 = 1.0
-		}
-		
 		// Expand the index-based vertices into straight arrays
-		var v0 = regionVertices[Int(i0)]
-		var v1 = regionVertices[Int(i1)]
-		var v2 = regionVertices[Int(i2)]
+		let v0 = regionVertices[Int(i0)]
+		let v1 = regionVertices[Int(i1)]
+		let v2 = regionVertices[Int(i2)]
 		
-		v0.attrib = attrib0
-		v1.attrib = attrib1
-		v2.attrib = attrib2
-		
-		edgeFlaggedVertices.append(contentsOf: [v0, v1, v2])
+		flattenedVertices.append(contentsOf: [v0, v1, v2])
 	}
 
-	return GeoTessellation(vertices: edgeFlaggedVertices, aabb: aabb, midpoint: Vertex(midpoint.0, midpoint.1))
+	return GeoTessellation(vertices: flattenedVertices, aabb: aabb, midpoint: Vertex(midpoint.0, midpoint.1))
 }
