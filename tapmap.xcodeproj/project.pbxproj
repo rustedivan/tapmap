@@ -8,6 +8,9 @@
 
 /* Begin PBXBuildFile section */
 		140835BC22B98F89004697FB /* pipeline.json in CopyFiles */ = {isa = PBXBuildFile; fileRef = 140835BB22B98F76004697FB /* pipeline.json */; };
+		140B990322E57CE000C912A4 /* EdgeShader.vsh in Resources */ = {isa = PBXBuildFile; fileRef = 140B990122E57CE000C912A4 /* EdgeShader.vsh */; };
+		140B990422E57CE000C912A4 /* EdgeShader.fsh in Resources */ = {isa = PBXBuildFile; fileRef = 140B990222E57CE000C912A4 /* EdgeShader.fsh */; };
+		140B990622E57D5700C912A4 /* EdgeGenerationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 140B990522E57D5700C912A4 /* EdgeGenerationTests.swift */; };
 		144B5D5A22D9E092001E2A85 /* SelectionRenderer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 144B5D5722D9E092001E2A85 /* SelectionRenderer.swift */; };
 		144B5D5C22D9E0A9001E2A85 /* world.geo in Resources */ = {isa = PBXBuildFile; fileRef = 140835BE22B991BA004697FB /* world.geo */; };
 		148937F522B97FDF009278A0 /* Geometry.swift in Sources */ = {isa = PBXBuildFile; fileRef = 148937DF22B97FDF009278A0 /* Geometry.swift */; };
@@ -108,6 +111,9 @@
 		08719FBC70EA1D5C3EAA5D98 /* Pods-tapmapTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-tapmapTests.release.xcconfig"; path = "Target Support Files/Pods-tapmapTests/Pods-tapmapTests.release.xcconfig"; sourceTree = "<group>"; };
 		140835BB22B98F76004697FB /* pipeline.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = pipeline.json; sourceTree = "<group>"; };
 		140835BE22B991BA004697FB /* world.geo */ = {isa = PBXFileReference; lastKnownFileType = file.bplist; name = world.geo; path = Raw/world.geo; sourceTree = "<group>"; };
+		140B990122E57CE000C912A4 /* EdgeShader.vsh */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.glsl; path = EdgeShader.vsh; sourceTree = "<group>"; };
+		140B990222E57CE000C912A4 /* EdgeShader.fsh */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.glsl; path = EdgeShader.fsh; sourceTree = "<group>"; };
+		140B990522E57D5700C912A4 /* EdgeGenerationTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EdgeGenerationTests.swift; sourceTree = "<group>"; };
 		144B5D5722D9E092001E2A85 /* SelectionRenderer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SelectionRenderer.swift; sourceTree = "<group>"; };
 		148937DF22B97FDF009278A0 /* Geometry.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Geometry.swift; sourceTree = "<group>"; };
 		148937E022B97FDF009278A0 /* AppTypes.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AppTypes.swift; sourceTree = "<group>"; };
@@ -230,6 +236,8 @@
 				148937EE22B97FDF009278A0 /* PoiRenderer.swift */,
 				148937E822B97FDF009278A0 /* MapShader.fsh */,
 				148937ED22B97FDF009278A0 /* MapShader.vsh */,
+				140B990222E57CE000C912A4 /* EdgeShader.fsh */,
+				140B990122E57CE000C912A4 /* EdgeShader.vsh */,
 				148937EB22B97FDF009278A0 /* PoiShader.vsh */,
 				148937E422B97FDF009278A0 /* PoiShader.fsh */,
 				148937E522B97FDF009278A0 /* OpeningShader.vsh */,
@@ -296,6 +304,7 @@
 				14C6657322B97D8B0054D7F2 /* tapmapTests.swift */,
 				14C665CA22B97F250054D7F2 /* GeometryTests.swift */,
 				14C6657522B97D8B0054D7F2 /* Info.plist */,
+				140B990522E57D5700C912A4 /* EdgeGenerationTests.swift */,
 			);
 			path = tapmapTests;
 			sourceTree = "<group>";
@@ -497,11 +506,13 @@
 				14C6656922B97D8A0054D7F2 /* LaunchScreen.storyboard in Resources */,
 				14C6656622B97D8A0054D7F2 /* Assets.xcassets in Resources */,
 				148937FA22B97FDF009278A0 /* OpeningShader.vsh in Resources */,
+				140B990322E57CE000C912A4 /* EdgeShader.vsh in Resources */,
 				14C6656422B97D890054D7F2 /* Main.storyboard in Resources */,
 				148937F922B97FDF009278A0 /* PoiShader.fsh in Resources */,
 				1489380222B97FDF009278A0 /* MapShader.vsh in Resources */,
 				1489380022B97FDF009278A0 /* PoiShader.vsh in Resources */,
 				148937FD22B97FDF009278A0 /* MapShader.fsh in Resources */,
+				140B990422E57CE000C912A4 /* EdgeShader.fsh in Resources */,
 				1489380122B97FDF009278A0 /* OpeningShader.fsh in Resources */,
 				144B5D5C22D9E0A9001E2A85 /* world.geo in Resources */,
 			);
@@ -641,6 +652,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				140B990622E57D5700C912A4 /* EdgeGenerationTests.swift in Sources */,
 				1489382322B98456009278A0 /* ViewCalculations.swift in Sources */,
 				14C6657422B97D8B0054D7F2 /* tapmapTests.swift in Sources */,
 				14C665CB22B97F250054D7F2 /* GeometryTests.swift in Sources */,
