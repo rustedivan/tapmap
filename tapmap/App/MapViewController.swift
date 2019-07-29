@@ -182,7 +182,7 @@ class MapViewController: GLKViewController, GLKViewControllerDelegate {
 	}
 	
 	override func glkView(_ view: GLKView, drawIn rect: CGRect) {
-		glClearColor(0.8, 0.8, 0.8, 1.0)
+		glClearColor(0.0, 0.1, 0.6, 1.0)
 		glClear(GLbitfield(GL_COLOR_BUFFER_BIT) | GLbitfield(GL_DEPTH_BUFFER_BIT))
 		
 		mapRenderer.renderWorld(geoWorld: geoWorld, inProjection: modelViewProjectionMatrix)
