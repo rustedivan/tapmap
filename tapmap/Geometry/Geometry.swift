@@ -107,43 +107,72 @@ func triangleSoupHitTest(point p: CGPoint, inVertices vertices: [Vertex]) -> Boo
 }
 
 // MARK: Outline generation
-typealias FatEdge = (in0: Vertex, in1: Vertex, out0: Vertex, out1: Vertex)
-func fattenEdge(_ edge: (v0: Vertex, v1: Vertex), width: Vertex.Precision) -> FatEdge {
-	let d = (dx: edge.v1.x - edge.v0.x, dy: edge.v1.y - edge.v0.y)
-	let m = sqrt(d.dx * d.dx + d.dy * d.dy)
-	let normal = (dx: -d.dy / m, dy: d.dx / m)
-	let offset0 = Vertex(edge.v0.x + normal.dx * width, edge.v0.y + normal.dy * width)
-	let offset1 = Vertex(edge.v1.x + normal.dx * width, edge.v1.y + normal.dy * width)
-	
-	return FatEdge(edge.v0, edge.v1,
-								 offset0, offset1)
+func vectorAdd(_ v0: Vertex, _ v1: Vertex) -> Vertex {
+	return Vertex(v1.x + v0.x, v1.y + v0.y)
 }
 
-func intersection(e0: (v0: Vertex, v1: Vertex), e1: (v0: Vertex, v1: Vertex)) -> Vertex? {
-	return nil
+func vectorSub(_ v0: Vertex, _ v1: Vertex) -> Vertex {
+	return Vertex(v0.x - v1.x, v0.y - v1.y)
 }
 
-func generateOutlineGeometry(outlines: [[Vertex]], width: Vertex.Precision) -> (vertices: [Vertex], indices: [UInt32]) {
-	var outVertices: [Vertex] = []
-	var outIndices: [UInt32] = []
+func normalize(_ v: Vertex) -> Vertex {
+	let m = sqrt(v.x * v.x + v.y * v.y)
+	return Vertex(v.x / m, v.y / m)
+}
+
+func normal(_ v: Vertex) -> Vertex {
+	return normalize(Vertex(-v.y, v.x))
+}
+
+func dotProduct(_ v0: Vertex, _ v1: Vertex) -> Vertex.Precision {
+	return v0.x * v1.x + v0.y * v1.y
+}
+
+func anchorTangent(v0: Vertex, v1: Vertex, v2: Vertex) -> Vertex {
+	return normalize(vectorAdd(normalize(vectorSub(v1, v0)), normalize(vectorSub(v2, v1))))
+}
+
+typealias Rib = (inner: Vertex, outer: Vertex)
+func makeRib(_ v0: Vertex, _ v1: Vertex, width: Vertex.Precision) -> Rib {
+	let edge = normalize(vectorSub(v1, v0))
+	let n = normal(edge)
+	let halfW = width / 2.0
+	let inner = Vertex(v0.x - n.x * halfW, v0.y - n.y * halfW)
+	let outer = Vertex(v0.x + n.x * halfW, v0.y + n.y * halfW)
 	
-	for outline in outlines {
-		let outlineBase = UInt32(outVertices.count)
-		for i in 1..<outline.count {
-			let v0 = outline[i - 1]
-			let v1 = outline[i - 0]
-			let fatEdge = fattenEdge((v0: v0, v1: v1), width: width)
-			
-			// Output inner edge, and then the outer edge. Make triangles as follows:
-			//   2-----3
-			//   |  \  |	triangles: 0-1-2 and 2-1-3
-			//   0-----1
-			let base = outlineBase + UInt32(i - 1) * 4	// Four vertices consumed by each loop
-			outIndices.append(contentsOf: [base + 0, base + 1, base + 2])
-			outIndices.append(contentsOf: [base + 2, base + 1, base + 3])
-			outVertices.append(contentsOf: [fatEdge.in0, fatEdge.in1, fatEdge.out0, fatEdge.out1])
-		}
+	return Rib(inner, outer)
+}
+
+func makeMiterRib(_ v0: Vertex, _ v1: Vertex, _ v2: Vertex, width: Vertex.Precision) -> Rib {
+	let incomingNormal = normal(vectorSub(v1, v0))
+	let tangent = anchorTangent(v0: v0, v1: v1, v2: v2)
+	let miter = Vertex(-tangent.y, tangent.x)
+	var miterLength = width / dotProduct(miter, incomingNormal) / 2.0
+	miterLength = min(miterLength, 5.0 * width)
+	
+	let inner = Vertex(v1.x - miter.x * miterLength, v1.y - miter.y * miterLength)
+	let outer = Vertex(v1.x + miter.x * miterLength, v1.y + miter.y * miterLength)
+	
+	return Rib(inner, outer)
+}
+
+func generateOutlineGeometry(outline: [Vertex], width: Vertex.Precision) -> [Vertex] {
+	guard outline.count >= 2 else { return [] }
+
+	let firstRib = makeRib(outline[0], outline[1], width: width)
+	var miterRibs: [Rib] = []
+	for i in 1..<outline.count - 1 {
+		let miterRib = makeMiterRib(outline[i - 1], outline[i], outline[i + 1], width: width)
+		miterRibs.append(miterRib)
 	}
 	
-	return (vertices: outVertices, indices: outIndices)
+	var lastRib = makeRib(outline[outline.count - 1], outline[outline.count - 2], width: width)
+	swap(&lastRib.inner, &lastRib.outer)	// lastRib will have inverted normal, so flip it back
+	
+	let ribs = [firstRib] + miterRibs + [lastRib]
+	
+	let outVertices = ribs.reduce([]) { (acc, cur) in
+		return acc + [cur.inner, cur.outer]
+	}
+	return outVertices
 }

@@ -10,12 +10,12 @@ import OpenGLES
 import GLKit
 
 class SelectionRenderer {
-	private var selectedPrimitive: RenderPrimitive?
+	var outlinePrimitives: [RenderPrimitive]
 	let outlineProgram: GLuint
 	let outlineUniforms : (modelViewMatrix: GLint, color: GLint)
 	
 	init?() {
-		selectedPrimitive = nil
+		outlinePrimitives = []
 		
 		outlineProgram = loadShaders(shaderName: "EdgeShader")
 		guard outlineProgram != 0 else {
@@ -34,26 +34,24 @@ class SelectionRenderer {
 	}
 	
 	func select(geometry tessellation: GeoTessellated) {
-		// Close the loop on each contour
-		let contours = tessellation.contours.compactMap { (ring: VertexRing) -> [Vertex]? in
-			guard ring.vertices.count >= 2 else { return nil }
-			return ring.vertices + [ring.vertices.first!]
-		};
+		let thinOutline = { (outline: [Vertex]) in generateOutlineGeometry(outline: outline, width: 1.0) }
 		
-		let outline = generateOutlineGeometry(outlines: contours, width: 1.0)
-		selectedPrimitive = RenderPrimitive(vertices: outline.vertices,
-																				indices: outline.indices,
-																				color: (r: 0, g: 0, b: 0, a: 1),
-																				ownerHash: 0,
-																				debugName: "Contour")
+		let countourVertices = tessellation.contours.map({$0.vertices})
+		let outlineGeometry = countourVertices.map(thinOutline)
+		
+		outlinePrimitives = outlineGeometry.map( { (contour: [Vertex]) -> RenderPrimitive in
+			return RenderPrimitive(vertices: contour,
+														 color: (r: 0, g: 0, b: 0, a: 1),
+														 ownerHash: 0,
+														 debugName: "Contour")
+			})
 	}
 	
 	func clear() {
-		selectedPrimitive = nil
+		outlinePrimitives = []
 	}
 	
 	func renderSelection(inProjection projection: GLKMatrix4) {
-		guard let primitive = selectedPrimitive else { return }
 		glPushGroupMarkerEXT(0, "Render outlines")
 		glUseProgram(outlineProgram)
 		
@@ -64,9 +62,9 @@ class SelectionRenderer {
 			})
 		})
 		
-		glEnable(GLenum(GL_BLEND))
-		glBlendFunc(GLenum(GL_SRC_ALPHA), GLenum(GL_ONE_MINUS_SRC_ALPHA));
-		
+//		glEnable(GLenum(GL_BLEND))
+//		glBlendFunc(GLenum(GL_SRC_ALPHA), GLenum(GL_ONE_MINUS_SRC_ALPHA));
+//
 		var components : [GLfloat] = [0.0, 0.0, 0.0, 1.0]
 		glUniform4f(outlineUniforms.color,
 								GLfloat(components[0]),
@@ -74,9 +72,9 @@ class SelectionRenderer {
 								GLfloat(components[2]),
 								GLfloat(components[3]))
 		
-		render(primitive: primitive)
+		_ = outlinePrimitives.map { render(primitive: $0, mode: .Tristrip) }
 	
-		glDisable(GLenum(GL_BLEND))
+//		glDisable(GLenum(GL_BLEND))
 		glPopGroupMarkerEXT()
 	}
 }
