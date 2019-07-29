@@ -34,7 +34,13 @@ class SelectionRenderer {
 	}
 	
 	func select(geometry tessellation: GeoTessellated) {
-		let outline = generateOutlineGeometry(outline: tessellation.contours.first!.vertices, width: 2.0)
+		// Close the loop on each contour
+		let contours = tessellation.contours.compactMap { (ring: VertexRing) -> [Vertex]? in
+			guard ring.vertices.count >= 2 else { return nil }
+			return ring.vertices + [ring.vertices.first!]
+		};
+		
+		let outline = generateOutlineGeometry(outlines: contours, width: 1.0)
 		selectedPrimitive = RenderPrimitive(vertices: outline.vertices,
 																				indices: outline.indices,
 																				color: (r: 0, g: 0, b: 0, a: 1),

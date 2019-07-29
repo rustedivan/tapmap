@@ -48,7 +48,8 @@ class EdgeGenerationTests: XCTestCase {
 		let v2 = Vertex(0.0, -10.0)
 		let v3 = Vertex(-10.0, 0.0)
 		
-		let (vertices, indices) = generateOutlineGeometry(outline: [v0, v1, v2, v3], width: 5.0)
+		// Close the loop by adding v0 at the end
+		let (vertices, indices) = generateOutlineGeometry(outlines: [[v0, v1, v2, v3, v0]], width: 5.0)
 		XCTAssertEqual(vertices.count, 16)
 		XCTAssertEqual(indices.count, 24)
 		
@@ -63,6 +64,23 @@ class EdgeGenerationTests: XCTestCase {
 		
 		let quad4 = indices[18..<24]
 		XCTAssertEqual(Array(quad4), [12, 13, 14, 14, 13, 15])
+	}
+	
+	func testShouldGenerateMultiEdgeGeometry() {
+		let v0 = Vertex(0.0, 10.0)
+		let v1 = Vertex(10.0, 0.0)
+		let v2 = Vertex(0.0, -10.0)
+		let v3 = Vertex(-10.0, 0.0)
+		
+		let (vertices, indices) = generateOutlineGeometry(outlines: [[v0, v1], [v2, v3]], width: 5.0)
+		XCTAssertEqual(vertices.count, 8)
+		XCTAssertEqual(indices.count, 12)
+		
+		let quad1 = indices[0..<6]
+		XCTAssertEqual(Array(quad1), [0, 1, 2, 2, 1, 3])
+		
+		let quad2 = indices[6..<12]
+		XCTAssertEqual(Array(quad2), [4, 5, 6, 6, 5, 7])
 	}
 	
 	func shouldMakeMiterJoin() {

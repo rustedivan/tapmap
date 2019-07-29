@@ -108,7 +108,7 @@ func triangleSoupHitTest(point p: CGPoint, inVertices vertices: [Vertex]) -> Boo
 
 // MARK: Outline generation
 typealias FatEdge = (in0: Vertex, in1: Vertex, out0: Vertex, out1: Vertex)
-func fattenEdge(_ edge: (v0: Vertex, v1: Vertex), width: Float) -> FatEdge {
+func fattenEdge(_ edge: (v0: Vertex, v1: Vertex), width: Vertex.Precision) -> FatEdge {
 	let d = (dx: edge.v1.x - edge.v0.x, dy: edge.v1.y - edge.v0.y)
 	let m = sqrt(d.dx * d.dx + d.dy * d.dy)
 	let normal = (dx: -d.dy / m, dy: d.dx / m)
@@ -123,25 +123,26 @@ func intersection(e0: (v0: Vertex, v1: Vertex), e1: (v0: Vertex, v1: Vertex)) ->
 	return nil
 }
 
-func generateOutlineGeometry(outline: [Vertex], width: Float) -> (vertices: [Vertex], indices: [UInt32]) {
+func generateOutlineGeometry(outlines: [[Vertex]], width: Vertex.Precision) -> (vertices: [Vertex], indices: [UInt32]) {
 	var outVertices: [Vertex] = []
 	var outIndices: [UInt32] = []
 	
-	var loopedOutline = outline
-	loopedOutline.append(outline.first!)
-	for i in 1..<loopedOutline.count {
-		let v0 = loopedOutline[i - 1]
-		let v1 = loopedOutline[i - 0]
-		let fatEdge = fattenEdge((v0: v0, v1: v1), width: width)
-		
-		// Output inner edge, and then the outer edge. Make triangles as follows:
-		//   2-----3
-		//   |  \  |	triangles: 0-1-2 and 2-1-3
-		//   0-----1
-		let base = UInt32(i - 1) * 4	// Four vertices consumed by each loop
-		outIndices.append(contentsOf: [base + 0, base + 1, base + 2])
-		outIndices.append(contentsOf: [base + 2, base + 1, base + 3])
-		outVertices.append(contentsOf: [fatEdge.in0, fatEdge.in1, fatEdge.out0, fatEdge.out1])
+	for outline in outlines {
+		let outlineBase = UInt32(outVertices.count)
+		for i in 1..<outline.count {
+			let v0 = outline[i - 1]
+			let v1 = outline[i - 0]
+			let fatEdge = fattenEdge((v0: v0, v1: v1), width: width)
+			
+			// Output inner edge, and then the outer edge. Make triangles as follows:
+			//   2-----3
+			//   |  \  |	triangles: 0-1-2 and 2-1-3
+			//   0-----1
+			let base = outlineBase + UInt32(i - 1) * 4	// Four vertices consumed by each loop
+			outIndices.append(contentsOf: [base + 0, base + 1, base + 2])
+			outIndices.append(contentsOf: [base + 2, base + 1, base + 3])
+			outVertices.append(contentsOf: [fatEdge.in0, fatEdge.in1, fatEdge.out0, fatEdge.out1])
+		}
 	}
 	
 	return (vertices: outVertices, indices: outIndices)
