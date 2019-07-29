@@ -134,7 +134,7 @@ class MapViewController: GLKViewController, GLKViewControllerDelegate {
 					userState.visitPlace(hitContinent)
 				} else {
 					uiState.selectRegion(hitContinent)
-					selectionRenderer.select(renderable: hitContinent)
+					selectionRenderer.select(geometry: hitContinent)
 				}
 				
 				placeName.text = hitContinent.name
@@ -148,7 +148,7 @@ class MapViewController: GLKViewController, GLKViewControllerDelegate {
 					userState.visitPlace(hitCountry)
 				} else {
 					uiState.selectRegion(hitCountry)
-					selectionRenderer.select(renderable: hitCountry)
+					selectionRenderer.select(geometry: hitCountry)
 				}
 				
 				placeName.text = hitCountry.name
@@ -162,7 +162,7 @@ class MapViewController: GLKViewController, GLKViewControllerDelegate {
 					userState.visitPlace(hitRegion)
 				} else {
 					uiState.selectRegion(hitRegion)
-					selectionRenderer.select(renderable: hitRegion)
+					selectionRenderer.select(geometry: hitRegion)
 				}
 				placeName.text = hitRegion.name
 			} else {
@@ -182,7 +182,7 @@ class MapViewController: GLKViewController, GLKViewControllerDelegate {
 	}
 	
 	override func glkView(_ view: GLKView, drawIn rect: CGRect) {
-		glClearColor(0.0, 0.1, 0.6, 1.0)
+		glClearColor(0.8, 0.8, 0.8, 1.0)
 		glClear(GLbitfield(GL_COLOR_BUFFER_BIT) | GLbitfield(GL_DEPTH_BUFFER_BIT))
 		
 		mapRenderer.renderWorld(geoWorld: geoWorld, inProjection: modelViewProjectionMatrix)

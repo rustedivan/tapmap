@@ -33,8 +33,13 @@ class SelectionRenderer {
 		}
 	}
 	
-	func select(renderable: Renderable) {
-		selectedPrimitive = renderable.renderPrimitive()
+	func select(geometry tessellation: GeoTessellated) {
+		let outline = generateOutlineGeometry(outline: tessellation.contours.first!.vertices, width: 2.0)
+		selectedPrimitive = RenderPrimitive(vertices: outline.vertices,
+																				indices: outline.indices,
+																				color: (r: 0, g: 0, b: 0, a: 1),
+																				ownerHash: 0,
+																				debugName: "Contour")
 	}
 	
 	func clear() {
