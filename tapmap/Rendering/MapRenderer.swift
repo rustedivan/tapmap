@@ -93,7 +93,7 @@ class MapRenderer {
 			
 			let selected = AppDelegate.sharedUIState.selected(primitive.ownerHash)
 			glUniform1i(mapUniforms.highlighted, GLint(selected ? 1 : 0))
-			render(primitive: primitive)
+			render(primitive: primitive, mode: .Triangles)
 		}
 		glPopGroupMarkerEXT()
 	}

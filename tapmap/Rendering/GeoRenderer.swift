@@ -28,6 +28,19 @@ class RenderPrimitive {
 		case Indexed
 		case Arrayed
 	}
+	enum PrimitiveMode {
+		case Triangles
+		case Tristrip
+		
+		var glMode: Int32 {
+			switch self {
+			case .Triangles:
+				return GL_TRIANGLES
+			case .Tristrip:
+				return GL_TRIANGLE_STRIP
+			}
+		}
+	}
 	
 	enum Attribs: GLuint {
 		case position = 1
@@ -113,7 +126,7 @@ class RenderPrimitive {
 	}
 }
 
-func render(primitive: RenderPrimitive) {
+func render(primitive: RenderPrimitive, mode: RenderPrimitive.PrimitiveMode) {
 	guard primitive.elementCount > 0 else {
 		return
 	}
@@ -130,7 +143,7 @@ func render(primitive: RenderPrimitive) {
 													GLenum(GL_FLOAT), GLboolean(GL_FALSE),
 													GLsizei(MemoryLayout<Vertex>.stride), BUFFER_OFFSET(0))
 		
-		glDrawElements(GLenum(GL_TRIANGLES),
+		glDrawElements(GLenum(mode.glMode),
 									 primitive.elementCount,
 									 GLenum(GL_UNSIGNED_INT),
 									 BUFFER_OFFSET(0))
@@ -146,7 +159,7 @@ func render(primitive: RenderPrimitive) {
 													GLenum(GL_FLOAT), GLboolean(GL_FALSE),
 													GLsizei(MemoryLayout<Vertex>.stride), BUFFER_OFFSET(0))
 		
-		glDrawArrays(GLenum(GL_TRIANGLES),
+		glDrawArrays(GLenum(mode.glMode),
 								 0,
 								 primitive.elementCount)
 	}

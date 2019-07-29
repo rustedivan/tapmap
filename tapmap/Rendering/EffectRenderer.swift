@@ -92,7 +92,7 @@ class EffectRenderer {
 				})
 			})
 			
-			render(primitive: primitive)
+			render(primitive: primitive, mode: .Triangles)
 		}
 		
 		glDisable(GLenum(GL_BLEND))
