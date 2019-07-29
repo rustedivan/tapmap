@@ -34,7 +34,7 @@ class SelectionRenderer {
 	}
 	
 	func select(geometry tessellation: GeoTessellated) {
-		let thinOutline = { (outline: [Vertex]) in generateOutlineGeometry(outline: outline, width: 1.0) }
+		let thinOutline = { (outline: [Vertex]) in generateClosedOutlineGeometry(outline: outline, width: 0.2) }
 		
 		let countourVertices = tessellation.contours.map({$0.vertices})
 		let outlineGeometry = countourVertices.map(thinOutline)

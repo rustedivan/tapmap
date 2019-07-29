@@ -148,7 +148,7 @@ func makeMiterRib(_ v0: Vertex, _ v1: Vertex, _ v2: Vertex, width: Vertex.Precis
 	let tangent = anchorTangent(v0: v0, v1: v1, v2: v2)
 	let miter = Vertex(-tangent.y, tangent.x)
 	var miterLength = width / dotProduct(miter, incomingNormal) / 2.0
-	miterLength = min(miterLength, 5.0 * width)
+	miterLength = min(miterLength, 2.0 * width)
 	
 	let inner = Vertex(v1.x - miter.x * miterLength, v1.y - miter.y * miterLength)
 	let outer = Vertex(v1.x + miter.x * miterLength, v1.y + miter.y * miterLength)
@@ -176,3 +176,25 @@ func generateOutlineGeometry(outline: [Vertex], width: Vertex.Precision) -> [Ver
 	}
 	return outVertices
 }
+
+func generateClosedOutlineGeometry(outline: [Vertex], width: Vertex.Precision) -> [Vertex] {
+	guard outline.count >= 3 else { return [] }
+	
+	let firstRib = makeMiterRib(outline.last!, outline.first!, outline[1], width: width)
+	var miterRibs: [Rib] = []
+	for i in 1..<outline.count - 1 {
+		let miterRib = makeMiterRib(outline[i - 1], outline[i], outline[i + 1], width: width)
+		miterRibs.append(miterRib)
+	}
+	
+	let endRib = makeMiterRib(outline[outline.count - 2], outline.last!, outline.first!, width: width)
+	let closeRib = makeMiterRib(outline[outline.count - 1], outline.first!, outline[1], width: width)
+	
+	let ribs = [firstRib] + miterRibs + [endRib, closeRib]
+	
+	let outVertices = ribs.reduce([]) { (acc, cur) in
+		return acc + [cur.inner, cur.outer]
+	}
+	return outVertices
+}
+
