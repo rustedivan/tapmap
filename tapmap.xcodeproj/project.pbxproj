@@ -11,6 +11,11 @@
 		140B990322E57CE000C912A4 /* EdgeShader.vsh in Resources */ = {isa = PBXBuildFile; fileRef = 140B990122E57CE000C912A4 /* EdgeShader.vsh */; };
 		140B990422E57CE000C912A4 /* EdgeShader.fsh in Resources */ = {isa = PBXBuildFile; fileRef = 140B990222E57CE000C912A4 /* EdgeShader.fsh */; };
 		140B990622E57D5700C912A4 /* EdgeGenerationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 140B990522E57D5700C912A4 /* EdgeGenerationTests.swift */; };
+		1429B0A522EAFA87001257AB /* AppTypes.swift in Sources */ = {isa = PBXBuildFile; fileRef = 148937E022B97FDF009278A0 /* AppTypes.swift */; };
+		1429B0A622EAFCD3001257AB /* Serialization.swift in Sources */ = {isa = PBXBuildFile; fileRef = 148937F422B97FDF009278A0 /* Serialization.swift */; };
+		1429B0A722EAFCE5001257AB /* Geometry.swift in Sources */ = {isa = PBXBuildFile; fileRef = 148937DF22B97FDF009278A0 /* Geometry.swift */; };
+		1429B0A822EAFD43001257AB /* GeoRegion.swift in Sources */ = {isa = PBXBuildFile; fileRef = 148937E222B97FDF009278A0 /* GeoRegion.swift */; };
+		1429B0A922EAFD53001257AB /* nullrenderer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14C6659822B97E660054D7F2 /* nullrenderer.swift */; };
 		144B5D5A22D9E092001E2A85 /* SelectionRenderer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 144B5D5722D9E092001E2A85 /* SelectionRenderer.swift */; };
 		144B5D5C22D9E0A9001E2A85 /* world.geo in Resources */ = {isa = PBXBuildFile; fileRef = 140835BE22B991BA004697FB /* world.geo */; };
 		148937F522B97FDF009278A0 /* Geometry.swift in Sources */ = {isa = PBXBuildFile; fileRef = 148937DF22B97FDF009278A0 /* Geometry.swift */; };
@@ -653,8 +658,13 @@
 			buildActionMask = 2147483647;
 			files = (
 				140B990622E57D5700C912A4 /* EdgeGenerationTests.swift in Sources */,
+				1429B0A822EAFD43001257AB /* GeoRegion.swift in Sources */,
+				1429B0A722EAFCE5001257AB /* Geometry.swift in Sources */,
 				1489382322B98456009278A0 /* ViewCalculations.swift in Sources */,
+				1429B0A922EAFD53001257AB /* nullrenderer.swift in Sources */,
 				14C6657422B97D8B0054D7F2 /* tapmapTests.swift in Sources */,
+				1429B0A522EAFA87001257AB /* AppTypes.swift in Sources */,
+				1429B0A622EAFCD3001257AB /* Serialization.swift in Sources */,
 				14C665CB22B97F250054D7F2 /* GeometryTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
