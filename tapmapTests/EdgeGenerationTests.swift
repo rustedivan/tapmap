@@ -11,86 +11,76 @@ import XCTest
 class EdgeGenerationTests: XCTestCase {
 
 	func testShouldFattenEdge() {
+		let v0 = Vertex(10.0, 20.0)
+		let v1 = Vertex(20.0, 10.0)
+		let rib = makeRib(v0, v1, width: 2.0)
 		
+		XCTAssertEqual(rib.inner.x, 9.3, accuracy: 0.1)
+		XCTAssertEqual(rib.inner.y, 19.3, accuracy: 0.1)
+		XCTAssertEqual(rib.outer.x, 10.7, accuracy: 0.1)
+		XCTAssertEqual(rib.outer.y, 20.7, accuracy: 0.1)
 	}
 	
-	func shouldIntersectEdges() {
+	func testShouldMiterCorner() {
+		let v0 = Vertex( 0.0,  10.0)
+		let v1 = Vertex(10.0, 10.0)
+		let v2 = Vertex(10.0, -10.0)
+		let mitered = makeMiterRib(v0, v1, v2, width: 1.0)
 		
-	}
-	
-	func shouldHandleConvexCorners() {
-		
-	}
-	
-	func shouldHandleIncidentEdges() {
-		
-	}
-	
-	func shouldHandleConcaveCorners() {
-		
-	}
-	
-	func testShouldFattenEdge() {
-		let edge = (v0: Vertex(10.0, 20.0), v1: Vertex(20.0, 10.0))
-		let quad = fattenEdge(edge, width: 1.0)
-		
-		XCTAssertEqual(quad.in0, edge.v0)
-		XCTAssertEqual(quad.in1, edge.v1)
-		XCTAssertEqual(quad.out0.x, 10.7, accuracy: 0.1)
-		XCTAssertEqual(quad.out0.y, 20.7, accuracy: 0.1)
-		XCTAssertEqual(quad.out1.x, 20.7, accuracy: 0.1)
-		XCTAssertEqual(quad.out1.y, 10.7, accuracy: 0.1)
+		XCTAssertEqual(mitered.inner.x, 9.5, accuracy: 0.1)
+		XCTAssertEqual(mitered.inner.y, 9.5, accuracy: 0.1)
+		XCTAssertEqual(mitered.outer.x, 10.5, accuracy: 0.1)
+		XCTAssertEqual(mitered.outer.y, 10.5, accuracy: 0.1)
 	}
 	
 	func testShouldGenerateFatEdgeGeometry() {
-		let v0 = Vertex(0.0, 10.0)
-		let v1 = Vertex(10.0, 0.0)
-		let v2 = Vertex(0.0, -10.0)
-		let v3 = Vertex(-10.0, 0.0)
+		let v0 = Vertex( 0.0,  10.0)
+		let v1 = Vertex(10.0, 10.0)
+		let v2 = Vertex(10.0, -10.0)
+
+		let vertices = generateOutlineGeometry(outline: [v0, v1, v2], width: 5.0)
+		XCTAssertEqual(vertices.count, 6)
 		
-		// Close the loop by adding v0 at the end
-		let (vertices, indices) = generateOutlineGeometry(outlines: [[v0, v1, v2, v3, v0]], width: 5.0)
-		XCTAssertEqual(vertices.count, 16)
-		XCTAssertEqual(indices.count, 24)
+		XCTAssertEqual(vertices[0].x,  0.0, accuracy: 0.1)
+		XCTAssertEqual(vertices[0].y,  7.5, accuracy: 0.1)
+		XCTAssertEqual(vertices[1].x,  0.0, accuracy: 0.1)
+		XCTAssertEqual(vertices[1].y, 12.5, accuracy: 0.1)
 		
-		let quad1 = indices[0..<6]
-		XCTAssertEqual(Array(quad1), [0, 1, 2, 2, 1, 3])
+		XCTAssertEqual(vertices[2].x,  7.5, accuracy: 0.1)
+		XCTAssertEqual(vertices[2].y,  7.5, accuracy: 0.1)
+		XCTAssertEqual(vertices[3].x, 12.5, accuracy: 0.1)
+		XCTAssertEqual(vertices[3].y, 12.5, accuracy: 0.1)
 		
-		let quad2 = indices[6..<12]
-		XCTAssertEqual(Array(quad2), [4, 5, 6, 6, 5, 7])
-		
-		let quad3 = indices[12..<18]
-		XCTAssertEqual(Array(quad3), [8, 9, 10, 10, 9, 11])
-		
-		let quad4 = indices[18..<24]
-		XCTAssertEqual(Array(quad4), [12, 13, 14, 14, 13, 15])
+		XCTAssertEqual(vertices[4].x,   7.5, accuracy: 0.1)
+		XCTAssertEqual(vertices[4].y, -10.0, accuracy: 0.1)
+		XCTAssertEqual(vertices[5].x,  12.5, accuracy: 0.1)
+		XCTAssertEqual(vertices[5].y, -10.0, accuracy: 0.1)
 	}
 	
-	func testShouldGenerateMultiEdgeGeometry() {
-		let v0 = Vertex(0.0, 10.0)
-		let v1 = Vertex(10.0, 0.0)
-		let v2 = Vertex(0.0, -10.0)
-		let v3 = Vertex(-10.0, 0.0)
+	func testShouldGenerateFatLoopGeometry() {
+		let v0 = Vertex( 0.0,  10.0)
+		let v1 = Vertex(10.0, 10.0)
+		let v2 = Vertex(10.0, -10.0)
 		
-		let (vertices, indices) = generateOutlineGeometry(outlines: [[v0, v1], [v2, v3]], width: 5.0)
-		XCTAssertEqual(vertices.count, 8)
-		XCTAssertEqual(indices.count, 12)
+		let vertices = generateOutlineGeometry(outline: [v0, v1, v2], width: 5.0)
+		XCTAssertEqual(vertices.count, 6)
 		
-		let quad1 = indices[0..<6]
-		XCTAssertEqual(Array(quad1), [0, 1, 2, 2, 1, 3])
+		XCTAssertEqual(vertices[0].x,  0.0, accuracy: 0.1)
+		XCTAssertEqual(vertices[0].y,  7.5, accuracy: 0.1)
+		XCTAssertEqual(vertices[1].x,  0.0, accuracy: 0.1)
+		XCTAssertEqual(vertices[1].y, 12.5, accuracy: 0.1)
 		
-		let quad2 = indices[6..<12]
-		XCTAssertEqual(Array(quad2), [4, 5, 6, 6, 5, 7])
+		XCTAssertEqual(vertices[2].x,  7.5, accuracy: 0.1)
+		XCTAssertEqual(vertices[2].y,  7.5, accuracy: 0.1)
+		XCTAssertEqual(vertices[3].x, 12.5, accuracy: 0.1)
+		XCTAssertEqual(vertices[3].y, 12.5, accuracy: 0.1)
+		
+		XCTAssertEqual(vertices[4].x,   7.5, accuracy: 0.1)
+		XCTAssertEqual(vertices[4].y, -10.0, accuracy: 0.1)
+		XCTAssertEqual(vertices[5].x,  12.5, accuracy: 0.1)
+		XCTAssertEqual(vertices[5].y, -10.0, accuracy: 0.1)
 	}
-	
-	func shouldMakeMiterJoin() {
-		
-	}
-	
-	func shouldBuildRenderPrimitive() {
-		
-	}
-	
+
 	func shouldCacheEdgePrimitives() {
 		
 	}
