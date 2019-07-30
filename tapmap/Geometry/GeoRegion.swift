@@ -79,6 +79,7 @@ protocol GeoPlaceContainer {
 
 protocol GeoTessellated : Renderable {
 	var geometry : GeoTessellation { get }
+	var contours : [VertexRing] { get }
 }
 
 protocol GeoNode : GeoIdentifiable {
@@ -90,6 +91,7 @@ protocol GeoNode : GeoIdentifiable {
 struct GeoRegion : GeoIdentifiable, GeoPlaceContainer, GeoTessellated, Codable, Equatable {
 	let name: String
 	let geometry: GeoTessellation
+	let contours: [VertexRing]
 	let places: Set<GeoPlace>
 	let parentHash: Int
 	var aabb : Aabb { return geometry.aabb }
@@ -110,6 +112,7 @@ struct GeoCountry : GeoNode, GeoPlaceContainer, GeoTessellated, Codable, Equatab
 	let children: Set<GeoRegion>
 	let places: Set<GeoPlace>
 	let geometry: GeoTessellation
+	let contours: [VertexRing]
 	let parentHash: Int
 	var aabb : Aabb { return geometry.aabb }
 	
@@ -130,6 +133,7 @@ struct GeoContinent : GeoNode, GeoTessellated, GeoPlaceContainer, Codable, Equat
 	let children: Set<GeoCountry>
 	let places: Set<GeoPlace>
 	let geometry: GeoTessellation
+	let contours: [VertexRing]
 	let parentHash: Int
 	var aabb : Aabb { return geometry.aabb }
 	

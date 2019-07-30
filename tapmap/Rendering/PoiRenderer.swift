@@ -78,7 +78,7 @@ class PoiRenderer {
 									GLfloat(components[1]),
 									GLfloat(components[2]),
 									GLfloat(components[3]))
-			render(primitive: primitive)
+			render(primitive: primitive, mode: .Triangles)
 		}
 		glPopGroupMarkerEXT()
 	}

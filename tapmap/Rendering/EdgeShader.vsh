@@ -11,10 +11,10 @@ attribute vec4 position;
 varying mediump vec4 colorVar;
 
 uniform mat4 modelViewProjectionMatrix;
-uniform lowp vec4 regionColor;
+uniform lowp vec4 edgeColor;
 
 void main()
 {
-		colorVar = regionColor;
+		colorVar = edgeColor;
 		gl_Position = modelViewProjectionMatrix * position;
 }

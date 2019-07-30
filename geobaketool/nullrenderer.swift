@@ -9,6 +9,15 @@
 import Foundation
 
 class RenderPrimitive {
+	init() {
+		
+	}
+	init(vertices: [Vertex], indices: [UInt32], color c: (r: Float, g: Float, b: Float, a: Float), ownerHash hash: Int, debugName: String) {
+		
+	}
+	init(vertices: [Vertex], color c: (r: Float, g: Float, b: Float, a: Float), ownerHash hash: Int, debugName: String) {
+		
+	}
 }
 
 extension GeoRegion : Renderable {

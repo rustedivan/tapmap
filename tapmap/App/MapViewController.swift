@@ -18,6 +18,7 @@ class MapViewController: GLKViewController, GLKViewControllerDelegate {
 	var mapRenderer: MapRenderer!
 	var poiRenderer: PoiRenderer!
 	var effectRenderer: EffectRenderer!
+	var selectionRenderer: SelectionRenderer!
 	var dummyView: UIView!
 	
 	// Navigation
@@ -79,6 +80,7 @@ class MapViewController: GLKViewController, GLKViewControllerDelegate {
 		mapRenderer = MapRenderer(withGeoWorld: geoWorld)!
 		poiRenderer = PoiRenderer(withGeoWorld: geoWorld)!
 		effectRenderer = EffectRenderer()
+		selectionRenderer = SelectionRenderer()
 	}
 	
 	override func didReceiveMemoryWarning() {
@@ -132,6 +134,7 @@ class MapViewController: GLKViewController, GLKViewControllerDelegate {
 					userState.visitPlace(hitContinent)
 				} else {
 					uiState.selectRegion(hitContinent)
+					selectionRenderer.select(geometry: hitContinent)
 				}
 				
 				placeName.text = hitContinent.name
@@ -145,6 +148,7 @@ class MapViewController: GLKViewController, GLKViewControllerDelegate {
 					userState.visitPlace(hitCountry)
 				} else {
 					uiState.selectRegion(hitCountry)
+					selectionRenderer.select(geometry: hitCountry)
 				}
 				
 				placeName.text = hitCountry.name
@@ -158,10 +162,12 @@ class MapViewController: GLKViewController, GLKViewControllerDelegate {
 					userState.visitPlace(hitRegion)
 				} else {
 					uiState.selectRegion(hitRegion)
+					selectionRenderer.select(geometry: hitRegion)
 				}
 				placeName.text = hitRegion.name
 			} else {
 				uiState.clearSelection()
+				selectionRenderer.clear()
 			}
 		}
 	}
@@ -182,6 +188,7 @@ class MapViewController: GLKViewController, GLKViewControllerDelegate {
 		mapRenderer.renderWorld(geoWorld: geoWorld, inProjection: modelViewProjectionMatrix)
 		poiRenderer.renderWorld(geoWorld: geoWorld, inProjection: modelViewProjectionMatrix)
 		effectRenderer.renderWorld(geoWorld: geoWorld, inProjection: modelViewProjectionMatrix)
+		selectionRenderer.renderSelection(inProjection: modelViewProjectionMatrix)
 	}
 }
 

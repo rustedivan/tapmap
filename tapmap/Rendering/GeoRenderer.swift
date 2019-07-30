@@ -28,10 +28,22 @@ class RenderPrimitive {
 		case Indexed
 		case Arrayed
 	}
+	enum PrimitiveMode {
+		case Triangles
+		case Tristrip
+		
+		var glMode: Int32 {
+			switch self {
+			case .Triangles:
+				return GL_TRIANGLES
+			case .Tristrip:
+				return GL_TRIANGLE_STRIP
+			}
+		}
+	}
 	
 	enum Attribs: GLuint {
 		case position = 1
-		case barycentric = 2
 	}
 	
 	let mode: DrawMode
@@ -114,7 +126,7 @@ class RenderPrimitive {
 	}
 }
 
-func render(primitive: RenderPrimitive) {
+func render(primitive: RenderPrimitive, mode: RenderPrimitive.PrimitiveMode) {
 	guard primitive.elementCount > 0 else {
 		return
 	}
@@ -131,14 +143,13 @@ func render(primitive: RenderPrimitive) {
 													GLenum(GL_FLOAT), GLboolean(GL_FALSE),
 													GLsizei(MemoryLayout<Vertex>.stride), BUFFER_OFFSET(0))
 		
-		glDrawElements(GLenum(GL_TRIANGLES),
+		glDrawElements(GLenum(mode.glMode),
 									 primitive.elementCount,
 									 GLenum(GL_UNSIGNED_INT),
 									 BUFFER_OFFSET(0))
 	case .Arrayed:
 		glEnableClientState(GLenum(GL_VERTEX_ARRAY))
 		glEnableVertexAttribArray(RenderPrimitive.Attribs.position.rawValue)
-		glEnableVertexAttribArray(RenderPrimitive.Attribs.barycentric.rawValue)
 		
 		glBindBuffer(GLenum(GL_ELEMENT_ARRAY_BUFFER), 0)
 		
@@ -147,12 +158,8 @@ func render(primitive: RenderPrimitive) {
 		glVertexAttribPointer(RenderPrimitive.Attribs.position.rawValue, 2,
 													GLenum(GL_FLOAT), GLboolean(GL_FALSE),
 													GLsizei(MemoryLayout<Vertex>.stride), BUFFER_OFFSET(0))
-		// Point out vertex attribs (offset by position)
-		glVertexAttribPointer(RenderPrimitive.Attribs.barycentric.rawValue, 3,
-													GLenum(GL_FLOAT), GLboolean(GL_FALSE),
-													GLsizei(MemoryLayout<Vertex>.stride), BUFFER_OFFSET(UInt32(MemoryLayout<Float>.stride * 2)))
-
-		glDrawArrays(GLenum(GL_TRIANGLES),
+		
+		glDrawArrays(GLenum(mode.glMode),
 								 0,
 								 primitive.elementCount)
 	}
@@ -261,7 +268,6 @@ func loadShaders(shaderName: String) -> GLuint {
 	// Bind attribute locations.
 	// This needs to be done prior to linking.
 	glBindAttribLocation(program, RenderPrimitive.Attribs.position.rawValue, "position")
-	glBindAttribLocation(program, RenderPrimitive.Attribs.barycentric.rawValue, "barycentric")
 	
 	// Link program.
 	if !linkProgram(program) {
