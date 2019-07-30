@@ -25,6 +25,7 @@ extension UIColor {
 
 enum VertexAttribs: GLuint {
 	case position = 1
+	case miter = 2
 }
 
 extension GeoRegion : Renderable {
@@ -111,6 +112,7 @@ func loadShaders(shaderName: String) -> GLuint {
 	// Bind attribute locations.
 	// This needs to be done prior to linking.
 	glBindAttribLocation(program, VertexAttribs.position.rawValue, "position")
+	glBindAttribLocation(program, VertexAttribs.miter.rawValue, "miter")
 	
 	// Link program.
 	if !linkProgram(program) {

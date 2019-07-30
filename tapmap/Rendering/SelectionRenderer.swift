@@ -12,7 +12,7 @@ import GLKit
 class SelectionRenderer {
 	var outlinePrimitives: [OutlineRenderPrimitive]
 	let outlineProgram: GLuint
-	let outlineUniforms : (modelViewMatrix: GLint, color: GLint)
+	let outlineUniforms : (modelViewMatrix: GLint, color: GLint, width: GLint)
 	
 	init?() {
 		outlinePrimitives = []
@@ -25,6 +25,7 @@ class SelectionRenderer {
 		
 		outlineUniforms.modelViewMatrix = glGetUniformLocation(outlineProgram, "modelViewProjectionMatrix")
 		outlineUniforms.color = glGetUniformLocation(outlineProgram, "edgeColor")
+		outlineUniforms.width = glGetUniformLocation(outlineProgram, "edgeWidth")
 	}
 	
 	deinit {
@@ -35,24 +36,19 @@ class SelectionRenderer {
 	
 	func select<T: GeoTessellated>(geometry tessellation: T) {
 		let thinOutline = { (outline: [Vertex]) in generateClosedOutlineGeometry(outline: outline, width: 0.2) }
-				// $ Generate a separate vec2 attrib stream with miter vectors
 		let countourVertices = tessellation.contours.map({$0.vertices})
 		let outlineGeometry = countourVertices.map(thinOutline)
 		
-		outlinePrimitives = outlineGeometry.map( { (contour: [Vertex]) -> OutlineRenderPrimitive in
+		outlinePrimitives = outlineGeometry.map( { (contour: [OutlineVertex]) -> OutlineRenderPrimitive in
 			return OutlineRenderPrimitive(vertices: contour,
 																		 color: (r: 0, g: 0, b: 0, a: 1),
 																		 ownerHash: 0,
 																		 debugName: "Contour")
 			})
-		
-		// $ Create separate attrib buffers
 	}
 	
 	func clear() {
 		outlinePrimitives = []
-		// $ delete miterBuffers
-		// $ clear miterVectors
 	}
 	
 	func renderSelection(inProjection projection: GLKMatrix4) {
@@ -72,12 +68,9 @@ class SelectionRenderer {
 								GLfloat(components[1]),
 								GLfloat(components[2]),
 								GLfloat(components[3]))
-		
-		// $ glBindBuffer(GLenum(GL_ARRAY_BUFFER), miterBuffers[i])
-		// $ glVertexAttribPointer(Attribs.miterVector.rawValue, 2, GLenum(GL_FLOAT), GLboolean(GL_FALSE), GLsizei(MemoryLayout<Vertex>.stride), BUFFER_OFFSET(0))
+		glUniform1f(outlineUniforms.width, 0.1)
 		_ = outlinePrimitives.map { render(primitive: $0) }
 	
 		glPopGroupMarkerEXT()
 	}
 }
-

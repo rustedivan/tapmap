@@ -53,7 +53,6 @@ func render(primitive: ArrayedRenderPrimitive) {
 	}
 	
 	glEnableClientState(GLenum(GL_VERTEX_ARRAY))
-	glEnableClientState(GLenum(GL_VERTEX_ARRAY))
 	glEnableVertexAttribArray(VertexAttribs.position.rawValue)
 	
 	glBindBuffer(GLenum(GL_ELEMENT_ARRAY_BUFFER), 0)
