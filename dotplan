@@ -2,6 +2,11 @@
 
 ## Simpleshapes.geojson
 
+## Outline rendering
+- teach RenderPrimitive to work with different vertex formats
+- try to break apart RenderPrimitive into Indexed, Arrayed and Tristrip versions
+- try to create an outline primitive with Tristrip and fat vertex format
+
 ## POI rendering
 - progressive POI plane rendering
 -- each POI plane has a feature level

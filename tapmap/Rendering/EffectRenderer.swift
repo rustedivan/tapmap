@@ -10,7 +10,7 @@ import OpenGLES
 import GLKit
 
 struct RegionEffect {
-	let primitive: RenderPrimitive
+	let primitive: ArrayedRenderPrimitive
 	let center: Vertex
 	let startTime: Date
 	let duration: TimeInterval
@@ -45,7 +45,7 @@ class EffectRenderer {
 		}
 	}
 	
-	func addOpeningEffect(for primitive: RenderPrimitive, at midpoint: Vertex) {
+	func addOpeningEffect(for primitive: ArrayedRenderPrimitive, at midpoint: Vertex) {
 		runningEffects.append(RegionEffect(primitive: primitive, center: midpoint, startTime: Date(), duration: 1.0))
 	}
 	
@@ -92,7 +92,7 @@ class EffectRenderer {
 				})
 			})
 			
-			render(primitive: primitive, mode: .Triangles)
+			render(primitive: primitive)
 		}
 		
 		glDisable(GLenum(GL_BLEND))

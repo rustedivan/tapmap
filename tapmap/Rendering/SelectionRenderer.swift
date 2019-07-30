@@ -10,7 +10,7 @@ import OpenGLES
 import GLKit
 
 class SelectionRenderer {
-	var outlinePrimitives: [RenderPrimitive]
+	var outlinePrimitives: [TriStripRenderPrimitive]
 	let outlineProgram: GLuint
 	let outlineUniforms : (modelViewMatrix: GLint, color: GLint)
 	
@@ -33,17 +33,17 @@ class SelectionRenderer {
 		}
 	}
 	
-	func select(geometry tessellation: GeoTessellated) {
+	func select<T: GeoTessellated>(geometry tessellation: T) {
 		let thinOutline = { (outline: [Vertex]) in generateClosedOutlineGeometry(outline: outline, width: 0.2) }
 				// $ Generate a separate vec2 attrib stream with miter vectors
 		let countourVertices = tessellation.contours.map({$0.vertices})
 		let outlineGeometry = countourVertices.map(thinOutline)
 		
-		outlinePrimitives = outlineGeometry.map( { (contour: [Vertex]) -> RenderPrimitive in
-			return RenderPrimitive(vertices: contour,
-														 color: (r: 0, g: 0, b: 0, a: 1),
-														 ownerHash: 0,
-														 debugName: "Contour")
+		outlinePrimitives = outlineGeometry.map( { (contour: [Vertex]) -> TriStripRenderPrimitive in
+			return TriStripRenderPrimitive(vertices: contour,
+																		 color: (r: 0, g: 0, b: 0, a: 1),
+																		 ownerHash: 0,
+																		 debugName: "Contour")
 			})
 		
 		// $ Create separate attrib buffers
@@ -75,7 +75,7 @@ class SelectionRenderer {
 		
 		// $ glBindBuffer(GLenum(GL_ARRAY_BUFFER), miterBuffers[i])
 		// $ glVertexAttribPointer(Attribs.miterVector.rawValue, 2, GLenum(GL_FLOAT), GLboolean(GL_FALSE), GLsizei(MemoryLayout<Vertex>.stride), BUFFER_OFFSET(0))
-		_ = outlinePrimitives.map { render(primitive: $0, mode: .Tristrip) }
+		_ = outlinePrimitives.map { render(primitive: $0) }
 	
 		glPopGroupMarkerEXT()
 	}

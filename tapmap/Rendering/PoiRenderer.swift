@@ -10,7 +10,7 @@ import OpenGLES
 import GLKit
 
 class PoiRenderer {
-	var regionPrimitives : [Int : RenderPrimitive]
+	var regionPrimitives : [Int : IndexedRenderPrimitive]
 	let poiProgram: GLuint
 	let poiUniforms : (modelViewMatrix: GLint, color: GLint)
 	
@@ -51,7 +51,8 @@ class PoiRenderer {
 		}
 	}
 	
-	func updatePrimitives<T:GeoNode>(for node: T, with subRegions: Set<T.SubType>) where T.SubType : GeoPlaceContainer {
+	func updatePrimitives<T:GeoNode>(for node: T, with subRegions: Set<T.SubType>)
+		where T.SubType : GeoPlaceContainer {
 		if AppDelegate.sharedUserState.placeVisited(node) {
 			regionPrimitives.removeValue(forKey: node.hashValue)
 
@@ -78,7 +79,7 @@ class PoiRenderer {
 									GLfloat(components[1]),
 									GLfloat(components[2]),
 									GLfloat(components[3]))
-			render(primitive: primitive, mode: .Triangles)
+			render(primitive: primitive)
 		}
 		glPopGroupMarkerEXT()
 	}

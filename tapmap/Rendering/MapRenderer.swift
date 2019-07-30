@@ -10,7 +10,7 @@ import OpenGLES
 import GLKit
 
 class MapRenderer {
-	var regionPrimitives : [Int : RenderPrimitive]
+	var regionPrimitives : [Int : ArrayedRenderPrimitive]
 	let mapProgram: GLuint
 	let mapUniforms : (modelViewMatrix: GLint, color: GLint, highlighted: GLint, time: GLint)
 	
@@ -56,7 +56,8 @@ class MapRenderer {
 		}
 	}
 	
-	func updatePrimitives<T:GeoNode>(for node: T, with subRegions: Set<T.SubType>) -> RenderPrimitive? {
+	func updatePrimitives<T:GeoNode>(for node: T, with subRegions: Set<T.SubType>) -> ArrayedRenderPrimitive?
+		where T.SubType.PrimitiveType == ArrayedRenderPrimitive {
 		if AppDelegate.sharedUserState.placeVisited(node) {
 			let removedPrimitive = regionPrimitives.removeValue(forKey: node.hashValue)
 
@@ -93,7 +94,7 @@ class MapRenderer {
 			
 			let selected = AppDelegate.sharedUIState.selected(primitive.ownerHash)
 			glUniform1i(mapUniforms.highlighted, GLint(selected ? 1 : 0))
-			render(primitive: primitive, mode: .Triangles)
+			render(primitive: primitive)
 		}
 		glPopGroupMarkerEXT()
 	}

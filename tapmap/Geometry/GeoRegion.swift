@@ -63,7 +63,8 @@ struct GeoTessellation : Codable {
 }
 
 protocol Renderable {
-	func renderPrimitive() -> RenderPrimitive
+	associatedtype PrimitiveType
+	func renderPrimitive() -> PrimitiveType
 }
 
 protocol GeoIdentifiable : Hashable {
@@ -74,7 +75,7 @@ protocol GeoIdentifiable : Hashable {
 
 protocol GeoPlaceContainer {
 	var places : Set<GeoPlace> { get }
-	func placesRenderPlane() -> RenderPrimitive
+	func placesRenderPlane() -> IndexedRenderPrimitive
 }
 
 protocol GeoTessellated : Renderable {
