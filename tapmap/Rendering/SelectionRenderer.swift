@@ -13,9 +13,11 @@ class SelectionRenderer {
 	var outlinePrimitives: [OutlineRenderPrimitive]
 	let outlineProgram: GLuint
 	let outlineUniforms : (modelViewMatrix: GLint, color: GLint, width: GLint)
+	var outlineWidth: Float
 	
 	init?() {
 		outlinePrimitives = []
+		outlineWidth = 0.0
 		
 		outlineProgram = loadShaders(shaderName: "EdgeShader")
 		guard outlineProgram != 0 else {
@@ -67,7 +69,7 @@ class SelectionRenderer {
 								GLfloat(components[1]),
 								GLfloat(components[2]),
 								GLfloat(components[3]))
-		glUniform1f(outlineUniforms.width, 0.1)
+		glUniform1f(outlineUniforms.width, outlineWidth)
 		_ = outlinePrimitives.map { render(primitive: $0) }
 	
 		glPopGroupMarkerEXT()
