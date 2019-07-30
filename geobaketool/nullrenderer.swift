@@ -8,44 +8,53 @@
 
 import Foundation
 
-class RenderPrimitive {
-	init() {
-		
-	}
-	init(vertices: [Vertex], indices: [UInt32], color c: (r: Float, g: Float, b: Float, a: Float), ownerHash hash: Int, debugName: String) {
-		
-	}
+class ArrayedRenderPrimitive {
+	init() {}
 	init(vertices: [Vertex], color c: (r: Float, g: Float, b: Float, a: Float), ownerHash hash: Int, debugName: String) {
-		
+	}
+}
+
+class IndexedRenderPrimitive {
+	init() {}
+	init(vertices: [Vertex], indices: [UInt32], color c: (r: Float, g: Float, b: Float, a: Float), ownerHash hash: Int, debugName: String) {
+	}
+}
+
+class OutlineRenderPrimitive {
+	init() {}
+	init(vertices: [Vertex], color c: (r: Float, g: Float, b: Float, a: Float), ownerHash hash: Int, debugName: String) {
 	}
 }
 
 extension GeoRegion : Renderable {
-	func renderPrimitive() -> RenderPrimitive {
-		return RenderPrimitive()
+	typealias PrimitiveType = ArrayedRenderPrimitive
+	func renderPrimitive() -> ArrayedRenderPrimitive {
+		return ArrayedRenderPrimitive()
 	}
 	
-	func placesRenderPlane() -> RenderPrimitive {
-		return RenderPrimitive()
+	func placesRenderPlane() -> IndexedRenderPrimitive {
+		return IndexedRenderPrimitive()
 	}
 }
 
 extension GeoCountry : Renderable {
-	func renderPrimitive() -> RenderPrimitive {
-		return RenderPrimitive()
+	typealias PrimitiveType = ArrayedRenderPrimitive
+	func renderPrimitive() -> ArrayedRenderPrimitive {
+		return ArrayedRenderPrimitive()
 	}
 	
-	func placesRenderPlane() -> RenderPrimitive {
-		return RenderPrimitive()
+	func placesRenderPlane() -> IndexedRenderPrimitive {
+		return IndexedRenderPrimitive()
 	}
 }
 
 extension GeoContinent : Renderable {
-	func renderPrimitive() -> RenderPrimitive {
-		return RenderPrimitive()
+	typealias PrimitiveType = ArrayedRenderPrimitive
+	func renderPrimitive() -> ArrayedRenderPrimitive {
+		return ArrayedRenderPrimitive()
 	}
 	
-	func placesRenderPlane() -> RenderPrimitive {
-		return RenderPrimitive()
+	func placesRenderPlane() -> IndexedRenderPrimitive {
+		return IndexedRenderPrimitive()
 	}
 }

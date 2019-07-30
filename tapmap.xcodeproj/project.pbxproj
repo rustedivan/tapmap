@@ -62,6 +62,9 @@
 		1489382022B9831C009278A0 /* OperationParseOSMJson.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14C665A322B97E670054D7F2 /* OperationParseOSMJson.swift */; };
 		1489382122B9831C009278A0 /* OperationTessellateRegions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14C6659A22B97E660054D7F2 /* OperationTessellateRegions.swift */; };
 		1489382322B98456009278A0 /* ViewCalculations.swift in Sources */ = {isa = PBXBuildFile; fileRef = 148937E122B97FDF009278A0 /* ViewCalculations.swift */; };
+		14985FEB22F0ECD100F68A1F /* ArrayedRenderPrimitive.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14985FEA22F0ECD100F68A1F /* ArrayedRenderPrimitive.swift */; };
+		14985FED22F0ED0C00F68A1F /* IndexedRenderPrimitive.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14985FEC22F0ED0C00F68A1F /* IndexedRenderPrimitive.swift */; };
+		14985FEF22F0ED4A00F68A1F /* OutlineRenderPrimitive.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14985FEE22F0ED4A00F68A1F /* OutlineRenderPrimitive.swift */; };
 		14C6656422B97D890054D7F2 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 14C6656222B97D890054D7F2 /* Main.storyboard */; };
 		14C6656622B97D8A0054D7F2 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 14C6656522B97D8A0054D7F2 /* Assets.xcassets */; };
 		14C6656922B97D8A0054D7F2 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 14C6656722B97D8A0054D7F2 /* LaunchScreen.storyboard */; };
@@ -140,6 +143,9 @@
 		148937F222B97FDF009278A0 /* AppDelegate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		148937F322B97FDF009278A0 /* UserState.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UserState.swift; sourceTree = "<group>"; };
 		148937F422B97FDF009278A0 /* Serialization.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Serialization.swift; sourceTree = "<group>"; };
+		14985FEA22F0ECD100F68A1F /* ArrayedRenderPrimitive.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ArrayedRenderPrimitive.swift; sourceTree = "<group>"; };
+		14985FEC22F0ED0C00F68A1F /* IndexedRenderPrimitive.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IndexedRenderPrimitive.swift; sourceTree = "<group>"; };
+		14985FEE22F0ED4A00F68A1F /* OutlineRenderPrimitive.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OutlineRenderPrimitive.swift; sourceTree = "<group>"; };
 		14C6655B22B97D890054D7F2 /* tapmap.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = tapmap.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		14C6656322B97D890054D7F2 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
 		14C6656522B97D8A0054D7F2 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
@@ -233,20 +239,14 @@
 		148937E322B97FDF009278A0 /* Rendering */ = {
 			isa = PBXGroup;
 			children = (
+				148937EA22B97FDF009278A0 /* GeoRenderer.swift */,
+				148937E722B97FDF009278A0 /* MapRenderer.swift */,
+				148937EE22B97FDF009278A0 /* PoiRenderer.swift */,
 				144B5D5722D9E092001E2A85 /* SelectionRenderer.swift */,
 				148937E622B97FDF009278A0 /* EffectRenderer.swift */,
-				148937E722B97FDF009278A0 /* MapRenderer.swift */,
+				14985FE922F0ECA000F68A1F /* Primitives */,
 				148937E922B97FDF009278A0 /* ColoredHash.swift */,
-				148937EA22B97FDF009278A0 /* GeoRenderer.swift */,
-				148937EE22B97FDF009278A0 /* PoiRenderer.swift */,
-				148937E822B97FDF009278A0 /* MapShader.fsh */,
-				148937ED22B97FDF009278A0 /* MapShader.vsh */,
-				140B990222E57CE000C912A4 /* EdgeShader.fsh */,
-				140B990122E57CE000C912A4 /* EdgeShader.vsh */,
-				148937EB22B97FDF009278A0 /* PoiShader.vsh */,
-				148937E422B97FDF009278A0 /* PoiShader.fsh */,
-				148937E522B97FDF009278A0 /* OpeningShader.vsh */,
-				148937EC22B97FDF009278A0 /* OpeningShader.fsh */,
+				14985FE822F0EC7500F68A1F /* Shaders */,
 			);
 			path = Rendering;
 			sourceTree = "<group>";
@@ -261,6 +261,31 @@
 				148937F422B97FDF009278A0 /* Serialization.swift */,
 			);
 			path = App;
+			sourceTree = "<group>";
+		};
+		14985FE822F0EC7500F68A1F /* Shaders */ = {
+			isa = PBXGroup;
+			children = (
+				148937E822B97FDF009278A0 /* MapShader.fsh */,
+				148937ED22B97FDF009278A0 /* MapShader.vsh */,
+				140B990222E57CE000C912A4 /* EdgeShader.fsh */,
+				140B990122E57CE000C912A4 /* EdgeShader.vsh */,
+				148937EB22B97FDF009278A0 /* PoiShader.vsh */,
+				148937E422B97FDF009278A0 /* PoiShader.fsh */,
+				148937E522B97FDF009278A0 /* OpeningShader.vsh */,
+				148937EC22B97FDF009278A0 /* OpeningShader.fsh */,
+			);
+			path = Shaders;
+			sourceTree = "<group>";
+		};
+		14985FE922F0ECA000F68A1F /* Primitives */ = {
+			isa = PBXGroup;
+			children = (
+				14985FEA22F0ECD100F68A1F /* ArrayedRenderPrimitive.swift */,
+				14985FEC22F0ED0C00F68A1F /* IndexedRenderPrimitive.swift */,
+				14985FEE22F0ED4A00F68A1F /* OutlineRenderPrimitive.swift */,
+			);
+			path = Primitives;
 			sourceTree = "<group>";
 		};
 		14C6655222B97D890054D7F2 = {
@@ -472,7 +497,6 @@
 					};
 					14C6656E22B97D8B0054D7F2 = {
 						CreatedOnToolsVersion = 10.2.1;
-						TestTargetID = 14C6655A22B97D890054D7F2;
 					};
 					14C6658122B97DF70054D7F2 = {
 						CreatedOnToolsVersion = 10.2.1;
@@ -641,10 +665,13 @@
 				1489380822B97FE0009278A0 /* Serialization.swift in Sources */,
 				148937F722B97FDF009278A0 /* ViewCalculations.swift in Sources */,
 				148937FC22B97FDF009278A0 /* MapRenderer.swift in Sources */,
+				14985FEF22F0ED4A00F68A1F /* OutlineRenderPrimitive.swift in Sources */,
 				1489380422B97FE0009278A0 /* MapViewController.swift in Sources */,
 				148937F822B97FDF009278A0 /* GeoRegion.swift in Sources */,
+				14985FEB22F0ECD100F68A1F /* ArrayedRenderPrimitive.swift in Sources */,
 				1489380522B97FE0009278A0 /* UIState.swift in Sources */,
 				148937F522B97FDF009278A0 /* Geometry.swift in Sources */,
+				14985FED22F0ED0C00F68A1F /* IndexedRenderPrimitive.swift in Sources */,
 				148937F622B97FDF009278A0 /* AppTypes.swift in Sources */,
 				1489380322B97FDF009278A0 /* PoiRenderer.swift in Sources */,
 				148937FF22B97FDF009278A0 /* GeoRenderer.swift in Sources */,
@@ -913,7 +940,6 @@
 			baseConfigurationReference = 68690DFCD8787652D2A1F6ED /* Pods-tapmapTests.debug.xcconfig */;
 			buildSettings = {
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
-				BUNDLE_LOADER = "$(TEST_HOST)";
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = Y4JDRD37Q9;
 				INFOPLIST_FILE = tapmapTests/Info.plist;
@@ -926,7 +952,6 @@
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
-				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/tapmap.app/tapmap";
 			};
 			name = Debug;
 		};
@@ -935,7 +960,6 @@
 			baseConfigurationReference = 08719FBC70EA1D5C3EAA5D98 /* Pods-tapmapTests.release.xcconfig */;
 			buildSettings = {
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
-				BUNDLE_LOADER = "$(TEST_HOST)";
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = Y4JDRD37Q9;
 				INFOPLIST_FILE = tapmapTests/Info.plist;
@@ -948,7 +972,6 @@
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
-				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/tapmap.app/tapmap";
 			};
 			name = Release;
 		};

@@ -10,7 +10,7 @@ import OpenGLES
 import GLKit
 
 class SelectionRenderer {
-	var outlinePrimitives: [TriStripRenderPrimitive]
+	var outlinePrimitives: [OutlineRenderPrimitive]
 	let outlineProgram: GLuint
 	let outlineUniforms : (modelViewMatrix: GLint, color: GLint)
 	
@@ -39,8 +39,8 @@ class SelectionRenderer {
 		let countourVertices = tessellation.contours.map({$0.vertices})
 		let outlineGeometry = countourVertices.map(thinOutline)
 		
-		outlinePrimitives = outlineGeometry.map( { (contour: [Vertex]) -> TriStripRenderPrimitive in
-			return TriStripRenderPrimitive(vertices: contour,
+		outlinePrimitives = outlineGeometry.map( { (contour: [Vertex]) -> OutlineRenderPrimitive in
+			return OutlineRenderPrimitive(vertices: contour,
 																		 color: (r: 0, g: 0, b: 0, a: 1),
 																		 ownerHash: 0,
 																		 debugName: "Contour")

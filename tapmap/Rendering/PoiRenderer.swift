@@ -84,3 +84,25 @@ class PoiRenderer {
 		glPopGroupMarkerEXT()
 	}
 }
+
+func buildPlaceMarkers(places: Set<GeoPlace>, markerSize: Float) -> ([Vertex], [UInt32]) {
+	let vertices = places.reduce([]) { (accumulator: [Vertex], place: GeoPlace) in
+		let size = markerSize / 2.0
+		let v0 = Vertex(0.0, size)
+		let v1 = Vertex(size, 0.0)
+		let v2 = Vertex(0.0, -size)
+		let v3 = Vertex(-size, 0.0)
+		let verts = [v0, v1, v2, v3].map { $0 + place.location }
+		return accumulator + verts
+	}
+	
+	let quadRange = 0..<UInt32(places.count)
+	let indices = quadRange.reduce([]) { (accumulator: [UInt32], quadIndex: UInt32) in
+		let quadIndices: [UInt32] = [0, 2, 1, 0, 3, 2]	// Build two triangles from the four quad vertices
+		let vertexOffset = quadIndex * 4
+		let offsetIndices = quadIndices.map { $0 + vertexOffset }
+		return accumulator + offsetIndices
+	}
+	
+	return (vertices, indices)
+}
