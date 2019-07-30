@@ -26,12 +26,9 @@ class OutlineRenderPrimitive {
 	var vertexBuffer: GLuint = 0
 	let elementCount: GLsizei
 	
-	let color: (r: GLfloat, g: GLfloat, b: GLfloat, a: GLfloat)
 	let name: String
 	
-	init(vertices: [OutlineVertex], color c: (r: Float, g: Float, b: Float, a: Float), ownerHash hash: Int, debugName: String) {
-		color = c
-		
+	init(vertices: [OutlineVertex], ownerHash hash: Int, debugName: String) {
 		ownerHash = hash
 		name = debugName
 		

@@ -41,7 +41,6 @@ class SelectionRenderer {
 		
 		outlinePrimitives = outlineGeometry.map( { (contour: [OutlineVertex]) -> OutlineRenderPrimitive in
 			return OutlineRenderPrimitive(vertices: contour,
-																		 color: (r: 0, g: 0, b: 0, a: 1),
 																		 ownerHash: 0,
 																		 debugName: "Contour")
 			})
