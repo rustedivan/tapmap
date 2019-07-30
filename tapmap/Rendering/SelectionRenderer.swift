@@ -35,7 +35,7 @@ class SelectionRenderer {
 	
 	func select(geometry tessellation: GeoTessellated) {
 		let thinOutline = { (outline: [Vertex]) in generateClosedOutlineGeometry(outline: outline, width: 0.2) }
-		
+				// $ Generate a separate vec2 attrib stream with miter vectors
 		let countourVertices = tessellation.contours.map({$0.vertices})
 		let outlineGeometry = countourVertices.map(thinOutline)
 		
@@ -45,10 +45,14 @@ class SelectionRenderer {
 														 ownerHash: 0,
 														 debugName: "Contour")
 			})
+		
+		// $ Create separate attrib buffers
 	}
 	
 	func clear() {
 		outlinePrimitives = []
+		// $ delete miterBuffers
+		// $ clear miterVectors
 	}
 	
 	func renderSelection(inProjection projection: GLKMatrix4) {
@@ -62,9 +66,6 @@ class SelectionRenderer {
 			})
 		})
 		
-//		glEnable(GLenum(GL_BLEND))
-//		glBlendFunc(GLenum(GL_SRC_ALPHA), GLenum(GL_ONE_MINUS_SRC_ALPHA));
-//
 		var components : [GLfloat] = [0.0, 0.0, 0.0, 1.0]
 		glUniform4f(outlineUniforms.color,
 								GLfloat(components[0]),
@@ -72,9 +73,10 @@ class SelectionRenderer {
 								GLfloat(components[2]),
 								GLfloat(components[3]))
 		
+		// $ glBindBuffer(GLenum(GL_ARRAY_BUFFER), miterBuffers[i])
+		// $ glVertexAttribPointer(Attribs.miterVector.rawValue, 2, GLenum(GL_FLOAT), GLboolean(GL_FALSE), GLsizei(MemoryLayout<Vertex>.stride), BUFFER_OFFSET(0))
 		_ = outlinePrimitives.map { render(primitive: $0, mode: .Tristrip) }
 	
-//		glDisable(GLenum(GL_BLEND))
 		glPopGroupMarkerEXT()
 	}
 }
