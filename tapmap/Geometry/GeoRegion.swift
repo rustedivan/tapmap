@@ -164,6 +164,7 @@ struct GeoPlace : Codable, Equatable, Hashable {
 	let location: Vertex
 	let name: String
 	let kind: Kind
+	let rank: Int
 	
 	public static func == (lhs: GeoPlace, rhs: GeoPlace) -> Bool {
 		return lhs.name == rhs.name && lhs.location == rhs.location && lhs.kind == rhs.kind
