@@ -39,7 +39,9 @@ class OperationFixupHierarchy : Operation {
 		var geoCountries = Set<ToolGeoFeature>()
 		let numRegions = remainingRegions.count
 		for country in countryList {
+			// Countries consist of their regions...
 			let belongingRegions = remainingRegions.filter {	$0.countryKey == country.countryKey	}
+			// ...and all the larger places in those regions
 			let belongingPlaces = Set(belongingRegions
 				.flatMap { $0.places ?? [] }
 				.filter { $0.kind != .Town }
