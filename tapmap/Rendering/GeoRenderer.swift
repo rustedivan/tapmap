@@ -37,7 +37,7 @@ extension GeoRegion : Renderable {
 	}
 	
 	func placesRenderPlane() -> IndexedRenderPrimitive {
-		let (vertices, indices, scalars) = buildPlaceMarkers(places: places, markerSize: 0.3)
+		let (vertices, indices, scalars) = buildPlaceMarkers(places: places)
 		
 		return IndexedRenderPrimitive(vertices: vertices,
 																	indices: indices, scalarAttribs: scalars,
@@ -55,7 +55,7 @@ extension GeoCountry : Renderable {
 	}
 	
 	func placesRenderPlane() -> IndexedRenderPrimitive {
-		let (vertices, indices, scalars) = buildPlaceMarkers(places: places, markerSize: 0.4)
+		let (vertices, indices, scalars) = buildPlaceMarkers(places: places)
 		
 		return IndexedRenderPrimitive(vertices: vertices,
 													 indices: indices, scalarAttribs: scalars,
@@ -73,7 +73,7 @@ extension GeoContinent : Renderable {
 	}
 	
 	func placesRenderPlane() -> IndexedRenderPrimitive {
-		let (vertices, indices, scalars) = buildPlaceMarkers(places: places, markerSize: 1.0)
+		let (vertices, indices, scalars) = buildPlaceMarkers(places: places)
 		return IndexedRenderPrimitive(vertices: vertices,
 																	indices: indices, scalarAttribs: scalars,
 																	color: (r: 1.0, g: 0.5, b: 0.5, a: 1.0),

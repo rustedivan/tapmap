@@ -89,9 +89,9 @@ class PoiRenderer {
 	}
 }
 
-func buildPlaceMarkers(places: Set<GeoPlace>, markerSize: Float) -> ([Vertex], [UInt32], [Float]) {
+func buildPlaceMarkers(places: Set<GeoPlace>) -> ([Vertex], [UInt32], [Float]) {
 	let vertices = places.reduce([]) { (accumulator: [Vertex], place: GeoPlace) in
-		let size = markerSize / 2.0
+		let size = log10(Float(place.rank) / 10.0)
 		let v0 = Vertex(0.0, size)
 		let v1 = Vertex(size, 0.0)
 		let v2 = Vertex(0.0, -size)
