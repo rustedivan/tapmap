@@ -26,6 +26,7 @@ extension UIColor {
 enum VertexAttribs: GLuint {
 	case position = 1
 	case miter = 2
+	case scalar = 3
 }
 
 extension GeoRegion : Renderable {
@@ -36,10 +37,10 @@ extension GeoRegion : Renderable {
 	}
 	
 	func placesRenderPlane() -> IndexedRenderPrimitive {
-		let (vertices, indices) = buildPlaceMarkers(places: places, markerSize: 0.3)
+		let (vertices, indices, scalars) = buildPlaceMarkers(places: places, markerSize: 0.3)
 		
 		return IndexedRenderPrimitive(vertices: vertices,
-													 indices: indices,
+																	indices: indices, scalarAttribs: scalars,
 													 color: (r: 0.7, g: 0.7, b: 0.7, a: 1.0),
 													 ownerHash: hashValue,
 													 debugName: "Region: \(name) - poi plane")
@@ -54,10 +55,10 @@ extension GeoCountry : Renderable {
 	}
 	
 	func placesRenderPlane() -> IndexedRenderPrimitive {
-		let (vertices, indices) = buildPlaceMarkers(places: places, markerSize: 0.4)
+		let (vertices, indices, scalars) = buildPlaceMarkers(places: places, markerSize: 0.4)
 		
 		return IndexedRenderPrimitive(vertices: vertices,
-													 indices: indices,
+													 indices: indices, scalarAttribs: scalars,
 													 color: (r: 0.8, g: 0.3, b: 0.0, a: 1.0),
 													 ownerHash: hashValue,
 													 debugName: "Country: \(name) - poi plane")
@@ -72,12 +73,12 @@ extension GeoContinent : Renderable {
 	}
 	
 	func placesRenderPlane() -> IndexedRenderPrimitive {
-		let (vertices, indices) = buildPlaceMarkers(places: places, markerSize: 1.0)
+		let (vertices, indices, scalars) = buildPlaceMarkers(places: places, markerSize: 1.0)
 		return IndexedRenderPrimitive(vertices: vertices,
-													 indices: indices,
-													 color: (r: 1.0, g: 0.5, b: 0.5, a: 1.0),
-													 ownerHash: hashValue,
-													 debugName: "Continent: \(name) - poi plane")
+																	indices: indices, scalarAttribs: scalars,
+																	color: (r: 1.0, g: 0.5, b: 0.5, a: 1.0),
+																	ownerHash: hashValue,
+																	debugName: "Continent: \(name) - poi plane")
 	}
 }
 
@@ -113,6 +114,7 @@ func loadShaders(shaderName: String) -> GLuint {
 	// This needs to be done prior to linking.
 	glBindAttribLocation(program, VertexAttribs.position.rawValue, "position")
 	glBindAttribLocation(program, VertexAttribs.miter.rawValue, "miter")
+	glBindAttribLocation(program, VertexAttribs.scalar.rawValue, "scalar")
 	
 	// Link program.
 	if !linkProgram(program) {

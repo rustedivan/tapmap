@@ -7,6 +7,7 @@
 //
 
 attribute vec4 position;
+attribute float scalar;
 
 varying lowp vec4 colorVarying;
 
