@@ -51,7 +51,7 @@ class OperationParseOSMJson : Operation {
 	fileprivate func parsePlace(_ json: JSON, asKind kind: GeoPlace.Kind) -> GeoPlace? {
 		let properties = json["tags"]
 		let possibleNames = properties["name:en"].string ?? properties["name"].string
-		let adminLevel = properties["admin_level"].int ?? 4	// Assume mid-range if missing
+		let adminLevel = Int(properties["admin_level"].string ?? "4")!	// Assume mid-range (admin_level is integer-string, shortest cast)
 		let knownCapital = (properties["capital"].stringValue == "yes" || adminLevel <= 2)	// Admin level 1-2 seem to be capitals too
 		
 		guard let x = json["lon"].double, let y = json["lat"].double else {
@@ -71,7 +71,11 @@ class OperationParseOSMJson : Operation {
 			default: decoratedPlaceKind = kind
 		}
 		
-		let rank = determineRank(kind: decoratedPlaceKind, name: featureName, adminLevel: adminLevel, population: properties["population"].int)
+		let population: Int?	// population is an integer string
+		if let popString = properties["population"].string { population = Int(popString) }
+		else { population = nil }
+		
+		let rank = determineRank(kind: decoratedPlaceKind, name: featureName, adminLevel: adminLevel, population: population)
 		
 		return GeoPlace(location: p,
 										name: featureName,
