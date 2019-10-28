@@ -37,12 +37,18 @@ class OperationParseOSMJson : Operation {
 		
 		let numPlaces = placeArray.count
 		var loadedPlaces : Set<GeoPlace> = []
-		
+		var rankHistogram: [Int] = [0, 0, 0, 0, 0, 0, 0, 0]
 		for placeJson in placeArray {
 			if let loadedPlace = parsePlace(placeJson, asKind: kind) {
 				loadedPlaces.insert(loadedPlace)
+				if (loadedPlace.rank < 8) { rankHistogram[loadedPlace.rank - 1] += 1 }
 				report(Double(loadedPlaces.count) / Double(numPlaces), loadedPlace.name, false)
 			}
+		}
+		
+		print("POI rank histogram:")
+		for (idx, bucket) in rankHistogram.enumerated() {
+			print("\(idx + 1):\t\(bucket)")
 		}
 		
 		return GeoPlaceCollection(loadedPlaces)
