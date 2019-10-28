@@ -84,7 +84,7 @@ class OperationParseOSMJson : Operation {
 	}
 	
 	fileprivate func determineRank(kind: GeoPlace.Kind, name: String, adminLevel: Int?, population: Int?) -> Int {
-		let logPopulation: Double? = population != nil ? log(Double(population!)) : nil
+		let logPopulation: Double? = population != nil ? log10(Double(population!)) : nil
 		
 		switch (kind, adminLevel, logPopulation) {
 		case (.Capital, _, let logPop?) where logPop > 6.5:	// Capital over 5M population
