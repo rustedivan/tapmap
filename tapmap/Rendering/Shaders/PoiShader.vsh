@@ -10,6 +10,7 @@ attribute vec4 position;
 attribute float scalar;
 
 varying lowp vec4 colorVarying;
+varying lowp float rank;
 
 uniform mat4 modelViewProjectionMatrix;
 uniform lowp vec4 poiColor;
@@ -17,5 +18,6 @@ uniform lowp vec4 poiColor;
 void main()
 {
 		colorVarying = poiColor;
-    gl_Position = modelViewProjectionMatrix * position;
+		rank = scalar;
+		gl_Position = modelViewProjectionMatrix * position;
 }

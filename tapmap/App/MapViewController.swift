@@ -179,7 +179,8 @@ class MapViewController: GLKViewController, GLKViewControllerDelegate {
 																											centeredOn: offset,
 																											zoomedTo: zoom)
 		effectRenderer.updatePrimitives()
-		selectionRenderer.outlineWidth = 0.2 / zoom;
+		selectionRenderer.outlineWidth = 0.2 / zoom
+		poiRenderer.rankThreshold = zoom
 	}
 	
 	override func glkView(_ view: GLKView, drawIn rect: CGRect) {

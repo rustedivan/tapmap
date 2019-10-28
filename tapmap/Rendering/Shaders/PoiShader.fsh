@@ -7,8 +7,13 @@
 //
 
 varying lowp vec4 colorVarying;
+varying lowp float rank;
+uniform lowp float rankThreshold;
 
 void main()
 {
-    gl_FragColor = colorVarying;
+	if (rank > rankThreshold) {
+		discard;
+	}
+  gl_FragColor = colorVarying;
 }

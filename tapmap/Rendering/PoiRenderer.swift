@@ -12,7 +12,8 @@ import GLKit
 class PoiRenderer {
 	var regionPrimitives : [Int : IndexedRenderPrimitive]
 	let poiProgram: GLuint
-	let poiUniforms : (modelViewMatrix: GLint, color: GLint)
+	let poiUniforms : (modelViewMatrix: GLint, color: GLint, rankThreshold: GLint)
+	var rankThreshold: Float = 1.0
 	
 	init?(withGeoWorld geoWorld: GeoWorld) {
 		poiProgram = loadShaders(shaderName: "PoiShader")
@@ -22,6 +23,7 @@ class PoiRenderer {
 		}
 		poiUniforms.modelViewMatrix = glGetUniformLocation(poiProgram, "modelViewProjectionMatrix")
 		poiUniforms.color = glGetUniformLocation(poiProgram, "poiColor")
+		poiUniforms.rankThreshold = glGetUniformLocation(poiProgram, "rankThreshold")
 		
 		let userState = AppDelegate.sharedUserState
 		
@@ -71,6 +73,8 @@ class PoiRenderer {
 				glUniformMatrix4fv(poiUniforms.modelViewMatrix, 1, 0, $0)
 			})
 		})
+		
+		glUniform1f(poiUniforms.rankThreshold, rankThreshold)
 		
 		for primitive in regionPrimitives.values {
 			var components : [GLfloat] = [primitive.color.r, primitive.color.g, primitive.color.b, 1.0]
