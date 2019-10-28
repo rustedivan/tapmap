@@ -80,5 +80,6 @@ func render(primitive: OutlineRenderPrimitive) {
 	glDrawArrays(GLenum(GL_TRIANGLE_STRIP),
 							 0,
 							 primitive.elementCount)
+	glDisableVertexAttribArray(VertexAttribs.miter.rawValue)
 }
 
