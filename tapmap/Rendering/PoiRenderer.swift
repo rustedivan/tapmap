@@ -77,8 +77,8 @@ class PoiRenderer {
 		glUniform1f(poiUniforms.rankThreshold, rankThreshold)
 		
 		for primitives in regionPrimitives.values {
-//			var components : [GLfloat] = [primitive.color.r, primitive.color.g, primitive.color.b, 1.0]
-			var components : [GLfloat] = [1.0, 0.0, 1.0, 1.0]
+			if primitives.isEmpty { continue }
+			var components : [GLfloat] = [primitives.first!.color.r, primitives.first!.color.g, primitives.first!.color.b, 1.0]
 			glUniform4f(poiUniforms.color,
 									GLfloat(components[0]),
 									GLfloat(components[1]),
@@ -88,6 +88,18 @@ class PoiRenderer {
 		}
 		glPopGroupMarkerEXT()
 	}
+}
+
+func bucketPlaceMarkers(places: Set<GeoPlace>) -> [Int: Set<GeoPlace>] {
+	var bins: [Int: Set<GeoPlace>] = [:]
+	for place in places {
+		if bins[place.rank] != nil {
+			bins[place.rank]!.insert(place)
+		} else {
+			bins[place.rank] = Set<GeoPlace>([place])
+		}
+	}
+	return bins
 }
 
 func buildPlaceMarkers(places: Set<GeoPlace>) -> ([Vertex], [UInt32], [Float]) {

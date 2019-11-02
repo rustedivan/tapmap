@@ -37,13 +37,15 @@ extension GeoRegion : Renderable {
 	}
 	
 	func placesRenderPlanes() -> [IndexedRenderPrimitive] {
-		let (vertices, indices, scalars) = buildPlaceMarkers(places: places)
-		
-		return [IndexedRenderPrimitive(vertices: vertices,
-																	indices: indices, scalarAttribs: scalars,
-													 color: (r: 0.7, g: 0.7, b: 0.7, a: 1.0),
-													 ownerHash: hashValue,
-													 debugName: "Region: \(name) - poi plane")]
+		let rankedPlaces = bucketPlaceMarkers(places: places)
+		return rankedPlaces.map {
+			let (vertices, indices, scalars) = buildPlaceMarkers(places: $0.value)
+			return IndexedRenderPrimitive(vertices: vertices,
+																		indices: indices, scalarAttribs: scalars,
+																		color: hashColor(withChild: $0.key).tuple(),
+																		ownerHash: hashValue,
+																		debugName: "Region: \(name) - poi plane @ \($0.key)")
+		}
 	}
 }
 
@@ -55,13 +57,15 @@ extension GeoCountry : Renderable {
 	}
 	
 	func placesRenderPlanes() -> [IndexedRenderPrimitive] {
-		let (vertices, indices, scalars) = buildPlaceMarkers(places: places)
-		
-		return [IndexedRenderPrimitive(vertices: vertices,
-													 indices: indices, scalarAttribs: scalars,
-													 color: (r: 0.8, g: 0.3, b: 0.0, a: 1.0),
-													 ownerHash: hashValue,
-													 debugName: "Country: \(name) - poi plane")]
+		let rankedPlaces = bucketPlaceMarkers(places: places)
+		return rankedPlaces.map {
+			let (vertices, indices, scalars) = buildPlaceMarkers(places: $0.value)
+			return IndexedRenderPrimitive(vertices: vertices,
+																		indices: indices, scalarAttribs: scalars,
+																		color: hashColor(withChild: $0.key).tuple(),
+																		ownerHash: hashValue,
+																		debugName: "Country: \(name) - poi plane @ \($0.key)")
+		}
 	}
 }
 
@@ -73,14 +77,15 @@ extension GeoContinent : Renderable {
 	}
 	
 	func placesRenderPlanes() -> [IndexedRenderPrimitive] {
-		// $ Put places into rank buckets
-		// $ bPM per bucket
-		let (vertices, indices, scalars) = buildPlaceMarkers(places: places)
-		return [IndexedRenderPrimitive(vertices: vertices,
-																	indices: indices, scalarAttribs: scalars,
-																	color: (r: 1.0, g: 0.5, b: 0.5, a: 1.0),
-																	ownerHash: hashValue,
-																	debugName: "Continent: \(name) - poi plane")]
+		let rankedPlaces = bucketPlaceMarkers(places: places)
+		return rankedPlaces.map {
+			let (vertices, indices, scalars) = buildPlaceMarkers(places: $0.value)
+			return IndexedRenderPrimitive(vertices: vertices,
+																		indices: indices, scalarAttribs: scalars,
+																		color: hashColor(withChild: $0.key).tuple(),
+																		ownerHash: hashValue,
+																		debugName: "Continent: \(name) - poi plane @ \($0.key)")
+		}
 	}
 }
 
