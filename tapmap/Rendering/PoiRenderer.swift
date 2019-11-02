@@ -10,7 +10,7 @@ import OpenGLES
 import GLKit
 
 class PoiRenderer {
-	var regionPrimitives : [Int : IndexedRenderPrimitive]
+	var regionPrimitives : [Int : [IndexedRenderPrimitive]]
 	let poiProgram: GLuint
 	let poiUniforms : (modelViewMatrix: GLint, color: GLint, rankThreshold: GLint)
 	var rankThreshold: Float = 1.0
@@ -38,9 +38,9 @@ class PoiRenderer {
 		let openRegions = regions.filter { userState.placeVisited($0) }
 		let closedRegions = regions.subtracting(openRegions)
 		
-		let visibleContinentPoiPlanes = closedContinents.map { ($0.hashValue, $0.placesRenderPlane()) }
-		let visibleCountryPoiPlanes = closedCountries.map { ($0.hashValue, $0.placesRenderPlane()) }
-		let visibleRegionPoiPlanes = closedRegions.map { ($0.hashValue, $0.placesRenderPlane()) }
+		let visibleContinentPoiPlanes = closedContinents.map { ($0.hashValue, $0.placesRenderPlanes()) }
+		let visibleCountryPoiPlanes = closedCountries.map { ($0.hashValue, $0.placesRenderPlanes()) }
+		let visibleRegionPoiPlanes = closedRegions.map { ($0.hashValue, $0.placesRenderPlanes()) }
 		let visiblePoiPlanes = visibleContinentPoiPlanes + visibleCountryPoiPlanes + visibleRegionPoiPlanes
 		
 		// Insert them into the primitive dictionary, ignoring any later duplicates
@@ -58,7 +58,7 @@ class PoiRenderer {
 		if AppDelegate.sharedUserState.placeVisited(node) {
 			regionPrimitives.removeValue(forKey: node.hashValue)
 
-			let hashedPrimitives = subRegions.map { ($0.hashValue, $0.placesRenderPlane()) }
+			let hashedPrimitives = subRegions.map { ($0.hashValue, $0.placesRenderPlanes()) }
 			regionPrimitives.merge(hashedPrimitives, uniquingKeysWith: { (l, r) in l })
 		}
 	}
@@ -76,14 +76,15 @@ class PoiRenderer {
 		
 		glUniform1f(poiUniforms.rankThreshold, rankThreshold)
 		
-		for primitive in regionPrimitives.values {
-			var components : [GLfloat] = [primitive.color.r, primitive.color.g, primitive.color.b, 1.0]
+		for primitives in regionPrimitives.values {
+//			var components : [GLfloat] = [primitive.color.r, primitive.color.g, primitive.color.b, 1.0]
+			var components : [GLfloat] = [1.0, 0.0, 1.0, 1.0]
 			glUniform4f(poiUniforms.color,
 									GLfloat(components[0]),
 									GLfloat(components[1]),
 									GLfloat(components[2]),
 									GLfloat(components[3]))
-			render(primitive: primitive)
+			_ = primitives.map(render)
 		}
 		glPopGroupMarkerEXT()
 	}

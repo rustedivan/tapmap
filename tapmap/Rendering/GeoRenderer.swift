@@ -36,14 +36,14 @@ extension GeoRegion : Renderable {
 		return ArrayedRenderPrimitive(vertices: geometry.vertices, color: c, ownerHash: hashValue, debugName: "Region: \(name)")
 	}
 	
-	func placesRenderPlane() -> IndexedRenderPrimitive {
+	func placesRenderPlanes() -> [IndexedRenderPrimitive] {
 		let (vertices, indices, scalars) = buildPlaceMarkers(places: places)
 		
-		return IndexedRenderPrimitive(vertices: vertices,
+		return [IndexedRenderPrimitive(vertices: vertices,
 																	indices: indices, scalarAttribs: scalars,
 													 color: (r: 0.7, g: 0.7, b: 0.7, a: 1.0),
 													 ownerHash: hashValue,
-													 debugName: "Region: \(name) - poi plane")
+													 debugName: "Region: \(name) - poi plane")]
 	}
 }
 
@@ -54,14 +54,14 @@ extension GeoCountry : Renderable {
 		return ArrayedRenderPrimitive(vertices: geometry.vertices, color: c, ownerHash: hashValue, debugName: "Country: \(name)")
 	}
 	
-	func placesRenderPlane() -> IndexedRenderPrimitive {
+	func placesRenderPlanes() -> [IndexedRenderPrimitive] {
 		let (vertices, indices, scalars) = buildPlaceMarkers(places: places)
 		
-		return IndexedRenderPrimitive(vertices: vertices,
+		return [IndexedRenderPrimitive(vertices: vertices,
 													 indices: indices, scalarAttribs: scalars,
 													 color: (r: 0.8, g: 0.3, b: 0.0, a: 1.0),
 													 ownerHash: hashValue,
-													 debugName: "Country: \(name) - poi plane")
+													 debugName: "Country: \(name) - poi plane")]
 	}
 }
 
@@ -72,13 +72,15 @@ extension GeoContinent : Renderable {
 		return ArrayedRenderPrimitive(vertices: geometry.vertices, color: c, ownerHash: hashValue, debugName: "Continent \(name)")
 	}
 	
-	func placesRenderPlane() -> IndexedRenderPrimitive {
+	func placesRenderPlanes() -> [IndexedRenderPrimitive] {
+		// $ Put places into rank buckets
+		// $ bPM per bucket
 		let (vertices, indices, scalars) = buildPlaceMarkers(places: places)
-		return IndexedRenderPrimitive(vertices: vertices,
+		return [IndexedRenderPrimitive(vertices: vertices,
 																	indices: indices, scalarAttribs: scalars,
 																	color: (r: 1.0, g: 0.5, b: 0.5, a: 1.0),
 																	ownerHash: hashValue,
-																	debugName: "Continent: \(name) - poi plane")
+																	debugName: "Continent: \(name) - poi plane")]
 	}
 }
 

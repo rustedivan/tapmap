@@ -75,7 +75,7 @@ protocol GeoIdentifiable : Hashable {
 
 protocol GeoPlaceContainer {
 	var places : Set<GeoPlace> { get }
-	func placesRenderPlane() -> IndexedRenderPrimitive
+	func placesRenderPlanes() -> [IndexedRenderPrimitive]
 }
 
 protocol GeoTessellated : Renderable {
