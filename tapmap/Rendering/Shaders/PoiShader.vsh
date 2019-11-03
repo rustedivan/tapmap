@@ -14,10 +14,11 @@ varying lowp float rank;
 
 uniform mat4 modelViewProjectionMatrix;
 uniform lowp vec4 poiColor;
+uniform lowp float progress;
 
 void main()
 {
-		colorVarying = poiColor;
+		colorVarying = vec4(poiColor.xyz, progress);
 		rank = scalar;
 		gl_Position = modelViewProjectionMatrix * position;
 }

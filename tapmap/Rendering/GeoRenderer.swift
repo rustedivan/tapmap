@@ -35,18 +35,6 @@ extension GeoRegion : Renderable {
 		let c = hashColor(ofHash: parentHash, childHash: hashValue).tuple()
 		return ArrayedRenderPrimitive(vertices: geometry.vertices, color: c, ownerHash: hashValue, debugName: "Region: \(name)")
 	}
-	
-	func placesRenderPlanes() -> [IndexedRenderPrimitive] {
-		let rankedPlaces = bucketPlaceMarkers(places: places)
-		return rankedPlaces.map {
-			let (vertices, indices, scalars) = buildPlaceMarkers(places: $0.value)
-			return IndexedRenderPrimitive(vertices: vertices,
-																		indices: indices, scalarAttribs: scalars,
-																		color: hashColor(withChild: $0.key).tuple(),
-																		ownerHash: hashValue,
-																		debugName: "Region: \(name) - poi plane @ \($0.key)")
-		}
-	}
 }
 
 extension GeoCountry : Renderable {
@@ -55,18 +43,6 @@ extension GeoCountry : Renderable {
 		let c = hashColor.tuple()
 		return ArrayedRenderPrimitive(vertices: geometry.vertices, color: c, ownerHash: hashValue, debugName: "Country: \(name)")
 	}
-	
-	func placesRenderPlanes() -> [IndexedRenderPrimitive] {
-		let rankedPlaces = bucketPlaceMarkers(places: places)
-		return rankedPlaces.map {
-			let (vertices, indices, scalars) = buildPlaceMarkers(places: $0.value)
-			return IndexedRenderPrimitive(vertices: vertices,
-																		indices: indices, scalarAttribs: scalars,
-																		color: hashColor(withChild: $0.key).tuple(),
-																		ownerHash: hashValue,
-																		debugName: "Country: \(name) - poi plane @ \($0.key)")
-		}
-	}
 }
 
 extension GeoContinent : Renderable {
@@ -74,18 +50,6 @@ extension GeoContinent : Renderable {
 	func renderPrimitive() -> PrimitiveType {
 		let c = hashColor.tuple()
 		return ArrayedRenderPrimitive(vertices: geometry.vertices, color: c, ownerHash: hashValue, debugName: "Continent \(name)")
-	}
-	
-	func placesRenderPlanes() -> [IndexedRenderPrimitive] {
-		let rankedPlaces = bucketPlaceMarkers(places: places)
-		return rankedPlaces.map {
-			let (vertices, indices, scalars) = buildPlaceMarkers(places: $0.value)
-			return IndexedRenderPrimitive(vertices: vertices,
-																		indices: indices, scalarAttribs: scalars,
-																		color: hashColor(withChild: $0.key).tuple(),
-																		ownerHash: hashValue,
-																		debugName: "Continent: \(name) - poi plane @ \($0.key)")
-		}
 	}
 }
 
