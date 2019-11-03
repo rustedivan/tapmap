@@ -201,6 +201,9 @@ extension MapViewController : UIScrollViewDelegate {
 	
 	func scrollViewDidZoom(_ scrollView: UIScrollView) {
 		zoom = Float(scrollView.zoomScale)
+		if (poiRenderer != nil) {
+			poiRenderer.updateZoomThreshold(viewZoom: zoom)
+		}
 	}
 	
 	func scrollViewDidScroll(_ scrollView: UIScrollView) {

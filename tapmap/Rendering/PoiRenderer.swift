@@ -11,8 +11,8 @@ import GLKit
 
 struct PoiPlane {
 	let primitive: IndexedRenderPrimitive
-	var toggleTime: Date
 	let rank: Int
+	var toggleTime: Date
 	var progress : Double {
 		return min(max(0.0, Date().timeIntervalSince(toggleTime), 0.0), 1.0)
 	}
@@ -71,6 +71,21 @@ class PoiRenderer {
 			let hashedPrimitives = subRegions.map { ($0.hashValue, $0.poiRenderPlanes()) }
 			regionPrimitives.merge(hashedPrimitives, uniquingKeysWith: { (l, r) in l + r })
 		}
+	}
+	
+	func updateZoomThreshold(viewZoom: Float) {
+		let previousPois = Set(regionPrimitives.values.flatMap { $0.filter { Float($0.rank) <= rankThreshold } })
+		let visiblePois = Set(regionPrimitives.values.flatMap { $0.filter { Float($0.rank) <= viewZoom } })
+
+		let A = previousPois.subtracting(visiblePois)	// Culled this frame
+		let B = visiblePois.subtracting(previousPois) // Shown this frame
+		let updatedPois = A.union(B)									// = updated this frame
+		
+		if updatedPois.isEmpty == false {
+			print("Should animate \(updatedPois.count) POI planes")
+		}
+		
+		rankThreshold = viewZoom
 	}
 	
 	func renderWorld(geoWorld: GeoWorld, inProjection projection: GLKMatrix4) {
@@ -153,7 +168,7 @@ func sortPlacesIntoPoiPlanes<T: GeoIdentifiable>(_ places: Set<GeoPlace>, in con
 																						color: rank.hashColor.tuple(),
 																						ownerHash: container.hashValue,
 																						debugName: "\(container.name) - poi plane @ \(rank)")
-		return PoiPlane(primitive: primitive, toggleTime: Date(), rank: rank)
+		return PoiPlane(primitive: primitive, rank: rank, toggleTime: Date())
 	}
 }
 	
