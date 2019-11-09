@@ -9,17 +9,23 @@
 import OpenGLES
 import GLKit
 
-struct PoiPlane {
+struct PoiPlane: Hashable {
 	let primitive: IndexedRenderPrimitive
 	let rank: Int
-	var toggleTime: Date
-	var progress : Double {
-		return min(max(0.0, Date().timeIntervalSince(toggleTime), 0.0), 1.0)
+	var ownerHash: Int { return primitive.ownerHash }
+	
+	func hash(into hasher: inout Hasher) {
+		hasher.combine(primitive.ownerHash)
+		hasher.combine(rank)
+	}
+	
+	static func == (lhs: PoiPlane, rhs: PoiPlane) -> Bool {
+		return lhs.hashValue == rhs.hashValue
 	}
 }
 
 class PoiRenderer {
-	var regionPrimitives : [Int : [PoiPlane]]
+	var regionPrimitives : [PoiPlane]
 	let poiProgram: GLuint
 	let poiUniforms : (modelViewMatrix: GLint, color: GLint, rankThreshold: GLint, progress: GLint)
 	var rankThreshold: Float = 1.0
@@ -48,13 +54,11 @@ class PoiRenderer {
 		let openRegions = regions.filter { userState.placeVisited($0) }
 		let closedRegions = regions.subtracting(openRegions)
 		
-		let visibleContinentPoiPlanes = closedContinents.map { ($0.hashValue, $0.poiRenderPlanes()) }
-		let visibleCountryPoiPlanes = closedCountries.map { ($0.hashValue, $0.poiRenderPlanes()) }
-		let visibleRegionPoiPlanes = closedRegions.map { ($0.hashValue, $0.poiRenderPlanes()) }
-		let visiblePoiPlanes = visibleContinentPoiPlanes + visibleCountryPoiPlanes + visibleRegionPoiPlanes
+		let visibleContinentPoiPlanes = closedContinents.flatMap { $0.poiRenderPlanes() }
+		let visibleCountryPoiPlanes = closedCountries.flatMap { $0.poiRenderPlanes() }
+		let visibleRegionPoiPlanes = closedRegions.flatMap { $0.poiRenderPlanes() }
 		
-		// Insert them into the primitive dictionary, ignoring any later duplicates
-		regionPrimitives = Dictionary(visiblePoiPlanes, uniquingKeysWith: { (l, r) in l + r } )
+		regionPrimitives = visibleContinentPoiPlanes + visibleCountryPoiPlanes + visibleRegionPoiPlanes
 	}
 	
 	deinit {
@@ -66,16 +70,16 @@ class PoiRenderer {
 	func updatePrimitives<T:GeoNode>(for node: T, with subRegions: Set<T.SubType>)
 		where T.SubType : GeoPlaceContainer {
 		if AppDelegate.sharedUserState.placeVisited(node) {
-			regionPrimitives.removeValue(forKey: node.hashValue)
-
-			let hashedPrimitives = subRegions.map { ($0.hashValue, $0.poiRenderPlanes()) }
-			regionPrimitives.merge(hashedPrimitives, uniquingKeysWith: { (l, r) in l + r })
+			let removedRegionsHash = node.hashValue
+			regionPrimitives = regionPrimitives.filter { $0.ownerHash != removedRegionsHash }
+			let subregionPrimitives = subRegions.flatMap { $0.poiRenderPlanes() }
+			regionPrimitives.append(contentsOf: subregionPrimitives)
 		}
 	}
 	
 	func updateZoomThreshold(viewZoom: Float) {
-		let previousPois = Set(regionPrimitives.values.flatMap { $0.filter { Float($0.rank) <= rankThreshold } })
-		let visiblePois = Set(regionPrimitives.values.flatMap { $0.filter { Float($0.rank) <= viewZoom } })
+		let previousPois = Set(regionPrimitives.filter { Float($0.rank) <= rankThreshold })
+		let visiblePois = Set(regionPrimitives.filter { Float($0.rank) <= viewZoom })
 
 		let A = previousPois.subtracting(visiblePois)	// Culled this frame
 		let B = visiblePois.subtracting(previousPois) // Shown this frame
@@ -109,12 +113,11 @@ class PoiRenderer {
 								GLfloat(components[3]))
 		glUniform1f(poiUniforms.rankThreshold, rankThreshold)
 		
-		for poiPlanes in regionPrimitives.values {
-			_ = poiPlanes.map { (poiPlane) in
-				glUniform1f(poiUniforms.progress, GLfloat(poiPlane.progress))
-				render(primitive: poiPlane.primitive)
-			}
+		for poiPlane in regionPrimitives {
+			glUniform1f(poiUniforms.progress, 1.0)	// $ Lookup progress in fade list
+			render(primitive: poiPlane.primitive)
 		}
+		
 		glDisable(GLenum(GL_BLEND))
 		glPopGroupMarkerEXT()
 	}
@@ -166,12 +169,13 @@ func sortPlacesIntoPoiPlanes<T: GeoIdentifiable>(_ places: Set<GeoPlace>, in con
 		let primitive = IndexedRenderPrimitive(vertices: vertices,
 																						indices: indices, scalarAttribs: scalars,
 																						color: rank.hashColor.tuple(),
-																						ownerHash: container.hashValue,
+																						ownerHash: container.hashValue,	// The hash of the owning region
 																						debugName: "\(container.name) - poi plane @ \(rank)")
-		return PoiPlane(primitive: primitive, rank: rank, toggleTime: Date())
+		return PoiPlane(primitive: primitive, rank: rank)
 	}
 }
-	
+
+// $ Put this extension on GeoPlaceContainer instead
 extension GeoRegion {
 	func poiRenderPlanes() -> [PoiPlane] {
 		return sortPlacesIntoPoiPlanes(places, in: self);
