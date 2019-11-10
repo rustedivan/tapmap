@@ -28,14 +28,12 @@ class PoiRenderer {
 	enum Visibility {
 		static let FadeInDuration = 1.0
 		static let FadeOutDuration = 0.75
-		case culled
 		case fadeIn(startTime: Date)
 		case fadeOut(startTime: Date)
 		case visible
 		
 		func alpha() -> Double {
 			switch self {
-			case .culled: return 0.0
 			case .fadeIn(let startTime):
 				let progress = Date().timeIntervalSince(startTime) / PoiRenderer.Visibility.FadeInDuration
 				return min(progress, 1.0)
@@ -83,8 +81,9 @@ class PoiRenderer {
 		regionPrimitives = visibleContinentPoiPlanes + visibleCountryPoiPlanes + visibleRegionPoiPlanes
 		
 		// Create rendering parameters for all currently visible POI planes
-		poiVisibility = Dictionary(uniqueKeysWithValues: regionPrimitives.map { (poiPlane) in
-			(poiPlane.hashValue, Visibility.fadeIn(startTime: Date()))
+		poiVisibility = Dictionary(uniqueKeysWithValues: regionPrimitives.compactMap { (poiPlane) in
+			let startsVisible = Float(poiPlane.rank) <= 1.0
+			return startsVisible ? (poiPlane.hashValue, Visibility.fadeIn(startTime: Date())) : nil
 		})
 	}
 	
@@ -101,6 +100,12 @@ class PoiRenderer {
 			regionPrimitives = regionPrimitives.filter { $0.ownerHash != removedRegionsHash }
 			let subregionPrimitives = subRegions.flatMap { $0.poiRenderPlanes() }
 			regionPrimitives.append(contentsOf: subregionPrimitives)
+			
+			for newRegion in subregionPrimitives {
+				if Float(newRegion.rank) <= rankThreshold {
+					poiVisibility.updateValue(.visible, forKey: newRegion.hashValue)
+				}
+			}
 		}
 	}
 	
@@ -114,7 +119,7 @@ class PoiRenderer {
 				}
 			case .fadeOut(let startTime):
 				if startTime.addingTimeInterval(1.0) < now {
-					poiVisibility.updateValue(.culled, forKey: key)
+					poiVisibility.removeValue(forKey: key)
 				}
 				break
 			default: break
@@ -225,6 +230,7 @@ func sortPlacesIntoPoiPlanes<T: GeoIdentifiable>(_ places: Set<GeoPlace>, in con
 }
 
 // $ Put this extension on GeoPlaceContainer instead
+// $ NOW is the time
 extension GeoRegion {
 	func poiRenderPlanes() -> [PoiPlane] {
 		return sortPlacesIntoPoiPlanes(places, in: self);
