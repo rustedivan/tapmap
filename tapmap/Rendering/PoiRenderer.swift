@@ -26,8 +26,8 @@ struct PoiPlane: Hashable {
 
 class PoiRenderer {
 	enum Visibility {
-		static let FadeInDuration = 1.0
-		static let FadeOutDuration = 0.75
+		static let FadeInDuration = 0.4
+		static let FadeOutDuration = 0.2
 		case fadeIn(startTime: Date)
 		case fadeOut(startTime: Date)
 		case visible
