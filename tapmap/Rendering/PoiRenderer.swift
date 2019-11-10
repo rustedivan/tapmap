@@ -229,23 +229,8 @@ func sortPlacesIntoPoiPlanes<T: GeoIdentifiable>(_ places: Set<GeoPlace>, in con
 	}
 }
 
-// $ Put this extension on GeoPlaceContainer instead
-// $ NOW is the time
-extension GeoRegion {
+extension GeoPlaceContainer where Self : GeoIdentifiable {
 	func poiRenderPlanes() -> [PoiPlane] {
 		return sortPlacesIntoPoiPlanes(places, in: self);
 	}
 }
-
-extension GeoCountry {
-	func poiRenderPlanes() -> [PoiPlane] {
-		return sortPlacesIntoPoiPlanes(places, in: self);
-	}
-}
-
-extension GeoContinent {
-	func poiRenderPlanes() -> [PoiPlane] {
-		return sortPlacesIntoPoiPlanes(places, in: self);
-	}
-}
-
