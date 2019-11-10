@@ -25,7 +25,29 @@ struct PoiPlane: Hashable {
 }
 
 class PoiRenderer {
+	enum Visibility {
+		static let FadeInDuration = 1.0
+		static let FadeOutDuration = 0.75
+		case culled
+		case fadeIn(startTime: Date)
+		case fadeOut(startTime: Date)
+		case visible
+		
+		func alpha() -> Double {
+			switch self {
+			case .culled: return 0.0
+			case .fadeIn(let startTime):
+				let progress = Date().timeIntervalSince(startTime) / PoiRenderer.Visibility.FadeInDuration
+				return min(progress, 1.0)
+			case .fadeOut(let startTime):
+				let progress = Date().timeIntervalSince(startTime) / PoiRenderer.Visibility.FadeOutDuration
+				return max(1.0 - progress, 0.0)
+			case .visible: return 1.0
+			}
+		}
+	}
 	var regionPrimitives : [PoiPlane]
+	var poiVisibility: [Int : Visibility]
 	let poiProgram: GLuint
 	let poiUniforms : (modelViewMatrix: GLint, color: GLint, rankThreshold: GLint, progress: GLint)
 	var rankThreshold: Float = 1.0
@@ -59,6 +81,11 @@ class PoiRenderer {
 		let visibleRegionPoiPlanes = closedRegions.flatMap { $0.poiRenderPlanes() }
 		
 		regionPrimitives = visibleContinentPoiPlanes + visibleCountryPoiPlanes + visibleRegionPoiPlanes
+		
+		// Create rendering parameters for all currently visible POI planes
+		poiVisibility = Dictionary(uniqueKeysWithValues: regionPrimitives.map { (poiPlane) in
+			(poiPlane.hashValue, Visibility.fadeIn(startTime: Date()))
+		})
 	}
 	
 	deinit {
@@ -77,16 +104,37 @@ class PoiRenderer {
 		}
 	}
 	
+	func updateFades() {
+		let now = Date()
+		for (key, p) in poiVisibility {
+			switch(p) {
+			case .fadeIn(let startTime):
+				if startTime.addingTimeInterval(1.0) < now {
+					poiVisibility.updateValue(.visible, forKey: key)
+				}
+			case .fadeOut(let startTime):
+				if startTime.addingTimeInterval(1.0) < now {
+					poiVisibility.updateValue(.culled, forKey: key)
+				}
+				break
+			default: break
+			}
+		}
+	}
+	
 	func updateZoomThreshold(viewZoom: Float) {
 		let previousPois = Set(regionPrimitives.filter { Float($0.rank) <= rankThreshold })
 		let visiblePois = Set(regionPrimitives.filter { Float($0.rank) <= viewZoom })
 
-		let A = previousPois.subtracting(visiblePois)	// Culled this frame
-		let B = visiblePois.subtracting(previousPois) // Shown this frame
-		let updatedPois = A.union(B)									// = updated this frame
+		let poisToHide = previousPois.subtracting(visiblePois)	// Culled this frame
+		let poisToShow = visiblePois.subtracting(previousPois) // Shown this frame
 		
-		if updatedPois.isEmpty == false {
-			print("Should animate \(updatedPois.count) POI planes")
+		for p in poisToHide {
+			poiVisibility.updateValue(.fadeOut(startTime: Date()), forKey: p.hashValue)
+		}
+		
+		for p in poisToShow {
+			poiVisibility.updateValue(.fadeIn(startTime: Date()), forKey: p.hashValue)
 		}
 		
 		rankThreshold = viewZoom
@@ -114,7 +162,8 @@ class PoiRenderer {
 		glUniform1f(poiUniforms.rankThreshold, rankThreshold)
 		
 		for poiPlane in regionPrimitives {
-			glUniform1f(poiUniforms.progress, 1.0)	// $ Lookup progress in fade list
+			guard let parameters = poiVisibility[poiPlane.hashValue] else { continue }
+			glUniform1f(poiUniforms.progress, GLfloat(parameters.alpha()))
 			render(primitive: poiPlane.primitive)
 		}
 		

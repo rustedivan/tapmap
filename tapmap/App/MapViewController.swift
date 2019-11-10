@@ -180,7 +180,7 @@ class MapViewController: GLKViewController, GLKViewControllerDelegate {
 																											zoomedTo: zoom)
 		effectRenderer.updatePrimitives()
 		selectionRenderer.outlineWidth = 0.2 / zoom
-		poiRenderer.rankThreshold = zoom
+		poiRenderer.updateFades()
 	}
 	
 	override func glkView(_ view: GLKView, drawIn rect: CGRect) {
@@ -201,8 +201,8 @@ extension MapViewController : UIScrollViewDelegate {
 	
 	func scrollViewDidZoom(_ scrollView: UIScrollView) {
 		zoom = Float(scrollView.zoomScale)
-		if (poiRenderer != nil) {
-			poiRenderer.updateZoomThreshold(viewZoom: zoom)
+		if let renderer = poiRenderer {
+			renderer.updateZoomThreshold(viewZoom: zoom)
 		}
 	}
 	

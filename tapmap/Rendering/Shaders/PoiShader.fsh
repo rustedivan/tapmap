@@ -12,8 +12,5 @@ uniform lowp float rankThreshold;
 
 void main()
 {
-	if (rank > rankThreshold) {
-		discard;
-	}
-  gl_FragColor = colorVarying;
+	gl_FragColor = colorVarying;
 }
