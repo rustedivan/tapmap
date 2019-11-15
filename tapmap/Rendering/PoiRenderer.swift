@@ -128,8 +128,12 @@ class PoiRenderer {
 	}
 	
 	func updateZoomThreshold(viewZoom: Float) {
-		let previousPois = Set(regionPrimitives.filter { Float($0.rank) <= rankThreshold })
-		let visiblePois = Set(regionPrimitives.filter { Float($0.rank) <= viewZoom })
+		// Polynomial curve fit (badly) in Grapher
+		let oldRankThreshold = rankThreshold
+		rankThreshold = 0.01 * viewZoom * viewZoom + 0.3 * viewZoom
+		
+		let previousPois = Set(regionPrimitives.filter { Float($0.rank) <= oldRankThreshold })
+		let visiblePois = Set(regionPrimitives.filter { Float($0.rank) <= rankThreshold })
 
 		let poisToHide = previousPois.subtracting(visiblePois)	// Culled this frame
 		let poisToShow = visiblePois.subtracting(previousPois) // Shown this frame
@@ -141,8 +145,6 @@ class PoiRenderer {
 		for p in poisToShow {
 			poiVisibility.updateValue(.fadeIn(startTime: Date()), forKey: p.hashValue)
 		}
-		
-		rankThreshold = viewZoom
 	}
 	
 	func renderWorld(geoWorld: GeoWorld, inProjection projection: GLKMatrix4) {
