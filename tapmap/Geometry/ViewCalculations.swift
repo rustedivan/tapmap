@@ -48,5 +48,5 @@ func buildProjectionMatrix(viewSize: CGSize, mapSize: CGSize, centeredOn center:
 
 func mapZoomLimits(viewSize: CGSize, mapSize: CGSize) -> (CGFloat, CGFloat) {
 	let height = viewSize.height / UIScreen.main.scale
-	return (height / mapSize.height, 15.0)
+	return (height / mapSize.height, 50.0)
 }
