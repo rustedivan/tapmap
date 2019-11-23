@@ -1,55 +1,5 @@
 # Road to Final
 
-## Map scale notes
-At furthest zoom level, only capitals and mega cities (NY, Caracas, Mumbai, Stockholm, London, Berlin, Moscow, Lagos, Cape Town, Cairo, Tehran, Karachi)
-At roughly Brazil size, large cities (Salvador, Rio, Palmas, Campo Grande, La Paz, Trujillo, Cordoba, Harare, Pretoria, Kansas City)
-At roughly Colorado size, towns (Littleton, Soria, Guildford, Alingsås, Budaun)
-At roughly Java size, villages (Magelang, Karangasem, Skara)
-
-[1] = 1.0
-[2] = 5.0
-[5] = 25.0
-[6] = 30.0
-
-1 = 1
-5 = 2
-25 = 5
-30 = 6
-
-Very rough approx: Tr = 0.01z^2 + 0.3z
-
-+ Levels get different border widths
-
-
-
-
-Do the same vec2+scale trick I used for the outlines, for the POIs, to get consistent scales
-
-Finally:
-- per zoom frame, find any poi plane that moved across the rank threshold and touch its toggleTime
-
-
-PROBLEM:
-- how do I pack POIs into progressively deeper regions? Does a province contain its megacapital?
-++ no problem, POIs are distributed into regions and promoted up into the countries
-
-POI Scaling:
-- Admin level <= 2 -> .Capital
-
-### STEPS
-+ rebake map data
-- use rank to scale poi markers
-- give indexedPrimitive an extra attrib buffer (scalar float)
--- fill that extra attrib from buildPlaceMarkers
-- use zoom to reject pois
--- put rankZoom into Z coordinate
--- send stepZoom level as uniform to entire shader
--- #1 Reject if too distant
--- if sZ<rZ, reject
--- #2 Smoothfade on approach
--- if sZ>rZ-w, render with alpha = lerp through (sZ in rZ-w, rZ)
-- polish crossfades from the poirenderer
--- stepZoom is zoom, smooth-snapped to specific rank levels
 
 
 
@@ -63,6 +13,14 @@ POI Scaling:
 - put into LRU cache
 - evict tiles at memory pressure warning
 - make sure model handles eviction of rendered tile
+
+## Map scale notes
+At furthest zoom level, only capitals and mega cities (NY, Caracas, Mumbai, Stockholm, London, Berlin, Moscow, Lagos, Cape Town, Cairo, Tehran, Karachi)
+At roughly Brazil size, large cities (Salvador, Rio, Palmas, Campo Grande, La Paz, Trujillo, Cordoba, Harare, Pretoria, Kansas City)
+At roughly Colorado size, towns (Littleton, Soria, Guildford, Alingsås, Budaun)
+At roughly Java size, villages (Magelang, Karangasem, Skara)
+
++ Levels get different border widths
 
 ## Outline rendering
 - teach RenderPrimitive to work with different vertex formats
