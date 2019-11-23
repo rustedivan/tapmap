@@ -12,6 +12,7 @@ import OpenGLES
 class MapViewController: GLKViewController, GLKViewControllerDelegate {
 	@IBOutlet var scrollView: UIScrollView!
 	@IBOutlet var placeName: UILabel!
+	@IBOutlet var labelView: UIView!
 	
 	// Presentation
 	var geoWorld: GeoWorld!
