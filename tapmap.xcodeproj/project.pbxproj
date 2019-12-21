@@ -62,6 +62,7 @@
 		1489382022B9831C009278A0 /* OperationParseOSMJson.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14C665A322B97E670054D7F2 /* OperationParseOSMJson.swift */; };
 		1489382122B9831C009278A0 /* OperationTessellateRegions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14C6659A22B97E660054D7F2 /* OperationTessellateRegions.swift */; };
 		1489382322B98456009278A0 /* ViewCalculations.swift in Sources */ = {isa = PBXBuildFile; fileRef = 148937E122B97FDF009278A0 /* ViewCalculations.swift */; };
+		148BA8EB23AE212F00A5331B /* LabelView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 148BA8EA23AE212F00A5331B /* LabelView.swift */; };
 		14985FEB22F0ECD100F68A1F /* ArrayedRenderPrimitive.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14985FEA22F0ECD100F68A1F /* ArrayedRenderPrimitive.swift */; };
 		14985FED22F0ED0C00F68A1F /* IndexedRenderPrimitive.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14985FEC22F0ED0C00F68A1F /* IndexedRenderPrimitive.swift */; };
 		14985FEF22F0ED4A00F68A1F /* OutlineRenderPrimitive.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14985FEE22F0ED4A00F68A1F /* OutlineRenderPrimitive.swift */; };
@@ -144,6 +145,7 @@
 		148937F222B97FDF009278A0 /* AppDelegate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		148937F322B97FDF009278A0 /* UserState.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UserState.swift; sourceTree = "<group>"; };
 		148937F422B97FDF009278A0 /* Serialization.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Serialization.swift; sourceTree = "<group>"; };
+		148BA8EA23AE212F00A5331B /* LabelView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LabelView.swift; sourceTree = "<group>"; };
 		14985FEA22F0ECD100F68A1F /* ArrayedRenderPrimitive.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ArrayedRenderPrimitive.swift; sourceTree = "<group>"; };
 		14985FEC22F0ED0C00F68A1F /* IndexedRenderPrimitive.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IndexedRenderPrimitive.swift; sourceTree = "<group>"; };
 		14985FEE22F0ED4A00F68A1F /* OutlineRenderPrimitive.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OutlineRenderPrimitive.swift; sourceTree = "<group>"; };
@@ -247,6 +249,7 @@
 				148937EE22B97FDF009278A0 /* PoiRenderer.swift */,
 				144B5D5722D9E092001E2A85 /* SelectionRenderer.swift */,
 				148937E622B97FDF009278A0 /* EffectRenderer.swift */,
+				148BA8EA23AE212F00A5331B /* LabelView.swift */,
 				14985FE922F0ECA000F68A1F /* Primitives */,
 				148937E922B97FDF009278A0 /* ColoredHash.swift */,
 				14985FE822F0EC7500F68A1F /* Shaders */,
@@ -671,6 +674,7 @@
 				148937FC22B97FDF009278A0 /* MapRenderer.swift in Sources */,
 				1489380422B97FE0009278A0 /* MapViewController.swift in Sources */,
 				148937F822B97FDF009278A0 /* GeoRegion.swift in Sources */,
+				148BA8EB23AE212F00A5331B /* LabelView.swift in Sources */,
 				14985FEB22F0ECD100F68A1F /* ArrayedRenderPrimitive.swift in Sources */,
 				1489380522B97FE0009278A0 /* UIState.swift in Sources */,
 				14F8918B22F0F3F7008CCCF3 /* OutlineGeometry.swift in Sources */,

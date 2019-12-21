@@ -12,7 +12,7 @@ import OpenGLES
 class MapViewController: GLKViewController, GLKViewControllerDelegate {
 	@IBOutlet var scrollView: UIScrollView!
 	@IBOutlet var placeName: UILabel!
-	@IBOutlet var labelView: UIView!
+	@IBOutlet var labelView: LabelView!
 	
 	// Presentation
 	var geoWorld: GeoWorld!
@@ -182,6 +182,15 @@ class MapViewController: GLKViewController, GLKViewControllerDelegate {
 		effectRenderer.updatePrimitives()
 		selectionRenderer.outlineWidth = 0.2 / zoom
 		poiRenderer.updateFades()
+		
+		var sthlm = CGPoint(x: 18, y: 59)
+		sthlm.y = -sthlm.y
+		var sthlmP = projectPoint(sthlm,
+												from: dummyView.bounds,
+												to: mapFrame,
+												space: mapSpace)
+		sthlmP = view.convert(sthlmP, from: dummyView)
+		labelView.updateLabels([(name: "Stockholm", screenPos: sthlmP)])
 	}
 	
 	override func glkView(_ view: GLKView, drawIn rect: CGRect) {
@@ -192,14 +201,6 @@ class MapViewController: GLKViewController, GLKViewControllerDelegate {
 		poiRenderer.renderWorld(geoWorld: geoWorld, inProjection: modelViewProjectionMatrix)
 		effectRenderer.renderWorld(geoWorld: geoWorld, inProjection: modelViewProjectionMatrix)
 		selectionRenderer.renderSelection(inProjection: modelViewProjectionMatrix)
-		
-		var sthlm = CGPoint(x: 18, y: 59)
-		sthlm.y = -sthlm.y
-		let sthlmP = projectPoint(sthlm,
-												from: dummyView.bounds,
-												to: mapFrame,
-												space: mapSpace)
-		let _ = view.convert(sthlmP, from: dummyView)
 	}
 }
 
