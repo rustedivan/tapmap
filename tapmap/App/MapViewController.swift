@@ -192,6 +192,14 @@ class MapViewController: GLKViewController, GLKViewControllerDelegate {
 		poiRenderer.renderWorld(geoWorld: geoWorld, inProjection: modelViewProjectionMatrix)
 		effectRenderer.renderWorld(geoWorld: geoWorld, inProjection: modelViewProjectionMatrix)
 		selectionRenderer.renderSelection(inProjection: modelViewProjectionMatrix)
+		
+		var sthlm = CGPoint(x: 18, y: 59)
+		sthlm.y = -sthlm.y
+		let sthlmP = projectPoint(sthlm,
+												from: dummyView.bounds,
+												to: mapFrame,
+												space: mapSpace)
+		let _ = view.convert(sthlmP, from: dummyView)
 	}
 }
 

@@ -10,14 +10,23 @@ import Foundation
 import CoreGraphics.CGGeometry
 import GLKit
 
+// Map from screen space to map space
 func mapPoint(_ p: CGPoint, from view: CGRect, to subView: CGRect, space: CGRect) -> CGPoint {
-	let x = (p.x - view.minX) - subView.minX
-	let u = (x / subView.width) * space.width + space.minX
+	let x = p.x - view.minX - subView.minX
+	let y = p.y - view.minY - subView.minY
 	
-	let y = (p.y - view.minY) - subView.minY
+	let u = (x / subView.width) * space.width + space.minX
 	let v = (y / subView.height) * space.height + space.minY
 
 	return CGPoint(x: u, y: v)
+}
+
+// Project from map space to screen space (mapPoint, in reverse)
+func projectPoint(_ m: CGPoint, from view: CGRect, to subView: CGRect, space: CGRect) -> CGPoint {
+	let x = (m.x - space.minX) * (subView.width / space.width)
+	let y = (m.y - space.minY) * (subView.height / space.height)
+	return CGPoint(x: x + subView.minX + view.minX,
+								 y: y + subView.minY + view.minY)
 }
 
 func buildProjectionMatrix(viewSize: CGSize, mapSize: CGSize, centeredOn center: CGPoint, zoomedTo zoom: Float) -> GLKMatrix4 {
