@@ -1,5 +1,28 @@
 # Road to Final
 
+
+## POI Labeling
+This is the feature that scares me the most right now, becaue I _don't_ want to end up having to render them through GL/Metal.
+Instead, the idea is to put a transparent UIView on top of the render view, and put the labels on that.
+That means that I have to be able to transform each visible POI to screenspace, along with its alpha.
+
+1. Put transparent view on top of GLview, with a label rendering on it
+2. Figure out the transform matrix from world- to screenspace
+3. Create a view model to pass down the rendering pipeline from POI to label view
+4. Possibly limit the label density in some way
+
+Getting the set of visible POIs into the label renderer is ALSO tricky.
+The Poi renderer will not be helpful, since it doesn't hold the POI:s' names,
+and only holds them in batch planes. This'll require another copy of the data
+(which will be a lot more efficient once box culling gets up and running).
+
+So, init with the geoWorld, make the necessary starting data copy, and update as needed.
+The data will be the entire regions this time around, since we need both the rich region
+metadata and the rich POI meta.
+
+
+
+
 ## Map scale notes
 At furthest zoom level, only capitals and mega cities (NY, Caracas, Mumbai, Stockholm, London, Berlin, Moscow, Lagos, Cape Town, Cairo, Tehran, Karachi)
 At roughly Brazil size, large cities (Salvador, Rio, Palmas, Campo Grande, La Paz, Trujillo, Cordoba, Harare, Pretoria, Kansas City)
