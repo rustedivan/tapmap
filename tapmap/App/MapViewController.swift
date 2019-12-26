@@ -9,6 +9,8 @@
 import GLKit
 import OpenGLES
 
+var debugCursorHandle: UUID!
+
 class MapViewController: GLKViewController, GLKViewControllerDelegate {
 	@IBOutlet var scrollView: UIScrollView!
 	@IBOutlet var placeName: UILabel!
@@ -19,6 +21,7 @@ class MapViewController: GLKViewController, GLKViewControllerDelegate {
 	var poiRenderer: PoiRenderer!
 	var effectRenderer: EffectRenderer!
 	var selectionRenderer: SelectionRenderer!
+	var debugRenderer: DebugRenderer!
 	var dummyView: UIView!
 	
 	// Navigation
@@ -81,6 +84,8 @@ class MapViewController: GLKViewController, GLKViewControllerDelegate {
 		poiRenderer = PoiRenderer(withGeoWorld: geoWorld)!
 		effectRenderer = EffectRenderer()
 		selectionRenderer = SelectionRenderer()
+		debugRenderer = DebugRenderer()
+		debugCursorHandle = debugRenderer.addCursor(Vertex(-10000.0, -10000.0), name: "Tap debug marker")
 	}
 	
 	override func didReceiveMemoryWarning() {
@@ -104,6 +109,8 @@ class MapViewController: GLKViewController, GLKViewControllerDelegate {
 													to: mapFrame,
 													space: mapSpace)
 			mapP.y = -mapP.y
+			
+//			debugRenderer.setCursor(Vertex(Float(mapP.x), Float(mapP.y)), handle: debugCursorHandle)
 			
 			let userState = AppDelegate.sharedUserState
 			let uiState = AppDelegate.sharedUIState
@@ -191,6 +198,8 @@ class MapViewController: GLKViewController, GLKViewControllerDelegate {
 		poiRenderer.renderWorld(geoWorld: geoWorld, inProjection: modelViewProjectionMatrix)
 		effectRenderer.renderWorld(geoWorld: geoWorld, inProjection: modelViewProjectionMatrix)
 		selectionRenderer.renderSelection(inProjection: modelViewProjectionMatrix)
+		
+		debugRenderer.renderMarkers(inProjection: modelViewProjectionMatrix)
 	}
 }
 
