@@ -103,17 +103,15 @@ class DebugRenderer {
 	let markerUniforms : (modelViewMatrix: GLint, color: GLint)
 	var primitives: [UUID: DebugRenderPrimitive]
 	
-	func addCursor(_ p: Vertex, name: String) -> UUID {
-		let handle = UUID()
-		let newCursor = makeDebugCursor(at: p, name: name)
-		primitives[handle] = newCursor
-		return handle
-	}
+	var mainCursorHandle: UUID?
 	
-	func moveCursor(_ p: Vertex, handle: UUID) {
-		let cursor = primitives[handle]!
-		let newCursor = makeDebugCursor(at: p, name: cursor.name)
-		primitives[handle] = newCursor
+	func moveCursor(_ x: CGFloat, _ y: CGFloat) {
+		if mainCursorHandle == nil {
+			mainCursorHandle = UUID()
+		}
+		
+		let newCursor = makeDebugCursor(at: Vertex(Vertex.Precision(x), Vertex.Precision(y)), name: "Debug - cursor")
+		primitives[mainCursorHandle!] = newCursor
 	}
 	
 	func addQuad(for box: Aabb, alpha: Float, name: String) -> UUID {
