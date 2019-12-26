@@ -76,6 +76,17 @@ func makeDebugCursor(at p: Vertex, name: String) -> DebugRenderPrimitive {
 															debugName: name)
 }
 
+func makeDebugQuad(for box: Aabb, alpha: Float, name: String) -> DebugRenderPrimitive {
+	let vertices: [Vertex] = [
+		Vertex(box.minX, box.minY),
+		Vertex(box.maxX, box.minY),
+		Vertex(box.maxX, box.maxY),
+		Vertex(box.minX, box.maxY),
+	]
+	return DebugRenderPrimitive(mode: GLenum(GL_LINE_LOOP),
+															vertices: vertices,
+															color: (r: 0.0, g: 1.0, b: 1.0, a: alpha),
+															debugName: name)
 }
 
 class DebugRenderer {
@@ -93,8 +104,18 @@ class DebugRenderer {
 	func moveCursor(_ p: Vertex, handle: UUID) {
 		let cursor = primitives[handle]!
 		let newCursor = makeDebugCursor(at: p, name: cursor.name)
-			primitives[handle] = newCursor
-		}
+		primitives[handle] = newCursor
+	}
+	
+	func addQuad(for box: Aabb, alpha: Float, name: String) -> UUID {
+		let handle = UUID()
+		let newQuad = makeDebugQuad(for: box, alpha: alpha, name: name)
+		primitives[handle] = newQuad
+		return handle
+	}
+	
+	func removeQuad(handle: UUID) {
+		primitives.removeValue(forKey: handle)
 	}
 	
 	init?() {
