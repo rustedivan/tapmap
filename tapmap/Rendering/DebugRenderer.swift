@@ -102,6 +102,7 @@ class DebugRenderer {
 	let debugProgram: GLuint
 	let markerUniforms : (modelViewMatrix: GLint, color: GLint)
 	var primitives: [UUID: DebugRenderPrimitive]
+	var transientPrimitives: [DebugRenderPrimitive]
 	
 	var mainCursorHandle: UUID?
 	var mainSelectionHandle: UUID?
@@ -135,6 +136,11 @@ class DebugRenderer {
 		primitives.removeValue(forKey: handle)
 	}
 	
+	func addTransientQuad(for box: Aabb, alpha: Float, name: String) {
+		let newQuad = makeDebugQuad(for: box, alpha: alpha, name: name)
+		transientPrimitives.append(newQuad)
+	}
+	
 	init?() {
 		debugProgram = loadShaders(shaderName: "DebugShader")
 		guard debugProgram != 0 else {
@@ -145,6 +151,7 @@ class DebugRenderer {
 		markerUniforms.modelViewMatrix = glGetUniformLocation(debugProgram, "modelViewProjectionMatrix")
 		markerUniforms.color = glGetUniformLocation(debugProgram, "markerColor")
 		primitives = [:]
+		transientPrimitives = []
 	}
 	
 	func renderMarkers(inProjection projection: GLKMatrix4) {
@@ -161,6 +168,7 @@ class DebugRenderer {
 		glEnable(GLenum(GL_BLEND))
 		glBlendFunc(GLenum(GL_SRC_ALPHA), GLenum(GL_ONE_MINUS_SRC_ALPHA))
 		
+		// Permanent markers
 		for primitive in primitives.values {
 			// Set color
 			glUniform4f(markerUniforms.color,
@@ -170,6 +178,18 @@ class DebugRenderer {
 									GLfloat(primitive.color.a))
 			render(primitive: primitive)
 		}
+		
+		// One-frame markers
+		for primitive in transientPrimitives {
+			// Set color
+			glUniform4f(markerUniforms.color,
+									GLfloat(primitive.color.r),
+									GLfloat(primitive.color.g),
+									GLfloat(primitive.color.b),
+									GLfloat(primitive.color.a))
+			render(primitive: primitive)
+		}
+		transientPrimitives.removeAll()
 		
 		glDisable(GLenum(GL_BLEND))
 	}
