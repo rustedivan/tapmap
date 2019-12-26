@@ -13,6 +13,7 @@ class UIState {
 	
 	func selectRegion<T:GeoIdentifiable>(_ region: T) {
 		selectedRegionHash = region.hashValue
+		DebugRenderer.shared.moveSelection(region.aabb)
 	}
 	
 	func selected<T:GeoIdentifiable>(_ object: T) -> Bool {
@@ -25,5 +26,6 @@ class UIState {
 	
 	func clearSelection() {
 		selectedRegionHash = 0
+		DebugRenderer.shared.moveSelection(Aabb.init())
 	}
 }

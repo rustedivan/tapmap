@@ -9,6 +9,8 @@
 import GLKit
 import OpenGLES
 
+var debugCursorHandle: UUID!
+
 class MapViewController: GLKViewController, GLKViewControllerDelegate {
 	@IBOutlet var scrollView: UIScrollView!
 	@IBOutlet var placeName: UILabel!
@@ -105,6 +107,8 @@ class MapViewController: GLKViewController, GLKViewControllerDelegate {
 													space: mapSpace)
 			mapP.y = -mapP.y
 			
+			DebugRenderer.shared.moveCursor(mapP.x, mapP.y)
+			
 			let userState = AppDelegate.sharedUserState
 			let uiState = AppDelegate.sharedUIState
 			
@@ -191,6 +195,8 @@ class MapViewController: GLKViewController, GLKViewControllerDelegate {
 		poiRenderer.renderWorld(geoWorld: geoWorld, inProjection: modelViewProjectionMatrix)
 		effectRenderer.renderWorld(geoWorld: geoWorld, inProjection: modelViewProjectionMatrix)
 		selectionRenderer.renderSelection(inProjection: modelViewProjectionMatrix)
+		
+		DebugRenderer.shared.renderMarkers(inProjection: modelViewProjectionMatrix)
 	}
 }
 
