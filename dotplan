@@ -1,6 +1,26 @@
 # Road to Final
 
 
+## View culling
+Start designing the tile system now, otherwise the label rendering will go down the wrong path
+Requirements:
+- culling away render primitives that are clearly outside the view
+- getting regions that intersect the view
+- getting POIs that intersect the view
+- making progressively good decisions at closer zoom levels
+- fast insertion/removal
+...which sounds like a perfect quadtree, with regions inserted in all t-cells they intersect.
+
+In general: given a q-tree and a view box, query out the regions and POIs in the view box. Without
+splitting the regions, regions may appear multiple times, but if we insert only the hashes, they can
+form a set and the rest can be queried out of the map. This query would be "reject all cells that
+don't intersect the viewbox."
+
+...aaand if I only have the region hashes in the tree, then I can pull out the POIs from that too.
+
+A) If the inner nodes of the search is included in the BSP result, then querying the map is easy
+B) If we have a map from hash to region for all visible regions, then quering that is easy - and
+   this would be super useful in other contexts.
 
 
 ## Tile streaming
