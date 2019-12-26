@@ -76,7 +76,7 @@ func makeDebugCursor(at p: Vertex, name: String) -> DebugRenderPrimitive {
 															debugName: name)
 }
 
-func makeDebugQuad(for box: Aabb, alpha: Float, name: String) -> DebugRenderPrimitive {
+func makeDebugQuad(for box: Aabb, color: UIColor, name: String) -> DebugRenderPrimitive {
 	let vertices: [Vertex] = [
 		Vertex(box.minX, box.minY),
 		Vertex(box.maxX, box.minY),
@@ -85,7 +85,7 @@ func makeDebugQuad(for box: Aabb, alpha: Float, name: String) -> DebugRenderPrim
 	]
 	return DebugRenderPrimitive(mode: GLenum(GL_LINE_LOOP),
 															vertices: vertices,
-															color: (r: 0.0, g: 1.0, b: 1.0, a: alpha),
+															color: color.tuple(),
 															debugName: name)
 }
 
@@ -121,13 +121,13 @@ class DebugRenderer {
 			mainSelectionHandle = UUID()
 		}
 		
-		let newSelection = makeDebugQuad(for: box, alpha: 1.0, name: "Debug - selection")
+		let newSelection = makeDebugQuad(for: box, color: .green, name: "Debug - selection")
 		primitives[mainSelectionHandle!] = newSelection
 	}
 	
-	func addQuad(for box: Aabb, alpha: Float, name: String) -> UUID {
+	func addQuad(for box: Aabb, alpha: Float, name: String, color: UIColor = .magenta) -> UUID {
 		let handle = UUID()
-		let newQuad = makeDebugQuad(for: box, alpha: alpha, name: name)
+		let newQuad = makeDebugQuad(for: box, color: color, name: name)
 		primitives[handle] = newQuad
 		return handle
 	}
@@ -136,8 +136,8 @@ class DebugRenderer {
 		primitives.removeValue(forKey: handle)
 	}
 	
-	func addTransientQuad(for box: Aabb, alpha: Float, name: String) {
-		let newQuad = makeDebugQuad(for: box, alpha: alpha, name: name)
+	func addTransientQuad(for box: Aabb, alpha: Float, name: String, color: UIColor = .magenta) {
+		let newQuad = makeDebugQuad(for: box, color: color, name: name)
 		transientPrimitives.append(newQuad)
 	}
 	
