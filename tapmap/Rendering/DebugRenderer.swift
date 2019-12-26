@@ -90,6 +90,15 @@ func makeDebugQuad(for box: Aabb, alpha: Float, name: String) -> DebugRenderPrim
 }
 
 class DebugRenderer {
+	static private var _shared: DebugRenderer!
+	static var shared: DebugRenderer {
+		get {
+			if _shared == nil {
+				_shared = DebugRenderer()
+			}
+			return _shared
+		}
+	}
 	let debugProgram: GLuint
 	let markerUniforms : (modelViewMatrix: GLint, color: GLint)
 	var primitives: [UUID: DebugRenderPrimitive]

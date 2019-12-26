@@ -21,7 +21,6 @@ class MapViewController: GLKViewController, GLKViewControllerDelegate {
 	var poiRenderer: PoiRenderer!
 	var effectRenderer: EffectRenderer!
 	var selectionRenderer: SelectionRenderer!
-	var debugRenderer: DebugRenderer!
 	var dummyView: UIView!
 	
 	// Navigation
@@ -84,8 +83,6 @@ class MapViewController: GLKViewController, GLKViewControllerDelegate {
 		poiRenderer = PoiRenderer(withGeoWorld: geoWorld)!
 		effectRenderer = EffectRenderer()
 		selectionRenderer = SelectionRenderer()
-		debugRenderer = DebugRenderer()
-		debugCursorHandle = debugRenderer.addCursor(Vertex(-10000.0, -10000.0), name: "Tap debug marker")
 	}
 	
 	override func didReceiveMemoryWarning() {
@@ -110,7 +107,7 @@ class MapViewController: GLKViewController, GLKViewControllerDelegate {
 													space: mapSpace)
 			mapP.y = -mapP.y
 			
-//			debugRenderer.setCursor(Vertex(Float(mapP.x), Float(mapP.y)), handle: debugCursorHandle)
+			DebugRenderer.shared.moveCursor(mapP.x, mapP.y)
 			
 			let userState = AppDelegate.sharedUserState
 			let uiState = AppDelegate.sharedUIState
@@ -199,7 +196,7 @@ class MapViewController: GLKViewController, GLKViewControllerDelegate {
 		effectRenderer.renderWorld(geoWorld: geoWorld, inProjection: modelViewProjectionMatrix)
 		selectionRenderer.renderSelection(inProjection: modelViewProjectionMatrix)
 		
-		debugRenderer.renderMarkers(inProjection: modelViewProjectionMatrix)
+		DebugRenderer.shared.renderMarkers(inProjection: modelViewProjectionMatrix)
 	}
 }
 
