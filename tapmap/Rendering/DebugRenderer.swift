@@ -104,6 +104,7 @@ class DebugRenderer {
 	var primitives: [UUID: DebugRenderPrimitive]
 	
 	var mainCursorHandle: UUID?
+	var mainSelectionHandle: UUID?
 	
 	func moveCursor(_ x: CGFloat, _ y: CGFloat) {
 		if mainCursorHandle == nil {
@@ -112,6 +113,15 @@ class DebugRenderer {
 		
 		let newCursor = makeDebugCursor(at: Vertex(Vertex.Precision(x), Vertex.Precision(y)), name: "Debug - cursor")
 		primitives[mainCursorHandle!] = newCursor
+	}
+	
+	func moveSelection(_ box: Aabb) {
+		if mainSelectionHandle == nil {
+			mainSelectionHandle = UUID()
+		}
+		
+		let newSelection = makeDebugQuad(for: box, alpha: 1.0, name: "Debug - selection")
+		primitives[mainSelectionHandle!] = newSelection
 	}
 	
 	func addQuad(for box: Aabb, alpha: Float, name: String) -> UUID {
