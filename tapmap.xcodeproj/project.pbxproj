@@ -18,6 +18,7 @@
 		1429B0A922EAFD53001257AB /* nullrenderer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14C6659822B97E660054D7F2 /* nullrenderer.swift */; };
 		144B5D5A22D9E092001E2A85 /* SelectionRenderer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 144B5D5722D9E092001E2A85 /* SelectionRenderer.swift */; };
 		144B5D5C22D9E0A9001E2A85 /* world.geo in Resources */ = {isa = PBXBuildFile; fileRef = 140835BE22B991BA004697FB /* world.geo */; };
+		14532D9E23B5197600943ADC /* OutlineGeometry.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14985FF522F0F35700F68A1F /* OutlineGeometry.swift */; };
 		1468830D23B4BC4100105E04 /* DebugRenderer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1468830C23B4BC4100105E04 /* DebugRenderer.swift */; };
 		1468831023B4D9E400105E04 /* DebugShader.vsh in Resources */ = {isa = PBXBuildFile; fileRef = 1468830E23B4D9E400105E04 /* DebugShader.vsh */; };
 		1468831123B4D9E400105E04 /* DebugShader.fsh in Resources */ = {isa = PBXBuildFile; fileRef = 1468830F23B4D9E400105E04 /* DebugShader.fsh */; };
@@ -707,6 +708,7 @@
 				1429B0A922EAFD53001257AB /* nullrenderer.swift in Sources */,
 				14C6657422B97D8B0054D7F2 /* tapmapTests.swift in Sources */,
 				1429B0A522EAFA87001257AB /* AppTypes.swift in Sources */,
+				14532D9E23B5197600943ADC /* OutlineGeometry.swift in Sources */,
 				1429B0A622EAFCD3001257AB /* Serialization.swift in Sources */,
 				14C665CB22B97F250054D7F2 /* GeometryTests.swift in Sources */,
 			);
