@@ -15,13 +15,8 @@ indirect enum QuadNode {
 	case Empty(bounds: Bounds)
 	
 	func contains(region: Bounds) -> Bool {
-		let bounds: Bounds
 		switch self {
-		case .Node(let b, _, _, _, _, _):
-			bounds = b
-		case .Empty(let b):
-			bounds = b
-		}
+		case let .Node(bounds, _, _, _, _, _), let .Empty(bounds):
 		return (region.minX >= bounds.minX && region.minY >= bounds.minY &&
 						region.maxX < bounds.maxX && region.maxY < bounds.maxY)
 	}
