@@ -8,13 +8,11 @@
 
 import Foundation
 
-typealias Bounds = (minX: Float, minY: Float, maxX: Float, maxY: Float)
-
 indirect enum QuadNode {
-	case Node(bounds: Bounds, values: [Int], tl: QuadNode, tr: QuadNode, bl: QuadNode, br: QuadNode)
-	case Empty(bounds: Bounds)
+	case Node(bounds: Aabb, values: [Int], tl: QuadNode, tr: QuadNode, bl: QuadNode, br: QuadNode)
+	case Empty(bounds: Aabb)
 	
-	func contains(region: Bounds) -> Bool {
+	func contains(region: Aabb) -> Bool {
 		switch self {
 		case let .Node(bounds, _, _, _, _, _), let .Empty(bounds):
 			return (region.minX >= bounds.minX && region.minY >= bounds.minY &&
@@ -29,13 +27,13 @@ struct QuadTree {
 	let maxDepth: Int
 	
 	init(minX: Float, minY: Float, maxX: Float, maxY: Float, maxDepth: Int) {
-		let emptyRoot = QuadNode.Empty(bounds: (minX, minY, maxX, maxY))
+		let emptyRoot = QuadNode.Empty(bounds: Aabb(loX: minX, loY: minY, hiX: maxX, hiY: maxY))
 		self.root = splitNode(emptyRoot)
 		self.depth = 1
 		self.maxDepth = maxDepth
 	}
 	
-	mutating func insert(value: Int, region: Bounds) {
+	mutating func insert(value: Int, region: Aabb) {
 		guard root.contains(region: region) else {
 			print("Value \(value) lies outside quadtree bounds: \(region)")
 			return
@@ -44,13 +42,11 @@ struct QuadTree {
 	}
 }
 
-func splitBounds(b: Bounds) -> (tl: Bounds, tr: Bounds, bl: Bounds, br: Bounds) {
-	let halfWidth = (b.minX + b.maxX) / 2.0
-	let halfHeight = (b.minY + b.maxY) / 2.0
-	let tlOut = Bounds(minX: b.minX, maxX: halfWidth, minY: b.minY, maxY: halfHeight)
-	let trOut = Bounds(minX: halfWidth, maxX: b.maxX, minY: b.minY, maxY: halfHeight)
-	let blOut = Bounds(minX: b.minX, maxX: halfWidth, minY: halfHeight, maxY: b.maxY)
-	let brOut = Bounds(minX: halfWidth, maxX: b.maxX, minY: halfHeight, maxY: b.maxY)
+func splitBounds(b: Aabb) -> (tl: Aabb, tr: Aabb, bl: Aabb, br: Aabb) {
+	let tlOut = Aabb(loX: b.minX, loY: b.minY, hiX: b.midpoint.x, hiY: b.midpoint.y)
+	let trOut = Aabb(loX: b.midpoint.x, loY: b.minY, hiX: b.maxX, hiY: b.midpoint.y)
+	let blOut = Aabb(loX: b.minX, loY: b.midpoint.y, hiX: b.midpoint.x, hiY: b.maxY)
+	let brOut = Aabb(loX: b.midpoint.x, loY: b.midpoint.y, hiX: b.maxX, hiY: b.maxY)
 	return (tlOut, trOut, blOut, brOut)
 }
 
@@ -69,7 +65,7 @@ func splitNode(_ node: QuadNode) -> QuadNode {
 /// Also need a point-qtree...
 /// Put subcells into an array
 
-func quadInsert(_ value: Int, region: Bounds, into node: QuadNode, depth: Int, maxDepth: Int) -> (QuadNode, Int) {
+func quadInsert(_ value: Int, region: Aabb, into node: QuadNode, depth: Int, maxDepth: Int) -> (QuadNode, Int) {
 	switch (node) {
 	case .Empty:
 		let newNode = splitNode(node)

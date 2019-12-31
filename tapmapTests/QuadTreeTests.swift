@@ -12,7 +12,7 @@ class QuadTreeTests: XCTestCase {
 	func testInsertInRootNode() {
 		var q = QuadTree(minX: -180.0, minY: -80.0, maxX: 180.0, maxY: 80.0, maxDepth: 10)
 		q.insert(value: 7,
-			 			 region: Bounds(minX: -10.0, minY: -10.0, maxX: 10.0, maxY: 10.0))
+						 region: Aabb(loX: -10.0, loY: -10.0, hiX: 10.0, hiY: 10.0))
 		guard case let .Node(_, values, _, _, _, _) = q.root else {
 			XCTFail("Inserted root was not a node")
 			return
@@ -23,7 +23,7 @@ class QuadTreeTests: XCTestCase {
 	func testInsertAndSplit() {
 		var q = QuadTree(minX: 0.0, minY: 0.0, maxX: 20.0, maxY: 20.0, maxDepth: 10)
 		q.insert(value: 7,
-						 region: Bounds(minX: 2.5, minY: 2.5, maxX: 7.5, maxY: 7.5))
+						 region: Aabb(loX: 2.5, loY: 2.5, hiX: 7.5, hiY: 7.5))
 		
 		guard case let .Node(_, rootValues, tl, .Empty, .Empty, .Empty) = q.root else {
 			XCTFail("Root had values outside top-left")
@@ -41,9 +41,9 @@ class QuadTreeTests: XCTestCase {
 	func testInsertWithoutSplit() {
 		var q = QuadTree(minX: 0.0, minY: 0.0, maxX: 20.0, maxY: 20.0, maxDepth: 10)
 		q.insert(value: 7,
-						 region: Bounds(minX: 2.5, minY: 2.5, maxX: 7.5, maxY: 7.5))
+						 region: Aabb(loX: 2.5, loY: 2.5, hiX: 7.5, hiY: 7.5))
 		q.insert(value: 8,
-						 region: Bounds(minX: 3.0, minY: 3.0, maxX: 7.0, maxY: 7.0))
+						 region: Aabb(loX: 3.0, loY: 3.0, hiX: 7.0, hiY: 7.0))
 		
 		guard case let .Node(_, _, .Node(_, innerValues, .Empty, .Empty, .Empty, .Empty), .Empty, .Empty, .Empty) = q.root else {
 			XCTFail("Tree structure is incorrect")
@@ -55,13 +55,13 @@ class QuadTreeTests: XCTestCase {
 	func testInsertInAllQuadrants() {
 		var q = QuadTree(minX: -10.0, minY: -10.0, maxX: 10.0, maxY: 10.0, maxDepth: 10)
 		q.insert(value: 1,
-						 region: Bounds(minX: -9.0, minY: -9.0, maxX: -1.0, maxY: -1.0))
+						 region: Aabb(loX: -9.0, loY: -9.0, hiX: -1.0, hiY: -1.0))
 		q.insert(value: 2,
-						 region: Bounds(minX:  1.0, minY: -9.0, maxX:  9.0, maxY: -1.0))
+						 region: Aabb(loX:  1.0, loY: -9.0, hiX:  9.0, hiY: -1.0))
 		q.insert(value: 3,
-						 region: Bounds(minX: -9.0, minY:  1.0, maxX: -1.0, maxY:  9.0))
+						 region: Aabb(loX: -9.0, loY:  1.0, hiX: -1.0, hiY:  9.0))
 		q.insert(value: 4,
-						 region: Bounds(minX:  1.0, minY:  1.0, maxX:  9.0, maxY:  9.0))
+						 region: Aabb(loX:  1.0, loY:  1.0, hiX:  9.0, hiY:  9.0))
 		
 		guard case let .Node(_, _, tl, tr, bl, br) = q.root else {
 			XCTFail()
@@ -85,17 +85,17 @@ class QuadTreeTests: XCTestCase {
 	func testStopAtMaxDepth() {
 		var q = QuadTree(minX: 0.0, minY: 0.0, maxX: 8.0, maxY: 8.0, maxDepth: 3)
 		q.insert(value: 1,
-						 region: Bounds(minX: 0.0, minY: 0.0, maxX: 0.1, maxY: 0.1))
+						 region: Aabb(loX: 0.0, loY: 0.0, hiX: 0.1, hiY: 0.1))
 		XCTAssertEqual(q.depth, 3)
 	}
 	
 	
-	func testSplitBounds() {
-		let bounds: Bounds = (-50.0, -40.0, 50.0, 30.0)
+	func testSplitAabb() {
+		let bounds = Aabb(loX: -50.0, loY: -40.0, hiX: 50.0, hiY: 30.0)
 		let splits = splitBounds(b: bounds)
-		XCTAssertTrue(splits.tl == Bounds(-50.0, -40.0,  0.0, -5.0))
-		XCTAssertTrue(splits.tr == Bounds(  0.0, -40.0, 50.0, -5.0))
-		XCTAssertTrue(splits.bl == Bounds(-50.0,  -5.0,  0.0, 30.0))
-		XCTAssertTrue(splits.br == Bounds(  0.0,  -5.0, 50.0, 30.0))
+		XCTAssertTrue(splits.tl == Aabb(loX: -50.0, loY: -40.0,  hiX: 0.0, hiY: -5.0))
+		XCTAssertTrue(splits.tr == Aabb(  loX: 0.0, loY: -40.0, hiX: 50.0, hiY: -5.0))
+		XCTAssertTrue(splits.bl == Aabb(loX: -50.0,  loY: -5.0,  hiX: 0.0, hiY: 30.0))
+		XCTAssertTrue(splits.br == Aabb(  loX: 0.0,  loY: -5.0, hiX: 50.0, hiY: 30.0))
 	}
 }
