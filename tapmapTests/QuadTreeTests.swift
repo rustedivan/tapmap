@@ -10,7 +10,7 @@ import XCTest
 
 class QuadTreeTests: XCTestCase {
 	func testInsertInRootNode() {
-		var q = QuadTree(minX: -180.0, minY: -80.0, maxX: 180.0, maxY: 80.0)
+		var q = QuadTree(minX: -180.0, minY: -80.0, maxX: 180.0, maxY: 80.0, maxDepth: 10)
 		q.insert(value: 7,
 			 			 region: Bounds(minX: -10.0, minY: -10.0, maxX: 10.0, maxY: 10.0))
 		guard case let .Node(_, values, _, _, _, _) = q.root else {
@@ -21,7 +21,7 @@ class QuadTreeTests: XCTestCase {
 	}
 	
 	func testInsertAndSplit() {
-		var q = QuadTree(minX: 0.0, minY: 0.0, maxX: 20.0, maxY: 20.0)
+		var q = QuadTree(minX: 0.0, minY: 0.0, maxX: 20.0, maxY: 20.0, maxDepth: 10)
 		q.insert(value: 7,
 						 region: Bounds(minX: 2.5, minY: 2.5, maxX: 7.5, maxY: 7.5))
 		
@@ -39,7 +39,7 @@ class QuadTreeTests: XCTestCase {
 	}
 	
 	func testInsertWithoutSplit() {
-		var q = QuadTree(minX: 0.0, minY: 0.0, maxX: 20.0, maxY: 20.0)
+		var q = QuadTree(minX: 0.0, minY: 0.0, maxX: 20.0, maxY: 20.0, maxDepth: 10)
 		q.insert(value: 7,
 						 region: Bounds(minX: 2.5, minY: 2.5, maxX: 7.5, maxY: 7.5))
 		q.insert(value: 8,
@@ -53,7 +53,7 @@ class QuadTreeTests: XCTestCase {
 	}
 	
 	func testInsertInAllQuadrants() {
-		var q = QuadTree(minX: -10.0, minY: -10.0, maxX: 10.0, maxY: 10.0)
+		var q = QuadTree(minX: -10.0, minY: -10.0, maxX: 10.0, maxY: 10.0, maxDepth: 10)
 		q.insert(value: 1,
 						 region: Bounds(minX: -9.0, minY: -9.0, maxX: -1.0, maxY: -1.0))
 		q.insert(value: 2,
@@ -81,6 +81,14 @@ class QuadTreeTests: XCTestCase {
 			XCTFail()
 		}
 	}
+	
+	func testStopAtMaxDepth() {
+		var q = QuadTree(minX: 0.0, minY: 0.0, maxX: 8.0, maxY: 8.0, maxDepth: 3)
+		q.insert(value: 1,
+						 region: Bounds(minX: 0.0, minY: 0.0, maxX: 0.1, maxY: 0.1))
+		XCTAssertEqual(q.depth, 3)
+	}
+	
 	
 	func testSplitBounds() {
 		let bounds: Bounds = (-50.0, -40.0, 50.0, 30.0)
