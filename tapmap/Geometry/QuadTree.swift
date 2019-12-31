@@ -40,7 +40,7 @@ struct QuadTree {
 			print("Value \(value) lies outside quadtree bounds: \(region)")
 			return
 		}
-		(root, depth) = quadInsert(hash: value, region: region, into: root, depth: 1, maxDepth: maxDepth)
+		(root, depth) = quadInsert(value, region: region, into: root, depth: 1, maxDepth: maxDepth)
 	}
 }
 
@@ -77,7 +77,7 @@ func splitNode(_ node: QuadNode) -> QuadNode {
 }
 
 
-func quadInsert(hash: Int, region: Bounds, into node: QuadNode, depth: Int, maxDepth: Int) -> (QuadNode, Int) {
+func quadInsert(_ value: Int, region: Bounds, into node: QuadNode, depth: Int, maxDepth: Int) -> (QuadNode, Int) {
 	switch (node) {
 	case .Empty(let bounds):
 		let subCells = splitBounds(b: bounds)
@@ -86,27 +86,27 @@ func quadInsert(hash: Int, region: Bounds, into node: QuadNode, depth: Int, maxD
 																	tr: .Empty(bounds: subCells.tr),
 																	bl: .Empty(bounds: subCells.bl),
 																	br: .Empty(bounds: subCells.br))
-		return quadInsert(hash: hash, region: region, into: splitNode, depth: depth, maxDepth: maxDepth)
+		return quadInsert(value, region: region, into: splitNode, depth: depth, maxDepth: maxDepth)
 	case .Node(let bounds, var values, var tl, var tr, var bl, var br):
 		let nextDepth = depth + 1
 		if (nextDepth <= maxDepth) {
 			let newDepth: Int
 			if (tl.contains(region: region)) {
-				(tl, newDepth) = quadInsert(hash: hash, region: region, into: tl, depth: nextDepth, maxDepth: maxDepth)
+				(tl, newDepth) = quadInsert(value, region: region, into: tl, depth: nextDepth, maxDepth: maxDepth)
 			} else if (tr.contains(region: region)) {
-				(tr, newDepth) = quadInsert(hash: hash, region: region, into: tr, depth: nextDepth, maxDepth: maxDepth)
+				(tr, newDepth) = quadInsert(value, region: region, into: tr, depth: nextDepth, maxDepth: maxDepth)
 			} else if (bl.contains(region: region)) {
-				(bl, newDepth) = quadInsert(hash: hash, region: region, into: bl, depth: nextDepth, maxDepth: maxDepth)
+				(bl, newDepth) = quadInsert(value, region: region, into: bl, depth: nextDepth, maxDepth: maxDepth)
 			} else if (br.contains(region: region)) {
-				(br, newDepth) = quadInsert(hash: hash, region: region, into: br, depth: nextDepth, maxDepth: maxDepth)
+				(br, newDepth) = quadInsert(value, region: region, into: br, depth: nextDepth, maxDepth: maxDepth)
 			} else {
 				newDepth = depth
-				values.append(hash)
+				values.append(value)
 			}
 			let node = QuadNode.Node(bounds: bounds, values: values, tl: tl, tr: tr, bl: bl, br: br)
 			return (node, newDepth)
 		} else {
-			values.append(hash)
+			values.append(value)
 			let node = QuadNode.Node(bounds: bounds, values: values, tl: tl, tr: tr, bl: bl, br: br)
 			return (node, depth)
 		}
