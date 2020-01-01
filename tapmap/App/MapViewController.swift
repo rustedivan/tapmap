@@ -44,11 +44,12 @@ class MapViewController: GLKViewController, GLKViewControllerDelegate {
 
 		do {
 			try self.geoWorld = PropertyListDecoder().decode(GeoWorld.self, from: geoData as Data)
+			AppDelegate.sharedUIState.buildWorldTree(withWorld: self.geoWorld, userState: AppDelegate.sharedUserState)
 		} catch {
 			print("Could not load world.")
 			return
 		}
-
+		
 		let duration = Date().timeIntervalSince(startTime)
 		print("Load done in \(Int(duration)) seconds.")
 		
@@ -136,6 +137,7 @@ class MapViewController: GLKViewController, GLKViewControllerDelegate {
 			if let hitContinent = pickFromTessellations(p: mapP, candidates: closedCandidateContinents) {
 				if uiState.selected(hitContinent) {
 					userState.visitPlace(hitContinent)
+					uiState.updateTree(replace: hitContinent, with: hitContinent.children)
 				} else {
 					uiState.selectRegion(hitContinent)
 					selectionRenderer.select(geometry: hitContinent)
@@ -150,6 +152,7 @@ class MapViewController: GLKViewController, GLKViewControllerDelegate {
 			} else if let hitCountry = pickFromTessellations(p: mapP, candidates: closedCandidateCountries) {
 				if uiState.selected(hitCountry) {
 					userState.visitPlace(hitCountry)
+					uiState.updateTree(replace: hitCountry, with: hitCountry.children)
 				} else {
 					uiState.selectRegion(hitCountry)
 					selectionRenderer.select(geometry: hitCountry)
@@ -185,6 +188,7 @@ class MapViewController: GLKViewController, GLKViewControllerDelegate {
 		effectRenderer.updatePrimitives()
 		selectionRenderer.outlineWidth = 0.2 / zoom
 		poiRenderer.updateFades()
+		debugRenderTree(AppDelegate.sharedUIState.worldTree)
 	}
 	
 	override func glkView(_ view: GLKView, drawIn rect: CGRect) {
