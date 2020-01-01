@@ -9,7 +9,7 @@
 import Foundation
 
 indirect enum QuadNode {
-	case Node(bounds: Aabb, values: [Int], tl: QuadNode, tr: QuadNode, bl: QuadNode, br: QuadNode)
+	case Node(bounds: Aabb, values: Set<Int>, tl: QuadNode, tr: QuadNode, bl: QuadNode, br: QuadNode)
 	case Empty(bounds: Aabb)
 	
 	func contains(region: Aabb) -> Bool {
@@ -17,6 +17,16 @@ indirect enum QuadNode {
 		case let .Node(bounds, _, _, _, _, _), let .Empty(bounds):
 			return (region.minX >= bounds.minX && region.minY >= bounds.minY &&
 							region.maxX < bounds.maxX && region.maxY < bounds.maxY)
+		}
+	}
+	
+	func intersects(region: Aabb) -> Bool {
+		switch self {
+		case let .Node(bounds, _, _, _, _, _), let .Empty(bounds):
+			return !( search.minX >= bounds.maxX ||
+								search.maxX <= bounds.minX ||
+								search.minY >= bounds.maxY ||
+								search.maxY <= bounds.minY)
 		}
 	}
 }
@@ -39,6 +49,14 @@ struct QuadTree {
 			return
 		}
 		(root, depth) = quadInsert(value, region: region, into: root, depth: 1, maxDepth: maxDepth)
+	}
+	
+	mutating func remove(value: Int) {
+		root = quadRemove(value, from: root)
+	}
+	
+	func query(box: Aabb) -> Set<Int> {
+		return quadQuery(box: box, in: root)
 	}
 }
 
@@ -83,14 +101,50 @@ func quadInsert(_ value: Int, region: Aabb, into node: QuadNode, depth: Int, max
 			else if (br.contains(region: region)) { (br, newDepth) = insertValueInto(br) }
 			else {
 				newDepth = depth
-				values.append(value)
+				values.insert(value)
 			}
 			let node = QuadNode.Node(bounds: bounds, values: values, tl: tl, tr: tr, bl: bl, br: br)
 			return (node, newDepth)
 		} else {
-			values.append(value)
+			values.insert(value)
 			let node = QuadNode.Node(bounds: bounds, values: values, tl: tl, tr: tr, bl: bl, br: br)
 			return (node, depth)
+		}
+	}
+}
+
+func quadRemove(_ value: Int, from node: QuadNode) -> QuadNode {
+	switch (node) {
+	case .Empty:
+		return node
+	case .Node(let bounds, var values, var tl, var tr, var bl, var br):
+		if values.contains(value) {
+			values.remove(value)
+			return QuadNode.Node(bounds: bounds, values: values, tl: tl, tr: tr, bl: bl, br: br)
+		} else {
+			tl = quadRemove(value, from: tl)
+			tr = quadRemove(value, from: tr)
+			bl = quadRemove(value, from: bl)
+			br = quadRemove(value, from: br)
+			return QuadNode.Node(bounds: bounds, values: values, tl: tl, tr: tr, bl: bl, br: br)
+		}
+	}
+}
+
+func quadQuery(box: Aabb, in node: QuadNode) -> Set<Int> {
+	switch (node) {
+	case .Empty:
+		return Set<Int>()
+	case let .Node(_, values, tl, tr, bl, br):
+		if node.intersects(region: box) {
+			var subtreeValues = Set<Int>(values)
+			subtreeValues.formUnion(quadQuery(box: box, in: tl))
+			subtreeValues.formUnion(quadQuery(box: box, in: tr))
+			subtreeValues.formUnion(quadQuery(box: box, in: bl))
+			subtreeValues.formUnion(quadQuery(box: box, in: br))
+			return subtreeValues
+		} else {
+			return Set<Int>()
 		}
 	}
 }

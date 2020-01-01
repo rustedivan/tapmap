@@ -98,4 +98,20 @@ class QuadTreeTests: XCTestCase {
 		XCTAssertTrue(splits.bl == Aabb(loX: -50.0,  loY: -5.0,  hiX: 0.0, hiY: 30.0))
 		XCTAssertTrue(splits.br == Aabb(  loX: 0.0,  loY: -5.0, hiX: 50.0, hiY: 30.0))
 	}
+
+	func testRemoveValue() {
+		var q = QuadTree(minX: 0.0, minY: 0.0, maxX: 20.0, maxY: 20.0, maxDepth: 10)
+		q.insert(value: 7,
+						 region: Aabb(loX: 2.5, loY: 2.5, hiX: 7.5, hiY: 7.5))
+		q.insert(value: 8,
+						 region: Aabb(loX: 3.0, loY: 3.0, hiX: 7.0, hiY: 7.0))
+		q.insert(value: 9,
+						 region: Aabb(loX: 15.0, loY: 12.0, hiX: 16.0, hiY: 14.0))
+		
+		q.remove(value: 8)
+		let values = q.query(box: Aabb(loX: 0.0, loY: 0.0, hiX: 20.0, hiY: 20.0))
+		XCTAssertTrue(values.contains(7))
+		XCTAssertFalse(values.contains(8))
+		XCTAssertTrue(values.contains(9))
+	}
 }
