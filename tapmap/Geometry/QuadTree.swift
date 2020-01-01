@@ -20,7 +20,7 @@ indirect enum QuadNode {
 		}
 	}
 	
-	func intersects(region: Aabb) -> Bool {
+	func intersects(search: Aabb) -> Bool {
 		switch self {
 		case let .Node(bounds, _, _, _, _, _), let .Empty(bounds):
 			return !( search.minX >= bounds.maxX ||
@@ -55,8 +55,8 @@ struct QuadTree {
 		root = quadRemove(value, from: root)
 	}
 	
-	func query(box: Aabb) -> Set<Int> {
-		return quadQuery(box: box, in: root)
+	func query(search: Aabb) -> Set<Int> {
+		return quadQuery(search: search, in: root)
 	}
 }
 
@@ -131,17 +131,17 @@ func quadRemove(_ value: Int, from node: QuadNode) -> QuadNode {
 	}
 }
 
-func quadQuery(box: Aabb, in node: QuadNode) -> Set<Int> {
+func quadQuery(search: Aabb, in node: QuadNode) -> Set<Int> {
 	switch (node) {
 	case .Empty:
 		return Set<Int>()
 	case let .Node(_, values, tl, tr, bl, br):
-		if node.intersects(region: box) {
+		if node.intersects(search: search) {
 			var subtreeValues = Set<Int>(values)
-			subtreeValues.formUnion(quadQuery(box: box, in: tl))
-			subtreeValues.formUnion(quadQuery(box: box, in: tr))
-			subtreeValues.formUnion(quadQuery(box: box, in: bl))
-			subtreeValues.formUnion(quadQuery(box: box, in: br))
+			subtreeValues.formUnion(quadQuery(search: search, in: tl))
+			subtreeValues.formUnion(quadQuery(search: search, in: tr))
+			subtreeValues.formUnion(quadQuery(search: search, in: bl))
+			subtreeValues.formUnion(quadQuery(search: search, in: br))
 			return subtreeValues
 		} else {
 			return Set<Int>()

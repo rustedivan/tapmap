@@ -63,23 +63,23 @@ class QuadTreeTests: XCTestCase {
 		q.insert(value: 4,
 						 region: Aabb(loX:  1.0, loY:  1.0, hiX:  9.0, hiY:  9.0))
 		
-		guard case let .Node(_, _, tl, tr, bl, br) = q.root else {
-			XCTFail()
-			return
-		}
+		let tlValues = q.query(search: Aabb(loX: -10.0, loY: -10.0, hiX:  0.0, hiY:  0.0))
+		let trValues = q.query(search: Aabb(loX: 0.0,   loY: -10.0, hiX: 10.0, hiY:  0.0))
+		let blValues = q.query(search: Aabb(loX: -10.0, loY:   0.0, hiX:  0.0, hiY: 10.0))
+		let brValues = q.query(search: Aabb(loX: 0.0,   loY:   0.0, hiX: 10.0, hiY: 10.0))
+		let alValues = q.query(search: Aabb(loX: -10.0, loY: -10.0, hiX:  0.0, hiY: 10.0))
+		let arValues = q.query(search: Aabb(loX: 0.0,   loY: -10.0, hiX: 10.0, hiY: 10.0))
+		let atValues = q.query(search: Aabb(loX: -10.0, loY: -10.0, hiX: 10.0, hiY:  0.0))
+		let abValues = q.query(search: Aabb(loX: -10.0, loY:   0.0, hiX: 10.0, hiY: 10.0))
 		
-		if case let .Node(_, tlValues, _, _, _, _) = tl,
-			 case let .Node(_, trValues, _, _, _, _) = tr,
-			 case let .Node(_, blValues, _, _, _, _) = bl,
-			 case let .Node(_, brValues, _, _, _, _) = br {
-			XCTAssertEqual(tlValues, [1])
-			XCTAssertEqual(trValues, [2])
-			XCTAssertEqual(blValues, [3])
-			XCTAssertEqual(brValues, [4])
-			return
-		} else {
-			XCTFail()
-		}
+		XCTAssertEqual(tlValues, Set([1]))
+		XCTAssertEqual(trValues, Set([2]))
+		XCTAssertEqual(blValues, Set([3]))
+		XCTAssertEqual(brValues, Set([4]))
+		XCTAssertEqual(alValues, Set([1, 3]))
+		XCTAssertEqual(arValues, Set([2, 4]))
+		XCTAssertEqual(atValues, Set([1, 2]))
+		XCTAssertEqual(abValues, Set([3, 4]))
 	}
 	
 	func testStopAtMaxDepth() {
@@ -109,7 +109,7 @@ class QuadTreeTests: XCTestCase {
 						 region: Aabb(loX: 15.0, loY: 12.0, hiX: 16.0, hiY: 14.0))
 		
 		q.remove(value: 8)
-		let values = q.query(box: Aabb(loX: 0.0, loY: 0.0, hiX: 20.0, hiY: 20.0))
+		let values = q.query(search: Aabb(loX: 0.0, loY: 0.0, hiX: 20.0, hiY: 20.0))
 		XCTAssertTrue(values.contains(7))
 		XCTAssertFalse(values.contains(8))
 		XCTAssertTrue(values.contains(9))
