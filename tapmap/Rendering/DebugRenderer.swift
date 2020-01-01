@@ -155,7 +155,7 @@ class DebugRenderer {
 	}
 	
 	func renderMarkers(inProjection projection: GLKMatrix4) {
-		glPushGroupMarkerEXT(0, "Render opening effect")
+		glPushGroupMarkerEXT(0, "Render debug layer")
 		glUseProgram(debugProgram)
 		
 		var mutableProjection = projection // The 'let' argument is not safe to pass into withUnsafePointer. No copy, since copy-on-write.
