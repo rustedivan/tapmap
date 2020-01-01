@@ -114,21 +114,26 @@ func quadInsert(_ value: Int, region: Aabb, into node: QuadNode, depth: Int, max
 }
 
 func quadRemove(_ value: Int, from node: QuadNode) -> QuadNode {
+	var result: QuadNode
 	switch (node) {
 	case .Empty:
-		return node
+		result = node
 	case .Node(let bounds, var values, var tl, var tr, var bl, var br):
 		if values.contains(value) {
 			values.remove(value)
-			return QuadNode.Node(bounds: bounds, values: values, tl: tl, tr: tr, bl: bl, br: br)
+			result = .Node(bounds: bounds, values: values, tl: tl, tr: tr, bl: bl, br: br)
 		} else {
 			tl = quadRemove(value, from: tl)
 			tr = quadRemove(value, from: tr)
 			bl = quadRemove(value, from: bl)
 			br = quadRemove(value, from: br)
-			return QuadNode.Node(bounds: bounds, values: values, tl: tl, tr: tr, bl: bl, br: br)
+			result = .Node(bounds: bounds, values: values, tl: tl, tr: tr, bl: bl, br: br)
+		}
+		if case (.Empty, .Empty, .Empty, .Empty) = (tl, tr, bl, br), values.isEmpty {
+			result = .Empty(bounds: bounds)
 		}
 	}
+	return result
 }
 
 func quadQuery(search: Aabb, in node: QuadNode) -> Set<Int> {
