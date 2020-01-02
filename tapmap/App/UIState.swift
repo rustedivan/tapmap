@@ -19,8 +19,9 @@ class UIState {
 	
 	private var selectedRegionHash: Int = 0
 	var worldTree: QuadTree<RegionBounds>!
+	var visibleRegions: Set<Int> = Set()
 	
-	func cullWorldTree(focus: Aabb) -> Set<Int> {
+	func cullWorldTree(focus: Aabb) {
 		func intersects(_ a: Aabb, _ b: Aabb) -> Bool {
 			return !( a.minX >= b.maxX ||
 								a.maxX <= b.minX ||
@@ -30,8 +31,9 @@ class UIState {
 		
 		let roughlyVisible = worldTree.query(search: focus)
 		let finelyVisible = roughlyVisible.filter { intersects($0.bounds, focus) }
-		let visibleHashes = Set(finelyVisible.map { $0.regionHash })
-		return visibleHashes
+		
+		// Update region cache
+		visibleRegions = Set(finelyVisible.map { $0.regionHash })
 	}
 	
 	func buildWorldTree(withWorld geoWorld: GeoWorld, userState: UserState) {

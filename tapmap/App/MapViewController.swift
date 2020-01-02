@@ -66,14 +66,14 @@ class MapViewController: GLKViewController, GLKViewControllerDelegate {
 		scrollView.addSubview(dummyView)
 		dummyView.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(handleTap)))
 		
+		// Calculate view-space frame of the map (scale map to fit in view, calculate the vertical offset to center it)
+		let heightDiff = dummyView.bounds.height - (mapSpace.height / (mapSpace.width / dummyView.bounds.width))
+		mapFrame = dummyView.bounds.insetBy(dx: 0.0, dy: heightDiff / 2.0)
+		
 		let zoomLimits = mapZoomLimits(viewSize: view.frame.size, mapSize: mapSpace.size)
 		scrollView.minimumZoomScale = zoomLimits.0
 		scrollView.zoomScale = zoomLimits.0
 		scrollView.maximumZoomScale = zoomLimits.1
-		
-		// Calculate view-space frame of the map (scale map to fit in view, calculate the vertical offset to center it)
-		let heightDiff = dummyView.bounds.height - (mapSpace.height / (mapSpace.width / dummyView.bounds.width))
-		mapFrame = dummyView.bounds.insetBy(dx: 0.0, dy: heightDiff / 2.0)
 		
 		delegate = self
 		
@@ -106,7 +106,7 @@ class MapViewController: GLKViewController, GLKViewControllerDelegate {
 													space: mapSpace)
 			mapP.y = -mapP.y
 			
-//			DebugRenderer.shared.moveCursor(mapP.x, mapP.y)
+			// DEBUG: DebugRenderer.shared.moveCursor(mapP.x, mapP.y)
 			
 			let userState = AppDelegate.sharedUserState
 			let uiState = AppDelegate.sharedUIState
@@ -175,6 +175,8 @@ class MapViewController: GLKViewController, GLKViewControllerDelegate {
 				selectionRenderer.clear()
 			}
 		}
+		
+		AppDelegate.sharedUIState.cullWorldTree(focus: visibleLongLat(viewBounds: view.bounds))
 	}
 
 	// MARK: - GLKView and GLKViewController delegate methods
@@ -186,28 +188,13 @@ class MapViewController: GLKViewController, GLKViewControllerDelegate {
 		effectRenderer.updatePrimitives()
 		selectionRenderer.outlineWidth = 0.2 / zoom
 		poiRenderer.updateFades()
-		
-		
-
-//		debugRenderTree(AppDelegate.sharedUIState.worldTree, at: Aabb(loX: Float(debugCorners[0].x), loY: Float(debugCorners[0].y), hiX: Float(debugCorners[1].x), hiY: Float(debugCorners[1].y)))
 	}
 	
 	override func glkView(_ view: GLKView, drawIn rect: CGRect) {
 		glClearColor(0.0, 0.1, 0.6, 1.0)
 		glClear(GLbitfield(GL_COLOR_BUFFER_BIT) | GLbitfield(GL_DEPTH_BUFFER_BIT))
 		
-		let focusBox = view.bounds.insetBy(dx: 100.0, dy: 100.0)
-		var debugCorners = [CGPoint(x: focusBox.minX, y: focusBox.minY), CGPoint(x: focusBox.maxX, y: focusBox.maxY)]
-		debugCorners = debugCorners.map({ (p: CGPoint) -> CGPoint in
-			var viewP = view.convert(p, to: dummyView)
-			var mapP = mapPoint(viewP,
-												from: dummyView.bounds,
-												to: mapFrame,
-												space: mapSpace)
-			mapP.y = -mapP.y
-			return mapP
-		})
-		let visibleRegions = AppDelegate.sharedUIState.cullWorldTree(focus: Aabb(loX: Float(debugCorners[0].x), loY: Float(debugCorners[1].y), hiX: Float(debugCorners[1].x), hiY: Float(debugCorners[0].y)))
+		let visibleRegions = AppDelegate.sharedUIState.visibleRegions
 		mapRenderer.renderWorld(geoWorld: geoWorld, inProjection: modelViewProjectionMatrix, visibleSet: visibleRegions)
 		poiRenderer.renderWorld(geoWorld: geoWorld, inProjection: modelViewProjectionMatrix)
 		effectRenderer.renderWorld(geoWorld: geoWorld, inProjection: modelViewProjectionMatrix)
@@ -227,9 +214,31 @@ extension MapViewController : UIScrollViewDelegate {
 		if let renderer = poiRenderer {
 			renderer.updateZoomThreshold(viewZoom: zoom)
 		}
+		
+		AppDelegate.sharedUIState.cullWorldTree(focus: visibleLongLat(viewBounds: view.bounds))
 	}
 	
 	func scrollViewDidScroll(_ scrollView: UIScrollView) {
 		offset = scrollView.contentOffset
+		AppDelegate.sharedUIState.cullWorldTree(focus: visibleLongLat(viewBounds: view.bounds))
+	}
+	
+	func visibleLongLat(viewBounds: CGRect) -> Aabb {
+		let focusBox = viewBounds // .insetBy(dx: 100.0, dy: 100.0)
+		let bottomLeft = CGPoint(x: focusBox.minX, y: focusBox.minY)
+		let topRight = CGPoint(x: focusBox.maxX, y: focusBox.maxY)
+		let worldCorners = [bottomLeft, topRight].map({ (p: CGPoint) -> CGPoint in
+			let viewP = view.convert(p, to: dummyView)
+			var mapP = mapPoint(viewP,
+												from: dummyView.bounds,
+												to: mapFrame,
+												space: mapSpace)
+			mapP.y = -mapP.y
+			return mapP
+		})
+		return Aabb(loX: Float(worldCorners[0].x),
+								loY: Float(worldCorners[1].y),
+								hiX: Float(worldCorners[1].x),
+								hiY: Float(worldCorners[0].y))
 	}
 }
