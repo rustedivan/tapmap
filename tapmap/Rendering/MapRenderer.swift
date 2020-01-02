@@ -84,7 +84,8 @@ class MapRenderer {
 		
 		glUniform1f(mapUniforms.time, 0.0)
 		
-		for primitive in regionPrimitives.values.filter({ visibleSet.contains($0.ownerHash) }) {
+		let visiblePrimitives = regionPrimitives.values.filter({ visibleSet.contains($0.ownerHash) })
+		for primitive in visiblePrimitives {
 			var components : [GLfloat] = [primitive.color.r, primitive.color.g, primitive.color.b, 1.0]
 			glUniform4f(mapUniforms.color,
 									GLfloat(components[0]),
