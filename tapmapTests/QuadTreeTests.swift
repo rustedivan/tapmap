@@ -8,9 +8,10 @@
 
 import XCTest
 
+typealias SimpleQuadTree = QuadTree<Int>
 class QuadTreeTests: XCTestCase {
 	func testInsertInRootNode() {
-		var q = QuadTree(minX: -180.0, minY: -80.0, maxX: 180.0, maxY: 80.0, maxDepth: 10)
+		var q = SimpleQuadTree(minX: -180.0, minY: -80.0, maxX: 180.0, maxY: 80.0, maxDepth: 10)
 		q.insert(value: 7,
 						 region: Aabb(loX: -10.0, loY: -10.0, hiX: 10.0, hiY: 10.0))
 		guard case let .Node(_, values, _, _, _, _) = q.root else {
@@ -21,7 +22,7 @@ class QuadTreeTests: XCTestCase {
 	}
 	
 	func testInsertAndSplit() {
-		var q = QuadTree(minX: 0.0, minY: 0.0, maxX: 20.0, maxY: 20.0, maxDepth: 10)
+		var q = SimpleQuadTree(minX: 0.0, minY: 0.0, maxX: 20.0, maxY: 20.0, maxDepth: 10)
 		q.insert(value: 7,
 						 region: Aabb(loX: 2.5, loY: 2.5, hiX: 7.5, hiY: 7.5))
 		
@@ -39,7 +40,7 @@ class QuadTreeTests: XCTestCase {
 	}
 	
 	func testInsertWithoutSplit() {
-		var q = QuadTree(minX: 0.0, minY: 0.0, maxX: 20.0, maxY: 20.0, maxDepth: 10)
+		var q = SimpleQuadTree(minX: 0.0, minY: 0.0, maxX: 20.0, maxY: 20.0, maxDepth: 10)
 		q.insert(value: 7,
 						 region: Aabb(loX: 2.5, loY: 12.5, hiX: 7.5, hiY: 17.5))
 		q.insert(value: 8,
@@ -53,7 +54,7 @@ class QuadTreeTests: XCTestCase {
 	}
 	
 	func testInsertInAllQuadrants() {
-		var q = QuadTree(minX: -10.0, minY: -10.0, maxX: 10.0, maxY: 10.0, maxDepth: 10)
+		var q = SimpleQuadTree(minX: -10.0, minY: -10.0, maxX: 10.0, maxY: 10.0, maxDepth: 10)
 		q.insert(value: 1,
 						 region: Aabb(loX: -9.0, loY: 1.0, hiX: -1.0, hiY: 9.0))
 		q.insert(value: 2,
@@ -83,7 +84,7 @@ class QuadTreeTests: XCTestCase {
 	}
 	
 	func testStopAtMaxDepth() {
-		let q = QuadTree(minX: 0.0, minY: 0.0, maxX: 8.0, maxY: 8.0, maxDepth: 3)
+		let q = SimpleQuadTree(minX: 0.0, minY: 0.0, maxX: 8.0, maxY: 8.0, maxDepth: 3)
 		let (_, depth) = quadInsert(1,
 						 region: Aabb(loX: 0.0, loY: 0.0, hiX: 0.1, hiY: 0.1),
 						 into: q.root, depth: 1, maxDepth: 3)
@@ -92,7 +93,7 @@ class QuadTreeTests: XCTestCase {
 	
 	
 	func testSplitAabb() {
-		let n = QuadNode.Empty(bounds: Aabb(loX: -50.0, loY: -40.0, hiX: 50.0, hiY: 30.0))
+		let n = QuadNode<Int>.Empty(bounds: Aabb(loX: -50.0, loY: -40.0, hiX: 50.0, hiY: 30.0))
 		let splits = n.subcells()
 		XCTAssertTrue(splits.tl == Aabb(loX: -50.0, loY:  -5.0, hiX:  0.0, hiY: 30.0))
 		XCTAssertTrue(splits.tr == Aabb(loX:   0.0, loY:  -5.0, hiX: 50.0, hiY: 30.0))
@@ -101,7 +102,7 @@ class QuadTreeTests: XCTestCase {
 	}
 
 	func testRemoveValue() {
-		var q = QuadTree(minX: 0.0, minY: 0.0, maxX: 20.0, maxY: 20.0, maxDepth: 10)
+		var q = SimpleQuadTree(minX: 0.0, minY: 0.0, maxX: 20.0, maxY: 20.0, maxDepth: 10)
 		q.insert(value: 7,
 						 region: Aabb(loX: 2.5, loY: 2.5, hiX: 7.5, hiY: 7.5))
 		q.insert(value: 8,
@@ -109,7 +110,7 @@ class QuadTreeTests: XCTestCase {
 		q.insert(value: 9,
 						 region: Aabb(loX: 15.0, loY: 12.0, hiX: 16.0, hiY: 14.0))
 		
-		q.remove(value: 8)
+		q.remove(hashValue: 8.hashValue)
 		let values = q.query(search: Aabb(loX: 0.0, loY: 0.0, hiX: 20.0, hiY: 20.0))
 		XCTAssertTrue(values.contains(7))
 		XCTAssertFalse(values.contains(8))

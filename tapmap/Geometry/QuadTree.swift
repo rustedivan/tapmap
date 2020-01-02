@@ -8,8 +8,8 @@
 
 import Foundation
 
-indirect enum QuadNode {
-	case Node(bounds: Aabb, values: Set<Int>, tl: QuadNode, tr: QuadNode, bl: QuadNode, br: QuadNode)
+indirect enum QuadNode<T: Hashable> {
+	case Node(bounds: Aabb, values: Set<T>, tl: QuadNode, tr: QuadNode, bl: QuadNode, br: QuadNode)
 	case Empty(bounds: Aabb)
 	
 	var bounds: Aabb { get {
@@ -43,7 +43,7 @@ indirect enum QuadNode {
 	}
 }
 
-func splitNode(_ node: QuadNode) -> QuadNode {
+func splitNode<T>(_ node: QuadNode<T>) -> QuadNode<T> {
 	let subCells = node.subcells()
 	return QuadNode.Node(bounds: node.bounds, values: [],
 												tl: .Empty(bounds: subCells.tl),
@@ -52,17 +52,17 @@ func splitNode(_ node: QuadNode) -> QuadNode {
 												br: .Empty(bounds: subCells.br))
 }
 
-struct QuadTree {
-	var root: QuadNode
+struct QuadTree<T: Hashable> {
+	var root: QuadNode<T>
 	let maxDepth: Int
 	
 	init(minX: Float, minY: Float, maxX: Float, maxY: Float, maxDepth: Int) {
-		let emptyRoot = QuadNode.Empty(bounds: Aabb(loX: minX, loY: minY, hiX: maxX, hiY: maxY))
+		let emptyRoot = QuadNode<T>.Empty(bounds: Aabb(loX: minX, loY: minY, hiX: maxX, hiY: maxY))
 		self.root = splitNode(emptyRoot)
 		self.maxDepth = maxDepth
 	}
 	
-	mutating func insert(value: Int, region: Aabb) {
+	mutating func insert(value: T, region: Aabb) {
 		guard root.contains(region: region) else {
 			print("Value \(value) lies outside quadtree bounds: \(region)")
 			return
@@ -70,18 +70,18 @@ struct QuadTree {
 		(root, _) = quadInsert(value, region: region, into: root, depth: 1, maxDepth: maxDepth)
 	}
 	
-	mutating func remove(value: Int) {
-		root = quadRemove(value, from: root)
+	mutating func remove(hashValue: Int) {
+		root = quadRemove(hashValue, from: root)
 	}
 	
-	func query(search: Aabb) -> Set<Int> {
+	func query(search: Aabb) -> Set<T> {
 		return quadQuery(search: search, in: root)
 	}
 }
 
 /// Also need a point-qtree...
 
-func quadInsert(_ value: Int, region: Aabb, into node: QuadNode, depth: Int, maxDepth: Int) -> (QuadNode, Int) {
+func quadInsert<T:Hashable>(_ value: T, region: Aabb, into node: QuadNode<T>, depth: Int, maxDepth: Int) -> (QuadNode<T>, Int) {
 	switch (node) {
 	case .Empty:
 		// Convert leaf to inner node and keep inserting
@@ -91,7 +91,7 @@ func quadInsert(_ value: Int, region: Aabb, into node: QuadNode, depth: Int, max
 		let nextDepth = depth + 1
 		// If there's room below:
 		if (nextDepth <= maxDepth) {
-			func insertValueInto(_ target: QuadNode) -> (QuadNode, Int) {
+			func insertValueInto(_ target: QuadNode<T>) -> (QuadNode<T>, Int) {
 				quadInsert(value, region: region, into: target, depth: nextDepth, maxDepth: maxDepth)
 			}
 			let newDepth: Int
@@ -116,23 +116,23 @@ func quadInsert(_ value: Int, region: Aabb, into node: QuadNode, depth: Int, max
 	}
 }
 
-func quadRemove(_ value: Int, from node: QuadNode) -> QuadNode {
-	var result: QuadNode
+func quadRemove<T:Hashable>(_ hashValue: Int, from node: QuadNode<T>) -> QuadNode<T> {
+	var result: QuadNode<T>
 	switch (node) {
 	case .Empty:
 		// No effect
 		return node
 	case .Node(let bounds, var values, var tl, var tr, var bl, var br):
-		if values.contains(value) {
+		if let targetIndex = values.firstIndex(where: { $0.hashValue == hashValue }) {
 			// Value found, update the node
-			values.remove(value)
+			values.remove(at: targetIndex)
 			result = .Node(bounds: bounds, values: values, tl: tl, tr: tr, bl: bl, br: br)
 		} else {
 			// Look in subcells and update with result
-			tl = quadRemove(value, from: tl)
-			tr = quadRemove(value, from: tr)
-			bl = quadRemove(value, from: bl)
-			br = quadRemove(value, from: br)
+			tl = quadRemove(hashValue, from: tl)
+			tr = quadRemove(hashValue, from: tr)
+			bl = quadRemove(hashValue, from: bl)
+			br = quadRemove(hashValue, from: br)
 			result = .Node(bounds: bounds, values: values, tl: tl, tr: tr, bl: bl, br: br)
 		}
 		if case (.Empty, .Empty, .Empty, .Empty) = (tl, tr, bl, br), values.isEmpty {
@@ -143,20 +143,20 @@ func quadRemove(_ value: Int, from node: QuadNode) -> QuadNode {
 	}
 }
 
-func quadQuery(search: Aabb, in node: QuadNode) -> Set<Int> {
+func quadQuery<T:Hashable>(search: Aabb, in node: QuadNode<T>) -> Set<T> {
 	switch (node) {
 	case .Empty:
-		return Set<Int>()
+		return Set<T>()
 	case let .Node(_, values, tl, tr, bl, br):
 		if node.intersects(search: search) {
-			var subtreeValues = Set<Int>(values)
+			var subtreeValues = Set<T>(values)
 			subtreeValues.formUnion(quadQuery(search: search, in: tl))
 			subtreeValues.formUnion(quadQuery(search: search, in: tr))
 			subtreeValues.formUnion(quadQuery(search: search, in: bl))
 			subtreeValues.formUnion(quadQuery(search: search, in: br))
 			return subtreeValues
 		} else {
-			return Set<Int>()
+			return Set<T>()
 		}
 	}
 }
