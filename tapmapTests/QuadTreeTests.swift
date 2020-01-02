@@ -83,16 +83,17 @@ class QuadTreeTests: XCTestCase {
 	}
 	
 	func testStopAtMaxDepth() {
-		var q = QuadTree(minX: 0.0, minY: 0.0, maxX: 8.0, maxY: 8.0, maxDepth: 3)
-		q.insert(value: 1,
-						 region: Aabb(loX: 0.0, loY: 0.0, hiX: 0.1, hiY: 0.1))
-		XCTAssertEqual(q.depth, 3)
+		let q = QuadTree(minX: 0.0, minY: 0.0, maxX: 8.0, maxY: 8.0, maxDepth: 3)
+		let (_, depth) = quadInsert(1,
+						 region: Aabb(loX: 0.0, loY: 0.0, hiX: 0.1, hiY: 0.1),
+						 into: q.root, depth: 1, maxDepth: 3)
+		XCTAssertEqual(depth, 3)
 	}
 	
 	
 	func testSplitAabb() {
-		let bounds = Aabb(loX: -50.0, loY: -40.0, hiX: 50.0, hiY: 30.0)
-		let splits = splitBounds(b: bounds)
+		let n = QuadNode.Empty(bounds: Aabb(loX: -50.0, loY: -40.0, hiX: 50.0, hiY: 30.0))
+		let splits = n.subcells()
 		XCTAssertTrue(splits.tl == Aabb(loX: -50.0, loY:  -5.0, hiX:  0.0, hiY: 30.0))
 		XCTAssertTrue(splits.tr == Aabb(loX:   0.0, loY:  -5.0, hiX: 50.0, hiY: 30.0))
 		XCTAssertTrue(splits.bl == Aabb(loX: -50.0, loY: -40.0, hiX:  0.0, hiY: -5.0))
