@@ -137,7 +137,8 @@ class DebugRenderer {
 	}
 	
 	func addTransientQuad(for box: Aabb, alpha: Float, name: String, color: UIColor = .magenta) {
-		let newQuad = makeDebugQuad(for: box, color: color, name: name)
+		let colorWithAlpha = color.withAlphaComponent(CGFloat(alpha))
+		let newQuad = makeDebugQuad(for: box, color: colorWithAlpha, name: name)
 		transientPrimitives.append(newQuad)
 	}
 	
