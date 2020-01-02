@@ -71,7 +71,7 @@ class MapRenderer {
 		return nil
 	}
 	
-	func renderWorld(geoWorld: GeoWorld, inProjection projection: GLKMatrix4) {
+	func renderWorld(geoWorld: GeoWorld, inProjection projection: GLKMatrix4, visibleSet: Set<Int>) {
 		glPushGroupMarkerEXT(0, "Render world")
 		glUseProgram(mapProgram)
 		
@@ -84,7 +84,7 @@ class MapRenderer {
 		
 		glUniform1f(mapUniforms.time, 0.0)
 		
-		for primitive in regionPrimitives.values {
+		for primitive in regionPrimitives.values.filter({ visibleSet.contains($0.ownerHash) }) {
 			var components : [GLfloat] = [primitive.color.r, primitive.color.g, primitive.color.b, 1.0]
 			glUniform4f(mapUniforms.color,
 									GLfloat(components[0]),
