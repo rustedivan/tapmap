@@ -22,6 +22,18 @@ A) If the inner nodes of the search is included in the BSP result, then querying
 B) If we have a map from hash to region for all visible regions, then quering that is easy - and
    this would be super useful in other contexts.
 
+## Loading
+The world tree could be used to speed up loading something fierce.
+Store the world tree (hashes + boxes) at the front of the file.
+Store the geometries by hash key in the file.
+Find the continent hashes and pull them from file, load and render as normal.
+Using .UserState, mark tree nodes as seen or not
+From here on:
+- when rendering the screen, figure out the visible set of hashes from the tree
+- pull missing region geometries from file and create primitives on the fly
+-- this can be done on a background thread until the main thread needs to create GL primitives
+- build the primitive list based off opened & visible & available geometry hashes
+- if a primitive is missing, just skip it - it will pop in when available
 
 ## Tile streaming
 - move POI distribution job to runtime side
