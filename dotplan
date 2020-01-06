@@ -22,6 +22,29 @@ A) If the inner nodes of the search is included in the BSP result, then querying
 B) If we have a map from hash to region for all visible regions, then quering that is easy - and
    this would be super useful in other contexts.
 
+Left to do:
+- geoworld filter by region hashes (dictionary hash -> region, should be copy-on-write and cheap)
+-- this dictionary should be the working copy after each opening
+-- that is, geoWorld is the source data, and the dictionary is a userstate cache
+-- worldTree should be renamed worldQuadTree, it's not the most important source
+-- visibleRegions should be visibleRegionHashes, it's just the hashes of currently rendered regions
+-- the new data source is availableRegions -> Int:GeoIdentifiable
+--- IFF it is possible to still cast GeoIdentifiables to PlaceContainers and GeoTessellations
+--- Because it it necessary to query against availableRegions and pull out poi lists and render primitives
+--- after all this, MapRenderer doesn't have to do the tree traversal to init the renderPrimitives list!
+- point query
+-- spearfish quadtree nodes from worldTree.visibleHashes
+-- use hashes to find regions in worldCache
+-- get the tessellations from those regions
+-- box-colline those tessellations
+-- tri-collide those tessellations
+- Poi cloud culling
+-- for all visible hashes, find the regions in worldCache
+-- collect all POIs
+-- point-collide against the projected viewbox (project the viewbox instead of all POIs)
+-- pass to POI renderer to select projected set
+-- project those points into viewspace
+
 ## Loading
 The world tree could be used to speed up loading something fierce.
 Store the world tree (hashes + boxes) at the front of the file.
