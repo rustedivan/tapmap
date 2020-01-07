@@ -18,8 +18,8 @@ class UIState {
 	}
 	
 	private var selectedRegionHash: Int = 0
-	var worldTree: QuadTree<RegionBounds>!
-	var visibleRegions: Set<Int> = Set()
+	var worldQuadTree: QuadTree<RegionBounds>!
+	var visibleRegionHashes: Set<Int> = Set()
 	
 	func cullWorldTree(focus: Aabb) {
 		func intersects(_ a: Aabb, _ b: Aabb) -> Bool {
@@ -29,27 +29,27 @@ class UIState {
 								a.maxY <= b.minY)
 		}
 		
-		let roughlyVisible = worldTree.query(search: focus)
+		let roughlyVisible = worldQuadTree.query(search: focus)
 		let finelyVisible = roughlyVisible.filter { intersects($0.bounds, focus) }
 		
 		// Update region cache
-		visibleRegions = Set(finelyVisible.map { $0.regionHash })
+		visibleRegionHashes = Set(finelyVisible.map { $0.regionHash })
 	}
 	
 	func buildWorldTree(withWorld geoWorld: GeoWorld, userState: UserState) {
-		worldTree = QuadTree(minX: -180.0, minY: -90.0, maxX: 181.0, maxY: 90.0, maxDepth: 6)
+		worldQuadTree = QuadTree(minX: -180.0, minY: -90.0, maxX: 181.0, maxY: 90.0, maxDepth: 6)
 		for continent in geoWorld.children {
 			let continentBox = RegionBounds(regionHash: continent.hashValue, bounds: continent.geometry.aabb)
-			worldTree.insert(value: continentBox, region: continentBox.bounds)
+			worldQuadTree.insert(value: continentBox, region: continentBox.bounds)
 			if userState.placeVisited(continent) {
 				for country in continent.children {
 					let countryBox = RegionBounds(regionHash: country.hashValue, bounds: country.geometry.aabb)
-					worldTree.insert(value: countryBox, region: countryBox.bounds)
+					worldQuadTree.insert(value: countryBox, region: countryBox.bounds)
 					if userState.placeVisited(country) {
 						for region in country.children {
 							if userState.placeVisited(continent) {
 								let regionBox = RegionBounds(regionHash: region.hashValue, bounds: region.geometry.aabb)
-								worldTree.insert(value: regionBox, region: regionBox.bounds)
+								worldQuadTree.insert(value: regionBox, region: regionBox.bounds)
 							}
 						}
 					}
@@ -59,18 +59,18 @@ class UIState {
 	}
 	
 	func updateTree(replace parent: GeoContinent, with children: Set<GeoCountry>) {
-		worldTree.remove(hashValue: parent.hashValue)
+		worldQuadTree.remove(hashValue: parent.hashValue)
 		for child in children {
 			let countryBox = RegionBounds(regionHash: child.hashValue, bounds: child.geometry.aabb)
-			worldTree.insert(value: countryBox, region: countryBox.bounds)
+			worldQuadTree.insert(value: countryBox, region: countryBox.bounds)
 		}
 	}
 
 	func updateTree(replace parent: GeoCountry, with children: Set<GeoRegion>) {
-		worldTree.remove(hashValue: parent.hashValue)
+		worldQuadTree.remove(hashValue: parent.hashValue)
 		for child in children {
 			let regionBox = RegionBounds(regionHash: child.hashValue, bounds: child.geometry.aabb)
-			worldTree.insert(value: regionBox, region: regionBox.bounds)
+			worldQuadTree.insert(value: regionBox, region: regionBox.bounds)
 		}
 	}
 

@@ -194,7 +194,7 @@ class MapViewController: GLKViewController, GLKViewControllerDelegate {
 		glClearColor(0.0, 0.1, 0.6, 1.0)
 		glClear(GLbitfield(GL_COLOR_BUFFER_BIT) | GLbitfield(GL_DEPTH_BUFFER_BIT))
 		
-		let visibleRegions = AppDelegate.sharedUIState.visibleRegions
+		let visibleRegions = AppDelegate.sharedUIState.visibleRegionHashes
 		mapRenderer.renderWorld(geoWorld: geoWorld, inProjection: modelViewProjectionMatrix, visibleSet: visibleRegions)
 		poiRenderer.renderWorld(geoWorld: geoWorld, inProjection: modelViewProjectionMatrix)
 		effectRenderer.renderWorld(geoWorld: geoWorld, inProjection: modelViewProjectionMatrix)
