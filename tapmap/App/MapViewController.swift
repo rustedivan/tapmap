@@ -135,7 +135,7 @@ class MapViewController: GLKViewController, GLKViewControllerDelegate {
 			// Perform three different checks for the three different Kinds
 			if let hitContinent = pickFromTessellations(p: mapP, candidates: closedCandidateContinents) {
 				if uiState.selected(hitContinent) {
-					userState.visitPlace(hitContinent)
+					userState.visitAndOpenPlace(hitContinent)
 					uiState.updateTree(replace: hitContinent, with: hitContinent.children)
 				} else {
 					uiState.selectRegion(hitContinent)
@@ -150,7 +150,7 @@ class MapViewController: GLKViewController, GLKViewControllerDelegate {
 				poiRenderer.updatePrimitives(for: hitContinent, with: hitContinent.children)
 			} else if let hitCountry = pickFromTessellations(p: mapP, candidates: closedCandidateCountries) {
 				if uiState.selected(hitCountry) {
-					userState.visitPlace(hitCountry)
+					userState.visitAndOpenPlace(hitCountry)
 					uiState.updateTree(replace: hitCountry, with: hitCountry.children)
 				} else {
 					uiState.selectRegion(hitCountry)

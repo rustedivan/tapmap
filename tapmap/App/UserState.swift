@@ -35,7 +35,7 @@ class UserState {
 		return visitedPlaces[p.hashValue] ?? false
 	}
 	
-	func visitPlace<T:Hashable>(_ p: T) {
+	func visitAndOpenPlace<T:GeoNode>(_ p: T) {
 		visitedPlaces[p.hashValue] = true
 		
 		switch (p) {
@@ -52,5 +52,9 @@ class UserState {
 		default:
 			break
 		}
+	}
+	
+	func visitPlace(_ p: GeoRegion) {
+		visitedPlaces[p.hashValue] = true
 	}
 }

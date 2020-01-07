@@ -109,6 +109,7 @@ struct GeoRegion : GeoIdentifiable, GeoPlaceContainer, GeoTessellated, Codable, 
 }
 
 struct GeoCountry : GeoNode, GeoPlaceContainer, GeoTessellated, Codable, Equatable {
+	typealias SubType = GeoRegion
 	let name: String
 	let children: Set<GeoRegion>
 	let places: Set<GeoPlace>
@@ -130,6 +131,7 @@ struct GeoCountry : GeoNode, GeoPlaceContainer, GeoTessellated, Codable, Equatab
 }
 
 struct GeoContinent : GeoNode, GeoTessellated, GeoPlaceContainer, Codable, Equatable, Hashable {
+	typealias SubType = GeoCountry
 	let name: String
 	let children: Set<GeoCountry>
 	let places: Set<GeoPlace>
