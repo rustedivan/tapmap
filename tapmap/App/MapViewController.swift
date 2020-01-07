@@ -42,6 +42,7 @@ class MapViewController: GLKViewController, GLKViewControllerDelegate {
 
 		do {
 			try self.geoWorld = PropertyListDecoder().decode(GeoWorld.self, from: geoData as Data)
+			AppDelegate.sharedUserState.buildWorldAvailability(withWorld: self.geoWorld)
 			AppDelegate.sharedUIState.buildWorldTree(withWorld: self.geoWorld, userState: AppDelegate.sharedUserState)
 		} catch {
 			print("Could not load world.")
