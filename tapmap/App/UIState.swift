@@ -18,8 +18,8 @@ class UIState {
 	}
 	
 	private var selectedRegionHash: Int = 0
-	var worldQuadTree: QuadTree<RegionBounds>!
-	var visibleRegionHashes: Set<Int> = Set()
+	var worldQuadTree: QuadTree<RegionBounds>!	// For spatial lookups
+	var visibleRegionHashes: Set<Int> = Set()		// Cache of currently visible regions
 	
 	func cullWorldTree(focus: Aabb) {
 		func intersects(_ a: Aabb, _ b: Aabb) -> Bool {
@@ -38,23 +38,20 @@ class UIState {
 	
 	func buildWorldTree(withWorld geoWorld: GeoWorld, userState: UserState) {
 		worldQuadTree = QuadTree(minX: -180.0, minY: -90.0, maxX: 181.0, maxY: 90.0, maxDepth: 6)
-		for continent in geoWorld.children {
-			let continentBox = RegionBounds(regionHash: continent.hashValue, bounds: continent.geometry.aabb)
+		
+		for (hash, continent) in userState.availableContinents {
+			let continentBox = RegionBounds(regionHash: hash, bounds: continent.geometry.aabb)
 			worldQuadTree.insert(value: continentBox, region: continentBox.bounds)
-			if userState.placeVisited(continent) {
-				for country in continent.children {
-					let countryBox = RegionBounds(regionHash: country.hashValue, bounds: country.geometry.aabb)
-					worldQuadTree.insert(value: countryBox, region: countryBox.bounds)
-					if userState.placeVisited(country) {
-						for region in country.children {
-							if userState.placeVisited(continent) {
-								let regionBox = RegionBounds(regionHash: region.hashValue, bounds: region.geometry.aabb)
-								worldQuadTree.insert(value: regionBox, region: regionBox.bounds)
-							}
-						}
-					}
-				}
-			}
+		}
+		
+		for (hash, country) in userState.availableCountries {
+			let countryBox = RegionBounds(regionHash: hash, bounds: country.geometry.aabb)
+			worldQuadTree.insert(value: countryBox, region: countryBox.bounds)
+		}
+		
+		for (hash, region) in userState.availableRegions {
+			let regionBox = RegionBounds(regionHash: hash, bounds: region.geometry.aabb)
+			worldQuadTree.insert(value: regionBox, region: regionBox.bounds)
 		}
 	}
 	
