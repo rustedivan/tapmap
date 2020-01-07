@@ -57,18 +57,13 @@ class MapRenderer {
 	}
 	
 	func updatePrimitives<T:GeoNode>(for node: T, with subRegions: Set<T.SubType>) -> ArrayedRenderPrimitive?
-		where T.SubType.PrimitiveType == ArrayedRenderPrimitive {
-		if AppDelegate.sharedUserState.placeVisited(node) {
-			let removedPrimitive = regionPrimitives.removeValue(forKey: node.hashValue)
-
-			let hashedPrimitives = subRegions.map {
-				($0.hashValue, $0.renderPrimitive())
-			}
-			regionPrimitives.merge(hashedPrimitives, uniquingKeysWith: { (l, r) in print("Replacing"); return l })
-			return removedPrimitive
+			where T.SubType.PrimitiveType == ArrayedRenderPrimitive {
+		let removedPrimitive = regionPrimitives.removeValue(forKey: node.hashValue)
+		let hashedPrimitives = subRegions.map {
+			($0.hashValue, $0.renderPrimitive())
 		}
-		
-		return nil
+		regionPrimitives.merge(hashedPrimitives, uniquingKeysWith: { (l, r) in print("Replacing"); return l })
+		return removedPrimitive
 	}
 	
 	func renderWorld(geoWorld: GeoWorld, inProjection projection: GLKMatrix4, visibleSet: Set<Int>) {
