@@ -100,12 +100,16 @@ class MapViewController: GLKViewController, GLKViewControllerDelegate {
 	
 	@objc func handleTap(sender: UITapGestureRecognizer) {
 		if sender.state == .ended {
-			let viewP = sender.location(in: dummyView)
-			var mapP = mapPoint(viewP,
-													from: dummyView.bounds,
-													to: mapFrame,
-													space: mapSpace)
-			mapP.y = -mapP.y
+			let tapPoint: Vertex
+			do {
+				let viewP = sender.location(in: dummyView)
+				var mapP = mapPoint(viewP,
+														from: dummyView.bounds,
+														to: mapFrame,
+														space: mapSpace)
+				mapP.y = -mapP.y
+				tapPoint = Vertex(Float(mapP.x), Float(mapP.y))
+			}
 			
 			// DEBUG: DebugRenderer.shared.moveCursor(mapP.x, mapP.y)
 			
@@ -115,25 +119,22 @@ class MapViewController: GLKViewController, GLKViewControllerDelegate {
 			GeometryCounters.begin()
 			defer { GeometryCounters.end() }
 			
-			// First split box-collided continents into open and closed sets
-			let candidateContinents = geoWorld.children.filter { aabbHitTest(p: mapP, aabb: $0.aabb) }
-			let openCandidateContinents = candidateContinents.filter { userState.placeVisited($0) }
-			let closedCandidateContinents = candidateContinents.subtracting(openCandidateContinents)
-			
-			// Form array of box-collided countries in the opened continents, and split into opened/closed sets
-			let candidateCountries = Set(openCandidateContinents.flatMap { $0.children })
-																													.filter { aabbHitTest(p: mapP, aabb: $0.aabb) }
-			let openCandidateCountries = candidateCountries.filter { userState.placeVisited($0) }
-			let closedCandidateCountries = candidateCountries.subtracting(openCandidateCountries)
-			
-			// Finally form a list of box-collided regions of opened countries
-			let candidateRegions = Set(openCandidateCountries.flatMap { $0.children })
-																											.filter { aabbHitTest(p: mapP, aabb: $0.aabb) }
-			// let openCandidateRegions = candidateRegions.filter { userState.placeVisited($0) }
-			// let closedCandidateRegions = candidateRegions.subtracting(openCandidateRegions)
+			// Filter out sets of closed, visible regions that contain the tap
+			let candidateContinents = Set(userState.availableContinents		// Closed continents
+				.filter { uiState.visibleRegionHashes.contains($0.key) }		// Visible continents
+				.filter { boxContains($0.value.aabb, tapPoint) }						// Under the tap position
+				.values)
+			let candidateCountries = Set(userState.availableCountries
+				.filter { uiState.visibleRegionHashes.contains($0.key) }
+				.filter { boxContains($0.value.aabb, tapPoint) }
+				.values)
+			let candidateRegions = Set(userState.availableRegions
+				.filter { uiState.visibleRegionHashes.contains($0.key) }
+				.filter { boxContains($0.value.aabb, tapPoint) }
+				.values)
 			
 			// Perform three different checks for the three different Kinds
-			if let hitContinent = pickFromTessellations(p: mapP, candidates: closedCandidateContinents) {
+			if let hitContinent = pickFromTessellations(p: tapPoint, candidates: candidateContinents) {
 				if uiState.selected(hitContinent) {
 					userState.visitAndOpenPlace(hitContinent)
 					uiState.updateTree(replace: hitContinent, with: hitContinent.children)
@@ -148,7 +149,7 @@ class MapViewController: GLKViewController, GLKViewControllerDelegate {
 					effectRenderer.addOpeningEffect(for: toAnimate, at: hitContinent.geometry.midpoint)
 				}
 				poiRenderer.updatePrimitives(for: hitContinent, with: hitContinent.children)
-			} else if let hitCountry = pickFromTessellations(p: mapP, candidates: closedCandidateCountries) {
+			} else if let hitCountry = pickFromTessellations(p: tapPoint, candidates: candidateCountries) {
 				if uiState.selected(hitCountry) {
 					userState.visitAndOpenPlace(hitCountry)
 					uiState.updateTree(replace: hitCountry, with: hitCountry.children)
@@ -163,7 +164,7 @@ class MapViewController: GLKViewController, GLKViewControllerDelegate {
 					effectRenderer.addOpeningEffect(for: toAnimate, at: hitCountry.geometry.midpoint)
 				}
 				poiRenderer.updatePrimitives(for: hitCountry, with: hitCountry.children)
-			} else if let hitRegion = pickFromTessellations(p: mapP, candidates: candidateRegions) {
+			} else if let hitRegion = pickFromTessellations(p: tapPoint, candidates: candidateRegions) {
 				if uiState.selected(hitRegion) {
 					userState.visitPlace(hitRegion)
 				} else {
