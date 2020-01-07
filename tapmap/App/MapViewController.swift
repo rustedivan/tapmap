@@ -100,18 +100,9 @@ class MapViewController: GLKViewController, GLKViewControllerDelegate {
 	
 	@objc func handleTap(sender: UITapGestureRecognizer) {
 		if sender.state == .ended {
-			let tapPoint: Vertex
-			do {
-				let viewP = sender.location(in: dummyView)
-				var mapP = mapPoint(viewP,
-														from: dummyView.bounds,
-														to: mapFrame,
-														space: mapSpace)
-				mapP.y = -mapP.y
-				tapPoint = Vertex(Float(mapP.x), Float(mapP.y))
-			}
-			
-			// DEBUG: DebugRenderer.shared.moveCursor(mapP.x, mapP.y)
+			let viewP = sender.location(in: dummyView)
+			let mapP = mapPoint(viewP, from: dummyView.bounds, to: mapFrame, space: mapSpace)
+			let tapPoint = Vertex(Float(mapP.x), Float(-mapP.y))
 			
 			let userState = AppDelegate.sharedUserState
 			let uiState = AppDelegate.sharedUIState
@@ -133,45 +124,16 @@ class MapViewController: GLKViewController, GLKViewControllerDelegate {
 				.filter { boxContains($0.value.aabb, tapPoint) }
 				.values)
 			
-			// Perform three different checks for the three different Kinds
 			if let hitContinent = pickFromTessellations(p: tapPoint, candidates: candidateContinents) {
-				if uiState.selected(hitContinent) {
-					userState.visitAndOpenPlace(hitContinent)
-					uiState.updateTree(replace: hitContinent, with: hitContinent.children)
-				} else {
-					uiState.selectRegion(hitContinent)
-					selectionRenderer.select(geometry: hitContinent)
+				if processSelection(of: hitContinent, user: userState, ui: uiState) {
+					processVisit(of: hitContinent, user: userState, ui: uiState)
 				}
-				
-				placeName.text = hitContinent.name
-				
-				if let toAnimate = mapRenderer.updatePrimitives(for: hitContinent, with: hitContinent.children) {
-					effectRenderer.addOpeningEffect(for: toAnimate, at: hitContinent.geometry.midpoint)
-				}
-				poiRenderer.updatePrimitives(for: hitContinent, with: hitContinent.children)
 			} else if let hitCountry = pickFromTessellations(p: tapPoint, candidates: candidateCountries) {
-				if uiState.selected(hitCountry) {
-					userState.visitAndOpenPlace(hitCountry)
-					uiState.updateTree(replace: hitCountry, with: hitCountry.children)
-				} else {
-					uiState.selectRegion(hitCountry)
-					selectionRenderer.select(geometry: hitCountry)
+				if processSelection(of: hitCountry, user: userState, ui: uiState) {
+					processVisit(of: hitCountry, user: userState, ui: uiState)
 				}
-				
-				placeName.text = hitCountry.name
-				
-				if let toAnimate = mapRenderer.updatePrimitives(for: hitCountry, with: hitCountry.children) {
-					effectRenderer.addOpeningEffect(for: toAnimate, at: hitCountry.geometry.midpoint)
-				}
-				poiRenderer.updatePrimitives(for: hitCountry, with: hitCountry.children)
 			} else if let hitRegion = pickFromTessellations(p: tapPoint, candidates: candidateRegions) {
-				if uiState.selected(hitRegion) {
-					userState.visitPlace(hitRegion)
-				} else {
-					uiState.selectRegion(hitRegion)
-					selectionRenderer.select(geometry: hitRegion)
-				}
-				placeName.text = hitRegion.name
+				_ = processSelection(of: hitRegion, user: userState, ui: uiState)
 			} else {
 				uiState.clearSelection()
 				selectionRenderer.clear()
@@ -203,6 +165,30 @@ class MapViewController: GLKViewController, GLKViewControllerDelegate {
 		selectionRenderer.renderSelection(inProjection: modelViewProjectionMatrix)
 		
 		DebugRenderer.shared.renderMarkers(inProjection: modelViewProjectionMatrix)
+	}
+	
+	func processSelection<T:GeoIdentifiable & GeoTessellated>(of hit: T, user: UserState, ui: UIState) -> Bool {
+		placeName.text = hit.name
+		if ui.selected(hit) {
+			user.visitPlace(hit)
+			return true
+		} else {
+			ui.selectRegion(hit)
+			selectionRenderer.select(geometry: hit)
+			return false
+		}
+	}
+	
+	func processVisit<T:GeoNode & GeoTessellated>(of hit: T, user: UserState, ui: UIState)
+		where T.SubType: GeoPlaceContainer,
+					T.SubType.PrimitiveType == ArrayedRenderPrimitive {
+		user.openPlace(hit)
+		ui.updateTree(replace: hit, with: hit.children)
+			
+		if let toAnimate = mapRenderer.updatePrimitives(for: hit, with: hit.children) {
+			effectRenderer.addOpeningEffect(for: toAnimate, at: hit.geometry.midpoint)
+		}
+		poiRenderer.updatePrimitives(for: hit, with: hit.children)
 	}
 }
 
