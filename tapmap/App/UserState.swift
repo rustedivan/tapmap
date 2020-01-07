@@ -35,9 +35,11 @@ class UserState {
 		return visitedPlaces[p.hashValue] ?? false
 	}
 	
-	func visitAndOpenPlace<T:GeoNode>(_ p: T) {
+	func visitPlace<T:GeoIdentifiable>(_ p: T) {
 		visitedPlaces[p.hashValue] = true
-		
+	}
+	
+	func openPlace<T:GeoNode>(_ p: T) {
 		switch (p) {
 		case let continent as GeoContinent:
 			availableContinents.removeValue(forKey: continent.hashValue)

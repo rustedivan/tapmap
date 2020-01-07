@@ -84,7 +84,7 @@ protocol GeoTessellated : Renderable {
 }
 
 protocol GeoNode : GeoIdentifiable {
-	associatedtype SubType : GeoIdentifiable & Renderable
+	associatedtype SubType : GeoIdentifiable & GeoTessellated
 	var children : Set<SubType> { get }
 }
 

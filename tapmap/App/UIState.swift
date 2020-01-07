@@ -55,7 +55,7 @@ class UIState {
 		}
 	}
 	
-	func updateTree(replace parent: GeoContinent, with children: Set<GeoCountry>) {
+	func updateTree<T:GeoNode>(replace parent: T, with children: Set<T.SubType>) {
 		worldQuadTree.remove(hashValue: parent.hashValue)
 		for child in children {
 			let countryBox = RegionBounds(regionHash: child.hashValue, bounds: child.geometry.aabb)
