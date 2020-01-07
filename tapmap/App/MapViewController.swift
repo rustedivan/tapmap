@@ -142,30 +142,6 @@ class MapViewController: GLKViewController, GLKViewControllerDelegate {
 		
 		AppDelegate.sharedUIState.cullWorldTree(focus: visibleLongLat(viewBounds: view.bounds))
 	}
-
-	// MARK: - GLKView and GLKViewController delegate methods
-	func glkViewControllerUpdate(_ controller: GLKViewController) {
-		modelViewProjectionMatrix = buildProjectionMatrix(viewSize: scrollView.bounds.size,
-																											mapSize: mapSpace.size,
-																											centeredOn: offset,
-																											zoomedTo: zoom)
-		effectRenderer.updatePrimitives()
-		selectionRenderer.outlineWidth = 0.2 / zoom
-		poiRenderer.updateFades()
-	}
-	
-	override func glkView(_ view: GLKView, drawIn rect: CGRect) {
-		glClearColor(0.0, 0.1, 0.6, 1.0)
-		glClear(GLbitfield(GL_COLOR_BUFFER_BIT) | GLbitfield(GL_DEPTH_BUFFER_BIT))
-		
-		let visibleRegions = AppDelegate.sharedUIState.visibleRegionHashes
-		mapRenderer.renderWorld(geoWorld: geoWorld, inProjection: modelViewProjectionMatrix, visibleSet: visibleRegions)
-		poiRenderer.renderWorld(geoWorld: geoWorld, inProjection: modelViewProjectionMatrix)
-		effectRenderer.renderWorld(geoWorld: geoWorld, inProjection: modelViewProjectionMatrix)
-		selectionRenderer.renderSelection(inProjection: modelViewProjectionMatrix)
-		
-		DebugRenderer.shared.renderMarkers(inProjection: modelViewProjectionMatrix)
-	}
 	
 	func processSelection<T:GeoIdentifiable & GeoTessellated>(of hit: T, user: UserState, ui: UIState) -> Bool {
 		placeName.text = hit.name
@@ -189,6 +165,30 @@ class MapViewController: GLKViewController, GLKViewControllerDelegate {
 			effectRenderer.addOpeningEffect(for: toAnimate, at: hit.geometry.midpoint)
 		}
 		poiRenderer.updatePrimitives(for: hit, with: hit.children)
+	}
+
+	// MARK: - GLKView and GLKViewController delegate methods
+	func glkViewControllerUpdate(_ controller: GLKViewController) {
+		modelViewProjectionMatrix = buildProjectionMatrix(viewSize: scrollView.bounds.size,
+																											mapSize: mapSpace.size,
+																											centeredOn: offset,
+																											zoomedTo: zoom)
+		effectRenderer.updatePrimitives()
+		selectionRenderer.outlineWidth = 0.2 / zoom
+		poiRenderer.updateFades()
+	}
+	
+	override func glkView(_ view: GLKView, drawIn rect: CGRect) {
+		glClearColor(0.0, 0.1, 0.6, 1.0)
+		glClear(GLbitfield(GL_COLOR_BUFFER_BIT) | GLbitfield(GL_DEPTH_BUFFER_BIT))
+		
+		let visibleRegions = AppDelegate.sharedUIState.visibleRegionHashes
+		mapRenderer.renderWorld(geoWorld: geoWorld, inProjection: modelViewProjectionMatrix, visibleSet: visibleRegions)
+		poiRenderer.renderWorld(geoWorld: geoWorld, inProjection: modelViewProjectionMatrix)
+		effectRenderer.renderWorld(geoWorld: geoWorld, inProjection: modelViewProjectionMatrix)
+		selectionRenderer.renderSelection(inProjection: modelViewProjectionMatrix)
+		
+		DebugRenderer.shared.renderMarkers(inProjection: modelViewProjectionMatrix)
 	}
 }
 
