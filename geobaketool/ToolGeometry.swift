@@ -148,10 +148,10 @@ func tessellate(_ feature: ToolGeoFeature) -> GeoTessellation? {
 	var midpoint: (Vertex.Precision, Vertex.Precision) = (0.0, 0.0)
 	let regionVertices = t.vertices.map { (v: CVector3) -> Vertex in
 		// Calculate the aabb while we're passing through
-		aabb = Aabb(loX: min(Float(v.x), aabb.minX),
-								loY: min(Float(v.y), aabb.minY),
-								hiX: max(Float(v.x), aabb.maxX),
-								hiY: max(Float(v.y), aabb.maxY))
+		aabb = Aabb(loX: min(Vertex.Precision(v.x), aabb.minX),
+								loY: min(Vertex.Precision(v.y), aabb.minY),
+								hiX: max(Vertex.Precision(v.x), aabb.maxX),
+								hiY: max(Vertex.Precision(v.y), aabb.maxY))
 		midpoint.0 += Vertex.Precision(v.x)
 		midpoint.1 += Vertex.Precision(v.y)
 		return Vertex(Vertex.Precision(v.x), Vertex.Precision(v.y))

@@ -23,16 +23,13 @@ struct GeometryCounters {
 	}
 }
 
-func aabbHitTest(p: CGPoint, aabb: Aabb) -> Bool {
-	// $ Replace aabb with CGRect directly.
-	let rect = CGRect(x: Double(aabb.minX), y: Double(aabb.minY), width: Double(aabb.maxX - aabb.minX), height: Double(aabb.maxY - aabb.minY))
-	
+func boxContains(_ aabb: Aabb, _ p: Vertex) -> Bool {
 	GeometryCounters.aabbHitCount += 1
-	
-	return rect.contains(p)
+	return (aabb.minX < p.x && p.x < aabb.maxX &&
+					aabb.minY < p.y && p.y < aabb.maxY)
 }
 
-func pickFromTessellations<T:GeoTessellated>(p: CGPoint, candidates: Set<T>) -> T? {
+func pickFromTessellations<T:GeoTessellated>(p: Vertex, candidates: Set<T>) -> T? {
 	for tessellation in candidates {
 		if triangleSoupHitTest(point: p,
 													 inVertices: tessellation.geometry.vertices) {
@@ -43,7 +40,7 @@ func pickFromTessellations<T:GeoTessellated>(p: CGPoint, candidates: Set<T>) -> 
 }
 
 // Assumes triangles is CCW GL_TRIANGLES mode (consecutive triplets form triangles)
-func triangleSoupHitTest(point p: CGPoint, inVertices vertices: [Vertex]) -> Bool {
+func triangleSoupHitTest(point p: Vertex, inVertices vertices: [Vertex]) -> Bool {
 	for i in stride(from: 0, to: vertices.count, by: 3) {
 		GeometryCounters.triHitCount += 1
 		

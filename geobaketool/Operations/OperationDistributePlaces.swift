@@ -36,14 +36,12 @@ class OperationDistributePlaces : Operation {
 			}
 			// Find all places that fit into the region's aabb
 			let candidatePlaces = remainingPlaces.filter {
-				aabbHitTest(p: CGPoint(x: $0.location.x,
-															 y: $0.location.y), aabb: regionTessellation.aabb)
+				boxContains(regionTessellation.aabb, $0.location)
 			}
 			
 			// Perform point-in-triangle tests
 			let belongingPlaces = candidatePlaces.filter {
-				triangleSoupHitTest(point: CGPoint(x: $0.location.x,
-																					 y: $0.location.y),
+				triangleSoupHitTest(point: $0.location,
 														inVertices: regionTessellation.vertices)
 			}
 			
