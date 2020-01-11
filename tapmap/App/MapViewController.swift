@@ -40,10 +40,12 @@ class MapViewController: GLKViewController, GLKViewControllerDelegate {
 		let startTime = Date()
 		let geoData = NSData(contentsOfFile: path)!
 
+		let userState = AppDelegate.sharedUserState
+		let uiState = AppDelegate.sharedUIState
 		do {
 			try self.geoWorld = PropertyListDecoder().decode(GeoWorld.self, from: geoData as Data)
-			AppDelegate.sharedUserState.buildWorldAvailability(withWorld: self.geoWorld)
-			AppDelegate.sharedUIState.buildWorldTree(withWorld: self.geoWorld, userState: AppDelegate.sharedUserState)
+			userState.buildWorldAvailability(withWorld: self.geoWorld)
+			uiState.buildWorldTree(withWorld: self.geoWorld, userState: AppDelegate.sharedUserState)
 		} catch {
 			print("Could not load world.")
 			return
@@ -79,8 +81,12 @@ class MapViewController: GLKViewController, GLKViewControllerDelegate {
 		delegate = self
 		
 		EAGLContext.setCurrent(self.context)
-		mapRenderer = MapRenderer(withGeoWorld: geoWorld)!
-		poiRenderer = PoiRenderer(withGeoWorld: geoWorld)!
+		mapRenderer = MapRenderer(withVisibleContinents: userState.availableContinents,
+															countries: userState.availableCountries,
+															regions: userState.availableRegions)
+		poiRenderer = PoiRenderer(withVisibleContinents: userState.availableContinents,
+															countries: userState.availableCountries,
+															regions: userState.availableRegions)
 		effectRenderer = EffectRenderer()
 		selectionRenderer = SelectionRenderer()
 	}
