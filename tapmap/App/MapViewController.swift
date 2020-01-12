@@ -87,6 +87,7 @@ class MapViewController: GLKViewController, GLKViewControllerDelegate {
 		poiRenderer = PoiRenderer(withVisibleContinents: userState.availableContinents,
 															countries: userState.availableCountries,
 															regions: userState.availableRegions)
+		poiRenderer.updateZoomThreshold(viewZoom: Float(scrollView!.zoomScale))
 		effectRenderer = EffectRenderer()
 		selectionRenderer = SelectionRenderer()
 	}
@@ -190,7 +191,7 @@ class MapViewController: GLKViewController, GLKViewControllerDelegate {
 		
 		let visibleRegions = AppDelegate.sharedUIState.visibleRegionHashes
 		mapRenderer.renderWorld(geoWorld: geoWorld, inProjection: modelViewProjectionMatrix, visibleSet: visibleRegions)
-		poiRenderer.renderWorld(geoWorld: geoWorld, inProjection: modelViewProjectionMatrix)
+		poiRenderer.renderWorld(geoWorld: geoWorld, inProjection: modelViewProjectionMatrix, visibleSet: visibleRegions)
 		effectRenderer.renderWorld(geoWorld: geoWorld, inProjection: modelViewProjectionMatrix)
 		selectionRenderer.renderSelection(inProjection: modelViewProjectionMatrix)
 		
