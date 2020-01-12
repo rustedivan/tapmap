@@ -18,6 +18,13 @@
 		1429B0A922EAFD53001257AB /* nullrenderer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14C6659822B97E660054D7F2 /* nullrenderer.swift */; };
 		144B5D5A22D9E092001E2A85 /* SelectionRenderer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 144B5D5722D9E092001E2A85 /* SelectionRenderer.swift */; };
 		144B5D5C22D9E0A9001E2A85 /* world.geo in Resources */ = {isa = PBXBuildFile; fileRef = 140835BE22B991BA004697FB /* world.geo */; };
+		14532D9A23B515BE00943ADC /* QuadTree.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14532D9923B515BE00943ADC /* QuadTree.swift */; };
+		14532D9C23B5190F00943ADC /* QuadTreeTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14532D9B23B5190F00943ADC /* QuadTreeTests.swift */; };
+		14532D9E23B5197600943ADC /* OutlineGeometry.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14985FF522F0F35700F68A1F /* OutlineGeometry.swift */; };
+		14532DA023B621A800943ADC /* QuadTree.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14532D9923B515BE00943ADC /* QuadTree.swift */; };
+		1468830D23B4BC4100105E04 /* DebugRenderer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1468830C23B4BC4100105E04 /* DebugRenderer.swift */; };
+		1468831023B4D9E400105E04 /* DebugShader.vsh in Resources */ = {isa = PBXBuildFile; fileRef = 1468830E23B4D9E400105E04 /* DebugShader.vsh */; };
+		1468831123B4D9E400105E04 /* DebugShader.fsh in Resources */ = {isa = PBXBuildFile; fileRef = 1468830F23B4D9E400105E04 /* DebugShader.fsh */; };
 		148937F522B97FDF009278A0 /* Geometry.swift in Sources */ = {isa = PBXBuildFile; fileRef = 148937DF22B97FDF009278A0 /* Geometry.swift */; };
 		148937F622B97FDF009278A0 /* AppTypes.swift in Sources */ = {isa = PBXBuildFile; fileRef = 148937E022B97FDF009278A0 /* AppTypes.swift */; };
 		148937F722B97FDF009278A0 /* ViewCalculations.swift in Sources */ = {isa = PBXBuildFile; fileRef = 148937E122B97FDF009278A0 /* ViewCalculations.swift */; };
@@ -62,10 +69,10 @@
 		1489382022B9831C009278A0 /* OperationParseOSMJson.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14C665A322B97E670054D7F2 /* OperationParseOSMJson.swift */; };
 		1489382122B9831C009278A0 /* OperationTessellateRegions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14C6659A22B97E660054D7F2 /* OperationTessellateRegions.swift */; };
 		1489382322B98456009278A0 /* ViewCalculations.swift in Sources */ = {isa = PBXBuildFile; fileRef = 148937E122B97FDF009278A0 /* ViewCalculations.swift */; };
-		148BA8EB23AE212F00A5331B /* LabelView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 148BA8EA23AE212F00A5331B /* LabelView.swift */; };
 		14985FEB22F0ECD100F68A1F /* ArrayedRenderPrimitive.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14985FEA22F0ECD100F68A1F /* ArrayedRenderPrimitive.swift */; };
 		14985FED22F0ED0C00F68A1F /* IndexedRenderPrimitive.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14985FEC22F0ED0C00F68A1F /* IndexedRenderPrimitive.swift */; };
 		14985FEF22F0ED4A00F68A1F /* OutlineRenderPrimitive.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14985FEE22F0ED4A00F68A1F /* OutlineRenderPrimitive.swift */; };
+		149CBDDD23CB230000A7AABB /* LabelView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 149CBDDC23CB230000A7AABB /* LabelView.swift */; };
 		14C6656422B97D890054D7F2 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 14C6656222B97D890054D7F2 /* Main.storyboard */; };
 		14C6656622B97D8A0054D7F2 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 14C6656522B97D8A0054D7F2 /* Assets.xcassets */; };
 		14C6656922B97D8A0054D7F2 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 14C6656722B97D8A0054D7F2 /* LaunchScreen.storyboard */; };
@@ -125,6 +132,11 @@
 		140B990222E57CE000C912A4 /* EdgeShader.fsh */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.glsl; path = EdgeShader.fsh; sourceTree = "<group>"; };
 		140B990522E57D5700C912A4 /* EdgeGenerationTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EdgeGenerationTests.swift; sourceTree = "<group>"; };
 		144B5D5722D9E092001E2A85 /* SelectionRenderer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SelectionRenderer.swift; sourceTree = "<group>"; };
+		14532D9923B515BE00943ADC /* QuadTree.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QuadTree.swift; sourceTree = "<group>"; };
+		14532D9B23B5190F00943ADC /* QuadTreeTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QuadTreeTests.swift; sourceTree = "<group>"; };
+		1468830C23B4BC4100105E04 /* DebugRenderer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DebugRenderer.swift; sourceTree = "<group>"; };
+		1468830E23B4D9E400105E04 /* DebugShader.vsh */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.glsl; path = DebugShader.vsh; sourceTree = "<group>"; };
+		1468830F23B4D9E400105E04 /* DebugShader.fsh */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.glsl; path = DebugShader.fsh; sourceTree = "<group>"; };
 		148937DF22B97FDF009278A0 /* Geometry.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Geometry.swift; sourceTree = "<group>"; };
 		148937E022B97FDF009278A0 /* AppTypes.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AppTypes.swift; sourceTree = "<group>"; };
 		148937E122B97FDF009278A0 /* ViewCalculations.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ViewCalculations.swift; sourceTree = "<group>"; };
@@ -145,11 +157,11 @@
 		148937F222B97FDF009278A0 /* AppDelegate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		148937F322B97FDF009278A0 /* UserState.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UserState.swift; sourceTree = "<group>"; };
 		148937F422B97FDF009278A0 /* Serialization.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Serialization.swift; sourceTree = "<group>"; };
-		148BA8EA23AE212F00A5331B /* LabelView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LabelView.swift; sourceTree = "<group>"; };
 		14985FEA22F0ECD100F68A1F /* ArrayedRenderPrimitive.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ArrayedRenderPrimitive.swift; sourceTree = "<group>"; };
 		14985FEC22F0ED0C00F68A1F /* IndexedRenderPrimitive.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IndexedRenderPrimitive.swift; sourceTree = "<group>"; };
 		14985FEE22F0ED4A00F68A1F /* OutlineRenderPrimitive.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OutlineRenderPrimitive.swift; sourceTree = "<group>"; };
 		14985FF522F0F35700F68A1F /* OutlineGeometry.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OutlineGeometry.swift; sourceTree = "<group>"; };
+		149CBDDC23CB230000A7AABB /* LabelView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LabelView.swift; sourceTree = "<group>"; };
 		14C6655B22B97D890054D7F2 /* tapmap.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = tapmap.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		14C6656322B97D890054D7F2 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
 		14C6656522B97D8A0054D7F2 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
@@ -237,6 +249,7 @@
 				148937E122B97FDF009278A0 /* ViewCalculations.swift */,
 				148937E222B97FDF009278A0 /* GeoRegion.swift */,
 				14985FF522F0F35700F68A1F /* OutlineGeometry.swift */,
+				14532D9923B515BE00943ADC /* QuadTree.swift */,
 			);
 			path = Geometry;
 			sourceTree = "<group>";
@@ -248,8 +261,9 @@
 				148937E722B97FDF009278A0 /* MapRenderer.swift */,
 				148937EE22B97FDF009278A0 /* PoiRenderer.swift */,
 				144B5D5722D9E092001E2A85 /* SelectionRenderer.swift */,
+				149CBDDC23CB230000A7AABB /* LabelView.swift */,
 				148937E622B97FDF009278A0 /* EffectRenderer.swift */,
-				148BA8EA23AE212F00A5331B /* LabelView.swift */,
+				1468830C23B4BC4100105E04 /* DebugRenderer.swift */,
 				14985FE922F0ECA000F68A1F /* Primitives */,
 				148937E922B97FDF009278A0 /* ColoredHash.swift */,
 				14985FE822F0EC7500F68A1F /* Shaders */,
@@ -280,6 +294,8 @@
 				148937E422B97FDF009278A0 /* PoiShader.fsh */,
 				148937E522B97FDF009278A0 /* OpeningShader.vsh */,
 				148937EC22B97FDF009278A0 /* OpeningShader.fsh */,
+				1468830F23B4D9E400105E04 /* DebugShader.fsh */,
+				1468830E23B4D9E400105E04 /* DebugShader.vsh */,
 			);
 			path = Shaders;
 			sourceTree = "<group>";
@@ -341,6 +357,7 @@
 				14C665CA22B97F250054D7F2 /* GeometryTests.swift */,
 				14C6657522B97D8B0054D7F2 /* Info.plist */,
 				140B990522E57D5700C912A4 /* EdgeGenerationTests.swift */,
+				14532D9B23B5190F00943ADC /* QuadTreeTests.swift */,
 			);
 			path = tapmapTests;
 			sourceTree = "<group>";
@@ -543,8 +560,10 @@
 				148937FA22B97FDF009278A0 /* OpeningShader.vsh in Resources */,
 				140B990322E57CE000C912A4 /* EdgeShader.vsh in Resources */,
 				14C6656422B97D890054D7F2 /* Main.storyboard in Resources */,
+				1468831023B4D9E400105E04 /* DebugShader.vsh in Resources */,
 				148937F922B97FDF009278A0 /* PoiShader.fsh in Resources */,
 				1489380222B97FDF009278A0 /* MapShader.vsh in Resources */,
+				1468831123B4D9E400105E04 /* DebugShader.fsh in Resources */,
 				1489380022B97FDF009278A0 /* PoiShader.vsh in Resources */,
 				148937FD22B97FDF009278A0 /* MapShader.fsh in Resources */,
 				140B990422E57CE000C912A4 /* EdgeShader.fsh in Resources */,
@@ -672,12 +691,14 @@
 				1489380822B97FE0009278A0 /* Serialization.swift in Sources */,
 				148937F722B97FDF009278A0 /* ViewCalculations.swift in Sources */,
 				148937FC22B97FDF009278A0 /* MapRenderer.swift in Sources */,
+				149CBDDD23CB230000A7AABB /* LabelView.swift in Sources */,
 				1489380422B97FE0009278A0 /* MapViewController.swift in Sources */,
 				148937F822B97FDF009278A0 /* GeoRegion.swift in Sources */,
-				148BA8EB23AE212F00A5331B /* LabelView.swift in Sources */,
+				14532D9A23B515BE00943ADC /* QuadTree.swift in Sources */,
 				14985FEB22F0ECD100F68A1F /* ArrayedRenderPrimitive.swift in Sources */,
 				1489380522B97FE0009278A0 /* UIState.swift in Sources */,
 				14F8918B22F0F3F7008CCCF3 /* OutlineGeometry.swift in Sources */,
+				1468830D23B4BC4100105E04 /* DebugRenderer.swift in Sources */,
 				148937F522B97FDF009278A0 /* Geometry.swift in Sources */,
 				14985FED22F0ED0C00F68A1F /* IndexedRenderPrimitive.swift in Sources */,
 				148937F622B97FDF009278A0 /* AppTypes.swift in Sources */,
@@ -692,13 +713,16 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				14532DA023B621A800943ADC /* QuadTree.swift in Sources */,
 				140B990622E57D5700C912A4 /* EdgeGenerationTests.swift in Sources */,
 				1429B0A822EAFD43001257AB /* GeoRegion.swift in Sources */,
 				1429B0A722EAFCE5001257AB /* Geometry.swift in Sources */,
 				1489382322B98456009278A0 /* ViewCalculations.swift in Sources */,
 				1429B0A922EAFD53001257AB /* nullrenderer.swift in Sources */,
 				14C6657422B97D8B0054D7F2 /* tapmapTests.swift in Sources */,
+				14532D9C23B5190F00943ADC /* QuadTreeTests.swift in Sources */,
 				1429B0A522EAFA87001257AB /* AppTypes.swift in Sources */,
+				14532D9E23B5197600943ADC /* OutlineGeometry.swift in Sources */,
 				1429B0A622EAFCD3001257AB /* Serialization.swift in Sources */,
 				14C665CB22B97F250054D7F2 /* GeometryTests.swift in Sources */,
 			);

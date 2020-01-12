@@ -14,7 +14,9 @@ class MapRenderer {
 	let mapProgram: GLuint
 	let mapUniforms : (modelViewMatrix: GLint, color: GLint, highlighted: GLint, time: GLint)
 	
-	init?(withGeoWorld geoWorld: GeoWorld) {
+	init?(withVisibleContinents continents: [Int: GeoContinent],
+				countries: [Int: GeoCountry],
+				regions: [Int: GeoRegion]) {
 		mapProgram = loadShaders(shaderName: "MapShader")
 		guard mapProgram != 0 else {
 			print("Failed to load map shaders")
@@ -26,28 +28,14 @@ class MapRenderer {
 		mapUniforms.highlighted = glGetUniformLocation(mapProgram, "highlighted")
 		mapUniforms.time = glGetUniformLocation(mapProgram, "time")
 		
-		let userState = AppDelegate.sharedUserState
-		
-		let openContinents = geoWorld.children.filter { userState.placeVisited($0) }
-		let closedContinents = geoWorld.children.subtracting(openContinents)
-		
-		let countries = Set(openContinents.flatMap { $0.children })
-		let openCountries = countries.filter { userState.placeVisited($0) }
-		let closedCountries = countries.subtracting(openCountries)
-		
-		// Finally form a list of box-collided regions of opened countries
-		let regions = Set(openCountries.flatMap { $0.children })
-		let openRegions = regions.filter { userState.placeVisited($0) }
-		let closedRegions = regions.subtracting(openRegions)
-		
-		// Now we have three sets of closed geographies that we could open
 		// Collect a flat list of all primitives and their hash keys
-		let hashedPrimitivesList = closedContinents.map { ($0.hashValue, $0.renderPrimitive()) } +
-															 closedCountries.map { ($0.hashValue, $0.renderPrimitive()) } +
-															 closedRegions.map { ($0.hashValue, $0.renderPrimitive()) }
+		let continentPrimitives = continents.map { ($0.key, $0.value.renderPrimitive()) }
+		let countryPrimitives = countries.map { ($0.key, $0.value.renderPrimitive()) }
+		let regionPrimitives = regions.map { ($0.key, $0.value.renderPrimitive()) }
+		let allPrimitives = continentPrimitives + countryPrimitives + regionPrimitives
 		
 		// Insert them into the primitive dictionary, ignoring any later duplicates
-		regionPrimitives = Dictionary(hashedPrimitivesList, uniquingKeysWith: { (l, r) in print("Inserting bad"); return l })
+		self.regionPrimitives = Dictionary(allPrimitives, uniquingKeysWith: { (l, r) in print("Inserting bad"); return l })
 	}
 	
 	deinit {
@@ -57,21 +45,16 @@ class MapRenderer {
 	}
 	
 	func updatePrimitives<T:GeoNode>(for node: T, with subRegions: Set<T.SubType>) -> ArrayedRenderPrimitive?
-		where T.SubType.PrimitiveType == ArrayedRenderPrimitive {
-		if AppDelegate.sharedUserState.placeVisited(node) {
-			let removedPrimitive = regionPrimitives.removeValue(forKey: node.hashValue)
-
-			let hashedPrimitives = subRegions.map {
-				($0.hashValue, $0.renderPrimitive())
-			}
-			regionPrimitives.merge(hashedPrimitives, uniquingKeysWith: { (l, r) in print("Replacing"); return l })
-			return removedPrimitive
+			where T.SubType.PrimitiveType == ArrayedRenderPrimitive {
+		let removedPrimitive = regionPrimitives.removeValue(forKey: node.hashValue)
+		let hashedPrimitives = subRegions.map {
+			($0.hashValue, $0.renderPrimitive())
 		}
-		
-		return nil
+		regionPrimitives.merge(hashedPrimitives, uniquingKeysWith: { (l, r) in print("Replacing"); return l })
+		return removedPrimitive
 	}
 	
-	func renderWorld(geoWorld: GeoWorld, inProjection projection: GLKMatrix4) {
+	func renderWorld(geoWorld: GeoWorld, inProjection projection: GLKMatrix4, visibleSet: Set<Int>) {
 		glPushGroupMarkerEXT(0, "Render world")
 		glUseProgram(mapProgram)
 		
@@ -84,7 +67,8 @@ class MapRenderer {
 		
 		glUniform1f(mapUniforms.time, 0.0)
 		
-		for primitive in regionPrimitives.values {
+		let visiblePrimitives = regionPrimitives.values.filter({ visibleSet.contains($0.ownerHash) })
+		for primitive in visiblePrimitives {
 			var components : [GLfloat] = [primitive.color.r, primitive.color.g, primitive.color.b, 1.0]
 			glUniform4f(mapUniforms.color,
 									GLfloat(components[0]),

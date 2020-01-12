@@ -41,13 +41,17 @@ class MapViewController: GLKViewController, GLKViewControllerDelegate {
 		let startTime = Date()
 		let geoData = NSData(contentsOfFile: path)!
 
+		let userState = AppDelegate.sharedUserState
+		let uiState = AppDelegate.sharedUIState
 		do {
 			try self.geoWorld = PropertyListDecoder().decode(GeoWorld.self, from: geoData as Data)
+			userState.buildWorldAvailability(withWorld: self.geoWorld)
+			uiState.buildWorldTree(withWorld: self.geoWorld, userState: AppDelegate.sharedUserState)
 		} catch {
 			print("Could not load world.")
 			return
 		}
-
+		
 		let duration = Date().timeIntervalSince(startTime)
 		print("Load done in \(Int(duration)) seconds.")
 		
@@ -66,20 +70,25 @@ class MapViewController: GLKViewController, GLKViewControllerDelegate {
 		scrollView.addSubview(dummyView)
 		dummyView.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(handleTap)))
 		
+		// Calculate view-space frame of the map (scale map to fit in view, calculate the vertical offset to center it)
+		let heightDiff = dummyView.bounds.height - (mapSpace.height / (mapSpace.width / dummyView.bounds.width))
+		mapFrame = dummyView.bounds.insetBy(dx: 0.0, dy: heightDiff / 2.0)
+		
 		let zoomLimits = mapZoomLimits(viewSize: view.frame.size, mapSize: mapSpace.size)
 		scrollView.minimumZoomScale = zoomLimits.0
 		scrollView.zoomScale = zoomLimits.0
 		scrollView.maximumZoomScale = zoomLimits.1
 		
-		// Calculate view-space frame of the map (scale map to fit in view, calculate the vertical offset to center it)
-		let heightDiff = dummyView.bounds.height - (mapSpace.height / (mapSpace.width / dummyView.bounds.width))
-		mapFrame = dummyView.bounds.insetBy(dx: 0.0, dy: heightDiff / 2.0)
-		
 		delegate = self
 		
 		EAGLContext.setCurrent(self.context)
-		mapRenderer = MapRenderer(withGeoWorld: geoWorld)!
-		poiRenderer = PoiRenderer(withGeoWorld: geoWorld)!
+		mapRenderer = MapRenderer(withVisibleContinents: userState.availableContinents,
+															countries: userState.availableCountries,
+															regions: userState.availableRegions)
+		poiRenderer = PoiRenderer(withVisibleContinents: userState.availableContinents,
+															countries: userState.availableCountries,
+															regions: userState.availableRegions)
+		poiRenderer.updateZoomThreshold(viewZoom: Float(scrollView!.zoomScale))
 		effectRenderer = EffectRenderer()
 		selectionRenderer = SelectionRenderer()
 	}
@@ -100,11 +109,8 @@ class MapViewController: GLKViewController, GLKViewControllerDelegate {
 	@objc func handleTap(sender: UITapGestureRecognizer) {
 		if sender.state == .ended {
 			let viewP = sender.location(in: dummyView)
-			var mapP = mapPoint(viewP,
-													from: dummyView.bounds,
-													to: mapFrame,
-													space: mapSpace)
-			mapP.y = -mapP.y
+			let mapP = mapPoint(viewP, from: dummyView.bounds, to: mapFrame, space: mapSpace)
+			let tapPoint = Vertex(Float(mapP.x), Float(-mapP.y))
 			
 			let userState = AppDelegate.sharedUserState
 			let uiState = AppDelegate.sharedUIState
@@ -112,65 +118,61 @@ class MapViewController: GLKViewController, GLKViewControllerDelegate {
 			GeometryCounters.begin()
 			defer { GeometryCounters.end() }
 			
-			// First split box-collided continents into open and closed sets
-			let candidateContinents = geoWorld.children.filter { aabbHitTest(p: mapP, aabb: $0.aabb) }
-			let openCandidateContinents = candidateContinents.filter { userState.placeVisited($0) }
-			let closedCandidateContinents = candidateContinents.subtracting(openCandidateContinents)
+			// Filter out sets of closed, visible regions that contain the tap
+			let candidateContinents = Set(userState.availableContinents		// Closed continents
+				.filter { uiState.visibleRegionHashes.contains($0.key) }		// Visible continents
+				.filter { boxContains($0.value.aabb, tapPoint) }						// Under the tap position
+				.values)
+			let candidateCountries = Set(userState.availableCountries
+				.filter { uiState.visibleRegionHashes.contains($0.key) }
+				.filter { boxContains($0.value.aabb, tapPoint) }
+				.values)
+			let candidateRegions = Set(userState.availableRegions
+				.filter { uiState.visibleRegionHashes.contains($0.key) }
+				.filter { boxContains($0.value.aabb, tapPoint) }
+				.values)
 			
-			// Form array of box-collided countries in the opened continents, and split into opened/closed sets
-			let candidateCountries = Set(openCandidateContinents.flatMap { $0.children })
-																													.filter { aabbHitTest(p: mapP, aabb: $0.aabb) }
-			let openCandidateCountries = candidateCountries.filter { userState.placeVisited($0) }
-			let closedCandidateCountries = candidateCountries.subtracting(openCandidateCountries)
-			
-			// Finally form a list of box-collided regions of opened countries
-			let candidateRegions = Set(openCandidateCountries.flatMap { $0.children })
-																											.filter { aabbHitTest(p: mapP, aabb: $0.aabb) }
-			// let openCandidateRegions = candidateRegions.filter { userState.placeVisited($0) }
-			// let closedCandidateRegions = candidateRegions.subtracting(openCandidateRegions)
-			
-			// Perform three different checks for the three different Kinds
-			if let hitContinent = pickFromTessellations(p: mapP, candidates: closedCandidateContinents) {
-				if uiState.selected(hitContinent) {
-					userState.visitPlace(hitContinent)
-				} else {
-					uiState.selectRegion(hitContinent)
-					selectionRenderer.select(geometry: hitContinent)
+			if let hitContinent = pickFromTessellations(p: tapPoint, candidates: candidateContinents) {
+				if processSelection(of: hitContinent, user: userState, ui: uiState) {
+					processVisit(of: hitContinent, user: userState, ui: uiState)
 				}
-				
-				placeName.text = hitContinent.name
-				
-				if let toAnimate = mapRenderer.updatePrimitives(for: hitContinent, with: hitContinent.children) {
-					effectRenderer.addOpeningEffect(for: toAnimate, at: hitContinent.geometry.midpoint)
+			} else if let hitCountry = pickFromTessellations(p: tapPoint, candidates: candidateCountries) {
+				if processSelection(of: hitCountry, user: userState, ui: uiState) {
+					processVisit(of: hitCountry, user: userState, ui: uiState)
 				}
-				poiRenderer.updatePrimitives(for: hitContinent, with: hitContinent.children)
-			} else if let hitCountry = pickFromTessellations(p: mapP, candidates: closedCandidateCountries) {
-				if uiState.selected(hitCountry) {
-					userState.visitPlace(hitCountry)
-				} else {
-					uiState.selectRegion(hitCountry)
-					selectionRenderer.select(geometry: hitCountry)
-				}
-				
-				placeName.text = hitCountry.name
-				
-				if let toAnimate = mapRenderer.updatePrimitives(for: hitCountry, with: hitCountry.children) {
-					effectRenderer.addOpeningEffect(for: toAnimate, at: hitCountry.geometry.midpoint)
-				}
-				poiRenderer.updatePrimitives(for: hitCountry, with: hitCountry.children)
-			} else if let hitRegion = pickFromTessellations(p: mapP, candidates: candidateRegions) {
-				if uiState.selected(hitRegion) {
-					userState.visitPlace(hitRegion)
-				} else {
-					uiState.selectRegion(hitRegion)
-					selectionRenderer.select(geometry: hitRegion)
-				}
-				placeName.text = hitRegion.name
+			} else if let hitRegion = pickFromTessellations(p: tapPoint, candidates: candidateRegions) {
+				_ = processSelection(of: hitRegion, user: userState, ui: uiState)
 			} else {
 				uiState.clearSelection()
 				selectionRenderer.clear()
 			}
 		}
+		
+		AppDelegate.sharedUIState.cullWorldTree(focus: visibleLongLat(viewBounds: view.bounds))
+	}
+	
+	func processSelection<T:GeoIdentifiable & GeoTessellated>(of hit: T, user: UserState, ui: UIState) -> Bool {
+		placeName.text = hit.name
+		if ui.selected(hit) {
+			user.visitPlace(hit)
+			return true
+		} else {
+			ui.selectRegion(hit)
+			selectionRenderer.select(geometry: hit)
+			return false
+		}
+	}
+	
+	func processVisit<T:GeoNode & GeoTessellated>(of hit: T, user: UserState, ui: UIState)
+		where T.SubType: GeoPlaceContainer,
+					T.SubType.PrimitiveType == ArrayedRenderPrimitive {
+		user.openPlace(hit)
+		ui.updateTree(replace: hit, with: hit.children)
+			
+		if let toAnimate = mapRenderer.updatePrimitives(for: hit, with: hit.children) {
+			effectRenderer.addOpeningEffect(for: toAnimate, at: hit.geometry.midpoint)
+		}
+		poiRenderer.updatePrimitives(for: hit, with: hit.children)
 	}
 
 	// MARK: - GLKView and GLKViewController delegate methods
@@ -197,10 +199,13 @@ class MapViewController: GLKViewController, GLKViewControllerDelegate {
 		glClearColor(0.0, 0.1, 0.6, 1.0)
 		glClear(GLbitfield(GL_COLOR_BUFFER_BIT) | GLbitfield(GL_DEPTH_BUFFER_BIT))
 		
-		mapRenderer.renderWorld(geoWorld: geoWorld, inProjection: modelViewProjectionMatrix)
-		poiRenderer.renderWorld(geoWorld: geoWorld, inProjection: modelViewProjectionMatrix)
+		let visibleRegions = AppDelegate.sharedUIState.visibleRegionHashes
+		mapRenderer.renderWorld(geoWorld: geoWorld, inProjection: modelViewProjectionMatrix, visibleSet: visibleRegions)
+		poiRenderer.renderWorld(geoWorld: geoWorld, inProjection: modelViewProjectionMatrix, visibleSet: visibleRegions)
 		effectRenderer.renderWorld(geoWorld: geoWorld, inProjection: modelViewProjectionMatrix)
 		selectionRenderer.renderSelection(inProjection: modelViewProjectionMatrix)
+		
+		DebugRenderer.shared.renderMarkers(inProjection: modelViewProjectionMatrix)
 	}
 }
 
@@ -214,9 +219,31 @@ extension MapViewController : UIScrollViewDelegate {
 		if let renderer = poiRenderer {
 			renderer.updateZoomThreshold(viewZoom: zoom)
 		}
+		
+		AppDelegate.sharedUIState.cullWorldTree(focus: visibleLongLat(viewBounds: view.bounds))
 	}
 	
 	func scrollViewDidScroll(_ scrollView: UIScrollView) {
 		offset = scrollView.contentOffset
+		AppDelegate.sharedUIState.cullWorldTree(focus: visibleLongLat(viewBounds: view.bounds))
+	}
+	
+	func visibleLongLat(viewBounds: CGRect) -> Aabb {
+		let focusBox = viewBounds // .insetBy(dx: 100.0, dy: 100.0)
+		let bottomLeft = CGPoint(x: focusBox.minX, y: focusBox.minY)
+		let topRight = CGPoint(x: focusBox.maxX, y: focusBox.maxY)
+		let worldCorners = [bottomLeft, topRight].map({ (p: CGPoint) -> CGPoint in
+			let viewP = view.convert(p, to: dummyView)
+			var mapP = mapPoint(viewP,
+												from: dummyView.bounds,
+												to: mapFrame,
+												space: mapSpace)
+			mapP.y = -mapP.y
+			return mapP
+		})
+		return Aabb(loX: Float(worldCorners[0].x),
+								loY: Float(worldCorners[1].y),
+								hiX: Float(worldCorners[1].x),
+								hiY: Float(worldCorners[0].y))
 	}
 }

@@ -44,13 +44,15 @@ class PoiRenderer {
 			}
 		}
 	}
-	var regionPrimitives : [PoiPlane]
-	var poiVisibility: [Int : Visibility]
+	var poiPlanePrimitives : [PoiPlane]
+	var poiVisibility: [Int : Visibility] = [:]
 	let poiProgram: GLuint
 	let poiUniforms : (modelViewMatrix: GLint, color: GLint, rankThreshold: GLint, progress: GLint)
-	var rankThreshold: Float = 1.0
+	var rankThreshold: Float = 0.0
 	
-	init?(withGeoWorld geoWorld: GeoWorld) {
+	init?(withVisibleContinents continents: [Int: GeoContinent],
+				countries: [Int: GeoCountry],
+				regions: [Int: GeoRegion]) {
 		poiProgram = loadShaders(shaderName: "PoiShader")
 		guard poiProgram != 0 else {
 			print("Failed to load POI shaders")
@@ -61,30 +63,11 @@ class PoiRenderer {
 		poiUniforms.rankThreshold = glGetUniformLocation(poiProgram, "rankThreshold")
 		poiUniforms.progress = glGetUniformLocation(poiProgram, "progress")
 		
-		let userState = AppDelegate.sharedUserState
+		let visibleContinentPoiPlanes = continents.flatMap { $0.value.poiRenderPlanes() }
+		let visibleCountryPoiPlanes = countries.flatMap { $0.value.poiRenderPlanes() }
+		let visibleRegionPoiPlanes = regions.flatMap { $0.value.poiRenderPlanes() }
 		
-		let openContinents = geoWorld.children.filter { userState.placeVisited($0) }
-		let closedContinents = geoWorld.children.subtracting(openContinents)
-		
-		let countries = Set(openContinents.flatMap { $0.children })
-		let openCountries = countries.filter { userState.placeVisited($0) }
-		let closedCountries = countries.subtracting(openCountries)
-		
-		let regions = Set(openCountries.flatMap { $0.children })
-		let openRegions = regions.filter { userState.placeVisited($0) }
-		let closedRegions = regions.subtracting(openRegions)
-		
-		let visibleContinentPoiPlanes = closedContinents.flatMap { $0.poiRenderPlanes() }
-		let visibleCountryPoiPlanes = closedCountries.flatMap { $0.poiRenderPlanes() }
-		let visibleRegionPoiPlanes = closedRegions.flatMap { $0.poiRenderPlanes() }
-		
-		regionPrimitives = visibleContinentPoiPlanes + visibleCountryPoiPlanes + visibleRegionPoiPlanes
-		
-		// Create rendering parameters for all currently visible POI planes
-		poiVisibility = Dictionary(uniqueKeysWithValues: regionPrimitives.compactMap { (poiPlane) in
-			let startsVisible = Float(poiPlane.rank) <= 1.0
-			return startsVisible ? (poiPlane.hashValue, Visibility.fadeIn(startTime: Date())) : nil
-		})
+		poiPlanePrimitives = visibleContinentPoiPlanes + visibleCountryPoiPlanes + visibleRegionPoiPlanes
 	}
 	
 	deinit {
@@ -95,16 +78,14 @@ class PoiRenderer {
 	
 	func updatePrimitives<T:GeoNode>(for node: T, with subRegions: Set<T.SubType>)
 		where T.SubType : GeoPlaceContainer {
-		if AppDelegate.sharedUserState.placeVisited(node) {
-			let removedRegionsHash = node.hashValue
-			regionPrimitives = regionPrimitives.filter { $0.ownerHash != removedRegionsHash }
-			let subregionPrimitives = subRegions.flatMap { $0.poiRenderPlanes() }
-			regionPrimitives.append(contentsOf: subregionPrimitives)
-			
-			for newRegion in subregionPrimitives {
-				if Float(newRegion.rank) <= rankThreshold {
-					poiVisibility.updateValue(.visible, forKey: newRegion.hashValue)
-				}
+		let removedRegionsHash = node.hashValue
+		poiPlanePrimitives = poiPlanePrimitives.filter { $0.ownerHash != removedRegionsHash }
+		let subregionPrimitives = subRegions.flatMap { $0.poiRenderPlanes() }
+		poiPlanePrimitives.append(contentsOf: subregionPrimitives)
+		
+		for newRegion in subregionPrimitives {
+			if Float(newRegion.rank) <= rankThreshold {
+				poiVisibility.updateValue(.visible, forKey: newRegion.hashValue)
 			}
 		}
 	}
@@ -130,10 +111,10 @@ class PoiRenderer {
 	func updateZoomThreshold(viewZoom: Float) {
 		// Polynomial curve fit (badly) in Grapher
 		let oldRankThreshold = rankThreshold
-		rankThreshold = 0.01 * viewZoom * viewZoom + 0.3 * viewZoom
+		rankThreshold = max(0.01 * viewZoom * viewZoom + 0.3 * viewZoom, 1.0)
 		
-		let previousPois = Set(regionPrimitives.filter { Float($0.rank) <= oldRankThreshold })
-		let visiblePois = Set(regionPrimitives.filter { Float($0.rank) <= rankThreshold })
+		let previousPois = Set(poiPlanePrimitives.filter { Float($0.rank) <= oldRankThreshold })
+		let visiblePois = Set(poiPlanePrimitives.filter { Float($0.rank) <= rankThreshold })
 
 		let poisToHide = previousPois.subtracting(visiblePois)	// Culled this frame
 		let poisToShow = visiblePois.subtracting(previousPois) // Shown this frame
@@ -147,7 +128,12 @@ class PoiRenderer {
 		}
 	}
 	
-	func renderWorld(geoWorld: GeoWorld, inProjection projection: GLKMatrix4) {
+	func visiblePoiPlanes(visibleRegions: Set<Int>) -> [PoiPlane] {
+		return poiPlanePrimitives.filter({ visibleRegions.contains($0.ownerHash) })
+			.filter({ poiVisibility[$0.hashValue] != nil })
+	}
+	
+	func renderWorld(geoWorld: GeoWorld, inProjection projection: GLKMatrix4, visibleSet: Set<Int>) {
 		glPushGroupMarkerEXT(0, "Render POI plane")
 		glUseProgram(poiProgram)
 		glEnable(GLenum(GL_BLEND))
@@ -168,8 +154,9 @@ class PoiRenderer {
 								GLfloat(components[3]))
 		glUniform1f(poiUniforms.rankThreshold, rankThreshold)
 		
-		for poiPlane in regionPrimitives {
-			guard let parameters = poiVisibility[poiPlane.hashValue] else { continue }
+		let visiblePrimitives = visiblePoiPlanes(visibleRegions: visibleSet)
+		for poiPlane in visiblePrimitives {
+			let parameters = poiVisibility[poiPlane.hashValue]! // Ensured by visiblePoiPlanes()
 			glUniform1f(poiUniforms.progress, GLfloat(parameters.alpha()))
 			render(primitive: poiPlane.primitive)
 		}

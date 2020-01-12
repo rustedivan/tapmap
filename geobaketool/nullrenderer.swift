@@ -9,18 +9,21 @@
 import Foundation
 
 class ArrayedRenderPrimitive {
+	let ownerHash = 17
 	init() {}
 	init(vertices: [Vertex], color c: (r: Float, g: Float, b: Float, a: Float), ownerHash hash: Int, debugName: String) {
 	}
 }
 
 class IndexedRenderPrimitive {
+	let ownerHash = 17
 	init() {}
 	init(vertices: [Vertex], indices: [UInt32], color c: (r: Float, g: Float, b: Float, a: Float), ownerHash hash: Int, debugName: String) {
 	}
 }
 
 class OutlineRenderPrimitive {
+	let ownerHash = 17
 	init() {}
 	init(vertices: [Vertex], color c: (r: Float, g: Float, b: Float, a: Float), ownerHash hash: Int, debugName: String) {
 	}
@@ -32,8 +35,8 @@ extension GeoRegion : Renderable {
 		return ArrayedRenderPrimitive()
 	}
 	
-	func placesRenderPlane() -> IndexedRenderPrimitive {
-		return IndexedRenderPrimitive()
+	func poiRenderPlanes() -> [PoiPlane] {
+		return []
 	}
 }
 
@@ -43,8 +46,8 @@ extension GeoCountry : Renderable {
 		return ArrayedRenderPrimitive()
 	}
 	
-	func placesRenderPlane() -> IndexedRenderPrimitive {
-		return IndexedRenderPrimitive()
+	func poiRenderPlanes() -> [PoiPlane] {
+		return []
 	}
 }
 
@@ -54,7 +57,11 @@ extension GeoContinent : Renderable {
 		return ArrayedRenderPrimitive()
 	}
 	
-	func placesRenderPlane() -> IndexedRenderPrimitive {
-		return IndexedRenderPrimitive()
+	func poiRenderPlanes() -> [PoiPlane] {
+		return []
 	}
+}
+
+struct PoiPlane {
+	
 }

@@ -26,10 +26,10 @@ struct Triangle {
 }
 
 struct Aabb : Equatable, Codable {
-	let minX : Float
-	let minY : Float
-	let maxX : Float
-	let maxY : Float
+	let minX : Vertex.Precision
+	let minY : Vertex.Precision
+	let maxX : Vertex.Precision
+	let maxY : Vertex.Precision
 	
 	init() {
 		minX = .greatestFiniteMagnitude
@@ -38,7 +38,7 @@ struct Aabb : Equatable, Codable {
 		maxY = -.greatestFiniteMagnitude
 	}
 	
-	init(loX : Float, loY : Float, hiX : Float, hiY : Float) {
+	init(loX : Vertex.Precision, loY : Vertex.Precision, hiX : Vertex.Precision, hiY : Vertex.Precision) {
 		minX = loX
 		minY = loY
 		maxX = hiX
@@ -84,7 +84,7 @@ protocol GeoTessellated : Renderable {
 }
 
 protocol GeoNode : GeoIdentifiable {
-	associatedtype SubType : GeoIdentifiable & Renderable
+	associatedtype SubType : GeoIdentifiable & GeoTessellated
 	var children : Set<SubType> { get }
 }
 
@@ -109,6 +109,7 @@ struct GeoRegion : GeoIdentifiable, GeoPlaceContainer, GeoTessellated, Codable, 
 }
 
 struct GeoCountry : GeoNode, GeoPlaceContainer, GeoTessellated, Codable, Equatable {
+	typealias SubType = GeoRegion
 	let name: String
 	let children: Set<GeoRegion>
 	let places: Set<GeoPlace>
@@ -130,6 +131,7 @@ struct GeoCountry : GeoNode, GeoPlaceContainer, GeoTessellated, Codable, Equatab
 }
 
 struct GeoContinent : GeoNode, GeoTessellated, GeoPlaceContainer, Codable, Equatable, Hashable {
+	typealias SubType = GeoCountry
 	let name: String
 	let children: Set<GeoCountry>
 	let places: Set<GeoPlace>

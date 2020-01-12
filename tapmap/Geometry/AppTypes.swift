@@ -31,6 +31,18 @@ struct Vertex : Equatable {
 	}
 }
 
+struct OutlineVertex {
+	let x: Float
+	let y: Float
+	let miterX: Float
+	let miterY: Float
+	
+	init(_ _x: Float, _ _y: Float, miterX _mx: Float, miterY _my: Float) {
+		x = _x; y = _y;
+		miterX = _mx; miterY = _my;
+	}
+}
+
 struct VertexRing : Codable {
 	var vertices: [Vertex]
 }

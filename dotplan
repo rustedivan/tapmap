@@ -1,5 +1,6 @@
 # Road to Final
 
+<<<<<<< HEAD
 
 ## POI Labeling
 This is the feature that scares me the most right now, becaue I _don't_ want to end up having to render them through GL/Metal.
@@ -74,7 +75,62 @@ POI Scaling:
 - polish crossfades from the poirenderer
 -- stepZoom is zoom, smooth-snapped to specific rank levels
 
+## View culling
+Start designing the tile system now, otherwise the label rendering will go down the wrong path
+Requirements:
+- culling away render primitives that are clearly outside the view
+- getting regions that intersect the view
+- getting POIs that intersect the view
+- making progressively good decisions at closer zoom levels
+- fast insertion/removal
+...which sounds like a perfect quadtree, with regions inserted in all t-cells they intersect.
 
+In general: given a q-tree and a view box, query out the regions and POIs in the view box. Without
+splitting the regions, regions may appear multiple times, but if we insert only the hashes, they can
+form a set and the rest can be queried out of the map. This query would be "reject all cells that
+don't intersect the viewbox."
+
+...aaand if I only have the region hashes in the tree, then I can pull out the POIs from that too.
+
+A) If the inner nodes of the search is included in the BSP result, then querying the map is easy
+B) If we have a map from hash to region for all visible regions, then quering that is easy - and
+   this would be super useful in other contexts.
+
+Left to do:
+- geoworld filter by region hashes (dictionary hash -> region, should be copy-on-write and cheap)
+-- this dictionary should be the working copy after each opening
+-- that is, geoWorld is the source data, and the dictionary is a userstate cache
+-- worldTree should be renamed worldQuadTree, it's not the most important source
+-- visibleRegions should be visibleRegionHashes, it's just the hashes of currently rendered regions
+-- the new data source is availableRegions -> Int:GeoIdentifiable
+--- IFF it is possible to still cast GeoIdentifiables to PlaceContainers and GeoTessellations
+--- Because it it necessary to query against availableRegions and pull out poi lists and render primitives
+--- after all this, MapRenderer doesn't have to do the tree traversal to init the renderPrimitives list!
+- point query
+-- spearfish quadtree nodes from worldTree.visibleHashes
+-- use hashes to find regions in worldCache
+-- get the tessellations from those regions
+-- box-colline those tessellations
+-- tri-collide those tessellations
+- Poi cloud culling
+-- for all visible hashes, find the regions in worldCache
+-- collect all POIs
+-- point-collide against the projected viewbox (project the viewbox instead of all POIs)
+-- pass to POI renderer to select projected set
+-- project those points into viewspace
+
+## Loading
+The world tree could be used to speed up loading something fierce.
+Store the world tree (hashes + boxes) at the front of the file.
+Store the geometries by hash key in the file.
+Find the continent hashes and pull them from file, load and render as normal.
+Using .UserState, mark tree nodes as seen or not
+From here on:
+- when rendering the screen, figure out the visible set of hashes from the tree
+- pull missing region geometries from file and create primitives on the fly
+-- this can be done on a background thread until the main thread needs to create GL primitives
+- build the primitive list based off opened & visible & available geometry hashes
+- if a primitive is missing, just skip it - it will pop in when available
 
 ## Tile streaming
 - move POI distribution job to runtime side
@@ -86,6 +142,14 @@ POI Scaling:
 - put into LRU cache
 - evict tiles at memory pressure warning
 - make sure model handles eviction of rendered tile
+
+## Map scale notes
+At furthest zoom level, only capitals and mega cities (NY, Caracas, Mumbai, Stockholm, London, Berlin, Moscow, Lagos, Cape Town, Cairo, Tehran, Karachi)
+At roughly Brazil size, large cities (Salvador, Rio, Palmas, Campo Grande, La Paz, Trujillo, Cordoba, Harare, Pretoria, Kansas City)
+At roughly Colorado size, towns (Littleton, Soria, Guildford, Alingsås, Budaun)
+At roughly Java size, villages (Magelang, Karangasem, Skara)
+
++ Levels get different border widths
 
 ## Outline rendering
 - teach RenderPrimitive to work with different vertex formats
