@@ -13,6 +13,7 @@ struct PoiPlane: Hashable {
 	let primitive: IndexedRenderPrimitive
 	let rank: Int
 	var ownerHash: Int { return primitive.ownerHash }
+	let poiHashes: [Int]
 	
 	func hash(into hasher: inout Hasher) {
 		hasher.combine(primitive.ownerHash)
@@ -214,7 +215,8 @@ func sortPlacesIntoPoiPlanes<T: GeoIdentifiable>(_ places: Set<GeoPlace>, in con
 																						color: rank.hashColor.tuple(),
 																						ownerHash: container.hashValue,	// The hash of the owning region
 																						debugName: "\(container.name) - poi plane @ \(rank)")
-		return PoiPlane(primitive: primitive, rank: rank)
+		let hashes = places.map { $0.hashValue }
+		return PoiPlane(primitive: primitive, rank: rank, poiHashes: hashes)
 	}
 }
 
