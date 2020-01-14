@@ -88,6 +88,9 @@ class MapViewController: GLKViewController, GLKViewControllerDelegate {
 		poiRenderer = PoiRenderer(withVisibleContinents: userState.availableContinents,
 															countries: userState.availableCountries,
 															regions: userState.availableRegions)
+		labelView.buildPoiPrimitives(withVisibleContinents: userState.availableContinents,
+																 countries: userState.availableCountries,
+																 regions: userState.availableRegions)
 		poiRenderer.updateZoomThreshold(viewZoom: Float(scrollView!.zoomScale))
 		effectRenderer = EffectRenderer()
 		selectionRenderer = SelectionRenderer()
@@ -163,7 +166,7 @@ class MapViewController: GLKViewController, GLKViewControllerDelegate {
 		}
 	}
 	
-	func processVisit<T:GeoNode & GeoTessellated>(of hit: T, user: UserState, ui: UIState)
+	func processVisit<T:GeoNode & GeoTessellated & GeoPlaceContainer>(of hit: T, user: UserState, ui: UIState)
 		where T.SubType: GeoPlaceContainer,
 					T.SubType.PrimitiveType == ArrayedRenderPrimitive {
 		user.openPlace(hit)
@@ -173,6 +176,7 @@ class MapViewController: GLKViewController, GLKViewControllerDelegate {
 			effectRenderer.addOpeningEffect(for: toAnimate, at: hit.geometry.midpoint)
 		}
 		poiRenderer.updatePrimitives(for: hit, with: hit.children)
+		labelView.updatePrimitives(for: hit, with: hit.children)
 	}
 
 	// MARK: - GLKView and GLKViewController delegate methods
@@ -204,6 +208,9 @@ class MapViewController: GLKViewController, GLKViewControllerDelegate {
 		poiRenderer.renderWorld(geoWorld: geoWorld, inProjection: modelViewProjectionMatrix, visibleSet: visibleRegions)
 		effectRenderer.renderWorld(geoWorld: geoWorld, inProjection: modelViewProjectionMatrix)
 		selectionRenderer.renderSelection(inProjection: modelViewProjectionMatrix)
+		
+		labelView.renderLabels(for: poiRenderer.renderedPoiHashes,
+													 inArea: visibleLongLat(viewBounds: view.bounds))
 		
 		DebugRenderer.shared.renderMarkers(inProjection: modelViewProjectionMatrix)
 	}

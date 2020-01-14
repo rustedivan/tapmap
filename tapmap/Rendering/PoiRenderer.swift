@@ -77,6 +77,11 @@ class PoiRenderer {
 		}
 	}
 	
+	var renderedPoiHashes: Set<Int> {
+		let visiblePoiPlanes = poiPlanePrimitives.filter { self.poiVisibility[$0.hashValue] != nil }
+		return Set(visiblePoiPlanes.flatMap { $0.poiHashes })
+	}
+	
 	func updatePrimitives<T:GeoNode>(for node: T, with subRegions: Set<T.SubType>)
 		where T.SubType : GeoPlaceContainer {
 		let removedRegionsHash = node.hashValue
@@ -129,11 +134,6 @@ class PoiRenderer {
 		}
 	}
 	
-	func visiblePoiPlanes(visibleRegions: Set<Int>) -> [PoiPlane] {
-		return poiPlanePrimitives.filter({ visibleRegions.contains($0.ownerHash) })
-			.filter({ poiVisibility[$0.hashValue] != nil })
-	}
-	
 	func renderWorld(geoWorld: GeoWorld, inProjection projection: GLKMatrix4, visibleSet: Set<Int>) {
 		glPushGroupMarkerEXT(0, "Render POI plane")
 		glUseProgram(poiProgram)
@@ -155,7 +155,8 @@ class PoiRenderer {
 								GLfloat(components[3]))
 		glUniform1f(poiUniforms.rankThreshold, rankThreshold)
 		
-		let visiblePrimitives = visiblePoiPlanes(visibleRegions: visibleSet)
+		let visiblePrimitives = poiPlanePrimitives.filter({ visibleSet.contains($0.ownerHash) })
+																							.filter({ poiVisibility[$0.hashValue] != nil })
 		for poiPlane in visiblePrimitives {
 			let parameters = poiVisibility[poiPlane.hashValue]! // Ensured by visiblePoiPlanes()
 			glUniform1f(poiUniforms.progress, GLfloat(parameters.alpha()))
