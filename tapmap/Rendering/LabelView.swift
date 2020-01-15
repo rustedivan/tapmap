@@ -23,7 +23,6 @@ struct LabelMarker {
 }
 
 class LabelView: UIView {
-	@IBOutlet var oneLabel: UILabel!
 	var poiPrimitives: [Int: LabelMarker] = [:]
 	
 	func buildPoiPrimitives(withVisibleContinents continents: [Int: GeoContinent],
@@ -57,10 +56,5 @@ class LabelView: UIView {
 	func renderLabels(for renderedPoiHashes: Set<Int>, inArea focus: Aabb) {
 		let availablePois = poiPrimitives.filter { renderedPoiHashes.contains($0.value.ownerHash) }
 		_ = availablePois.filter { boxContains(focus, $0.value.worldPos) }
-	}
-	
-	func updateLabels(_ labels: [(name: String, screenPos: CGPoint)]) {
-		oneLabel.text = labels.first?.name
-		oneLabel.frame.origin = labels.first?.screenPos ?? .zero
 	}
 }
