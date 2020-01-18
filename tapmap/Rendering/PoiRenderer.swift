@@ -134,7 +134,7 @@ class PoiRenderer {
 		}
 	}
 	
-	func renderWorld(geoWorld: GeoWorld, inProjection projection: GLKMatrix4, visibleSet: Set<Int>) {
+	func renderWorld(visibleSet: Set<Int>, inProjection projection: GLKMatrix4) {
 		glPushGroupMarkerEXT(0, "Render POI plane")
 		glUseProgram(poiProgram)
 		glEnable(GLenum(GL_BLEND))

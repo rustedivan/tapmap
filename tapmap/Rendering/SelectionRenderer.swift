@@ -52,6 +52,10 @@ class SelectionRenderer {
 		outlinePrimitives = []
 	}
 	
+	func updateStyle(zoomLevel: Float) {
+		outlineWidth = 0.2 / zoomLevel
+	}
+	
 	func renderSelection(inProjection projection: GLKMatrix4) {
 		glPushGroupMarkerEXT(0, "Render outlines")
 		glUseProgram(outlineProgram)
@@ -63,7 +67,7 @@ class SelectionRenderer {
 			})
 		})
 		
-		var components : [GLfloat] = [0.0, 0.0, 0.0, 1.0]
+		let components : [GLfloat] = [0.0, 0.0, 0.0, 1.0]
 		glUniform4f(outlineUniforms.color,
 								GLfloat(components[0]),
 								GLfloat(components[1]),

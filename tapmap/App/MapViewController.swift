@@ -186,7 +186,7 @@ class MapViewController: GLKViewController, GLKViewControllerDelegate {
 																											centeredOn: offset,
 																											zoomedTo: zoom)
 		effectRenderer.updatePrimitives()
-		selectionRenderer.outlineWidth = 0.2 / zoom
+		selectionRenderer.updateStyle(zoomLevel: zoom)
 		poiRenderer.updateFades()
 		labelView.updateLabels(for: poiRenderer.activePoiHashes,
 													 inArea: visibleLongLat(viewBounds: view.bounds))
@@ -197,13 +197,13 @@ class MapViewController: GLKViewController, GLKViewControllerDelegate {
 		glClear(GLbitfield(GL_COLOR_BUFFER_BIT) | GLbitfield(GL_DEPTH_BUFFER_BIT))
 		
 		let visibleRegions = AppDelegate.sharedUIState.visibleRegionHashes
-		mapRenderer.renderWorld(geoWorld: geoWorld, inProjection: modelViewProjectionMatrix, visibleSet: visibleRegions)
-		poiRenderer.renderWorld(geoWorld: geoWorld, inProjection: modelViewProjectionMatrix, visibleSet: visibleRegions)
-		effectRenderer.renderWorld(geoWorld: geoWorld, inProjection: modelViewProjectionMatrix)
+		mapRenderer.renderWorld(visibleSet: visibleRegions, inProjection: modelViewProjectionMatrix)
+		poiRenderer.renderWorld(visibleSet: visibleRegions, inProjection: modelViewProjectionMatrix)
+		effectRenderer.renderWorld(inProjection: modelViewProjectionMatrix)
 		selectionRenderer.renderSelection(inProjection: modelViewProjectionMatrix)
 		labelView.renderLabels(projection: mapToView)
 		
-		DebugRenderer.shared.renderMarkers(inProjection: modelViewProjectionMatrix)
+//		DebugRenderer.shared.renderMarkers(inProjection: modelViewProjectionMatrix)
 	}
 }
 
@@ -233,9 +233,9 @@ extension MapViewController : UIScrollViewDelegate {
 		let worldCorners = [bottomLeft, topRight].map({ (p: CGPoint) -> CGPoint in
 			let viewP = view.convert(p, to: dummyView)
 			return mapPoint(viewP,
-												from: dummyView.bounds,
-												to: mapFrame,
-												space: mapSpace)
+											from: dummyView.bounds,
+											to: mapFrame,
+											space: mapSpace)
 		})
 		return Aabb(loX: Float(worldCorners[0].x),
 								loY: Float(worldCorners[1].y),

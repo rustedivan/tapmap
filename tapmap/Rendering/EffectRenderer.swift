@@ -55,7 +55,7 @@ class EffectRenderer {
 		}
 	}
 	
-	func renderWorld(geoWorld: GeoWorld, inProjection projection: GLKMatrix4) {
+	func renderWorld(inProjection projection: GLKMatrix4) {
 		glPushGroupMarkerEXT(0, "Render opening effect")
 		glUseProgram(openingProgram)
 		
@@ -71,7 +71,7 @@ class EffectRenderer {
 		
 		for effect in runningEffects {
 			let primitive = effect.primitive
-			var components : [GLfloat] = [primitive.color.r, primitive.color.g, primitive.color.b, 1.0]
+			let components : [GLfloat] = [primitive.color.r, primitive.color.g, primitive.color.b, 1.0]
 			glUniform4f(effectUniforms.color,
 									GLfloat(components[0]),
 									GLfloat(components[1]),
