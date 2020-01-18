@@ -10,35 +10,35 @@
 		046D4DAE2873E61054D6E6535182C483 /* mesh.h in Headers */ = {isa = PBXBuildFile; fileRef = 849EB65E45286568842653B670AD214B /* mesh.h */; settings = {ATTRIBUTES = (Project, ); }; };
 		0771C9CA53E4B7FDDD87BEF5C3D21A5A /* Pods-tapmapTests-umbrella.h in Headers */ = {isa = PBXBuildFile; fileRef = 52C22B73EF57D14DE277AEAA7F9A52D1 /* Pods-tapmapTests-umbrella.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		0E90A849C5911335D20370EA224E36B9 /* Pods-geobaketool-dummy.m in Sources */ = {isa = PBXBuildFile; fileRef = 195EBC6AFE0D471EB97B244D31E16664 /* Pods-geobaketool-dummy.m */; };
-		21E37311A8FD1BBE77AD2F2D6BEF3473 /* MemAllocators.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9D956DC33B17D56FB84D8CEF9070E226 /* MemAllocators.swift */; };
+		10EC4F570D7BC4EA48A121419E45120E /* dict.c in Sources */ = {isa = PBXBuildFile; fileRef = 5F48D0A24761F275ABA0658BD4F29455 /* dict.c */; };
 		2C043A77DE3BFF4015F841D6559EC6A2 /* Pods-tapmapTests-dummy.m in Sources */ = {isa = PBXBuildFile; fileRef = DEBCE749809A8B84E4FCCC51A1F6160A /* Pods-tapmapTests-dummy.m */; };
 		36871E61E3163490D6B71BD6B499A67C /* priorityq.h in Headers */ = {isa = PBXBuildFile; fileRef = E3BD0AE2FA8DB408DE6B17C1D5BCF1E5 /* priorityq.h */; settings = {ATTRIBUTES = (Project, ); }; };
+		4AB9F97D9443CC01E37F79B0C7C67A47 /* tess.c in Sources */ = {isa = PBXBuildFile; fileRef = 0899D922055D4BD8F06A82C6206DA200 /* tess.c */; };
 		4C39E78C1ABAB9DD4E82502772A0DBBA /* tesselator.h in Headers */ = {isa = PBXBuildFile; fileRef = 1B0C75A9BBA3971158EF555D93027F58 /* tesselator.h */; settings = {ATTRIBUTES = (Project, ); }; };
 		5057D2C59AD10C17FC3D0E2C3697C280 /* LibTessSwift-umbrella.h in Headers */ = {isa = PBXBuildFile; fileRef = 0A4F3FFB89859FCD821573782D384160 /* LibTessSwift-umbrella.h */; settings = {ATTRIBUTES = (Project, ); }; };
 		520685B46FFDDD6BCD333A878191C07E /* geom.h in Headers */ = {isa = PBXBuildFile; fileRef = 6D8A1F61F0006E17498D96DC5707E9B4 /* geom.h */; settings = {ATTRIBUTES = (Project, ); }; };
-		582E0796B1C2B10875809A6C8BA23381 /* LibTessSwift-dummy.m in Sources */ = {isa = PBXBuildFile; fileRef = AFF3121243D5362B982D75444A2682ED /* LibTessSwift-dummy.m */; };
 		5AB337B57439767E7D7502ADEE8B3F14 /* Pods-geobaketool-geobaketoolTests-umbrella.h in Headers */ = {isa = PBXBuildFile; fileRef = 2CFFD98D43B67053C7F1F0EEB5422BF9 /* Pods-geobaketool-geobaketoolTests-umbrella.h */; settings = {ATTRIBUTES = (Project, ); }; };
 		5BB560B8F9D6242C930B6243193FB7F3 /* SwiftyJSON.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84E97C49394DC03268CA6EB3ACBCEFF3 /* SwiftyJSON.swift */; };
-		5C6EF4C4DC9F72E7433A9A37C1B5B5AC /* mesh.c in Sources */ = {isa = PBXBuildFile; fileRef = 0234886A5A3E188ABD055B7A0C62BEF7 /* mesh.c */; };
+		5D67A6158E30D546BBB0E5C384954C18 /* MemAllocators.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9D956DC33B17D56FB84D8CEF9070E226 /* MemAllocators.swift */; };
 		6B81E3776B5438D4FD91AE262DD12B54 /* objc-clang.h in Headers */ = {isa = PBXBuildFile; fileRef = CBB3A7B1F324B36AE4DDF9BA500746DF /* objc-clang.h */; settings = {ATTRIBUTES = (Project, ); }; };
-		71C05F5FBF9CC064277067C5549C8B12 /* tess.c in Sources */ = {isa = PBXBuildFile; fileRef = 0899D922055D4BD8F06A82C6206DA200 /* tess.c */; };
-		863A4F50FDA0E0C0A5ACA3657DD4EA78 /* TessC.swift in Sources */ = {isa = PBXBuildFile; fileRef = E6FAF7677D36079BC203F69082DA17E6 /* TessC.swift */; };
-		8E35FEA954615CAB736E4D0C068D8785 /* sweep.c in Sources */ = {isa = PBXBuildFile; fileRef = A4E1B739C153DAABF4C10D4BBDD0326D /* sweep.c */; };
-		90328820F035786779BA0400FC026A5E /* dict.c in Sources */ = {isa = PBXBuildFile; fileRef = 5F48D0A24761F275ABA0658BD4F29455 /* dict.c */; };
+		79EBD2D6B7CF3C50BB6FCFC5861DCD24 /* LibTessSwift-dummy.m in Sources */ = {isa = PBXBuildFile; fileRef = AFF3121243D5362B982D75444A2682ED /* LibTessSwift-dummy.m */; };
 		9522A8059F7260D1F5721BD7CFF91C92 /* Pods-geobaketool-geobaketoolTests-dummy.m in Sources */ = {isa = PBXBuildFile; fileRef = 6EB38E5B99461A817E11F3FFE80011B4 /* Pods-geobaketool-geobaketoolTests-dummy.m */; };
 		97DE1D91512721CF78373B8C641C2A29 /* SwiftyJSON-umbrella.h in Headers */ = {isa = PBXBuildFile; fileRef = C9B4D59D045867EE8FCC9E06495EFBA6 /* SwiftyJSON-umbrella.h */; settings = {ATTRIBUTES = (Project, ); }; };
 		98EE4D4C1B01DE186648D54CB9A08FF3 /* sweep.h in Headers */ = {isa = PBXBuildFile; fileRef = E98ECA2960B6FB3C69099866FB66694D /* sweep.h */; settings = {ATTRIBUTES = (Project, ); }; };
 		9D722CEF0752AEA7629A5DF8D83F4050 /* SwiftyJSON-dummy.m in Sources */ = {isa = PBXBuildFile; fileRef = DD4D07E4B17DDB691C0A172C44A9FEB0 /* SwiftyJSON-dummy.m */; };
 		9DDAD1C1343CC7B1B255BEC5FB07BF9B /* Pods-geobaketool-umbrella.h in Headers */ = {isa = PBXBuildFile; fileRef = 9F3D7CE726D46EDB068E774E63C472A8 /* Pods-geobaketool-umbrella.h */; settings = {ATTRIBUTES = (Project, ); }; };
-		9EC39E67255D3D9A02ACA2673726CDDA /* geom.c in Sources */ = {isa = PBXBuildFile; fileRef = 6D2842B6880390759F2BECEFA2CD0DD1 /* geom.c */; };
 		9F6149DB37372B57080B58D554CA6527 /* Pods-tapmap-umbrella.h in Headers */ = {isa = PBXBuildFile; fileRef = 730CA4F685BBE6D65E615A1C11E00AD4 /* Pods-tapmap-umbrella.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		A15727D4D31B870B7359F8D1836C5F34 /* bucketalloc.c in Sources */ = {isa = PBXBuildFile; fileRef = 6C57607EE8165D27C35B46C2F551A44D /* bucketalloc.c */; };
+		B0D68C62556A873EEFFB7BD89FD0EC82 /* priorityq.c in Sources */ = {isa = PBXBuildFile; fileRef = DEB96BF5BF775477484143BAD6EE77BC /* priorityq.c */; };
 		B47A9F4A20C3B16F679F12186B5750C3 /* bucketalloc.h in Headers */ = {isa = PBXBuildFile; fileRef = 8DE78EF20717291BCB590D108AC7E2E7 /* bucketalloc.h */; settings = {ATTRIBUTES = (Project, ); }; };
 		B771473B13C757D6731AAD8D64426D63 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3212113385A8FBBDB272BD23C409FF61 /* Foundation.framework */; };
-		B86AF64ECB2A1EFEFBB8BD88ABFBD21F /* Public.swift in Sources */ = {isa = PBXBuildFile; fileRef = C08B8852EB64E4D790395F6F589B647D /* Public.swift */; };
+		B9E74123A78DE1D1BF0AE52F7C6F4A80 /* sweep.c in Sources */ = {isa = PBXBuildFile; fileRef = A4E1B739C153DAABF4C10D4BBDD0326D /* sweep.c */; };
+		BB357A94C9901BAA8A26FE6501BCB689 /* Public.swift in Sources */ = {isa = PBXBuildFile; fileRef = C08B8852EB64E4D790395F6F589B647D /* Public.swift */; };
 		BC931CFC48A64EC4EF1E9764F3B599DF /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3212113385A8FBBDB272BD23C409FF61 /* Foundation.framework */; };
-		C2E227F38058DC3F8FCBD6DD586FAED4 /* priorityq.c in Sources */ = {isa = PBXBuildFile; fileRef = DEB96BF5BF775477484143BAD6EE77BC /* priorityq.c */; };
+		CBA13B612AD5129A6BCDAB394C5044B4 /* mesh.c in Sources */ = {isa = PBXBuildFile; fileRef = 0234886A5A3E188ABD055B7A0C62BEF7 /* mesh.c */; };
+		DD24316A3A77B0CC9FB093C80D921521 /* geom.c in Sources */ = {isa = PBXBuildFile; fileRef = 6D2842B6880390759F2BECEFA2CD0DD1 /* geom.c */; };
 		E107D98A886BAA59EBD9E6F001227D58 /* tess.h in Headers */ = {isa = PBXBuildFile; fileRef = 68FB96B39DA25BF93BB9BCAAC90A39DF /* tess.h */; settings = {ATTRIBUTES = (Project, ); }; };
-		E36EBC042F44B07859AA0FF0EECAE826 /* bucketalloc.c in Sources */ = {isa = PBXBuildFile; fileRef = 6C57607EE8165D27C35B46C2F551A44D /* bucketalloc.c */; };
+		E3BE0A42D8344C08B0D7AF1378018818 /* TessC.swift in Sources */ = {isa = PBXBuildFile; fileRef = E6FAF7677D36079BC203F69082DA17E6 /* TessC.swift */; };
 		F2E9F1171F4504F2FB2AD7CBBCFF1113 /* Pods-tapmap-dummy.m in Sources */ = {isa = PBXBuildFile; fileRef = 1C849284BEAAB2A06BD4AE5B3FDAE906 /* Pods-tapmap-dummy.m */; };
 		FB2557EB7B754D2B7E09A8DAAA8EDE1C /* dict.h in Headers */ = {isa = PBXBuildFile; fileRef = 650C903E8A32F263A209897832ABFF8A /* dict.h */; settings = {ATTRIBUTES = (Project, ); }; };
 /* End PBXBuildFile section */
@@ -547,7 +547,7 @@
 			buildConfigurationList = 748EF7E8F8C632B0B6EA6BFC2D7B40FD /* Build configuration list for PBXNativeTarget "LibTessSwift" */;
 			buildPhases = (
 				D9DDF08A60456EF8DF6892F780BCB3BF /* Headers */,
-				3D4E7D63034F84B197724E74EF0D67B5 /* Sources */,
+				D23CA576FD0EA2F2D5995A210DDC1137 /* Sources */,
 				955DC82BD55FC3E917E6281BEDDE2897 /* Frameworks */,
 				9ACDE8554260E1E02F6E2A3CF9940AFE /* Copy generated compatibility header */,
 			);
@@ -575,6 +575,7 @@
 			hasScannedForEncodings = 0;
 			knownRegions = (
 				en,
+				Base,
 			);
 			mainGroup = CF1408CF629C7361332E53B88F7BD30C;
 			productRefGroup = 89394CA4B21960ABC545DAE7EC35AEA6 /* Products */;
@@ -660,24 +661,6 @@
 /* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
-		3D4E7D63034F84B197724E74EF0D67B5 /* Sources */ = {
-			isa = PBXSourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				E36EBC042F44B07859AA0FF0EECAE826 /* bucketalloc.c in Sources */,
-				90328820F035786779BA0400FC026A5E /* dict.c in Sources */,
-				9EC39E67255D3D9A02ACA2673726CDDA /* geom.c in Sources */,
-				582E0796B1C2B10875809A6C8BA23381 /* LibTessSwift-dummy.m in Sources */,
-				21E37311A8FD1BBE77AD2F2D6BEF3473 /* MemAllocators.swift in Sources */,
-				5C6EF4C4DC9F72E7433A9A37C1B5B5AC /* mesh.c in Sources */,
-				C2E227F38058DC3F8FCBD6DD586FAED4 /* priorityq.c in Sources */,
-				B86AF64ECB2A1EFEFBB8BD88ABFBD21F /* Public.swift in Sources */,
-				8E35FEA954615CAB736E4D0C068D8785 /* sweep.c in Sources */,
-				71C05F5FBF9CC064277067C5549C8B12 /* tess.c in Sources */,
-				863A4F50FDA0E0C0A5ACA3657DD4EA78 /* TessC.swift in Sources */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
 		5326C1ACB4105AD634F0BA9BD0726BF3 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -691,6 +674,24 @@
 			buildActionMask = 2147483647;
 			files = (
 				9522A8059F7260D1F5721BD7CFF91C92 /* Pods-geobaketool-geobaketoolTests-dummy.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		D23CA576FD0EA2F2D5995A210DDC1137 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				A15727D4D31B870B7359F8D1836C5F34 /* bucketalloc.c in Sources */,
+				10EC4F570D7BC4EA48A121419E45120E /* dict.c in Sources */,
+				DD24316A3A77B0CC9FB093C80D921521 /* geom.c in Sources */,
+				79EBD2D6B7CF3C50BB6FCFC5861DCD24 /* LibTessSwift-dummy.m in Sources */,
+				5D67A6158E30D546BBB0E5C384954C18 /* MemAllocators.swift in Sources */,
+				CBA13B612AD5129A6BCDAB394C5044B4 /* mesh.c in Sources */,
+				B0D68C62556A873EEFFB7BD89FD0EC82 /* priorityq.c in Sources */,
+				BB357A94C9901BAA8A26FE6501BCB689 /* Public.swift in Sources */,
+				B9E74123A78DE1D1BF0AE52F7C6F4A80 /* sweep.c in Sources */,
+				4AB9F97D9443CC01E37F79B0C7C67A47 /* tess.c in Sources */,
+				E3BE0A42D8344C08B0D7AF1378018818 /* TessC.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
