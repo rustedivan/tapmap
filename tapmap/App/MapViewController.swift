@@ -113,7 +113,7 @@ class MapViewController: GLKViewController, GLKViewControllerDelegate {
 		if sender.state == .ended {
 			let viewP = sender.location(in: dummyView)
 			let mapP = mapPoint(viewP, from: dummyView.bounds, to: mapFrame, space: mapSpace)
-			let tapPoint = Vertex(Float(mapP.x), Float(-mapP.y))
+			let tapPoint = Vertex(Float(mapP.x), Float(mapP.y))
 			
 			let userState = AppDelegate.sharedUserState
 			let uiState = AppDelegate.sharedUIState
@@ -232,12 +232,10 @@ extension MapViewController : UIScrollViewDelegate {
 		let topRight = CGPoint(x: focusBox.maxX, y: focusBox.maxY)
 		let worldCorners = [bottomLeft, topRight].map({ (p: CGPoint) -> CGPoint in
 			let viewP = view.convert(p, to: dummyView)
-			var mapP = mapPoint(viewP,
+			return mapPoint(viewP,
 												from: dummyView.bounds,
 												to: mapFrame,
 												space: mapSpace)
-			mapP.y = -mapP.y
-			return mapP
 		})
 		return Aabb(loX: Float(worldCorners[0].x),
 								loY: Float(worldCorners[1].y),
@@ -247,7 +245,7 @@ extension MapViewController : UIScrollViewDelegate {
 	
 	var mapToView: ((Vertex) -> CGPoint) {
 		return { (p: Vertex) -> CGPoint in
-			let mp = projectPoint(CGPoint(x: CGFloat(p.x), y: -CGFloat(p.y)),
+			let mp = projectPoint(CGPoint(x: CGFloat(p.x), y: CGFloat(p.y)),
 														 from: self.dummyView.bounds,
 														 to: self.mapFrame,
 														 space: self.mapSpace)

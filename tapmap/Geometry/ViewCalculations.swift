@@ -18,13 +18,14 @@ func mapPoint(_ p: CGPoint, from view: CGRect, to subView: CGRect, space: CGRect
 	let u = (x / subView.width) * space.width + space.minX
 	let v = (y / subView.height) * space.height + space.minY
 
-	return CGPoint(x: u, y: v)
+	return CGPoint(x: u, y: -v)	// Flip Y axis
 }
 
 // Project from map space to screen space (mapPoint, in reverse)
 func projectPoint(_ m: CGPoint, from view: CGRect, to subView: CGRect, space: CGRect) -> CGPoint {
-	let x = (m.x - space.minX) * (subView.width / space.width)
-	let y = (m.y - space.minY) * (subView.height / space.height)
+	let mp = CGPoint(x: m.x, y: -m.y)	// Flip Y axis
+	let x = (mp.x - space.minX) * (subView.width / space.width)
+	let y = (mp.y - space.minY) * (subView.height / space.height)
 	return CGPoint(x: x + subView.minX + view.minX,
 								 y: y + subView.minY + view.minY)
 }
