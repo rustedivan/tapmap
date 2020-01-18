@@ -77,7 +77,7 @@ class PoiRenderer {
 		}
 	}
 	
-	var renderedPoiHashes: Set<Int> {
+	var activePoiHashes: Set<Int> {
 		let visiblePoiPlanes = poiPlanePrimitives.filter { self.poiVisibility[$0.hashValue] != nil }
 		return Set(visiblePoiPlanes.flatMap { $0.poiHashes })
 	}

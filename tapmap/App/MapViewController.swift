@@ -188,6 +188,8 @@ class MapViewController: GLKViewController, GLKViewControllerDelegate {
 		effectRenderer.updatePrimitives()
 		selectionRenderer.outlineWidth = 0.2 / zoom
 		poiRenderer.updateFades()
+		labelView.updateLabels(for: poiRenderer.activePoiHashes,
+													 inArea: visibleLongLat(viewBounds: view.bounds))
 		
 		var sthlm = CGPoint(x: 18, y: 59)
 		sthlm.y = -sthlm.y
@@ -209,8 +211,7 @@ class MapViewController: GLKViewController, GLKViewControllerDelegate {
 		effectRenderer.renderWorld(geoWorld: geoWorld, inProjection: modelViewProjectionMatrix)
 		selectionRenderer.renderSelection(inProjection: modelViewProjectionMatrix)
 		
-		labelView.renderLabels(for: poiRenderer.renderedPoiHashes,
-													 inArea: visibleLongLat(viewBounds: view.bounds))
+		labelView.renderLabels()
 		
 		DebugRenderer.shared.renderMarkers(inProjection: modelViewProjectionMatrix)
 	}
