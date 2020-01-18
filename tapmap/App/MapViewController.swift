@@ -190,15 +190,6 @@ class MapViewController: GLKViewController, GLKViewControllerDelegate {
 		poiRenderer.updateFades()
 		labelView.updateLabels(for: poiRenderer.activePoiHashes,
 													 inArea: visibleLongLat(viewBounds: view.bounds))
-		
-		var sthlm = CGPoint(x: 18, y: 59)
-		sthlm.y = -sthlm.y
-		var sthlmP = projectPoint(sthlm,
-												from: dummyView.bounds,
-												to: mapFrame,
-												space: mapSpace)
-		sthlmP = view.convert(sthlmP, from: dummyView)
-		labelView.updateLabels([(name: "Stockholm", screenPos: sthlmP)])
 	}
 	
 	override func glkView(_ view: GLKView, drawIn rect: CGRect) {
@@ -210,8 +201,7 @@ class MapViewController: GLKViewController, GLKViewControllerDelegate {
 		poiRenderer.renderWorld(geoWorld: geoWorld, inProjection: modelViewProjectionMatrix, visibleSet: visibleRegions)
 		effectRenderer.renderWorld(geoWorld: geoWorld, inProjection: modelViewProjectionMatrix)
 		selectionRenderer.renderSelection(inProjection: modelViewProjectionMatrix)
-		
-		labelView.renderLabels()
+		labelView.renderLabels(projection: mapToView)
 		
 		DebugRenderer.shared.renderMarkers(inProjection: modelViewProjectionMatrix)
 	}
@@ -253,5 +243,15 @@ extension MapViewController : UIScrollViewDelegate {
 								loY: Float(worldCorners[1].y),
 								hiX: Float(worldCorners[1].x),
 								hiY: Float(worldCorners[0].y))
+	}
+	
+	var mapToView: ((Vertex) -> CGPoint) {
+		return { (p: Vertex) -> CGPoint in
+			let mp = projectPoint(CGPoint(x: CGFloat(p.x), y: -CGFloat(p.y)),
+														 from: self.dummyView.bounds,
+														 to: self.mapFrame,
+														 space: self.mapSpace)
+			return self.view.convert(mp, from: self.dummyView)
+		}
 	}
 }

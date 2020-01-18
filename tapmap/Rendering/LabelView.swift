@@ -99,13 +99,14 @@ class LabelView: UIView {
 		}
 	}
 	
-	func renderLabels() {
+	func renderLabels(projection project: (Vertex) -> CGPoint) {
 		for label in poiLabels {
 			guard let marker = poiPrimitives.values.first(where: { $0.ownerHash == label.tag }) else {
 				continue
 			}
-			label.text = \(marker.name)
-			label.frame.origin = CGPoint(x: 24.0, y: y)
+			label.text = marker.name
+			let screenPos = project(marker.worldPos)
+			label.frame.origin = screenPos
 		}
 	}
 	
