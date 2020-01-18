@@ -29,7 +29,7 @@ struct LabelMarker: Comparable {
 }
 
 class LabelView: UIView {
-	static let s_maxLabels = 10
+	static let s_maxLabels = 20
 	var poiPrimitives: [Int: LabelMarker] = [:]
 	var poiLabels: [UILabel] = []
 	
@@ -39,6 +39,8 @@ class LabelView: UIView {
 			newLabel.tag = 0
 			newLabel.isHidden = true
 			newLabel.frame = CGRect(x: 0.0, y: 0.0, width: 100.0, height: 30.0)
+			newLabel.font = UIFont.systemFont(ofSize: 14.0)
+			
 			poiLabels.append(newLabel)
 			addSubview(newLabel)
 		}
@@ -95,7 +97,7 @@ class LabelView: UIView {
 				continue
 			}
 			
-			bindLabel(freeLabel, to: marker.ownerHash)
+			bindLabel(freeLabel, to: marker)
 		}
 	}
 	
@@ -104,15 +106,20 @@ class LabelView: UIView {
 			guard let marker = poiPrimitives.values.first(where: { $0.ownerHash == label.tag }) else {
 				continue
 			}
-			label.text = marker.name
 			let screenPos = project(marker.worldPos)
 			label.frame.origin = screenPos
 		}
 	}
 	
-	func bindLabel(_ label: UILabel, to hash: Int) {
-		label.tag = hash
+	func bindLabel(_ label: UILabel, to marker: LabelMarker) {
+		label.tag = marker.ownerHash
 		label.isHidden = false
+		
+		let strokeAttribs: [NSAttributedString.Key: Any] =
+			[.strokeColor: UIColor.black,
+			 .foregroundColor: UIColor.white,
+			 .strokeWidth: -3.0]
+		label.attributedText = NSAttributedString(string: marker.name, attributes: strokeAttribs)
 	}
 	
 	func unbindLabel(_ label: UILabel) {
