@@ -1,6 +1,93 @@
 # Road to Final
 
-<<<<<<< HEAD
+## Tile streaming
+*The world tree could be used to speed up loading.*
+The structure of the world must be known up-front, but the actual
+geometry data can be streamed in lazily.
+
+Build a file header that stores offset/size of the worldtree and the geometry chunk.
+Store the world quadtree (hashes + boxes) at the top of the file.
+Store the actual GeoXRegions under their keys in a keyed container.
+
+Goal 1: load the world tree without having to parse the geometry yet.
+Goal 2: load specific GeoXRegions from their hashkeys
+				- ah, that's not how Codable's hashkeys work. Pulling partial results doesn't make
+				  sense, unless I want to spin up an entire Decoder, partially parse it,
+				  copy out the parts I want, and then destroy the entire thing again.
+				- I think a better approach is to marshal each XRegion into an NSData,
+				  concatenate them into one superbuffer and build a ToC for it. Then
+				  I can pull byte ranges out of the sbuffer and unmarshal them as needed.
+				  Very parallelizable too.
+				- Pulling these chunks needs to be run on a back thread, or there will be
+				  terrible frame hitches. I think that, if the file is mmapped, I don't have
+				  to go out on an I/O thread, but the parsing needs to be async.
+				- Wrote a testbed for the above, works really well. The chunk table should be
+				  seeded with the mmapped file, and then the targeted accesses will be spooled
+				  up from disk by the OS.
+
+That is, loading the world needs to be done from a streaming controller.
+
+### Loading file chunks
+Haven't done chunk loading in modern iOS for a long time, so here are primitives
+for writing and loading a raw file header from a byte chunk.
+```
+var headerData = withUnsafePointer(to: header) { (headerBytes) in
+	return Data(bytes: headerBytes, count: MemoryLayout<WorldHeader>.size)
+}
+
+var loadedHeader = headerData.withUnsafeBytes { (bytes) in
+	return bytes.load(as: WorldHeader.self)
+}
+```
+
+### Tile streaming strategy
+- rebuild the world file
+-- build a file header
+-- store the quadtree at the top of the file
+-- move the tessellations out to a separate dictionary
+-- reference the tessellations by ownerHash
+-- tree, geoWorld and tessellation dictionaries should be marshaled
+   separately and appended into the file with the file header.
+
+- load tessellations into a GeometryCache controller
+-- render geometries via lookup into that cache
+-- MapRenderer needs to lookup its primitives through the GeoCache
+- at this point, everything should work as before
+
+- replace the tessellation dictionary with the chunk table
+- append the chunk table's data to the file
+- on loading, create empty render primitives for each tessellation
+- when a tessellation is looked up and isn't created yet, pull the chunk from
+  the chunk table and update the empty primitive
+
+---
+
+- restructure the GeoRegions so they have keys to their geometries. the geometries should be kept separate in the tilestreamer and fetched from there.
+- on boot, get a file handle on the geometry file, read the header, then the tree and the chunk table. They are always necessary and should be loaded up-front.
+- from userState + worldTree, we can get the set of visible hashes. They will be all continents since we haven't updated with UserState yet.
+- insert those GeoRegions into the GeoWorld??? or load the GeoWorld sans geometries directly? I guess that would be easier - keep the logic running as before, but just constructing the render primitives on the fly?
+- yeah, looks like I can create a null VBO for the primitive, and then glBufferData into it when the actual vertices are available.
+
+Find the continent hashes and pull them from file, load and render as normal.
+Using .UserState, mark tree nodes as seen or not
+From here on:
+- when rendering the screen, figure out the visible set of hashes from the tree
+- pull missing region geometries from file and create primitives on the fly
+-- this can be done on a background thread until the main thread needs to create GL primitives
+- build the primitive list based off opened & visible & available geometry hashes
+- if a primitive is missing, just skip it - it will pop in when available
+
+- move POI distribution job to runtime side
+- load continent + country POI planes
+- start client
+- load region POI planes, distribute, re-render
+- quantize world grid into 5ºx5º boxes
+- if close to village-level, load POI box files for visible grids
+- put into LRU cache
+- evict tiles at memory pressure warning
+- make sure model handles eviction of rendered tile
+
+
 
 ## POI Labeling
 This is the feature that scares me the most right now, becaue I _don't_ want to end up having to render them through GL/Metal.
@@ -20,9 +107,6 @@ and only holds them in batch planes. This'll require another copy of the data
 So, init with the geoWorld, make the necessary starting data copy, and update as needed.
 The data will be the entire regions this time around, since we need both the rich region
 metadata and the rich POI meta.
-
-
-
 
 ## Map scale notes
 At furthest zoom level, only capitals and mega cities (NY, Caracas, Mumbai, Stockholm, London, Berlin, Moscow, Lagos, Cape Town, Cairo, Tehran, Karachi)
@@ -118,30 +202,6 @@ Left to do:
 -- point-collide against the projected viewbox (project the viewbox instead of all POIs)
 -- pass to POI renderer to select projected set
 -- project those points into viewspace
-
-## Loading
-The world tree could be used to speed up loading something fierce.
-Store the world tree (hashes + boxes) at the front of the file.
-Store the geometries by hash key in the file.
-Find the continent hashes and pull them from file, load and render as normal.
-Using .UserState, mark tree nodes as seen or not
-From here on:
-- when rendering the screen, figure out the visible set of hashes from the tree
-- pull missing region geometries from file and create primitives on the fly
--- this can be done on a background thread until the main thread needs to create GL primitives
-- build the primitive list based off opened & visible & available geometry hashes
-- if a primitive is missing, just skip it - it will pop in when available
-
-## Tile streaming
-- move POI distribution job to runtime side
-- load continent + country POI planes
-- start client
-- load region POI planes, distribute, re-render
-- quantize world grid into 5ºx5º boxes
-- if close to village-level, load POI box files for visible grids
-- put into LRU cache
-- evict tiles at memory pressure warning
-- make sure model handles eviction of rendered tile
 
 ## Map scale notes
 At furthest zoom level, only capitals and mega cities (NY, Caracas, Mumbai, Stockholm, London, Berlin, Moscow, Lagos, Cape Town, Cairo, Tehran, Karachi)
