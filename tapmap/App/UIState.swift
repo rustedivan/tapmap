@@ -9,16 +9,8 @@
 import Foundation
 
 class UIState {
-	struct RegionBounds: Hashable {
-		let regionHash: Int
-		let bounds: Aabb
-		func hash(into hasher: inout Hasher) {
-			hasher.combine(regionHash)
-		}
-	}
-	
 	private var selectedRegionHash: Int = 0
-	var worldQuadTree: QuadTree<RegionBounds>!	// For spatial lookups
+	var worldQuadTree: WorldTree!								// For spatial lookups
 	var visibleRegionHashes: Set<Int> = Set()		// Cache of currently visible regions
 	
 	func cullWorldTree(focus: Aabb) {

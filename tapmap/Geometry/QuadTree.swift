@@ -56,7 +56,7 @@ struct QuadTree<T: Hashable> {
 	var root: QuadNode<T>
 	let maxDepth: Int
 	
-	init(minX: Float, minY: Float, maxX: Float, maxY: Float, maxDepth: Int) {
+	init(minX: Vertex.Precision, minY: Vertex.Precision, maxX: Vertex.Precision, maxY: Vertex.Precision, maxDepth: Int) {
 		let emptyRoot = QuadNode<T>.Empty(bounds: Aabb(loX: minX, loY: minY, hiX: maxX, hiY: maxY))
 		self.root = splitNode(emptyRoot)
 		self.maxDepth = maxDepth
