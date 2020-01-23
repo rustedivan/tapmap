@@ -53,6 +53,9 @@ class OperationBakeGeometry : Operation {
 	
 	func buildWorld(from: Set<ToolGeoFeature>) -> GeoWorld {
 		var worldResult = Set<GeoContinent>()
+		var continentTessellations: [Int : GeoTessellation] = [:]
+		var countryTessellations: [Int : GeoTessellation] = [:]
+		var regionTessellations: [Int : GeoTessellation] = [:]
 		
 		// Build continents
 		for continent in input {
@@ -74,11 +77,12 @@ class OperationBakeGeometry : Operation {
 					}
 					
 					let geoRegion = GeoRegion(name: region.name,
-																		geometry: regionTessellation,
 																		contours: region.polygons.map { $0.exteriorRing },
 																		places: region.places ?? [],
-																		parentHash: country.hashValue)
+																		parentHash: country.hashValue,
+																		aabb: regionTessellation.aabb)
 					regionResult.insert(geoRegion)
+					regionTessellations[geoRegion.hashValue] = regionTessellation
 				}
 				
 				guard let countryTessellation = country.tessellation else {
@@ -89,19 +93,21 @@ class OperationBakeGeometry : Operation {
 				let geoCountry = GeoCountry(name: country.name,
 																		children: regionResult,
 																		places: country.places ?? [],
-																		geometry: countryTessellation,
 																		contours: country.polygons.map { $0.exteriorRing },
-																		parentHash: continent.hashValue)
+																		parentHash: continent.hashValue,
+																		aabb: countryTessellation.aabb)
 				countryResult.insert(geoCountry)
+				countryTessellations[geoCountry.hashValue] = countryTessellation
 			}
 			
 			let geoContinent = GeoContinent(name: continent.name,
 																			children: countryResult,
 																			places: continent.places ?? [],
-																			geometry: continentTessellation,
 																			contours: continent.polygons.map { $0.exteriorRing },
-																			parentHash: 0)
+																			parentHash: 0,
+																			aabb: continentTessellation.aabb)
 			worldResult.insert(geoContinent)
+			continentTessellations[geoContinent.hashValue] = continentTessellation
 		}
 		return GeoWorld(name: "Earth", children: worldResult, parentHash: 0)
 	}

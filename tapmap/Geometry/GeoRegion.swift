@@ -84,18 +84,17 @@ protocol GeoTessellated : Renderable {
 }
 
 protocol GeoNode : GeoIdentifiable {
-	associatedtype SubType : GeoIdentifiable & GeoTessellated
+	associatedtype SubType : GeoIdentifiable
 	var children : Set<SubType> { get }
 }
 
 
-struct GeoRegion : GeoIdentifiable, GeoPlaceContainer, GeoTessellated, Codable, Equatable {
+struct GeoRegion : GeoIdentifiable, GeoPlaceContainer, Codable, Equatable {
 	let name: String
-	let geometry: GeoTessellation
 	let contours: [VertexRing]
 	let places: Set<GeoPlace>
 	let parentHash: Int
-	var aabb : Aabb { return geometry.aabb }
+	let aabb: Aabb
 	
 	public static func == (lhs: GeoRegion, rhs: GeoRegion) -> Bool {
 		return lhs.name == rhs.name && lhs.aabb.midpoint == rhs.aabb.midpoint
@@ -108,15 +107,14 @@ struct GeoRegion : GeoIdentifiable, GeoPlaceContainer, GeoTessellated, Codable, 
 	}
 }
 
-struct GeoCountry : GeoNode, GeoPlaceContainer, GeoTessellated, Codable, Equatable {
+struct GeoCountry : GeoNode, GeoPlaceContainer, Codable, Equatable {
 	typealias SubType = GeoRegion
 	let name: String
 	let children: Set<GeoRegion>
 	let places: Set<GeoPlace>
-	let geometry: GeoTessellation
 	let contours: [VertexRing]
 	let parentHash: Int
-	var aabb : Aabb { return geometry.aabb }
+	let aabb: Aabb
 	
 	
 	public static func == (lhs: GeoCountry, rhs: GeoCountry) -> Bool {
@@ -130,15 +128,14 @@ struct GeoCountry : GeoNode, GeoPlaceContainer, GeoTessellated, Codable, Equatab
 	}
 }
 
-struct GeoContinent : GeoNode, GeoTessellated, GeoPlaceContainer, Codable, Equatable, Hashable {
+struct GeoContinent : GeoNode, GeoPlaceContainer, Codable, Equatable, Hashable {
 	typealias SubType = GeoCountry
 	let name: String
 	let children: Set<GeoCountry>
 	let places: Set<GeoPlace>
-	let geometry: GeoTessellation
 	let contours: [VertexRing]
 	let parentHash: Int
-	var aabb : Aabb { return geometry.aabb }
+	let aabb: Aabb
 	
 	public static func == (lhs: GeoContinent, rhs: GeoContinent) -> Bool {
 		return lhs.name == rhs.name
