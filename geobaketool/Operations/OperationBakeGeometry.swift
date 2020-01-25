@@ -42,7 +42,8 @@ class OperationBakeGeometry : Operation {
 		if let encoded = try? encoder.encode(bakedWorld) {
 			do {
 				try encoded.write(to: saveUrl, options: .atomicWrite)
-				print("GeoWorld baked to \(ByteCountFormatter().string(fromByteCount: Int64(encoded.count)))")
+				let fileSize = Int64(encoded.count)
+				print("GeoWorld baked to \(ByteCountFormatter.string(fromByteCount: fileSize, countStyle: .file))")
 			} catch {
 				print("Saving failed")
 			}
@@ -133,7 +134,7 @@ class OperationBakeGeometry : Operation {
 		return worldQuadTree
 	}
 	
-	func buildTessellationTable(from toolWorld: Set<ToolGeoFeature>) -> Bool {
+	func buildTessellationTable(from toolWorld: Set<ToolGeoFeature>) -> ChunkTable {
 		var continentTessellations: [(Int, GeoTessellation)] = []
 		var countryTessellations: [(Int, GeoTessellation)] = []
 		var regionTessellations: [(Int, GeoTessellation)] = []
@@ -156,8 +157,29 @@ class OperationBakeGeometry : Operation {
 		print(" - \(countryTessellations.count) countries")
 		print(" - \(regionTessellations.count) regions")
 		
+		let chunkTable = ChunkTable()
+		var level = ""
+		do {
+			level = "continent"
+			for (key, tess) in continentTessellations {
+				try chunkTable.addChunk(forKey: key, chunk: tess)
+			}
+			
+			level = "country"
+			for (key, tess) in countryTessellations {
+				try chunkTable.addChunk(forKey: key, chunk: tess)
+			}
+			
+			level = "region"
+			for (key, tess) in regionTessellations {
+				try chunkTable.addChunk(forKey: key, chunk: tess)
+			}
+		} catch (let error) {
+			print("Failed to encode \(level) geometry: \(error.localizedDescription)")
+		}
 		
+		print("Built chunk table of \(ByteCountFormatter.string(fromByteCount: Int64(chunkTable.cursor), countStyle: .file))")
 		
-		return false
+		return chunkTable
 	}
 }
