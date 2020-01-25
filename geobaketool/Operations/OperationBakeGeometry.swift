@@ -42,9 +42,10 @@ class OperationBakeGeometry : Operation {
 			let treeData = try PropertyListEncoder().encode(worldTree)
 			let worldData = try PropertyListEncoder().encode(bakedWorld)
 			let meshData = try PropertyListEncoder().encode(tessellations)
-			let fileHeader = buildHeader(treeSize: worldData.count,
-																	 tableSize: treeData.count,
-																	 dataSize: meshData.count)
+			let fileHeader = buildHeader(treeSize: treeData.count,
+																	 worldSize: worldData.count,
+																	 tableSize: meshData.count,
+																	 dataSize: tessellations.chunkData.count)
 			let headerData = withUnsafePointer(to: fileHeader) { (headerBytes) in
 				return Data(bytes: headerBytes, count: MemoryLayout<WorldHeader>.size)
 			}
@@ -70,12 +71,14 @@ class OperationBakeGeometry : Operation {
 		report(1.0, "Done.", true)
 	}
 	
-	func buildHeader(treeSize: Int, tableSize: Int, dataSize: Int) -> WorldHeader {
+	func buildHeader(treeSize: Int, worldSize: Int, tableSize: Int, dataSize: Int) -> WorldHeader {
 		let treeOffset = MemoryLayout<WorldHeader>.size
-		let tableOffset = treeOffset + treeSize
+		let worldOffset = treeOffset + treeSize
+		let tableOffset = worldOffset + worldSize
 		let dataOffset = tableOffset + tableSize
 		
 		return WorldHeader( treeOffset: treeOffset, treeSize: treeSize,
+												worldOffset: worldOffset, worldSize: worldSize,
 												tableOffset: tableOffset, tableSize: tableSize,
 												dataOffset: dataOffset, dataSize: dataSize)
 	}
