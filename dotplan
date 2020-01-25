@@ -40,6 +40,14 @@ var loadedHeader = headerData.withUnsafeBytes { (bytes) in
 }
 ```
 
+WOW this is actually looking super promising. The entire geometry chunk table is ~30MB now,
+so I guess there must have been some massive redundancies in the Foundation-coded file.
+Looked into Swift half-floats and there is a proposal making its way through the Swift WG
+_this_ week.
+
+Geometry streaming is in. Even without actually using the streamer (loading all the geometry
+up-front anyway) loading times are down to about 70%.
+
 ### Tile streaming strategy
 - rebuild the world file
 -- build a file header
@@ -86,8 +94,6 @@ From here on:
 - put into LRU cache
 - evict tiles at memory pressure warning
 - make sure model handles eviction of rendered tile
-
-
 
 ## POI Labeling
 This is the feature that scares me the most right now, becaue I _don't_ want to end up having to render them through GL/Metal.
