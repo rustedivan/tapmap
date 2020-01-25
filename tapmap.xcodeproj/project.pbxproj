@@ -18,8 +18,9 @@
 		1429B0A922EAFD53001257AB /* nullrenderer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14C6659822B97E660054D7F2 /* nullrenderer.swift */; };
 		142A21EF23DC61A3000DA4FA /* ChunkTable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 142A21EE23DC61A3000DA4FA /* ChunkTable.swift */; };
 		142A21F023DC61A3000DA4FA /* ChunkTable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 142A21EE23DC61A3000DA4FA /* ChunkTable.swift */; };
+		1440944A23DCC1A80067F7D6 /* world.geo in Resources */ = {isa = PBXBuildFile; fileRef = 1440944923DCC1A70067F7D6 /* world.geo */; };
+		1440944C23DCC1DB0067F7D6 /* GeometryStreamer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1440944B23DCC1DB0067F7D6 /* GeometryStreamer.swift */; };
 		144B5D5A22D9E092001E2A85 /* SelectionRenderer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 144B5D5722D9E092001E2A85 /* SelectionRenderer.swift */; };
-		144B5D5C22D9E0A9001E2A85 /* world.geo in Resources */ = {isa = PBXBuildFile; fileRef = 140835BE22B991BA004697FB /* world.geo */; };
 		14532D9A23B515BE00943ADC /* QuadTree.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14532D9923B515BE00943ADC /* QuadTree.swift */; };
 		14532D9C23B5190F00943ADC /* QuadTreeTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14532D9B23B5190F00943ADC /* QuadTreeTests.swift */; };
 		14532D9E23B5197600943ADC /* OutlineGeometry.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14985FF522F0F35700F68A1F /* OutlineGeometry.swift */; };
@@ -139,6 +140,8 @@
 		140B990222E57CE000C912A4 /* EdgeShader.fsh */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.glsl; path = EdgeShader.fsh; sourceTree = "<group>"; };
 		140B990522E57D5700C912A4 /* EdgeGenerationTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EdgeGenerationTests.swift; sourceTree = "<group>"; };
 		142A21EE23DC61A3000DA4FA /* ChunkTable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChunkTable.swift; sourceTree = "<group>"; };
+		1440944923DCC1A70067F7D6 /* world.geo */ = {isa = PBXFileReference; lastKnownFileType = file; name = world.geo; path = tapmap/Raw/world.geo; sourceTree = "<group>"; };
+		1440944B23DCC1DB0067F7D6 /* GeometryStreamer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GeometryStreamer.swift; sourceTree = "<group>"; };
 		144B5D5722D9E092001E2A85 /* SelectionRenderer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SelectionRenderer.swift; sourceTree = "<group>"; };
 		14532D9923B515BE00943ADC /* QuadTree.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QuadTree.swift; sourceTree = "<group>"; };
 		14532D9B23B5190F00943ADC /* QuadTreeTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QuadTreeTests.swift; sourceTree = "<group>"; };
@@ -254,6 +257,7 @@
 		142A21ED23DC6189000DA4FA /* Streaming */ = {
 			isa = PBXGroup;
 			children = (
+				1440944B23DCC1DB0067F7D6 /* GeometryStreamer.swift */,
 				142A21EE23DC61A3000DA4FA /* ChunkTable.swift */,
 			);
 			path = Streaming;
@@ -339,6 +343,7 @@
 		14C6655222B97D890054D7F2 = {
 			isa = PBXGroup;
 			children = (
+				1440944923DCC1A70067F7D6 /* world.geo */,
 				14C6659522B97E570054D7F2 /* dotplan */,
 				14C6655D22B97D890054D7F2 /* tapmap */,
 				14C6657222B97D8B0054D7F2 /* tapmapTests */,
@@ -597,7 +602,7 @@
 				148937FD22B97FDF009278A0 /* MapShader.fsh in Resources */,
 				140B990422E57CE000C912A4 /* EdgeShader.fsh in Resources */,
 				1489380122B97FDF009278A0 /* OpeningShader.fsh in Resources */,
-				144B5D5C22D9E0A9001E2A85 /* world.geo in Resources */,
+				1440944A23DCC1A80067F7D6 /* world.geo in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -725,6 +730,7 @@
 				1489380422B97FE0009278A0 /* MapViewController.swift in Sources */,
 				148937F822B97FDF009278A0 /* GeoRegion.swift in Sources */,
 				14532D9A23B515BE00943ADC /* QuadTree.swift in Sources */,
+				1440944C23DCC1DB0067F7D6 /* GeometryStreamer.swift in Sources */,
 				14985FEB22F0ECD100F68A1F /* ArrayedRenderPrimitive.swift in Sources */,
 				1489380522B97FE0009278A0 /* UIState.swift in Sources */,
 				14F8918B22F0F3F7008CCCF3 /* OutlineGeometry.swift in Sources */,

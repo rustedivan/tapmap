@@ -34,26 +34,19 @@ class MapViewController: GLKViewController, GLKViewControllerDelegate {
 	
 	override func viewDidLoad() {
 		super.viewDidLoad()
-		
-		let path = Bundle.main.path(forResource: "world", ofType: "geo")!
-		
-		print("Starting to load geometry.")
-		let startTime = Date()
-		let geoData = NSData(contentsOfFile: path)!
-
 		let userState = AppDelegate.sharedUserState
 		let uiState = AppDelegate.sharedUIState
-		do {
-			try self.geoWorld = PropertyListDecoder().decode(GeoWorld.self, from: geoData as Data)
-			userState.buildWorldAvailability(withWorld: self.geoWorld)
-			uiState.buildWorldTree(withWorld: self.geoWorld, userState: AppDelegate.sharedUserState)
-		} catch {
-			print("Could not load world.")
-			return
-		}
 		
+		let startTime = Date()
+		let path = Bundle.main.path(forResource: "world", ofType: "geo")!
+		
+		let streamer = GeometryStreamer(attachFile: path)!
+		
+		uiState.worldQuadTree = streamer.loadWorldTree()
+		geoWorld = streamer.loadGeoWorld()
+
 		let duration = Date().timeIntervalSince(startTime)
-		print("Load done in \(Int(duration)) seconds.")
+		print("Loaded \(geoWorld.children.count) continents after \(String(format: "%.2f", duration)) seconds")
 		
 		self.context = EAGLContext(api: .openGLES2)
 		

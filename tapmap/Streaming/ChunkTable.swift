@@ -11,6 +11,8 @@ import Foundation
 struct WorldHeader {
 	let treeOffset: Int
 	let treeSize: Int
+	let worldOffset: Int
+	let worldSize: Int
 	let tableOffset: Int
 	let tableSize: Int
 	let dataOffset: Int
