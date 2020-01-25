@@ -1,4 +1,4 @@
-struct RegionBounds: Hashable {
+struct RegionBounds: Hashable, Codable {
 	let regionHash: Int
 	let bounds: Aabb
 	func hash(into hasher: inout Hasher) {

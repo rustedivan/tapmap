@@ -8,9 +8,44 @@
 
 import Foundation
 
-indirect enum QuadNode<T: Hashable> {
+indirect enum QuadNode<T: Hashable & Codable>: Codable {
+	enum CodingKeys: CodingKey {
+		case bounds
+		case values
+		case topLeft, topRight, bottomLeft, bottomRight
+	}
 	case Node(bounds: Aabb, values: Set<T>, tl: QuadNode, tr: QuadNode, bl: QuadNode, br: QuadNode)
 	case Empty(bounds: Aabb)
+	
+	init(from decoder: Decoder) throws {
+		let container = try decoder.container(keyedBy: CodingKeys.self)
+		let bounds = try container.decode(Aabb.self, forKey: .bounds)
+		if container.allKeys.contains(CodingKeys.values) {
+			let values = try! container.decode(Set<T>.self, forKey: .values)
+			let tl = try! container.decode(QuadNode<T>.self, forKey: .topLeft)
+			let tr = try! container.decode(QuadNode<T>.self, forKey: .topRight)
+			let bl = try! container.decode(QuadNode<T>.self, forKey: .bottomLeft)
+			let br = try! container.decode(QuadNode<T>.self, forKey: .bottomRight)
+			self = .Node(bounds: bounds, values: values, tl: tl, tr: tr, bl: bl, br: br)
+		} else {
+			self = .Empty(bounds: bounds)
+		}
+	}
+	
+	func encode(to encoder: Encoder) throws {
+		var container = encoder.container(keyedBy: CodingKeys.self)
+		switch self {
+		case let .Node(bounds, values, tl, tr, bl, br):
+			try container.encode(bounds, forKey: .bounds)
+			try container.encode(values, forKey: .values)
+			try container.encode(tl, forKey: .topLeft)
+			try container.encode(tr, forKey: .topRight)
+			try container.encode(bl, forKey: .bottomLeft)
+			try container.encode(br, forKey: .bottomRight)
+		case let .Empty(bounds):
+			try container.encode(bounds, forKey: .bounds)
+		}
+	}
 	
 	var bounds: Aabb { get {
 		switch self {
@@ -52,7 +87,7 @@ func splitNode<T>(_ node: QuadNode<T>) -> QuadNode<T> {
 												br: .Empty(bounds: subCells.br))
 }
 
-struct QuadTree<T: Hashable> {
+struct QuadTree<T: Hashable & Codable>: Codable {
 	var root: QuadNode<T>
 	let maxDepth: Int
 	
@@ -78,8 +113,6 @@ struct QuadTree<T: Hashable> {
 		return quadQuery(search: search, in: root)
 	}
 }
-
-/// Also need a point-qtree...
 
 func quadInsert<T:Hashable>(_ value: T, region: Aabb, into node: QuadNode<T>, depth: Int, maxDepth: Int) -> (QuadNode<T>, Int) {
 	switch (node) {
