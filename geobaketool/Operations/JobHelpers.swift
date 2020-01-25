@@ -50,4 +50,13 @@ struct ToolGeoFeature : Equatable, Hashable {
 		hasher.combine(name)
 		hasher.combine(countryKey)
 	}
+	
+	// The hash used in the app runtime (this is based off geometry, but .hashValue must be usable before tessellation)
+	public func runtimeHash() -> Int {
+		var h = Hasher()
+		h.combine(name)
+		h.combine(tessellation!.aabb.midpoint.quantized.0)
+		h.combine(tessellation!.aabb.midpoint.quantized.1)
+		return h.finalize()
+	}
 }

@@ -31,6 +31,7 @@ class OperationBakeGeometry : Operation {
 		
 		// Bake job should only do this conversion and save
 		let bakedWorld = buildWorld(from: input)
+		let tessellations = buildTessellationTable(from: input)
 		let worldTree = buildTree(from: bakedWorld)
 		
 		print("\n")
@@ -130,5 +131,33 @@ class OperationBakeGeometry : Operation {
 			worldQuadTree.insert(value: continentBox, region: continentBox.bounds)
 		}
 		return worldQuadTree
+	}
+	
+	func buildTessellationTable(from toolWorld: Set<ToolGeoFeature>) -> Bool {
+		var continentTessellations: [(Int, GeoTessellation)] = []
+		var countryTessellations: [(Int, GeoTessellation)] = []
+		var regionTessellations: [(Int, GeoTessellation)] = []
+		
+		// Serialize the tree into a list so continents come before countries come before regions.
+		// This will improve cache/VM locality when pulling chunks from the baked file.
+		
+		continentTessellations.append(contentsOf: toolWorld.map { ($0.runtimeHash(), $0.tessellation!) })
+		for continent in toolWorld {
+			let countries = continent.children ?? []
+			countryTessellations.append(contentsOf: countries.map { ($0.runtimeHash(), $0.tessellation!) })
+			for country in continent.children ?? [] {
+				let regions = country.children ?? []
+				regionTessellations.append(contentsOf: regions.map { ($0.runtimeHash(), $0.tessellation!) })
+			}
+		}
+		
+		print("Packing tessellations...")
+		print(" - \(continentTessellations.count) continents")
+		print(" - \(countryTessellations.count) countries")
+		print(" - \(regionTessellations.count) regions")
+		
+		
+		
+		return false
 	}
 }
