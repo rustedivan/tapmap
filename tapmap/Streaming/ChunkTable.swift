@@ -8,6 +8,15 @@
 
 import Foundation
 
+struct WorldHeader {
+	let treeOffset: Int
+	let treeSize: Int
+	let tableOffset: Int
+	let tableSize: Int
+	let dataOffset: Int
+	let dataSize: Int
+}
+
 class ChunkTable: Codable {
 	enum CodingKeys: CodingKey {
 		case chunkMap

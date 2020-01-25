@@ -35,23 +35,49 @@ class OperationBakeGeometry : Operation {
 		let worldTree = buildTree(from: bakedWorld)
 		
 		print("\n")
-		report(0.1, "Writing world to \(saveUrl.lastPathComponent)...", false)
+		report(0.1, "Serializing baked data...", false)
 		
-		let encoder = PropertyListEncoder()
-		
-		if let encoded = try? encoder.encode(bakedWorld) {
-			do {
-				try encoded.write(to: saveUrl, options: .atomicWrite)
-				let fileSize = Int64(encoded.count)
-				print("GeoWorld baked to \(ByteCountFormatter.string(fromByteCount: fileSize, countStyle: .file))")
-			} catch {
-				print("Saving failed")
+		var fileData = Data()
+		do {
+			let treeData = try PropertyListEncoder().encode(worldTree)
+			let worldData = try PropertyListEncoder().encode(bakedWorld)
+			let meshData = try PropertyListEncoder().encode(tessellations)
+			let fileHeader = buildHeader(treeSize: worldData.count,
+																	 tableSize: treeData.count,
+																	 dataSize: meshData.count)
+			let headerData = withUnsafePointer(to: fileHeader) { (headerBytes) in
+				return Data(bytes: headerBytes, count: MemoryLayout<WorldHeader>.size)
 			}
+
+			fileData.append(headerData)
+			fileData.append(treeData)
+			fileData.append(worldData)
+			fileData.append(meshData)
+			fileData.append(tessellations.chunkData)
+		} catch (let error) {
+			print("Serialisation failed: \(error.localizedDescription)")
 		}
-		else {
-			print("Encoding failed")
+		report(0.7, "Writing world to \(saveUrl.lastPathComponent)...", false)
+		
+		do {
+			try fileData.write(to: saveUrl, options: .atomicWrite)
+			let fileSize = Int64(fileData.count)
+			print("GeoWorld baked to \(ByteCountFormatter.string(fromByteCount: fileSize, countStyle: .file))")
+		} catch {
+			print("Saving failed")
 		}
+	
 		report(1.0, "Done.", true)
+	}
+	
+	func buildHeader(treeSize: Int, tableSize: Int, dataSize: Int) -> WorldHeader {
+		let treeOffset = MemoryLayout<WorldHeader>.size
+		let tableOffset = treeOffset + treeSize
+		let dataOffset = tableOffset + tableSize
+		
+		return WorldHeader( treeOffset: treeOffset, treeSize: treeSize,
+												tableOffset: tableOffset, tableSize: tableSize,
+												dataOffset: dataOffset, dataSize: dataSize)
 	}
 	
 	func buildWorld(from toolWorld: Set<ToolGeoFeature>) -> GeoWorld {
