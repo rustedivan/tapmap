@@ -31,6 +31,7 @@ class OperationBakeGeometry : Operation {
 		
 		// Bake job should only do this conversion and save
 		let bakedWorld = buildWorld(from: input)
+		let worldTree = buildTree(from: bakedWorld)
 		
 		print("\n")
 		report(0.1, "Writing world to \(saveUrl.lastPathComponent)...", false)
@@ -51,22 +52,26 @@ class OperationBakeGeometry : Operation {
 		report(1.0, "Done.", true)
 	}
 	
-	func buildWorld(from: Set<ToolGeoFeature>) -> GeoWorld {
+	func buildWorld(from toolWorld: Set<ToolGeoFeature>) -> GeoWorld {
 		var worldResult = Set<GeoContinent>()
 		var continentTessellations: [Int : GeoTessellation] = [:]
 		var countryTessellations: [Int : GeoTessellation] = [:]
 		var regionTessellations: [Int : GeoTessellation] = [:]
 		
 		// Build continents
-		for continent in input {
+		for continent in toolWorld {
 			guard let continentTessellation = continent.tessellation else {
 				print("\(continent.name) has no tessellation - skipping...")
 				continue
 			}
-			
+
 			// Build countries
 			var countryResult = Set<GeoCountry>()
 			for country in continent.children ?? [] {
+				guard let countryTessellation = country.tessellation else {
+					print("\(country.name) has no tessellation - skipping...")
+					continue
+				}
 				
 				// Build regions
 				var regionResult = Set<GeoRegion>()
@@ -83,11 +88,6 @@ class OperationBakeGeometry : Operation {
 																		aabb: regionTessellation.aabb)
 					regionResult.insert(geoRegion)
 					regionTessellations[geoRegion.hashValue] = regionTessellation
-				}
-				
-				guard let countryTessellation = country.tessellation else {
-					print("\(country.name) has no tessellation - skipping...")
-					continue
 				}
 				
 				let geoCountry = GeoCountry(name: country.name,
@@ -110,5 +110,25 @@ class OperationBakeGeometry : Operation {
 			continentTessellations[geoContinent.hashValue] = continentTessellation
 		}
 		return GeoWorld(name: "Earth", children: worldResult, parentHash: 0)
+	}
+	
+	func buildTree(from bakedWorld: GeoWorld) -> WorldTree {
+		var worldQuadTree = QuadTree<RegionBounds>(minX: -180.0, minY: -90.0, maxX: 181.0, maxY: 90.0, maxDepth: 6)
+		
+		for continent in bakedWorld.children {
+			for country in continent.children {
+				for region in country.children {
+					let regionBox = RegionBounds(regionHash: region.hashValue, bounds: region.aabb)
+					worldQuadTree.insert(value: regionBox, region: regionBox.bounds)
+				}
+				
+				let countryBox = RegionBounds(regionHash: country.hashValue, bounds: country.aabb)
+				worldQuadTree.insert(value: countryBox, region: countryBox.bounds)
+			}
+			
+			let continentBox = RegionBounds(regionHash: continent.hashValue, bounds: continent.aabb)
+			worldQuadTree.insert(value: continentBox, region: continentBox.bounds)
+		}
+		return worldQuadTree
 	}
 }

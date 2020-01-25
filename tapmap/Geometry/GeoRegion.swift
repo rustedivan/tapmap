@@ -143,6 +143,8 @@ struct GeoContinent : GeoNode, GeoPlaceContainer, Codable, Equatable, Hashable {
 	
 	func hash(into hasher: inout Hasher) {
 		hasher.combine(name)
+		hasher.combine(aabb.midpoint.quantized.0)
+		hasher.combine(aabb.midpoint.quantized.1)
 	}
 }
 
