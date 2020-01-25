@@ -85,9 +85,6 @@ class OperationBakeGeometry : Operation {
 	
 	func buildWorld(from toolWorld: Set<ToolGeoFeature>) -> GeoWorld {
 		var worldResult = Set<GeoContinent>()
-		var continentTessellations: [Int : GeoTessellation] = [:]
-		var countryTessellations: [Int : GeoTessellation] = [:]
-		var regionTessellations: [Int : GeoTessellation] = [:]
 		
 		// Build continents
 		for continent in toolWorld {
@@ -118,7 +115,6 @@ class OperationBakeGeometry : Operation {
 																		parentHash: country.hashValue,
 																		aabb: regionTessellation.aabb)
 					regionResult.insert(geoRegion)
-					regionTessellations[geoRegion.hashValue] = regionTessellation
 				}
 				
 				let geoCountry = GeoCountry(name: country.name,
@@ -128,7 +124,6 @@ class OperationBakeGeometry : Operation {
 																		parentHash: continent.hashValue,
 																		aabb: countryTessellation.aabb)
 				countryResult.insert(geoCountry)
-				countryTessellations[geoCountry.hashValue] = countryTessellation
 			}
 			
 			let geoContinent = GeoContinent(name: continent.name,
@@ -138,7 +133,6 @@ class OperationBakeGeometry : Operation {
 																			parentHash: 0,
 																			aabb: continentTessellation.aabb)
 			worldResult.insert(geoContinent)
-			continentTessellations[geoContinent.hashValue] = continentTessellation
 		}
 		return GeoWorld(name: "Earth", children: worldResult, parentHash: 0)
 	}
@@ -164,20 +158,20 @@ class OperationBakeGeometry : Operation {
 	}
 	
 	func buildTessellationTable(from toolWorld: Set<ToolGeoFeature>) -> ChunkTable {
-		var continentTessellations: [(Int, GeoTessellation)] = []
-		var countryTessellations: [(Int, GeoTessellation)] = []
-		var regionTessellations: [(Int, GeoTessellation)] = []
+		var continentTessellations: [(String, GeoTessellation)] = []
+		var countryTessellations: [(String, GeoTessellation)] = []
+		var regionTessellations: [(String, GeoTessellation)] = []
 		
 		// Serialize the tree into a list so continents come before countries come before regions.
 		// This will improve cache/VM locality when pulling chunks from the baked file.
 		
-		continentTessellations.append(contentsOf: toolWorld.map { ($0.runtimeHash(), $0.tessellation!) })
+		continentTessellations.append(contentsOf: toolWorld.map { ($0.serializationKey, $0.tessellation!) })
 		for continent in toolWorld {
 			let countries = continent.children ?? []
-			countryTessellations.append(contentsOf: countries.map { ($0.runtimeHash(), $0.tessellation!) })
+			countryTessellations.append(contentsOf: countries.map { ($0.serializationKey, $0.tessellation!) })
 			for country in continent.children ?? [] {
 				let regions = country.children ?? []
-				regionTessellations.append(contentsOf: regions.map { ($0.runtimeHash(), $0.tessellation!) })
+				regionTessellations.append(contentsOf: regions.map { ($0.serializationKey, $0.tessellation!) })
 			}
 		}
 		

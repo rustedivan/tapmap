@@ -24,10 +24,10 @@ class ChunkTable: Codable {
 		case chunkMap
 	}
 	var cursor: Int = 0
-	var chunkMap: [Int : Range<Int>] = [:]
+	var chunkMap: [String : Range<Int>] = [:]
 	var chunkData: Data = Data()
 	
-	func addChunk<T:Encodable>(forKey key: Int, chunk: T) throws {
+	func addChunk<T:Encodable>(forKey key: String, chunk: T) throws {
 		let encodedChunk = try PropertyListEncoder().encode(chunk)
 		let chunkRange = cursor..<(cursor + encodedChunk.count)
 		chunkMap[key] = chunkRange
@@ -37,7 +37,7 @@ class ChunkTable: Codable {
 		cursor += chunkRange.count
 	}
 	
-	func pullChunk<T:Decodable>(_ key: Int) throws -> T {
+	func pullChunk<T:Decodable>(_ key: String) throws -> T {
 		guard let chunkRange = chunkMap[key] else {
 			print("No chunk found for \"\(key)\"")
 			exit(1)
@@ -45,4 +45,11 @@ class ChunkTable: Codable {
 		let chunkBytes = chunkData.subdata(in: chunkRange)
 		return try PropertyListDecoder().decode(T.self, from: chunkBytes)
 	}
+}
+
+func streamingKey(type: String, name: String) -> String {
+	let key = "\(type) \(name)"
+	return key.components(separatedBy: .punctuationCharacters).joined(separator: "")
+					  .components(separatedBy: .whitespaces).joined(separator: "-")
+						.lowercased()
 }

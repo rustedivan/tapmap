@@ -71,6 +71,7 @@ protocol GeoIdentifiable : Hashable {
 	var name : String { get }
 	var aabb : Aabb { get }
 	var parentHash: Int { get }
+	var streamKey: String { get }
 }
 
 protocol GeoPlaceContainer {
@@ -105,6 +106,10 @@ struct GeoRegion : GeoIdentifiable, GeoPlaceContainer, Codable, Equatable {
 		hasher.combine(aabb.midpoint.quantized.0)
 		hasher.combine(aabb.midpoint.quantized.1)
 	}
+	
+	var streamKey: String {
+		return streamingKey(type: "region", name: name)
+	}
 }
 
 struct GeoCountry : GeoNode, GeoPlaceContainer, Codable, Equatable {
@@ -126,6 +131,10 @@ struct GeoCountry : GeoNode, GeoPlaceContainer, Codable, Equatable {
 		hasher.combine(aabb.midpoint.quantized.0)
 		hasher.combine(aabb.midpoint.quantized.1)
 	}
+	
+	var streamKey: String {
+		return streamingKey(type: "country", name: name)
+	}
 }
 
 struct GeoContinent : GeoNode, GeoPlaceContainer, Codable, Equatable, Hashable {
@@ -146,6 +155,10 @@ struct GeoContinent : GeoNode, GeoPlaceContainer, Codable, Equatable, Hashable {
 		hasher.combine(aabb.midpoint.quantized.0)
 		hasher.combine(aabb.midpoint.quantized.1)
 	}
+	
+	var streamKey: String {
+		return streamingKey(type: "continent", name: name)
+	}
 }
 
 struct GeoWorld : GeoNode, Codable {
@@ -153,6 +166,10 @@ struct GeoWorld : GeoNode, Codable {
 	var aabb : Aabb { return Aabb(loX: -180.0, loY: -85.0, hiX: 180.0, hiY: 85.0) }
 	let children: Set<GeoContinent>
 	let parentHash: Int
+	
+	var streamKey: String {
+		return streamingKey(type: "world", name: name)
+	}
 }
 
 struct GeoPlace : Codable, Equatable, Hashable {

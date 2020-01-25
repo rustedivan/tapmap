@@ -9,7 +9,7 @@
 import Foundation
 
 class GeometryStreamer {
-	let fileData: Data	// fileData is memory-mapped so no need to attch a FileHandle here
+	let fileData: Data	// fileData is memory-mapped so no need to attach a FileHandle here
 	let fileHeader: WorldHeader
 	let chunkTable: ChunkTable
 	init?(attachFile path: String) {
@@ -43,5 +43,15 @@ class GeometryStreamer {
 		let loadedWorldBytes = fileData.subdata(in: fileHeader.worldOffset..<fileHeader.worldOffset + fileHeader.worldSize)
 		let loadedWorld = try! PropertyListDecoder().decode(GeoWorld.self, from: loadedWorldBytes)
 		return loadedWorld
+	}
+	
+	func getRenderPrimitive(name: String) -> ArrayedRenderPrimitive? {
+		do {
+			let tessellation: GeoTessellation = try chunkTable.pullChunk(name)
+			return nil
+		} catch (let error) {
+			print("Could not load tessellation: \(error.localizedDescription)")
+			return nil
+		}
 	}
 }
