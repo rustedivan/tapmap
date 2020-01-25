@@ -10,10 +10,10 @@ typealias ProgressReport = (Double, String, Bool) -> ()
 typealias ErrorReport = (String, String) -> ()
 
 struct ToolGeoFeature : Equatable, Hashable {
-	enum Level {
-		case Continent
-		case Country
-		case Region
+	enum Level: String {
+		case Continent = "continent"
+		case Country = "country"
+		case Region = "region"
 	}
 	
 	let level: Level
@@ -51,12 +51,7 @@ struct ToolGeoFeature : Equatable, Hashable {
 		hasher.combine(countryKey)
 	}
 	
-	// The hash used in the app runtime (this is based off geometry, but .hashValue must be usable before tessellation)
-	public func runtimeHash() -> Int {
-		var h = Hasher()
-		h.combine(name)
-		h.combine(tessellation!.aabb.midpoint.quantized.0)
-		h.combine(tessellation!.aabb.midpoint.quantized.1)
-		return h.finalize()
+	var serializationKey: String {
+		return streamingKey(type: level.rawValue, name: name)
 	}
 }

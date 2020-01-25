@@ -37,16 +37,14 @@ class MapViewController: GLKViewController, GLKViewControllerDelegate {
 		let userState = AppDelegate.sharedUserState
 		let uiState = AppDelegate.sharedUIState
 		
-		let startTime = Date()
 		let path = Bundle.main.path(forResource: "world", ofType: "geo")!
 		
 		let streamer = GeometryStreamer(attachFile: path)!
 		
 		uiState.worldQuadTree = streamer.loadWorldTree()
 		geoWorld = streamer.loadGeoWorld()
-
-		let duration = Date().timeIntervalSince(startTime)
-		print("Loaded \(geoWorld.children.count) continents after \(String(format: "%.2f", duration)) seconds")
+		userState.buildWorldAvailability(withWorld: geoWorld)
+		
 		
 		self.context = EAGLContext(api: .openGLES2)
 		

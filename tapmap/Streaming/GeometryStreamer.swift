@@ -13,9 +13,10 @@ class GeometryStreamer {
 	let fileHeader: WorldHeader
 	let chunkTable: ChunkTable
 	init?(attachFile path: String) {
+		let startTime = Date()
 		print("Attaching geometry streamer...")
 		do {
-			fileData = try NSData(contentsOfFile: path) as Data
+			fileData = try NSData(contentsOfFile: path, options: .mappedIfSafe) as Data
 		} catch (let e) {
 			print(e.localizedDescription)
 			return nil
@@ -31,6 +32,11 @@ class GeometryStreamer {
 		let loadedTable = try! PropertyListDecoder().decode(ChunkTable.self, from: loadedTableBytes)
 		chunkTable = loadedTable
 		print("  - geometry streamer has \(chunkTable.chunkMap.count) tesselation entries")
+		chunkTable.chunkData = fileData.subdata(in: fileHeader.dataOffset..<fileHeader.dataOffset + fileHeader.dataSize)
+		print("  - chunk data attached with \(ByteCountFormatter.string(fromByteCount: Int64(chunkTable.chunkData.count), countStyle: .memory))")
+		
+		let duration = Date().timeIntervalSince(startTime)
+		print("  - ready to stream after \(String(format: "%.2f", duration)) seconds")
 	}
 	
 	func loadWorldTree() -> WorldTree {
