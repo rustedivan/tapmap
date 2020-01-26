@@ -74,9 +74,7 @@ class MapViewController: GLKViewController, GLKViewControllerDelegate {
 		delegate = self
 		
 		EAGLContext.setCurrent(self.context)
-		mapRenderer = MapRenderer(withVisibleContinents: userState.availableContinents,
-															countries: userState.availableCountries,
-															regions: userState.availableRegions)
+		mapRenderer = MapRenderer()
 		poiRenderer = PoiRenderer(withVisibleContinents: userState.availableContinents,
 															countries: userState.availableCountries,
 															regions: userState.availableRegions)

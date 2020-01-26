@@ -26,9 +26,9 @@ class UserState {
 		let allRegions = Set(openCountries.flatMap { $0.children })
 		let closedRegions = allRegions.filter { placeVisited($0) == false }
 		
-		availableContinents = Dictionary(uniqueKeysWithValues: closedContinents.map { ($0.hashValue, $0) })
-		availableCountries = Dictionary(uniqueKeysWithValues: closedCountries.map { ($0.hashValue, $0) })
-		availableRegions = Dictionary(uniqueKeysWithValues: closedRegions.map { ($0.hashValue, $0) })
+		availableContinents = Dictionary(uniqueKeysWithValues: closedContinents.map { ($0.geographyId.hashed, $0) })
+		availableCountries = Dictionary(uniqueKeysWithValues: closedCountries.map { ($0.geographyId.hashed, $0) })
+		availableRegions = Dictionary(uniqueKeysWithValues: closedRegions.map { ($0.geographyId.hashed, $0) })
 	}
 	
 	func placeVisited<T:Hashable>(_ p: T) -> Bool {
