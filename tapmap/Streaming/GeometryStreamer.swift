@@ -9,6 +9,17 @@
 import Foundation
 
 class GeometryStreamer {
+	static private var _shared: GeometryStreamer!
+	static var shared: GeometryStreamer {
+		get {
+			if _shared == nil {
+				print("Geometry streamer has not been created yet.")
+				exit(1)
+			}
+			return _shared
+		}
+	}
+	
 	let fileData: Data	// fileData is memory-mapped so no need to attach a FileHandle here
 	let fileHeader: WorldHeader
 	let chunkTable: ChunkTable
@@ -43,6 +54,8 @@ class GeometryStreamer {
 		streamQueue.name = "Geometry streaming"
 		streamQueue.qualityOfService = .userInitiated
 		print("  - empty streaming op-queue setup")
+		
+		GeometryStreamer._shared = self
 		
 		let duration = Date().timeIntervalSince(startTime)
 		print("  - ready to stream after \(String(format: "%.2f", duration)) seconds")
