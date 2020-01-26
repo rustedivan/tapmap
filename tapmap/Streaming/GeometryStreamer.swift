@@ -90,6 +90,11 @@ class GeometryStreamer {
 		return nil
 	}
 	
+	func evictPrimitive(for streamHash: RegionHash) {
+		primitiveCache.removeValue(forKey: streamHash)
+		geometryCache.removeValue(forKey: streamHash)
+	}
+	
 	func tessellation(for streamHash: RegionHash) -> GeoTessellation? {
 		return geometryCache[streamHash]
 	}
