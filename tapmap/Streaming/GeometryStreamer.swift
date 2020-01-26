@@ -60,36 +60,35 @@ class GeometryStreamer {
 		return loadedWorld
 	}
 	
-	func getRenderPrimitive(name streamKey: String, streamHash: Int) -> ArrayedRenderPrimitive? {
-		if let cachedPrimitive = geometryCache[streamHash] {
-			return cachedPrimitive
+	func renderPrimitive(for streamHash: RegionHash) -> ArrayedRenderPrimitive? {
+		return geometryCache[streamHash]
+	}
+	
+	func streamPrimitive(for regionId: RegionId) {
+		if pendingChunks.contains(regionId.hashed) {
+			return
 		}
 		
-		if pendingChunks.contains(streamHash) {
-			return nil
-		}
-		
-		pendingChunks.insert(streamHash)
+		pendingChunks.insert(regionId.hashed)
 		let streamOp = BlockOperation {
 			let startTime = DispatchTime.now()
-			if let tessellation = self.streamGeometry(streamKey) {
+			if let tessellation = self.streamGeometry(regionId.key) {
 				OperationQueue.main.addOperation {
-					let c = streamHash.hashColor.tuple()
-					let primitive = ArrayedRenderPrimitive(vertices: tessellation.vertices, color: c, ownerHash: streamHash, debugName: streamKey)
-					self.geometryCache[streamHash] = primitive
-					self.pendingChunks.remove(streamHash)
+					let c = regionId.hashed.hashColor.tuple()
+					let primitive = ArrayedRenderPrimitive(vertices: tessellation.vertices, color: c, ownerHash: regionId.hashed, debugName: regionId.key)
+					self.geometryCache[regionId.hashed] = primitive
+					self.pendingChunks.remove(regionId.hashed)
 					let duration = Double(DispatchTime.now().uptimeNanoseconds - startTime.uptimeNanoseconds)/1e9
-					print("Streamed \(streamKey) (\(primitive.elementCount) vertices) in \(String(format: "%.2f", duration)) seconds")
+					print("Streamed \(regionId.key) (\(primitive.elementCount) vertices) in \(String(format: "%.2f", duration)) seconds")
 				}
 			} else {
-				print("No geometry chunk available for \(streamKey)")
+				print("No geometry chunk available for \(regionId.key)")
 			}
 		}
 		streamQueue.addOperation(streamOp)
-		return nil
 	}
 	
-	func streamGeometry(_ name: String) -> GeoTessellation? {
+	private func streamGeometry(_ name: String) -> GeoTessellation? {
 		do {
 			return try chunkTable.pullChunk(name)
 		} catch (let error) {
