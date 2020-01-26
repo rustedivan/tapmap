@@ -74,7 +74,19 @@ class GeometryStreamer {
 	}
 	
 	func renderPrimitive(for streamHash: RegionHash) -> ArrayedRenderPrimitive? {
-		return geometryCache[streamHash]
+		if let primitive = geometryCache[streamHash] {
+			return primitive
+		} else {
+			// Only stream primitives that are actually opened
+			if let region = AppDelegate.sharedUserState.availableContinents[streamHash] {
+				streamPrimitive(for: region.geographyId)
+			} else if let country = AppDelegate.sharedUserState.availableCountries[streamHash] {
+				streamPrimitive(for: country.geographyId)
+			} else if let continent = AppDelegate.sharedUserState.availableContinents[streamHash] {
+				streamPrimitive(for: continent.geographyId)
+			}
+			return nil
+		}
 	}
 	
 	func streamPrimitive(for regionId: RegionId) {
