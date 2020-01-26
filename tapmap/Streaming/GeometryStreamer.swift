@@ -25,7 +25,8 @@ class GeometryStreamer {
 	let chunkTable: ChunkTable
 	let streamQueue: OperationQueue
 	var pendingChunks: Set<Int> = []
-	var geometryCache: [Int : ArrayedRenderPrimitive] = [:]
+	var primitiveCache: [Int : ArrayedRenderPrimitive] = [:]
+	var geometryCache: [Int : GeoTessellation] = [:]
 	
 	init?(attachFile path: String) {
 		let startTime = Date()
@@ -74,7 +75,7 @@ class GeometryStreamer {
 	}
 	
 	func renderPrimitive(for streamHash: RegionHash, queueIfMissing: Bool = true) -> ArrayedRenderPrimitive? {
-		if let primitive = geometryCache[streamHash] {
+		if let primitive = primitiveCache[streamHash] {
 			return primitive
 		} else if (queueIfMissing) {
 			// Only stream primitives that are actually opened
@@ -89,6 +90,10 @@ class GeometryStreamer {
 		return nil
 	}
 	
+	func tessellation(for streamHash: RegionHash) -> GeoTessellation? {
+		return geometryCache[streamHash]
+	}
+	
 	func streamPrimitive(for regionId: RegionId) {
 		if pendingChunks.contains(regionId.hashed) {
 			return
@@ -101,7 +106,8 @@ class GeometryStreamer {
 				OperationQueue.main.addOperation {
 					let c = regionId.hashed.hashColor.tuple()
 					let primitive = ArrayedRenderPrimitive(vertices: tessellation.vertices, color: c, ownerHash: regionId.hashed, debugName: regionId.key)
-					self.geometryCache[regionId.hashed] = primitive
+					self.primitiveCache[regionId.hashed] = primitive
+					self.geometryCache[regionId.hashed] = tessellation
 					self.pendingChunks.remove(regionId.hashed)
 					let duration = Double(DispatchTime.now().uptimeNanoseconds - startTime.uptimeNanoseconds)/1e9
 					print("Streamed \(regionId.key) (\(primitive.elementCount) vertices) in \(String(format: "%.2f", duration)) seconds")
