@@ -29,30 +29,6 @@ enum VertexAttribs: GLuint {
 	case scalar = 3
 }
 
-extension GeoRegion : Renderable {
-	typealias PrimitiveType = ArrayedRenderPrimitive
-	func renderPrimitive() -> PrimitiveType {
-		let c = hashColor(ofHash: parentHash, childHash: hashValue).tuple()
-		return ArrayedRenderPrimitive(vertices: geometry.vertices, color: c, ownerHash: hashValue, debugName: "Region: \(name)")
-	}
-}
-
-extension GeoCountry : Renderable {
-	typealias PrimitiveType = ArrayedRenderPrimitive
-	func renderPrimitive() -> PrimitiveType {
-		let c = hashColor.tuple()
-		return ArrayedRenderPrimitive(vertices: geometry.vertices, color: c, ownerHash: hashValue, debugName: "Country: \(name)")
-	}
-}
-
-extension GeoContinent : Renderable {
-	typealias PrimitiveType = ArrayedRenderPrimitive
-	func renderPrimitive() -> PrimitiveType {
-		let c = hashColor.tuple()
-		return ArrayedRenderPrimitive(vertices: geometry.vertices, color: c, ownerHash: hashValue, debugName: "Continent \(name)")
-	}
-}
-
 func loadShaders(shaderName: String) -> GLuint {
 	var program: GLuint = 0
 	var vertShader: GLuint = 0

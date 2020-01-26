@@ -105,11 +105,6 @@ struct GeoTessellation : Codable {
 	let midpoint: Vertex
 }
 
-protocol Renderable {
-	associatedtype PrimitiveType
-	func renderPrimitive() -> PrimitiveType
-}
-
 protocol GeoIdentifiable : Hashable {
 	var name : String { get }
 	var aabb : Aabb { get }
@@ -121,7 +116,7 @@ protocol GeoPlaceContainer {
 	func poiRenderPlanes() -> [PoiPlane]
 }
 
-protocol GeoTessellated : Renderable {
+protocol GeoTessellated {
 	var geometry : GeoTessellation { get }
 	var contours : [VertexRing] { get }
 }
