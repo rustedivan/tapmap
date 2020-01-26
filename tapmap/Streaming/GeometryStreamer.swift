@@ -12,6 +12,8 @@ class GeometryStreamer {
 	let fileData: Data	// fileData is memory-mapped so no need to attach a FileHandle here
 	let fileHeader: WorldHeader
 	let chunkTable: ChunkTable
+	let streamQueue: OperationQueue
+	
 	init?(attachFile path: String) {
 		let startTime = Date()
 		print("Attaching geometry streamer...")
@@ -35,6 +37,11 @@ class GeometryStreamer {
 		chunkTable.chunkData = fileData.subdata(in: fileHeader.dataOffset..<fileHeader.dataOffset + fileHeader.dataSize)
 		print("  - chunk data attached with \(ByteCountFormatter.string(fromByteCount: Int64(chunkTable.chunkData.count), countStyle: .memory))")
 		
+		streamQueue = OperationQueue()
+		streamQueue.name = "Geometry streaming"
+		streamQueue.qualityOfService = .userInitiated
+		print("  - empty streaming op-queue setup")
+		
 		let duration = Date().timeIntervalSince(startTime)
 		print("  - ready to stream after \(String(format: "%.2f", duration)) seconds")
 	}
@@ -51,10 +58,25 @@ class GeometryStreamer {
 		return loadedWorld
 	}
 	
-	func getRenderPrimitive(name: String) -> ArrayedRenderPrimitive? {
+	func getRenderPrimitive(name: String, ownerHash hashValue: Int) -> ArrayedRenderPrimitive? {
+		let streamOp = BlockOperation {
+			let startTime = DispatchTime.now()
+			if let tessellation = self.streamGeometry(name) {
+				let c = hashValue.hashColor.tuple()
+				OperationQueue.main.addOperation {
+					let primitive = ArrayedRenderPrimitive(vertices: tessellation.vertices, color: c, ownerHash: hashValue, debugName: name)
+					let duration = Double(DispatchTime.now().uptimeNanoseconds - startTime.uptimeNanoseconds)/1e9
+					print("Streamed \(name) (\(primitive.elementCount) vertices) in \(String(format: "%.2f", duration)) seconds")
+				}
+			}
+		}
+		streamQueue.addOperation(streamOp)
+		return nil
+	}
+	
+	func streamGeometry(_ name: String) -> GeoTessellation? {
 		do {
-			let tessellation: GeoTessellation = try chunkTable.pullChunk(name)
-			return nil
+			return try chunkTable.pullChunk(name)
 		} catch (let error) {
 			print("Could not load tessellation: \(error.localizedDescription)")
 			return nil
