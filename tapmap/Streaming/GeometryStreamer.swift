@@ -13,6 +13,8 @@ class GeometryStreamer {
 	let fileHeader: WorldHeader
 	let chunkTable: ChunkTable
 	let streamQueue: OperationQueue
+	var pendingChunks: Set<Int> = []
+	var geometryCache: [Int : ArrayedRenderPrimitive] = [:]
 	
 	init?(attachFile path: String) {
 		let startTime = Date()
@@ -59,12 +61,23 @@ class GeometryStreamer {
 	}
 	
 	func getRenderPrimitive(name: String, ownerHash hashValue: Int) -> ArrayedRenderPrimitive? {
+		if let cachedPrimitive = geometryCache[hashValue] {
+			return cachedPrimitive
+		}
+		
+		if pendingChunks.contains(hashValue) {
+			return nil
+		}
+		
+		pendingChunks.insert(hashValue)
 		let streamOp = BlockOperation {
 			let startTime = DispatchTime.now()
 			if let tessellation = self.streamGeometry(name) {
-				let c = hashValue.hashColor.tuple()
 				OperationQueue.main.addOperation {
+					let c = hashValue.hashColor.tuple()
 					let primitive = ArrayedRenderPrimitive(vertices: tessellation.vertices, color: c, ownerHash: hashValue, debugName: name)
+					self.geometryCache[hashValue] = primitive
+					self.pendingChunks.remove(hashValue)
 					let duration = Double(DispatchTime.now().uptimeNanoseconds - startTime.uptimeNanoseconds)/1e9
 					print("Streamed \(name) (\(primitive.elementCount) vertices) in \(String(format: "%.2f", duration)) seconds")
 				}

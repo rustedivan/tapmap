@@ -31,6 +31,7 @@ class MapViewController: GLKViewController, GLKViewControllerDelegate {
 	// Rendering
 	var modelViewProjectionMatrix: GLKMatrix4 = GLKMatrix4Identity
 	var context: EAGLContext? = nil
+	var geometryStreamer: GeometryStreamer!
 	
 	override func viewDidLoad() {
 		super.viewDidLoad()
@@ -39,10 +40,10 @@ class MapViewController: GLKViewController, GLKViewControllerDelegate {
 		
 		let path = Bundle.main.path(forResource: "world", ofType: "geo")!
 		
-		let streamer = GeometryStreamer(attachFile: path)!
+		geometryStreamer = GeometryStreamer(attachFile: path)!
 		
-		uiState.worldQuadTree = streamer.loadWorldTree()
-		geoWorld = streamer.loadGeoWorld()
+		uiState.worldQuadTree = geometryStreamer.loadWorldTree()
+		geoWorld = geometryStreamer.loadGeoWorld()
 		userState.buildWorldAvailability(withWorld: geoWorld)
 		
 		
