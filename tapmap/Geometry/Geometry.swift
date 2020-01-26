@@ -29,11 +29,15 @@ func boxContains(_ aabb: Aabb, _ p: Vertex) -> Bool {
 					aabb.minY < p.y && p.y < aabb.maxY)
 }
 
-func pickFromTessellations<T:GeoTessellated>(p: Vertex, candidates: Set<T>) -> T? {
-	for tessellation in candidates {
-		if triangleSoupHitTest(point: p,
-													 inVertices: tessellation.geometry.vertices) {
-			return tessellation
+func pickFromTessellations<T:GeoIdentifiable>(p: Vertex, candidates: Set<T>) -> RegionHash? {
+	let streamer = GeometryStreamer.shared
+	for candidate in candidates {
+		let hash = candidate.geographyId.hashed
+		guard let tessellation = streamer.tessellation(for: hash) else {
+			continue
+		}
+		if triangleSoupHitTest(point: p, inVertices: tessellation.vertices) {
+			return hash
 		}
 	}
 	return nil

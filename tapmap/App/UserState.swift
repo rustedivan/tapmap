@@ -31,25 +31,25 @@ class UserState {
 		availableRegions = Dictionary(uniqueKeysWithValues: closedRegions.map { ($0.geographyId.hashed, $0) })
 	}
 	
-	func placeVisited<T:Hashable>(_ p: T) -> Bool {
-		return visitedPlaces[p.hashValue] ?? false
+	func placeVisited<T:GeoIdentifiable>(_ p: T) -> Bool {
+		return visitedPlaces[p.geographyId.hashed] ?? false
 	}
 	
 	func visitPlace<T:GeoIdentifiable>(_ p: T) {
-		visitedPlaces[p.hashValue] = true
+		visitedPlaces[p.geographyId.hashed] = true
 	}
 	
 	func openPlace<T:GeoNode>(_ p: T) {
 		switch (p) {
 		case let continent as GeoContinent:
-			availableContinents.removeValue(forKey: continent.hashValue)
+			availableContinents.removeValue(forKey: continent.geographyId.hashed)
 			for newCountry in continent.children {
-				availableCountries[newCountry.hashValue] = newCountry
+				availableCountries[newCountry.geographyId.hashed] = newCountry
 			}
 		case let country as GeoCountry:
-			availableCountries.removeValue(forKey: country.hashValue)
+			availableCountries.removeValue(forKey: country.geographyId.hashed)
 			for newRegion in country.children {
-				availableRegions[newRegion.hashValue] = newRegion
+				availableRegions[newRegion.geographyId.hashed] = newRegion
 			}
 		default:
 			break
@@ -57,6 +57,6 @@ class UserState {
 	}
 	
 	func visitPlace(_ p: GeoRegion) {
-		visitedPlaces[p.hashValue] = true
+		visitedPlaces[p.geographyId.hashed] = true
 	}
 }

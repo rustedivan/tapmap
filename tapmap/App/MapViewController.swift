@@ -125,15 +125,18 @@ class MapViewController: GLKViewController, GLKViewControllerDelegate {
 				.filter { boxContains($0.value.aabb, tapPoint) }
 				.values)
 			
-			if let hitContinent = pickFromTessellations(p: tapPoint, candidates: candidateContinents) {
+			if let hitHash = pickFromTessellations(p: tapPoint, candidates: candidateContinents) {
+				let hitContinent = userState.availableContinents[hitHash]!
 				if processSelection(of: hitContinent, user: userState, ui: uiState) {
 					processVisit(of: hitContinent, user: userState, ui: uiState)
 				}
-			} else if let hitCountry = pickFromTessellations(p: tapPoint, candidates: candidateCountries) {
+			} else if let hitHash = pickFromTessellations(p: tapPoint, candidates: candidateCountries) {
+				let hitCountry = userState.availableCountries[hitHash]!
 				if processSelection(of: hitCountry, user: userState, ui: uiState) {
 					processVisit(of: hitCountry, user: userState, ui: uiState)
 				}
-			} else if let hitRegion = pickFromTessellations(p: tapPoint, candidates: candidateRegions) {
+			} else if let hitHash = pickFromTessellations(p: tapPoint, candidates: candidateRegions) {
+				let hitRegion = userState.availableRegions[hitHash]!
 				_ = processSelection(of: hitRegion, user: userState, ui: uiState)
 			} else {
 				uiState.clearSelection()
@@ -144,7 +147,7 @@ class MapViewController: GLKViewController, GLKViewControllerDelegate {
 		AppDelegate.sharedUIState.cullWorldTree(focus: visibleLongLat(viewBounds: view.bounds))
 	}
 	
-	func processSelection<T:GeoIdentifiable & GeoTessellated>(of hit: T, user: UserState, ui: UIState) -> Bool {
+	func processSelection<T:GeoIdentifiable>(of hit: T, user: UserState, ui: UIState) -> Bool {
 		placeName.text = hit.name
 		if ui.selected(hit) {
 			user.visitPlace(hit)
@@ -156,14 +159,13 @@ class MapViewController: GLKViewController, GLKViewControllerDelegate {
 		}
 	}
 	
-	func processVisit<T:GeoNode & GeoTessellated & GeoPlaceContainer>(of hit: T, user: UserState, ui: UIState)
-		where T.SubType: GeoPlaceContainer,
-					T.SubType.PrimitiveType == ArrayedRenderPrimitive {
+	func processVisit<T:GeoNode & GeoPlaceContainer>(of hit: T, user: UserState, ui: UIState)
+		where T.SubType: GeoPlaceContainer {
+
 		user.openPlace(hit)
-		ui.updateTree(replace: hit, with: hit.children)
-			
-		if let toAnimate = mapRenderer.updatePrimitives(for: hit, with: hit.children) {
-			effectRenderer.addOpeningEffect(for: toAnimate, at: hit.geometry.midpoint)
+		
+		if let visitedGeometry = geometryStreamer.renderPrimitive(for: hit.geographyId.hashed) {
+			geometryStreamer.evictPrimitive(for: hit.geographyId.hashed)
 		}
 		poiRenderer.updatePrimitives(for: hit, with: hit.children)
 		labelView.updatePrimitives(for: hit, with: hit.children)
