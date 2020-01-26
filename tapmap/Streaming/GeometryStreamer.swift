@@ -73,10 +73,10 @@ class GeometryStreamer {
 		return loadedWorld
 	}
 	
-	func renderPrimitive(for streamHash: RegionHash) -> ArrayedRenderPrimitive? {
+	func renderPrimitive(for streamHash: RegionHash, queueIfMissing: Bool = true) -> ArrayedRenderPrimitive? {
 		if let primitive = geometryCache[streamHash] {
 			return primitive
-		} else {
+		} else if (queueIfMissing) {
 			// Only stream primitives that are actually opened
 			if let region = AppDelegate.sharedUserState.availableContinents[streamHash] {
 				streamPrimitive(for: region.geographyId)
@@ -85,8 +85,8 @@ class GeometryStreamer {
 			} else if let continent = AppDelegate.sharedUserState.availableContinents[streamHash] {
 				streamPrimitive(for: continent.geographyId)
 			}
-			return nil
 		}
+		return nil
 	}
 	
 	func streamPrimitive(for regionId: RegionId) {
