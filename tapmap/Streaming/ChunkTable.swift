@@ -46,10 +46,3 @@ class ChunkTable: Codable {
 		return try PropertyListDecoder().decode(T.self, from: chunkBytes)
 	}
 }
-
-func streamingKey(type: String, name: String) -> String {
-	let key = "\(type) \(name)"
-	return key.components(separatedBy: .punctuationCharacters).joined(separator: "")
-					  .components(separatedBy: .whitespaces).joined(separator: "-")
-						.lowercased()
-}

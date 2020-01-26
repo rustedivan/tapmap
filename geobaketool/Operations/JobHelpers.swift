@@ -52,6 +52,6 @@ struct ToolGeoFeature : Equatable, Hashable {
 	}
 	
 	var geographyId: RegionId {
-		return streamingKey(type: level.rawValue, name: name)
+		return RegionId(level.rawValue, name)
 	}
 }

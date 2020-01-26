@@ -10,16 +10,45 @@ import Foundation
 
 // Swift's Hasher is randomized on each launch, so use these
 // for values that need to be persisted into data.
-typealias RegionId = String
-typealias RegionHash = Int
-extension RegionId {
+struct RegionId: Codable {
+	let key: String
+	var hashed: Int = 0
+	
 	init(_ level: String, _ name: String) {
-		self = level + name
+		let fatKey = "\(level) \(name)"
+		key = fatKey.components(separatedBy: .punctuationCharacters).joined(separator: "")
+								.components(separatedBy: .whitespaces).joined(separator: "-")
+								.lowercased()
+		hashed = RegionId.rabinKarp(key)
 	}
-	var hashed: Int {
-		return 7
+	
+	func encode(to encoder: Encoder) throws {
+		var container = encoder.unkeyedContainer()
+		try container.encode(key)
+	}
+	
+	init(from decoder: Decoder) throws {
+		var container = try decoder.unkeyedContainer()
+		key = try container.decode(String.self)
+		hashed = RegionId.rabinKarp(key)
+	}
+	
+	private static func rabinKarp(_ key: String) -> RegionHash {
+		// Swift's Hasher is not deterministic across executions,
+		// so use this polynomial hash function for streaming keys.
+		// (Rabin-Karp at base 13)
+		let base = 13
+
+		var hash = 0
+		for char in key {
+			let charCode = Int(char.unicodeScalars.first!.value)
+			hash = (hash * base + charCode) % Int(Int16.max)
+		}
+
+		return hash
 	}
 }
+typealias RegionHash = Int
 
 
 struct GeoColor : Codable {
@@ -117,11 +146,7 @@ struct GeoRegion : GeoIdentifiable, GeoPlaceContainer, Codable, Equatable {
 	}
 	
 	func hash(into hasher: inout Hasher) {
-		hasher.combine(geographyId)
-	}
-	
-	var streamKey: String {
-		return streamingKey(type: "region", name: name)
+		hasher.combine(geographyId.key)
 	}
 }
 
@@ -135,17 +160,12 @@ struct GeoCountry : GeoNode, GeoPlaceContainer, Codable, Equatable {
 	let geographyId: RegionId
 	let aabb: Aabb
 	
-	
 	public static func == (lhs: GeoCountry, rhs: GeoCountry) -> Bool {
 		return lhs.name == rhs.name && lhs.aabb.midpoint == rhs.aabb.midpoint
 	}
 	
 	public func hash(into hasher: inout Hasher) {
-		hasher.combine(geographyId)
-	}
-	
-	var streamKey: String {
-		return streamingKey(type: "country", name: name)
+		hasher.combine(geographyId.key)
 	}
 }
 
@@ -164,11 +184,7 @@ struct GeoContinent : GeoNode, GeoPlaceContainer, Codable, Equatable, Hashable {
 	}
 	
 	func hash(into hasher: inout Hasher) {
-		hasher.combine(geographyId)
-	}
-	
-	var streamKey: String {
-		return streamingKey(type: "continent", name: name)
+		hasher.combine(geographyId.key)
 	}
 }
 
@@ -176,11 +192,15 @@ struct GeoWorld : GeoNode, Codable {
 	let name: String
 	var aabb : Aabb { return Aabb(loX: -180.0, loY: -85.0, hiX: 180.0, hiY: 85.0) }
 	let children: Set<GeoContinent>
-	let parentId: RegionId
-	let geographyId: RegionId
+	let parentId = RegionId("universe", "universe")
+	let geographyId = RegionId("world", "earth")
 	
-	var streamKey: String {
-		return streamingKey(type: "world", name: name)
+	func hash(into hasher: inout Hasher) {
+		hasher.combine(geographyId.key)
+	}
+	
+	public static func == (lhs: GeoWorld, rhs: GeoWorld) -> Bool {
+		return lhs.name == rhs.name
 	}
 }
 

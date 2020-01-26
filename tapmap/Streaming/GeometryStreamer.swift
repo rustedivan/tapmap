@@ -60,27 +60,29 @@ class GeometryStreamer {
 		return loadedWorld
 	}
 	
-	func getRenderPrimitive(name: String, ownerHash hashValue: Int) -> ArrayedRenderPrimitive? {
-		if let cachedPrimitive = geometryCache[hashValue] {
+	func getRenderPrimitive(name streamKey: String, streamHash: Int) -> ArrayedRenderPrimitive? {
+		if let cachedPrimitive = geometryCache[streamHash] {
 			return cachedPrimitive
 		}
 		
-		if pendingChunks.contains(hashValue) {
+		if pendingChunks.contains(streamHash) {
 			return nil
 		}
 		
-		pendingChunks.insert(hashValue)
+		pendingChunks.insert(streamHash)
 		let streamOp = BlockOperation {
 			let startTime = DispatchTime.now()
-			if let tessellation = self.streamGeometry(name) {
+			if let tessellation = self.streamGeometry(streamKey) {
 				OperationQueue.main.addOperation {
-					let c = hashValue.hashColor.tuple()
-					let primitive = ArrayedRenderPrimitive(vertices: tessellation.vertices, color: c, ownerHash: hashValue, debugName: name)
-					self.geometryCache[hashValue] = primitive
-					self.pendingChunks.remove(hashValue)
+					let c = streamHash.hashColor.tuple()
+					let primitive = ArrayedRenderPrimitive(vertices: tessellation.vertices, color: c, ownerHash: streamHash, debugName: streamKey)
+					self.geometryCache[streamHash] = primitive
+					self.pendingChunks.remove(streamHash)
 					let duration = Double(DispatchTime.now().uptimeNanoseconds - startTime.uptimeNanoseconds)/1e9
-					print("Streamed \(name) (\(primitive.elementCount) vertices) in \(String(format: "%.2f", duration)) seconds")
+					print("Streamed \(streamKey) (\(primitive.elementCount) vertices) in \(String(format: "%.2f", duration)) seconds")
 				}
+			} else {
+				print("No geometry chunk available for \(streamKey)")
 			}
 		}
 		streamQueue.addOperation(streamOp)
