@@ -51,7 +51,7 @@ struct ToolGeoFeature : Equatable, Hashable {
 		hasher.combine(countryKey)
 	}
 	
-	var serializationKey: String {
+	var geographyId: RegionId {
 		return streamingKey(type: level.rawValue, name: name)
 	}
 }

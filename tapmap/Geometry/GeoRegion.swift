@@ -8,6 +8,20 @@
 
 import Foundation
 
+// Swift's Hasher is randomized on each launch, so use these
+// for values that need to be persisted into data.
+typealias RegionId = String
+typealias RegionHash = Int
+extension RegionId {
+	init(_ level: String, _ name: String) {
+		self = level + name
+	}
+	var hashed: Int {
+		return 7
+	}
+}
+
+
 struct GeoColor : Codable {
 	let r, g, b: Float
 }
@@ -70,8 +84,8 @@ protocol Renderable {
 protocol GeoIdentifiable : Hashable {
 	var name : String { get }
 	var aabb : Aabb { get }
-	var parentHash: Int { get }
-	var streamKey: String { get }
+	var parentId: RegionId { get }
+	var geographyId: RegionId { get }
 }
 
 protocol GeoPlaceContainer {
@@ -94,7 +108,8 @@ struct GeoRegion : GeoIdentifiable, GeoPlaceContainer, Codable, Equatable {
 	let name: String
 	let contours: [VertexRing]
 	let places: Set<GeoPlace>
-	let parentHash: Int
+	let parentId: RegionId
+	let geographyId: RegionId
 	let aabb: Aabb
 	
 	public static func == (lhs: GeoRegion, rhs: GeoRegion) -> Bool {
@@ -102,9 +117,7 @@ struct GeoRegion : GeoIdentifiable, GeoPlaceContainer, Codable, Equatable {
 	}
 	
 	func hash(into hasher: inout Hasher) {
-		hasher.combine(name)
-		hasher.combine(aabb.midpoint.quantized.0)
-		hasher.combine(aabb.midpoint.quantized.1)
+		hasher.combine(geographyId)
 	}
 	
 	var streamKey: String {
@@ -118,7 +131,8 @@ struct GeoCountry : GeoNode, GeoPlaceContainer, Codable, Equatable {
 	let children: Set<GeoRegion>
 	let places: Set<GeoPlace>
 	let contours: [VertexRing]
-	let parentHash: Int
+	let parentId: RegionId
+	let geographyId: RegionId
 	let aabb: Aabb
 	
 	
@@ -127,9 +141,7 @@ struct GeoCountry : GeoNode, GeoPlaceContainer, Codable, Equatable {
 	}
 	
 	public func hash(into hasher: inout Hasher) {
-		hasher.combine(name)
-		hasher.combine(aabb.midpoint.quantized.0)
-		hasher.combine(aabb.midpoint.quantized.1)
+		hasher.combine(geographyId)
 	}
 	
 	var streamKey: String {
@@ -143,7 +155,8 @@ struct GeoContinent : GeoNode, GeoPlaceContainer, Codable, Equatable, Hashable {
 	let children: Set<GeoCountry>
 	let places: Set<GeoPlace>
 	let contours: [VertexRing]
-	let parentHash: Int
+	let parentId: RegionId
+	let geographyId: RegionId
 	let aabb: Aabb
 	
 	public static func == (lhs: GeoContinent, rhs: GeoContinent) -> Bool {
@@ -151,9 +164,7 @@ struct GeoContinent : GeoNode, GeoPlaceContainer, Codable, Equatable, Hashable {
 	}
 	
 	func hash(into hasher: inout Hasher) {
-		hasher.combine(name)
-		hasher.combine(aabb.midpoint.quantized.0)
-		hasher.combine(aabb.midpoint.quantized.1)
+		hasher.combine(geographyId)
 	}
 	
 	var streamKey: String {
@@ -165,7 +176,8 @@ struct GeoWorld : GeoNode, Codable {
 	let name: String
 	var aabb : Aabb { return Aabb(loX: -180.0, loY: -85.0, hiX: 180.0, hiY: 85.0) }
 	let children: Set<GeoContinent>
-	let parentHash: Int
+	let parentId: RegionId
+	let geographyId: RegionId
 	
 	var streamKey: String {
 		return streamingKey(type: "world", name: name)

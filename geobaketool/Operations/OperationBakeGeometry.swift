@@ -112,7 +112,8 @@ class OperationBakeGeometry : Operation {
 					let geoRegion = GeoRegion(name: region.name,
 																		contours: region.polygons.map { $0.exteriorRing },
 																		places: region.places ?? [],
-																		parentHash: country.hashValue,
+																		parentId: country.geographyId,
+																		geographyId: RegionId("region", region.name),
 																		aabb: regionTessellation.aabb)
 					regionResult.insert(geoRegion)
 				}
@@ -121,7 +122,8 @@ class OperationBakeGeometry : Operation {
 																		children: regionResult,
 																		places: country.places ?? [],
 																		contours: country.polygons.map { $0.exteriorRing },
-																		parentHash: continent.hashValue,
+																		parentId: continent.geographyId,
+																		geographyId: RegionId("country", country.name),
 																		aabb: countryTessellation.aabb)
 				countryResult.insert(geoCountry)
 			}
@@ -130,11 +132,12 @@ class OperationBakeGeometry : Operation {
 																			children: countryResult,
 																			places: continent.places ?? [],
 																			contours: continent.polygons.map { $0.exteriorRing },
-																			parentHash: 0,
+																			parentId: "world-earth",
+																			geographyId: RegionId("continent", continent.name),
 																			aabb: continentTessellation.aabb)
 			worldResult.insert(geoContinent)
 		}
-		return GeoWorld(name: "Earth", children: worldResult, parentHash: 0)
+		return GeoWorld(name: "Earth", children: worldResult, parentId: "universe", geographyId: "world-earth")
 	}
 	
 	func buildTree(from bakedWorld: GeoWorld) -> WorldTree {
@@ -143,15 +146,15 @@ class OperationBakeGeometry : Operation {
 		for continent in bakedWorld.children {
 			for country in continent.children {
 				for region in country.children {
-					let regionBox = RegionBounds(regionHash: region.hashValue, bounds: region.aabb)
+					let regionBox = RegionBounds(regionHash: region.geographyId.hashed, bounds: region.aabb)
 					worldQuadTree.insert(value: regionBox, region: regionBox.bounds)
 				}
 				
-				let countryBox = RegionBounds(regionHash: country.hashValue, bounds: country.aabb)
+				let countryBox = RegionBounds(regionHash: country.geographyId.hashed, bounds: country.aabb)
 				worldQuadTree.insert(value: countryBox, region: countryBox.bounds)
 			}
 			
-			let continentBox = RegionBounds(regionHash: continent.hashValue, bounds: continent.aabb)
+			let continentBox = RegionBounds(regionHash: continent.geographyId.hashed, bounds: continent.aabb)
 			worldQuadTree.insert(value: continentBox, region: continentBox.bounds)
 		}
 		return worldQuadTree
@@ -165,13 +168,13 @@ class OperationBakeGeometry : Operation {
 		// Serialize the tree into a list so continents come before countries come before regions.
 		// This will improve cache/VM locality when pulling chunks from the baked file.
 		
-		continentTessellations.append(contentsOf: toolWorld.map { ($0.serializationKey, $0.tessellation!) })
+		continentTessellations.append(contentsOf: toolWorld.map { ($0.geographyId, $0.tessellation!) })
 		for continent in toolWorld {
 			let countries = continent.children ?? []
-			countryTessellations.append(contentsOf: countries.map { ($0.serializationKey, $0.tessellation!) })
+			countryTessellations.append(contentsOf: countries.map { ($0.geographyId, $0.tessellation!) })
 			for country in continent.children ?? [] {
 				let regions = country.children ?? []
-				regionTessellations.append(contentsOf: regions.map { ($0.serializationKey, $0.tessellation!) })
+				regionTessellations.append(contentsOf: regions.map { ($0.geographyId, $0.tessellation!) })
 			}
 		}
 		
