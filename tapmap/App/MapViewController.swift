@@ -164,7 +164,8 @@ class MapViewController: GLKViewController, GLKViewControllerDelegate {
 
 		user.openPlace(hit)
 		
-		if let visitedGeometry = geometryStreamer.renderPrimitive(for: hit.geographyId.hashed) {
+		if geometryStreamer.renderPrimitive(for: hit.geographyId.hashed) != nil {
+			effectRenderer.addOpeningEffect(for: hit.geographyId.hashed)
 			geometryStreamer.evictPrimitive(for: hit.geographyId.hashed)
 		}
 		poiRenderer.updatePrimitives(for: hit, with: hit.children)

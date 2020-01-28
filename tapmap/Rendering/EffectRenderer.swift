@@ -45,8 +45,10 @@ class EffectRenderer {
 		}
 	}
 	
-	func addOpeningEffect(for primitive: ArrayedRenderPrimitive, at midpoint: Vertex) {
-		runningEffects.append(RegionEffect(primitive: primitive, center: midpoint, startTime: Date(), duration: 1.0))
+	func addOpeningEffect(for regionHash: RegionHash) {
+		guard let tessellation = GeometryStreamer.shared.tessellation(for: regionHash) else { return }
+		guard let primitive = GeometryStreamer.shared.renderPrimitive(for: regionHash) else { return }
+		runningEffects.append(RegionEffect(primitive: primitive, center: tessellation.midpoint, startTime: Date(), duration: 1.0))
 	}
 	
 	func updatePrimitives() {
