@@ -84,7 +84,7 @@ class PoiRenderer {
 	
 	func updatePrimitives<T:GeoNode>(for node: T, with subRegions: Set<T.SubType>)
 		where T.SubType : GeoPlaceContainer {
-		let removedRegionsHash = node.hashValue
+		let removedRegionsHash = node.geographyId.hashed
 		poiPlanePrimitives = poiPlanePrimitives.filter { $0.ownerHash != removedRegionsHash }
 		let subregionPrimitives = subRegions.flatMap { $0.poiRenderPlanes() }
 		poiPlanePrimitives.append(contentsOf: subregionPrimitives)
@@ -214,7 +214,7 @@ func sortPlacesIntoPoiPlanes<T: GeoIdentifiable>(_ places: Set<GeoPlace>, in con
 		let primitive = IndexedRenderPrimitive(vertices: vertices,
 																						indices: indices, scalarAttribs: scalars,
 																						color: rank.hashColor.tuple(),
-																						ownerHash: container.hashValue,	// The hash of the owning region
+																						ownerHash: container.geographyId.hashed,	// The hash of the owning region
 																						debugName: "\(container.name) - poi plane @ \(rank)")
 		let hashes = places.map { $0.hashValue }
 		return PoiPlane(primitive: primitive, rank: rank, poiHashes: hashes)

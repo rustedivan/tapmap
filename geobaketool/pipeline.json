@@ -12,5 +12,7 @@
 		"simplify-regions" : 30
 	},
 	"input-countries": "reshaped-countries.json",
+	"input-regions": "reshaped-regions.json",
+	"input-cities": "osm-cities.json",
 	"output": "Development/tapmap/tapmap/Raw/world.geo"
 }
