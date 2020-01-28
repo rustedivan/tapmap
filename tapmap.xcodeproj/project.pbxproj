@@ -25,6 +25,8 @@
 		14532D9C23B5190F00943ADC /* QuadTreeTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14532D9B23B5190F00943ADC /* QuadTreeTests.swift */; };
 		14532D9E23B5197600943ADC /* OutlineGeometry.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14985FF522F0F35700F68A1F /* OutlineGeometry.swift */; };
 		14532DA023B621A800943ADC /* QuadTree.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14532D9923B515BE00943ADC /* QuadTree.swift */; };
+		145668FF23E0EA3C001EF91E /* Geometry.swift in Sources */ = {isa = PBXBuildFile; fileRef = 148937DF22B97FDF009278A0 /* Geometry.swift */; };
+		1456690023E0EA3D001EF91E /* Geometry.swift in Sources */ = {isa = PBXBuildFile; fileRef = 148937DF22B97FDF009278A0 /* Geometry.swift */; };
 		1468830D23B4BC4100105E04 /* DebugRenderer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1468830C23B4BC4100105E04 /* DebugRenderer.swift */; };
 		1468831023B4D9E400105E04 /* DebugShader.vsh in Resources */ = {isa = PBXBuildFile; fileRef = 1468830E23B4D9E400105E04 /* DebugShader.vsh */; };
 		1468831123B4D9E400105E04 /* DebugShader.fsh in Resources */ = {isa = PBXBuildFile; fileRef = 1468830F23B4D9E400105E04 /* DebugShader.fsh */; };
@@ -56,8 +58,6 @@
 		1489380A22B98112009278A0 /* GeoRegion.swift in Sources */ = {isa = PBXBuildFile; fileRef = 148937E222B97FDF009278A0 /* GeoRegion.swift */; };
 		1489380B22B98217009278A0 /* Serialization.swift in Sources */ = {isa = PBXBuildFile; fileRef = 148937F422B97FDF009278A0 /* Serialization.swift */; };
 		1489380C22B98218009278A0 /* Serialization.swift in Sources */ = {isa = PBXBuildFile; fileRef = 148937F422B97FDF009278A0 /* Serialization.swift */; };
-		1489380F22B98287009278A0 /* Geometry.swift in Sources */ = {isa = PBXBuildFile; fileRef = 148937DF22B97FDF009278A0 /* Geometry.swift */; };
-		1489381022B98288009278A0 /* Geometry.swift in Sources */ = {isa = PBXBuildFile; fileRef = 148937DF22B97FDF009278A0 /* Geometry.swift */; };
 		1489381122B982D2009278A0 /* toolgeometry.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14C665C622B97EC30054D7F2 /* toolgeometry.swift */; };
 		1489381222B982EB009278A0 /* nullrenderer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14C6659822B97E660054D7F2 /* nullrenderer.swift */; };
 		1489381322B982F8009278A0 /* nullrenderer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14C6659822B97E660054D7F2 /* nullrenderer.swift */; };
@@ -774,6 +774,7 @@
 				14C665C522B97EA00054D7F2 /* main.swift in Sources */,
 				1489381322B982F8009278A0 /* nullrenderer.swift in Sources */,
 				14C665C722B97EC30054D7F2 /* toolgeometry.swift in Sources */,
+				145668FF23E0EA3C001EF91E /* Geometry.swift in Sources */,
 				147B819723DA043500942C9B /* WorldTree.swift in Sources */,
 				14C665B322B97E670054D7F2 /* config.swift in Sources */,
 				14C665AF22B97E670054D7F2 /* download.swift in Sources */,
@@ -784,7 +785,6 @@
 				142A21F023DC61A3000DA4FA /* ChunkTable.swift in Sources */,
 				14C665C922B97ED40054D7F2 /* JobHelpers.swift in Sources */,
 				1489380B22B98217009278A0 /* Serialization.swift in Sources */,
-				1489380F22B98287009278A0 /* Geometry.swift in Sources */,
 				147B819223DA03B700942C9B /* QuadTree.swift in Sources */,
 				1489380922B98112009278A0 /* GeoRegion.swift in Sources */,
 				14C665AD22B97E670054D7F2 /* OperationTessellateRegions.swift in Sources */,
@@ -809,9 +809,9 @@
 				1489381B22B9831C009278A0 /* OperationBakeGeometry.swift in Sources */,
 				1489381522B98317009278A0 /* main.swift in Sources */,
 				1489381E22B9831C009278A0 /* OperationFixupHierarchy.swift in Sources */,
+				1456690023E0EA3D001EF91E /* Geometry.swift in Sources */,
 				1489381222B982EB009278A0 /* nullrenderer.swift in Sources */,
 				14C6659022B97E130054D7F2 /* geobaketoolTests.swift in Sources */,
-				1489381022B98288009278A0 /* Geometry.swift in Sources */,
 				1489381C22B9831C009278A0 /* OperationCleanUpBorders.swift in Sources */,
 				1489381622B98317009278A0 /* config.swift in Sources */,
 				1489382122B9831C009278A0 /* OperationTessellateRegions.swift in Sources */,

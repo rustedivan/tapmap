@@ -10,6 +10,7 @@ import Foundation
 
 class ArrayedRenderPrimitive {
 	let ownerHash = 17
+	let vertices: [Vertex] = []
 	init() {}
 	init(vertices: [Vertex], color c: (r: Float, g: Float, b: Float, a: Float), ownerHash hash: Int, debugName: String) {
 	}
@@ -29,34 +30,19 @@ class OutlineRenderPrimitive {
 	}
 }
 
-extension GeoRegion : Renderable {
-	typealias PrimitiveType = ArrayedRenderPrimitive
-	func renderPrimitive() -> ArrayedRenderPrimitive {
-		return ArrayedRenderPrimitive()
-	}
-	
+extension GeoRegion {
 	func poiRenderPlanes() -> [PoiPlane] {
 		return []
 	}
 }
 
-extension GeoCountry : Renderable {
-	typealias PrimitiveType = ArrayedRenderPrimitive
-	func renderPrimitive() -> ArrayedRenderPrimitive {
-		return ArrayedRenderPrimitive()
-	}
-	
+extension GeoCountry {
 	func poiRenderPlanes() -> [PoiPlane] {
 		return []
 	}
 }
 
-extension GeoContinent : Renderable {
-	typealias PrimitiveType = ArrayedRenderPrimitive
-	func renderPrimitive() -> ArrayedRenderPrimitive {
-		return ArrayedRenderPrimitive()
-	}
-	
+extension GeoContinent {
 	func poiRenderPlanes() -> [PoiPlane] {
 		return []
 	}
@@ -64,4 +50,13 @@ extension GeoContinent : Renderable {
 
 struct PoiPlane {
 	
+}
+
+class GeometryStreamer {
+	static var shared: GeometryStreamer { get {
+		return GeometryStreamer()
+	}}
+	func tessellation(for: Int) -> ArrayedRenderPrimitive? {
+		return nil
+	}
 }
