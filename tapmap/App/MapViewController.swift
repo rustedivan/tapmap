@@ -154,7 +154,7 @@ class MapViewController: GLKViewController, GLKViewControllerDelegate {
 			return true
 		} else {
 			ui.selectRegion(hit)
-			selectionRenderer.select(geometry: hit)
+			selectionRenderer.select(regionHash: hit.geographyId.hashed)
 			return false
 		}
 	}

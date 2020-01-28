@@ -36,7 +36,9 @@ class SelectionRenderer {
 		}
 	}
 	
-	func select<T: GeoTessellated>(geometry tessellation: T) {
+	func select(regionHash: RegionHash) {
+		guard let tessellation = GeometryStreamer.shared.tessellation(for: regionHash) else { return }
+		
 		let thinOutline = { (outline: [Vertex]) in generateClosedOutlineGeometry(outline: outline, width: 0.2) }
 		let countourVertices = tessellation.contours.map({$0.vertices})
 		let outlineGeometry = countourVertices.map(thinOutline)
