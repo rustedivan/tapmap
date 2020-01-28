@@ -27,6 +27,9 @@ class GeometryStreamer {
 	var pendingChunks: Set<Int> = []
 	var primitiveCache: [Int : ArrayedRenderPrimitive] = [:]
 	var geometryCache: [Int : GeoTessellation] = [:]
+	var streaming: Bool { get {
+		return !pendingChunks.isEmpty
+	}}
 	
 	init?(attachFile path: String) {
 		let startTime = Date()
@@ -114,8 +117,8 @@ class GeometryStreamer {
 					self.primitiveCache[regionId.hashed] = primitive
 					self.geometryCache[regionId.hashed] = tessellation
 					self.pendingChunks.remove(regionId.hashed)
-					let duration = Double(DispatchTime.now().uptimeNanoseconds - startTime.uptimeNanoseconds)/1e9
-					print("Streamed \(regionId.key) (\(primitive.elementCount) vertices) in \(String(format: "%.2f", duration)) seconds")
+//					let duration = Double(DispatchTime.now().uptimeNanoseconds - startTime.uptimeNanoseconds)/1e9
+//					print("Streamed \(regionId.key) (\(primitive.elementCount) vertices) after \(String(format: "%.2f", duration)) seconds")
 				}
 			} else {
 				print("No geometry chunk available for \(regionId.key)")

@@ -27,6 +27,10 @@ class MapViewController: GLKViewController, GLKViewControllerDelegate {
 	var offset: CGPoint = .zero
 	let mapSpace = CGRect(x: -180.0, y: -80.0, width: 360.0, height: 160.0)
 	var mapFrame = CGRect.zero
+	var lastRenderFrame: Int = Int.max
+	var needsRender: Bool = true { didSet {
+		if needsRender { self.isPaused = false }
+	}}
 	
 	// Rendering
 	var modelViewProjectionMatrix: GLKMatrix4 = GLKMatrix4Identity
@@ -100,6 +104,8 @@ class MapViewController: GLKViewController, GLKViewControllerDelegate {
 	}
 	
 	@objc func handleTap(sender: UITapGestureRecognizer) {
+		needsRender = true
+		
 		if sender.state == .ended {
 			let viewP = sender.location(in: dummyView)
 			let mapP = mapPoint(viewP, from: dummyView.bounds, to: mapFrame, space: mapSpace)
@@ -183,6 +189,8 @@ class MapViewController: GLKViewController, GLKViewControllerDelegate {
 		poiRenderer.updateFades()
 		labelView.updateLabels(for: poiRenderer.activePoiHashes,
 													 inArea: visibleLongLat(viewBounds: view.bounds))
+		
+		idleIfStill(willRender: needsRender, frameCount: controller.framesDisplayed)
 	}
 	
 	override func glkView(_ view: GLKView, drawIn rect: CGRect) {
@@ -196,7 +204,18 @@ class MapViewController: GLKViewController, GLKViewControllerDelegate {
 		selectionRenderer.renderSelection(inProjection: modelViewProjectionMatrix)
 		labelView.renderLabels(projection: mapToView)
 		
+		needsRender = false
 //		DebugRenderer.shared.renderMarkers(inProjection: modelViewProjectionMatrix)
+	}
+	
+	func idleIfStill(willRender: Bool, frameCount: Int) {
+		needsRender = effectRenderer.animating ? true : willRender
+		needsRender = geometryStreamer.streaming ? true : willRender
+		if (needsRender) {
+			lastRenderFrame = frameCount
+		} else if frameCount - lastRenderFrame > 30 {
+			self.isPaused = true
+		}
 	}
 }
 
@@ -212,11 +231,13 @@ extension MapViewController : UIScrollViewDelegate {
 		}
 		
 		AppDelegate.sharedUIState.cullWorldTree(focus: visibleLongLat(viewBounds: view.bounds))
+		needsRender = true
 	}
 	
 	func scrollViewDidScroll(_ scrollView: UIScrollView) {
 		offset = scrollView.contentOffset
 		AppDelegate.sharedUIState.cullWorldTree(focus: visibleLongLat(viewBounds: view.bounds))
+		needsRender = true
 	}
 	
 	func visibleLongLat(viewBounds: CGRect) -> Aabb {

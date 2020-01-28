@@ -23,6 +23,9 @@ class EffectRenderer {
 	var runningEffects : [RegionEffect]
 	let openingProgram: GLuint
 	let effectUniforms : (modelViewMatrix: GLint, color: GLint, progress: GLint, scaleInPlaceMatrix: GLint)
+	var animating: Bool { get {
+		return !runningEffects.isEmpty
+	}}
 	
 	init?() {
 		openingProgram = loadShaders(shaderName: "OpeningShader")
