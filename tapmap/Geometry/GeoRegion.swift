@@ -101,6 +101,7 @@ struct Aabb : Equatable, Codable {
 
 struct GeoTessellation : Codable {
 	let vertices: [Vertex]
+	let contours: [VertexRing]
 	let aabb: Aabb
 	let midpoint: Vertex
 }
@@ -116,11 +117,6 @@ protocol GeoPlaceContainer {
 	func poiRenderPlanes() -> [PoiPlane]
 }
 
-protocol GeoTessellated {
-	var geometry : GeoTessellation { get }
-	var contours : [VertexRing] { get }
-}
-
 protocol GeoNode : GeoIdentifiable {
 	associatedtype SubType : GeoIdentifiable
 	var children : Set<SubType> { get }
@@ -129,7 +125,6 @@ protocol GeoNode : GeoIdentifiable {
 
 struct GeoRegion : GeoIdentifiable, GeoPlaceContainer, Codable, Equatable {
 	let name: String
-	let contours: [VertexRing]
 	let places: Set<GeoPlace>
 	let geographyId: RegionId
 	let aabb: Aabb
@@ -148,7 +143,6 @@ struct GeoCountry : GeoNode, GeoPlaceContainer, Codable, Equatable {
 	let name: String
 	let children: Set<GeoRegion>
 	let places: Set<GeoPlace>
-	let contours: [VertexRing]
 	let geographyId: RegionId
 	let aabb: Aabb
 	
@@ -166,7 +160,6 @@ struct GeoContinent : GeoNode, GeoPlaceContainer, Codable, Equatable, Hashable {
 	let name: String
 	let children: Set<GeoCountry>
 	let places: Set<GeoPlace>
-	let contours: [VertexRing]
 	let geographyId: RegionId
 	let aabb: Aabb
 	

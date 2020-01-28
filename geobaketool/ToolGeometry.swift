@@ -175,5 +175,5 @@ func tessellate(_ feature: ToolGeoFeature) -> GeoTessellation? {
 		flattenedVertices.append(contentsOf: [v0, v1, v2])
 	}
 
-	return GeoTessellation(vertices: flattenedVertices, aabb: aabb, midpoint: Vertex(midpoint.0, midpoint.1))
+	return GeoTessellation(vertices: flattenedVertices, contours: feature.polygons.map { $0.exteriorRing }, aabb: aabb, midpoint: Vertex(midpoint.0, midpoint.1))
 }

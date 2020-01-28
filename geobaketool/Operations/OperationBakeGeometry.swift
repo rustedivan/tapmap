@@ -110,7 +110,6 @@ class OperationBakeGeometry : Operation {
 					}
 					
 					let geoRegion = GeoRegion(name: region.name,
-																		contours: region.polygons.map { $0.exteriorRing },
 																		places: region.places ?? [],
 																		geographyId: RegionId("region", region.name),
 																		aabb: regionTessellation.aabb)
@@ -120,7 +119,6 @@ class OperationBakeGeometry : Operation {
 				let geoCountry = GeoCountry(name: country.name,
 																		children: regionResult,
 																		places: country.places ?? [],
-																		contours: country.polygons.map { $0.exteriorRing },
 																		geographyId: RegionId("country", country.name),
 																		aabb: countryTessellation.aabb)
 				countryResult.insert(geoCountry)
@@ -129,7 +127,6 @@ class OperationBakeGeometry : Operation {
 			let geoContinent = GeoContinent(name: continent.name,
 																			children: countryResult,
 																			places: continent.places ?? [],
-																			contours: continent.polygons.map { $0.exteriorRing },
 																			geographyId: RegionId("continent", continent.name),
 																			aabb: continentTessellation.aabb)
 			worldResult.insert(geoContinent)

@@ -69,7 +69,6 @@
 		1489381922B98317009278A0 /* bake.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14C6659722B97E660054D7F2 /* bake.swift */; };
 		1489381A22B9831C009278A0 /* OperationAssembleContinents.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14C6659922B97E660054D7F2 /* OperationAssembleContinents.swift */; };
 		1489381B22B9831C009278A0 /* OperationBakeGeometry.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14C665A022B97E660054D7F2 /* OperationBakeGeometry.swift */; };
-		1489381C22B9831C009278A0 /* OperationCleanUpBorders.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14C6659F22B97E660054D7F2 /* OperationCleanUpBorders.swift */; };
 		1489381D22B9831C009278A0 /* OperationDistributePlaces.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14C665A222B97E670054D7F2 /* OperationDistributePlaces.swift */; };
 		1489381E22B9831C009278A0 /* OperationFixupHierarchy.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14C6659E22B97E660054D7F2 /* OperationFixupHierarchy.swift */; };
 		1489381F22B9831C009278A0 /* OperationParseGeoJson.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14C665A422B97E670054D7F2 /* OperationParseGeoJson.swift */; };
@@ -92,7 +91,6 @@
 		14C665AF22B97E670054D7F2 /* download.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14C6659B22B97E660054D7F2 /* download.swift */; };
 		14C665B322B97E670054D7F2 /* config.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14C6659D22B97E660054D7F2 /* config.swift */; };
 		14C665B522B97E670054D7F2 /* OperationFixupHierarchy.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14C6659E22B97E660054D7F2 /* OperationFixupHierarchy.swift */; };
-		14C665B722B97E670054D7F2 /* OperationCleanUpBorders.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14C6659F22B97E660054D7F2 /* OperationCleanUpBorders.swift */; };
 		14C665B922B97E670054D7F2 /* OperationBakeGeometry.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14C665A022B97E660054D7F2 /* OperationBakeGeometry.swift */; };
 		14C665BD22B97E670054D7F2 /* OperationDistributePlaces.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14C665A222B97E670054D7F2 /* OperationDistributePlaces.swift */; };
 		14C665BF22B97E670054D7F2 /* OperationParseOSMJson.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14C665A322B97E670054D7F2 /* OperationParseOSMJson.swift */; };
@@ -195,7 +193,6 @@
 		14C6659B22B97E660054D7F2 /* download.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = download.swift; sourceTree = "<group>"; };
 		14C6659D22B97E660054D7F2 /* config.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = config.swift; sourceTree = "<group>"; };
 		14C6659E22B97E660054D7F2 /* OperationFixupHierarchy.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = OperationFixupHierarchy.swift; sourceTree = "<group>"; };
-		14C6659F22B97E660054D7F2 /* OperationCleanUpBorders.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = OperationCleanUpBorders.swift; sourceTree = "<group>"; };
 		14C665A022B97E660054D7F2 /* OperationBakeGeometry.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = OperationBakeGeometry.swift; sourceTree = "<group>"; };
 		14C665A222B97E670054D7F2 /* OperationDistributePlaces.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = OperationDistributePlaces.swift; sourceTree = "<group>"; };
 		14C665A322B97E670054D7F2 /* OperationParseOSMJson.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = OperationParseOSMJson.swift; sourceTree = "<group>"; };
@@ -427,7 +424,6 @@
 				14C665C822B97ED40054D7F2 /* JobHelpers.swift */,
 				14C6659922B97E660054D7F2 /* OperationAssembleContinents.swift */,
 				14C665A022B97E660054D7F2 /* OperationBakeGeometry.swift */,
-				14C6659F22B97E660054D7F2 /* OperationCleanUpBorders.swift */,
 				14C665A222B97E670054D7F2 /* OperationDistributePlaces.swift */,
 				14C6659E22B97E660054D7F2 /* OperationFixupHierarchy.swift */,
 				14C665A422B97E670054D7F2 /* OperationParseGeoJson.swift */,
@@ -792,7 +788,6 @@
 				14C665AB22B97E670054D7F2 /* OperationAssembleContinents.swift in Sources */,
 				14C665B922B97E670054D7F2 /* OperationBakeGeometry.swift in Sources */,
 				14C665BD22B97E670054D7F2 /* OperationDistributePlaces.swift in Sources */,
-				14C665B722B97E670054D7F2 /* OperationCleanUpBorders.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -812,7 +807,6 @@
 				1456690023E0EA3D001EF91E /* Geometry.swift in Sources */,
 				1489381222B982EB009278A0 /* nullrenderer.swift in Sources */,
 				14C6659022B97E130054D7F2 /* geobaketoolTests.swift in Sources */,
-				1489381C22B9831C009278A0 /* OperationCleanUpBorders.swift in Sources */,
 				1489381622B98317009278A0 /* config.swift in Sources */,
 				1489382122B9831C009278A0 /* OperationTessellateRegions.swift in Sources */,
 				1489380C22B98218009278A0 /* Serialization.swift in Sources */,
