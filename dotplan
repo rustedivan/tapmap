@@ -48,6 +48,32 @@ _this_ week.
 Geometry streaming is in. Even without actually using the streamer (loading all the geometry
 up-front anyway) loading times are down to about 70%.
 
+---
+
+$$ Move GeoRegion to /Mapping
+
+Now for the final act: actually using the streamer.
+- teach GeometryStreamer to load GeoTessellations on-demand
+- teach GeometryStreamer to create RenderPrimitives for them
+- let MapRenderer fetch primitives from GeoStreamer instead
+-- list of hashes -> list of primitives
+- GeoTessellations can be evicted when no longer useful
+- move the 'updatePrimitives' logic to GeoStreamer
+- parse on background thread
+-- creating the GL objects can be done on main thread, because
+	 that will be different on Metal anyway.
+	 
+This is working a lot better than it has any right to do.
+The map renderer gets a set of region hashes to render, and does
+just that. If a primitive is not resident, the streamer pulls it
+in on a background thread and the renderer never knows it missed
+anything since it gets the list through a compactMap.
+
+And since we stream only what is visible through the quadtree,
+I can zoom in on Spain, open Europe, and only get resident primitives
+for Portugal, Spain, France and Italy. Norway isn't streamed in until
+I scroll that way.
+
 ### Tile streaming strategy
 - rebuild the world file
 -- build a file header
