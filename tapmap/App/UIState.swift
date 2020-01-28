@@ -27,41 +27,6 @@ class UIState {
 		// Update region cache
 		visibleRegionHashes = Set(finelyVisible.map { $0.regionHash })
 	}
-	
-	func buildWorldTree(withWorld geoWorld: GeoWorld, userState: UserState) {
-		worldQuadTree = QuadTree(minX: -180.0, minY: -90.0, maxX: 181.0, maxY: 90.0, maxDepth: 6)
-		
-		for (hash, continent) in userState.availableContinents {
-			let continentBox = RegionBounds(regionHash: hash, bounds: continent.geometry.aabb)
-			worldQuadTree.insert(value: continentBox, region: continentBox.bounds)
-		}
-		
-		for (hash, country) in userState.availableCountries {
-			let countryBox = RegionBounds(regionHash: hash, bounds: country.geometry.aabb)
-			worldQuadTree.insert(value: countryBox, region: countryBox.bounds)
-		}
-		
-		for (hash, region) in userState.availableRegions {
-			let regionBox = RegionBounds(regionHash: hash, bounds: region.geometry.aabb)
-			worldQuadTree.insert(value: regionBox, region: regionBox.bounds)
-		}
-	}
-	
-	func updateTree<T:GeoNode>(replace parent: T, with children: Set<T.SubType>) {
-		worldQuadTree.remove(hashValue: parent.hashValue)
-		for child in children {
-			let countryBox = RegionBounds(regionHash: child.hashValue, bounds: child.geometry.aabb)
-			worldQuadTree.insert(value: countryBox, region: countryBox.bounds)
-		}
-	}
-
-	func updateTree(replace parent: GeoCountry, with children: Set<GeoRegion>) {
-		worldQuadTree.remove(hashValue: parent.hashValue)
-		for child in children {
-			let regionBox = RegionBounds(regionHash: child.hashValue, bounds: child.geometry.aabb)
-			worldQuadTree.insert(value: regionBox, region: regionBox.bounds)
-		}
-	}
 
 	func selectRegion<T:GeoIdentifiable>(_ region: T) {
 		selectedRegionHash = region.hashValue
