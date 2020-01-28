@@ -79,7 +79,7 @@ class GeometryStreamer {
 			return primitive
 		} else if (queueIfMissing) {
 			// Only stream primitives that are actually opened
-			if let region = AppDelegate.sharedUserState.availableContinents[streamHash] {
+			if let region = AppDelegate.sharedUserState.availableRegions[streamHash] {
 				streamPrimitive(for: region.geographyId)
 			} else if let country = AppDelegate.sharedUserState.availableCountries[streamHash] {
 				streamPrimitive(for: country.geographyId)
