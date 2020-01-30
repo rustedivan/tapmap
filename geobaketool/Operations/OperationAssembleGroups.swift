@@ -8,16 +8,22 @@
 
 import Foundation
 
-class OperationAssembleContinents : Operation {
+class OperationAssembleGroups : Operation {
 	let input : Set<ToolGeoFeature>
 	var output : Set<ToolGeoFeature>?
 	let report : ProgressReport
+	let sourceLevel : ToolGeoFeature.Level
+	let targetLevel : ToolGeoFeature.Level
 	
-	init(countries countriesOfContinent: Set<ToolGeoFeature>,
+	init(parts: Set<ToolGeoFeature>,
+			 sourceLevel: ToolGeoFeature.Level,
+			 targetLevel: ToolGeoFeature.Level,
 			 reporter: @escaping ProgressReport) {
-		input = countriesOfContinent
+		input = parts
 		report = reporter
 		output = input
+		self.sourceLevel = sourceLevel
+		self.targetLevel = targetLevel
 		
 		super.init()
 	}
@@ -25,39 +31,40 @@ class OperationAssembleContinents : Operation {
 	override func main() {
 		guard !isCancelled else { print("Cancelled before starting"); return }
 		
-		print("Assembling continents")
-		var continentCountries = [String : Set<ToolGeoFeature>]()
-		for country in input {
-			if continentCountries[country.continentKey] == nil {
-				continentCountries[country.continentKey] = []
+		print("Assembling parts (\(sourceLevel.rawValue)) into groups (\(targetLevel.rawValue))")
+		var partGroups = [String : Set<ToolGeoFeature>]()
+		for part in input {
+			let partKey = (targetLevel == ToolGeoFeature.Level.Continent) ? part.continentKey : part.countryKey
+			if partGroups[partKey] == nil {
+				partGroups[partKey] = []
 			}
-			continentCountries[country.continentKey]!.insert(country)
+			partGroups[partKey]!.insert(part)
 		}
 		
-		print("Continents:")
-		for continent in continentCountries {
-			print("\t\(continent.key): \(continent.value.count) countries (e.g. \(continent.value.first!.name))")
+		print("Groups (\(targetLevel.rawValue)):")
+		for group in partGroups {
+			print("\t\(group.key): \(group.value.count) parts (e.g. \(group.value.first!.name))")
 		}
 		
-		print("Building continent contours...")
-		var continentFeatures = Set<ToolGeoFeature>()
-		for countryList in continentCountries {
-			let contourRings = countryList.value.flatMap { $0.polygons.map { $0.exteriorRing } }
+		print("Building group contours...")
+		var groupFeatures = Set<ToolGeoFeature>()
+		for partList in partGroups {
+			let contourRings = partList.value.flatMap { $0.polygons.map { $0.exteriorRing } }
 			
-			let continentRings = buildContourOf(rings: contourRings, report: report, countryList.key)
-			print("Collected \(contourRings.count) country rings into \(continentRings.count) continent rings.")
-			let geometry = continentRings.map { Polygon(exteriorRing: $0, interiorRings: []) }
-			let continent = ToolGeoFeature(level: .Continent,
+			let groupRings = buildContourOf(rings: contourRings, report: report, partList.key)
+			print("Collected \(contourRings.count) part rings into \(groupRings.count) group rings.")
+			let geometry = groupRings.map { Polygon(exteriorRing: $0, interiorRings: []) }
+			let continent = ToolGeoFeature(level: targetLevel,	// $ Pass it down here
 																		 polygons: geometry,
 																		 tessellation: nil,
 																		 places: nil,
 																		 children: nil,
-																		 stringProperties: ["name" : countryList.key],
+																		 stringProperties: ["name" : partList.key],
 																		 valueProperties: [:])
-			continentFeatures.insert(continent)
+			groupFeatures.insert(continent)
 		}
 		
-		output = continentFeatures
+		output = groupFeatures
 		
 		report(1.0, "Done.", true)
 	}

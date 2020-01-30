@@ -66,7 +66,7 @@
 		1489381722B98317009278A0 /* download.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14C6659B22B97E660054D7F2 /* download.swift */; };
 		1489381822B98317009278A0 /* reshape.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14C6659622B97E660054D7F2 /* reshape.swift */; };
 		1489381922B98317009278A0 /* bake.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14C6659722B97E660054D7F2 /* bake.swift */; };
-		1489381A22B9831C009278A0 /* OperationAssembleContinents.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14C6659922B97E660054D7F2 /* OperationAssembleContinents.swift */; };
+		1489381A22B9831C009278A0 /* OperationAssembleGroups.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14C6659922B97E660054D7F2 /* OperationAssembleGroups.swift */; };
 		1489381B22B9831C009278A0 /* OperationBakeGeometry.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14C665A022B97E660054D7F2 /* OperationBakeGeometry.swift */; };
 		1489381D22B9831C009278A0 /* OperationDistributePlaces.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14C665A222B97E670054D7F2 /* OperationDistributePlaces.swift */; };
 		1489381E22B9831C009278A0 /* OperationFixupHierarchy.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14C6659E22B97E660054D7F2 /* OperationFixupHierarchy.swift */; };
@@ -85,7 +85,7 @@
 		14C6659022B97E130054D7F2 /* geobaketoolTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14C6658F22B97E130054D7F2 /* geobaketoolTests.swift */; };
 		14C665A522B97E670054D7F2 /* reshape.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14C6659622B97E660054D7F2 /* reshape.swift */; };
 		14C665A722B97E670054D7F2 /* bake.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14C6659722B97E660054D7F2 /* bake.swift */; };
-		14C665AB22B97E670054D7F2 /* OperationAssembleContinents.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14C6659922B97E660054D7F2 /* OperationAssembleContinents.swift */; };
+		14C665AB22B97E670054D7F2 /* OperationAssembleGroups.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14C6659922B97E660054D7F2 /* OperationAssembleGroups.swift */; };
 		14C665AD22B97E670054D7F2 /* OperationTessellateRegions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14C6659A22B97E660054D7F2 /* OperationTessellateRegions.swift */; };
 		14C665AF22B97E670054D7F2 /* download.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14C6659B22B97E660054D7F2 /* download.swift */; };
 		14C665B322B97E670054D7F2 /* config.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14C6659D22B97E660054D7F2 /* config.swift */; };
@@ -186,7 +186,7 @@
 		14C6659622B97E660054D7F2 /* reshape.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = reshape.swift; sourceTree = "<group>"; };
 		14C6659722B97E660054D7F2 /* bake.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = bake.swift; sourceTree = "<group>"; };
 		14C6659822B97E660054D7F2 /* nullrenderer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = nullrenderer.swift; sourceTree = "<group>"; };
-		14C6659922B97E660054D7F2 /* OperationAssembleContinents.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = OperationAssembleContinents.swift; sourceTree = "<group>"; };
+		14C6659922B97E660054D7F2 /* OperationAssembleGroups.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = OperationAssembleGroups.swift; sourceTree = "<group>"; };
 		14C6659A22B97E660054D7F2 /* OperationTessellateRegions.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = OperationTessellateRegions.swift; sourceTree = "<group>"; };
 		14C6659B22B97E660054D7F2 /* download.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = download.swift; sourceTree = "<group>"; };
 		14C6659D22B97E660054D7F2 /* config.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = config.swift; sourceTree = "<group>"; };
@@ -419,7 +419,7 @@
 			isa = PBXGroup;
 			children = (
 				14C665C822B97ED40054D7F2 /* JobHelpers.swift */,
-				14C6659922B97E660054D7F2 /* OperationAssembleContinents.swift */,
+				14C6659922B97E660054D7F2 /* OperationAssembleGroups.swift */,
 				14C665A022B97E660054D7F2 /* OperationBakeGeometry.swift */,
 				14C665A222B97E670054D7F2 /* OperationDistributePlaces.swift */,
 				14C6659E22B97E660054D7F2 /* OperationFixupHierarchy.swift */,
@@ -782,7 +782,7 @@
 				1489380922B98112009278A0 /* GeoRegion.swift in Sources */,
 				14C665AD22B97E670054D7F2 /* OperationTessellateRegions.swift in Sources */,
 				14C665C122B97E670054D7F2 /* OperationParseGeoJson.swift in Sources */,
-				14C665AB22B97E670054D7F2 /* OperationAssembleContinents.swift in Sources */,
+				14C665AB22B97E670054D7F2 /* OperationAssembleGroups.swift in Sources */,
 				14C665B922B97E670054D7F2 /* OperationBakeGeometry.swift in Sources */,
 				14C665BD22B97E670054D7F2 /* OperationDistributePlaces.swift in Sources */,
 			);
@@ -808,7 +808,7 @@
 				1489382122B9831C009278A0 /* OperationTessellateRegions.swift in Sources */,
 				1489380C22B98218009278A0 /* Serialization.swift in Sources */,
 				1489381F22B9831C009278A0 /* OperationParseGeoJson.swift in Sources */,
-				1489381A22B9831C009278A0 /* OperationAssembleContinents.swift in Sources */,
+				1489381A22B9831C009278A0 /* OperationAssembleGroups.swift in Sources */,
 				1489381722B98317009278A0 /* download.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

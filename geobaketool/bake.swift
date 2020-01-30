@@ -85,7 +85,7 @@ func bakeGeometry() throws {
 	let bakeQueue = OperationQueue()
 	bakeQueue.name = "Baking queue"
 	
-	let continentAssemblyJob = OperationAssembleContinents(countries: countries, reporter: reportLoad)
+	let continentAssemblyJob = OperationAssembleGroups(parts: countries, sourceLevel: .Country, targetLevel: .Continent, reporter: reportLoad)
 	
 	bakeQueue.addOperation(continentAssemblyJob)
 	bakeQueue.waitUntilAllOperationsAreFinished()
