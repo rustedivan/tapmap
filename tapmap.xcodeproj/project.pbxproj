@@ -55,7 +55,6 @@
 		1489380722B97FE0009278A0 /* UserState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 148937F322B97FDF009278A0 /* UserState.swift */; };
 		1489380822B97FE0009278A0 /* Serialization.swift in Sources */ = {isa = PBXBuildFile; fileRef = 148937F422B97FDF009278A0 /* Serialization.swift */; };
 		1489380922B98112009278A0 /* GeoRegion.swift in Sources */ = {isa = PBXBuildFile; fileRef = 148937E222B97FDF009278A0 /* GeoRegion.swift */; };
-		1489380A22B98112009278A0 /* GeoRegion.swift in Sources */ = {isa = PBXBuildFile; fileRef = 148937E222B97FDF009278A0 /* GeoRegion.swift */; };
 		1489380B22B98217009278A0 /* Serialization.swift in Sources */ = {isa = PBXBuildFile; fileRef = 148937F422B97FDF009278A0 /* Serialization.swift */; };
 		1489380C22B98218009278A0 /* Serialization.swift in Sources */ = {isa = PBXBuildFile; fileRef = 148937F422B97FDF009278A0 /* Serialization.swift */; };
 		1489381122B982D2009278A0 /* toolgeometry.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14C665C622B97EC30054D7F2 /* toolgeometry.swift */; };
@@ -262,6 +261,7 @@
 		147B819323DA041800942C9B /* Mapping */ = {
 			isa = PBXGroup;
 			children = (
+				148937E222B97FDF009278A0 /* GeoRegion.swift */,
 				147B819423DA043500942C9B /* WorldTree.swift */,
 			);
 			path = Mapping;
@@ -273,7 +273,6 @@
 				148937DF22B97FDF009278A0 /* Geometry.swift */,
 				148937E022B97FDF009278A0 /* AppTypes.swift */,
 				148937E122B97FDF009278A0 /* ViewCalculations.swift */,
-				148937E222B97FDF009278A0 /* GeoRegion.swift */,
 				14985FF522F0F35700F68A1F /* OutlineGeometry.swift */,
 				14532D9923B515BE00943ADC /* QuadTree.swift */,
 			);
@@ -808,7 +807,6 @@
 				1489381622B98317009278A0 /* config.swift in Sources */,
 				1489382122B9831C009278A0 /* OperationTessellateRegions.swift in Sources */,
 				1489380C22B98218009278A0 /* Serialization.swift in Sources */,
-				1489380A22B98112009278A0 /* GeoRegion.swift in Sources */,
 				1489381F22B9831C009278A0 /* OperationParseGeoJson.swift in Sources */,
 				1489381A22B9831C009278A0 /* OperationAssembleContinents.swift in Sources */,
 				1489381722B98317009278A0 /* download.swift in Sources */,

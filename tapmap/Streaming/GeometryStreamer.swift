@@ -57,7 +57,8 @@ class GeometryStreamer {
 		streamQueue = OperationQueue()
 		streamQueue.name = "Geometry streaming"
 		streamQueue.qualityOfService = .userInitiated
-		print("  - empty streaming op-queue setup")
+		streamQueue.maxConcurrentOperationCount = OperationQueue.defaultMaxConcurrentOperationCount
+		print("  - empty streaming op-queue setup, max \(streamQueue.maxConcurrentOperationCount) concurrent loads")
 		
 		GeometryStreamer._shared = self
 		
