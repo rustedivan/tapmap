@@ -1,4 +1,67 @@
-# Road to Final
+ROAD TO FINAL
+
+# Spherical projection
+## If at all possible?
+## Otherwise, lock to Winkel-Tripel
+
+# Region labelling
+## Pipeline calculation of major axis (center-point, angle, length of axis)
+## Center label on the major axis
+## Cull label if too long (can use UILabel's limitations?)
+## Two lines' worth of linebreak
+
+# Metal rewrite
+# This is all of May...
+
+# LOD support
+## Define reshape settings for LOD levels
+## Run pipeline for each LOD level
+## Load entire world for each LOD level
+## Suffix LOD to streaming key
+## Use zoom to select LOD level
+## Switch LOD level for entire map renderer
+## Don't swap render level while a LOD level is missing
+
+# POI rendering
+## Fixed screen scale
+## Define rank sizes
+## Render sprites
+## Mipmapping
+
+# Outline rendering
+## Outline geometry knows what rank they belong to
+## Pass width as uniform per ring
+## Pass color based on rank
+## Arc length UVs
+## Scale outline width on tap
+## Move outline generation to queue op
+
+# Creative brief
+## Shading
+## UX
+## Splash screen
+## Launch experience
+## Opening animation
+## Selected state
+## Color scheme
+## Labelling scheme
+
+# Persistence
+## Store userstate to user defaults
+## Store userstate to iCloud
+## Knock out geoworld from userstate on startup
+
+# Country collation
+## Generalize variable names
+
+# Rendering improvements
+## Outline feathering
+## Texture UV's
+## 60Hz updates
+## Splash screen until streamer goes still
+## Evict LRU render primitive
+
+
 
 ## Tile streaming
 *The world tree could be used to speed up loading.*
