@@ -81,6 +81,12 @@ func bakeGeometry() throws {
 		throw GeoBakePipelineError.datasetFailed(dataset: "cities")
 	}
 	
+	// MARK: Create region hierarchy
+	let hierarchyJob = OperationBuildHierarchy(countries: countries,
+																						 regions: regions,
+																						 reporter: reportLoad)
+	hierarchyJob.start()
+	
 	// MARK: Continent assembly
 	let bakeQueue = OperationQueue()
 	bakeQueue.name = "Baking queue"
@@ -96,7 +102,6 @@ func bakeGeometry() throws {
 	}
 	
 	// MARK: Tessellate geometry
-	
 	let continentTessJob = OperationTessellateRegions(generatedContinents, reporter: reportLoad, errorReporter: reportError)
 	let countryTessJob = OperationTessellateRegions(countries, reporter: reportLoad, errorReporter: reportError)
 	let regionTessJob = OperationTessellateRegions(regions, reporter: reportLoad, errorReporter: reportError)

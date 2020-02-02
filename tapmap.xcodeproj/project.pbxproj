@@ -34,6 +34,7 @@
 		147B819523DA043500942C9B /* WorldTree.swift in Sources */ = {isa = PBXBuildFile; fileRef = 147B819423DA043500942C9B /* WorldTree.swift */; };
 		147B819623DA043500942C9B /* WorldTree.swift in Sources */ = {isa = PBXBuildFile; fileRef = 147B819423DA043500942C9B /* WorldTree.swift */; };
 		147B819723DA043500942C9B /* WorldTree.swift in Sources */ = {isa = PBXBuildFile; fileRef = 147B819423DA043500942C9B /* WorldTree.swift */; };
+		1481A34D23E6C3FA0088251E /* OperationBuildHierarchy.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1481A34C23E6C3FA0088251E /* OperationBuildHierarchy.swift */; };
 		148937F522B97FDF009278A0 /* Geometry.swift in Sources */ = {isa = PBXBuildFile; fileRef = 148937DF22B97FDF009278A0 /* Geometry.swift */; };
 		148937F622B97FDF009278A0 /* AppTypes.swift in Sources */ = {isa = PBXBuildFile; fileRef = 148937E022B97FDF009278A0 /* AppTypes.swift */; };
 		148937F722B97FDF009278A0 /* ViewCalculations.swift in Sources */ = {isa = PBXBuildFile; fileRef = 148937E122B97FDF009278A0 /* ViewCalculations.swift */; };
@@ -145,6 +146,7 @@
 		1468830E23B4D9E400105E04 /* DebugShader.vsh */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.glsl; path = DebugShader.vsh; sourceTree = "<group>"; };
 		1468830F23B4D9E400105E04 /* DebugShader.fsh */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.glsl; path = DebugShader.fsh; sourceTree = "<group>"; };
 		147B819423DA043500942C9B /* WorldTree.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorldTree.swift; sourceTree = "<group>"; };
+		1481A34C23E6C3FA0088251E /* OperationBuildHierarchy.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OperationBuildHierarchy.swift; sourceTree = "<group>"; };
 		148937DF22B97FDF009278A0 /* Geometry.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Geometry.swift; sourceTree = "<group>"; };
 		148937E022B97FDF009278A0 /* AppTypes.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AppTypes.swift; sourceTree = "<group>"; };
 		148937E122B97FDF009278A0 /* ViewCalculations.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ViewCalculations.swift; sourceTree = "<group>"; };
@@ -422,6 +424,7 @@
 				14C6659922B97E660054D7F2 /* OperationAssembleGroups.swift */,
 				14C665A022B97E660054D7F2 /* OperationBakeGeometry.swift */,
 				14C665A222B97E670054D7F2 /* OperationDistributePlaces.swift */,
+				1481A34C23E6C3FA0088251E /* OperationBuildHierarchy.swift */,
 				14C6659E22B97E660054D7F2 /* OperationFixupHierarchy.swift */,
 				14C665A422B97E670054D7F2 /* OperationParseGeoJson.swift */,
 				14C665A322B97E670054D7F2 /* OperationParseOSMJson.swift */,
@@ -766,6 +769,7 @@
 			files = (
 				14C665C522B97EA00054D7F2 /* main.swift in Sources */,
 				1489381322B982F8009278A0 /* nullrenderer.swift in Sources */,
+				1481A34D23E6C3FA0088251E /* OperationBuildHierarchy.swift in Sources */,
 				14C665C722B97EC30054D7F2 /* toolgeometry.swift in Sources */,
 				145668FF23E0EA3C001EF91E /* Geometry.swift in Sources */,
 				147B819723DA043500942C9B /* WorldTree.swift in Sources */,
