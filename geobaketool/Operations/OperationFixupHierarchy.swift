@@ -66,7 +66,7 @@ class OperationFixupHierarchy : Operation {
 		var geoContinents = Set<ToolGeoFeature>()
 		let numCountries = remainingCountries.count
 		for continent in continentList {
-			let belongingCountries = remainingCountries.filter { $0.continentKey == continent.name }
+			let belongingCountries = remainingCountries.filter { $0.continentKey == continent.continentKey }
 			let belongingPlaces = Set(belongingCountries
 				.flatMap { $0.places ?? [] }
 				.filter { $0.kind == .Capital }
