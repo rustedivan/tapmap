@@ -81,18 +81,23 @@ func bakeGeometry() throws {
 		throw GeoBakePipelineError.datasetFailed(dataset: "cities")
 	}
 	
-	// MARK: Create region hierarchy
-	let hierarchyJob = OperationBuildHierarchy(countries: countries,
-																						 regions: regions,
-																						 reporter: reportLoad)
-	hierarchyJob.start()
 	
-	// MARK: Continent assembly
 	let bakeQueue = OperationQueue()
 	bakeQueue.name = "Baking queue"
 	
-	let continentAssemblyJob = OperationAssembleGroups(parts: countries, sourceLevel: .Country, targetLevel: .Continent, reporter: reportLoad)
+	// MARK: Country assembly
+	let countryProperties = Dictionary(countries.map { ($0.countryKey, $0.stringProperties) },	// Needed to group newly created countries into continents
+																		 uniquingKeysWith: { (first, _) in first })
+	let countryAssemblyJob = OperationAssembleGroups(parts: regions, targetLevel: .Country, properties: countryProperties, reporter: reportLoad)
+	bakeQueue.addOperation(countryAssemblyJob)
+	bakeQueue.waitUntilAllOperationsAreFinished()
+	guard let generatedCountries = countryAssemblyJob.output else {
+		print("Country assembly failed")
+		return
+	}
 	
+	// MARK: Continent assembly
+	let continentAssemblyJob = OperationAssembleGroups(parts: generatedCountries, targetLevel: .Continent, properties: [:], reporter: reportLoad)
 	bakeQueue.addOperation(continentAssemblyJob)
 	bakeQueue.waitUntilAllOperationsAreFinished()
 	
@@ -103,7 +108,7 @@ func bakeGeometry() throws {
 	
 	// MARK: Tessellate geometry
 	let continentTessJob = OperationTessellateRegions(generatedContinents, reporter: reportLoad, errorReporter: reportError)
-	let countryTessJob = OperationTessellateRegions(countries, reporter: reportLoad, errorReporter: reportError)
+	let countryTessJob = OperationTessellateRegions(generatedCountries, reporter: reportLoad, errorReporter: reportError)
 	let regionTessJob = OperationTessellateRegions(regions, reporter: reportLoad, errorReporter: reportError)
 	
 	continentTessJob.addDependency(continentAssemblyJob)

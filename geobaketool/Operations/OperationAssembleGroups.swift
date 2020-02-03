@@ -12,17 +12,17 @@ class OperationAssembleGroups : Operation {
 	let input : Set<ToolGeoFeature>
 	var output : Set<ToolGeoFeature>?
 	let report : ProgressReport
-	let sourceLevel : ToolGeoFeature.Level
+	let propertiesMap: [String : ToolGeoFeature.GeoStringProperties]
 	let targetLevel : ToolGeoFeature.Level
 	
 	init(parts: Set<ToolGeoFeature>,
-			 sourceLevel: ToolGeoFeature.Level,
 			 targetLevel: ToolGeoFeature.Level,
+			 properties: [String : ToolGeoFeature.GeoStringProperties],
 			 reporter: @escaping ProgressReport) {
 		input = parts
+		propertiesMap = properties
 		report = reporter
 		output = input
-		self.sourceLevel = sourceLevel
 		self.targetLevel = targetLevel
 		
 		super.init()
@@ -31,7 +31,7 @@ class OperationAssembleGroups : Operation {
 	override func main() {
 		guard !isCancelled else { print("Cancelled before starting"); return }
 		
-		print("Assembling parts (\(sourceLevel.rawValue)) into groups (\(targetLevel.rawValue))")
+		print("Assembling parts into groups (\(targetLevel.rawValue))")
 		var partGroups = [String : Set<ToolGeoFeature>]()
 		for part in input {
 			let partKey = (targetLevel == ToolGeoFeature.Level.Continent) ? part.continentKey : part.countryKey
@@ -54,14 +54,23 @@ class OperationAssembleGroups : Operation {
 			let groupRings = buildContourOf(rings: contourRings, report: report, partList.key)
 			print("Collected \(contourRings.count) part rings into \(groupRings.count) group rings.")
 			let geometry = groupRings.map { Polygon(exteriorRing: $0, interiorRings: []) }
-			let continent = ToolGeoFeature(level: targetLevel,	// $ Pass it down here
+			
+			let properties: ToolGeoFeature.GeoStringProperties
+			if targetLevel == .Country {
+				properties = propertiesMap[partList.key] ?? [:]
+			} else {
+				properties = ["CONTINENT" : partList.key,
+											"name" : partList.key]
+			}
+			if properties.isEmpty { print("Cannot find properties for \(partList.key)") }
+			let grouped = ToolGeoFeature(level: targetLevel,
 																		 polygons: geometry,
 																		 tessellation: nil,
 																		 places: nil,
 																		 children: nil,
-																		 stringProperties: ["name" : partList.key],
+																		 stringProperties: properties,
 																		 valueProperties: [:])
-			groupFeatures.insert(continent)
+			groupFeatures.insert(grouped)
 		}
 		
 		output = groupFeatures
@@ -69,7 +78,6 @@ class OperationAssembleGroups : Operation {
 		report(1.0, "Done.", true)
 	}
 }
-
 
 func countEdgeCardinalities(rings: [VertexRing]) -> [Edge : Int] {
 	var cardinalities: [Edge : Int] = [:]
