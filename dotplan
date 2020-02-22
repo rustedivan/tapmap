@@ -1,8 +1,10 @@
 ROAD TO FINAL
 
-# Spherical projection
-## If at all possible?
-## Otherwise, lock to Winkel-Tripel
+# POI rendering
+## Fixed screen scale
+## Fixed size + rank scale
+## Define rank sizes
+## Render sprites
 
 # Region labelling
 ## Pipeline calculation of major axis (center-point, angle, length of axis)
@@ -22,11 +24,10 @@ ROAD TO FINAL
 ## Switch LOD level for entire map renderer
 ## Don't swap render level while a LOD level is missing
 
-# POI rendering
-## Fixed screen scale
-## Define rank sizes
-## Render sprites
-## Mipmapping
+# Spherical projection
+## If at all possible?
+## Otherwise, lock to Winkel-Tripel
+### Winkel-Tripel looks like a bastard to invert (for click mapping)
 
 # Outline rendering
 ## Outline geometry knows what rank they belong to
