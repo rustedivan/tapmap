@@ -102,10 +102,10 @@ func countEdgeCardinalities(rings: [VertexRing]) -> [Edge : Int] {
 func buildContiguousEdgeRings(edges: [Edge], report: ProgressReport, _ reportName: String = "") -> [VertexRing] {
 	var rings: [VertexRing] = []
 	var workVertices: [Vertex] = []
-	var workEdges: [Int : Edge] = [:]
+	var workEdges: [Int : [Edge]] = [:]
 	
 	for e in edges {
-		workEdges[e.v0.hashValue] = e
+		workEdges[e.v0.hashValue, default: []].append(e)
 	}
 	
 	// Select the starting vertex
@@ -114,13 +114,15 @@ func buildContiguousEdgeRings(edges: [Edge], report: ProgressReport, _ reportNam
 	while (!workEdges.isEmpty) {
 		// Find the edge leading from the last vertex
 		let nextEdge = Edge(workVertices.last!, workVertices.last!)
-		if let foundEdge = workEdges[nextEdge.v0.hashValue] {
+		if let foundEdge = workEdges[nextEdge.v0.hashValue]?.popLast() {
 			workVertices.append(foundEdge.v1)
-			workEdges.removeValue(forKey: foundEdge.v0.hashValue)
+			if workEdges[nextEdge.v0.hashValue]!.isEmpty {
+				workEdges.removeValue(forKey: foundEdge.v0.hashValue)
+			}
 		} else {
 			// If there is no edge leading away, this ring has closed. Restart.
 			rings.append(VertexRing(vertices: workVertices))
-			if let restartEdge = workEdges.first?.value {
+			if let restartEdge = workEdges.first?.value.first {
 				workVertices = [restartEdge.v0]
 			} else {
 				break
