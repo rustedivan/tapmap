@@ -8,8 +8,8 @@
 	"reshape": {
 		"node" : ".nvm/versions/node/v7.8.0/bin/",
 		"method" : "visvalingam",
-		"simplify-countries" : 20,
-		"simplify-regions" : 30
+		"simplify-countries" : 5,
+		"simplify-regions" : 5
 	},
 	"input-countries": "reshaped-countries.json",
 	"input-regions": "reshaped-regions.json",

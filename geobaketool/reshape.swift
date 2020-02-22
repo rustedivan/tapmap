@@ -53,6 +53,7 @@ func reshapeFile(input: URL, strength: Int, method: String, output: String) thro
 	reshapeTask.standardError = Pipe()
 	reshapeTask.arguments = ["mapshaper",
 													 "-i", input.path,
+													 "-clean",
 													 "-simplify", method, "keep-shapes", "\(strength)%",
 													 "-o", fileOutUrl.path, "format=geojson"]
 	reshapeTask.launch()

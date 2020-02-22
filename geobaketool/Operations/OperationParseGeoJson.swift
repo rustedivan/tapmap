@@ -101,10 +101,10 @@ class OperationParseGeoJson : Operation {
 		// Flatten string/value properties
 		let stringProps = properties.dictionaryValue
 					.filter { $0.value.type == .string }
-					.mapValues { $0.stringValue }
+					.mapValues { $0.stringValue } as ToolGeoFeature.GeoStringProperties
 		let valueProps = properties.dictionaryValue
 					.filter { $0.value.type == .number }
-					.mapValues { $0.doubleValue }
+					.mapValues { $0.doubleValue } as ToolGeoFeature.GeoValueProperties
 		
 		return ToolGeoFeature(level: level,
 													polygons: loadedPolygons,

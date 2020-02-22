@@ -8,16 +8,22 @@
 
 import Foundation
 
-class OperationAssembleContinents : Operation {
+class OperationAssembleGroups : Operation {
 	let input : Set<ToolGeoFeature>
 	var output : Set<ToolGeoFeature>?
 	let report : ProgressReport
+	let propertiesMap: [String : ToolGeoFeature.GeoStringProperties]
+	let targetLevel : ToolGeoFeature.Level
 	
-	init(countries countriesOfContinent: Set<ToolGeoFeature>,
+	init(parts: Set<ToolGeoFeature>,
+			 targetLevel: ToolGeoFeature.Level,
+			 properties: [String : ToolGeoFeature.GeoStringProperties],
 			 reporter: @escaping ProgressReport) {
-		input = countriesOfContinent
+		input = parts
+		propertiesMap = properties
 		report = reporter
 		output = input
+		self.targetLevel = targetLevel
 		
 		super.init()
 	}
@@ -25,44 +31,53 @@ class OperationAssembleContinents : Operation {
 	override func main() {
 		guard !isCancelled else { print("Cancelled before starting"); return }
 		
-		print("Assembling continents")
-		var continentCountries = [String : Set<ToolGeoFeature>]()
-		for country in input {
-			if continentCountries[country.continentKey] == nil {
-				continentCountries[country.continentKey] = []
+		print("Assembling parts into groups (\(targetLevel.rawValue))")
+		var partGroups = [String : Set<ToolGeoFeature>]()
+		for part in input {
+			let partKey = (targetLevel == ToolGeoFeature.Level.Continent) ? part.continentKey : part.countryKey
+			if partGroups[partKey] == nil {
+				partGroups[partKey] = []
 			}
-			continentCountries[country.continentKey]!.insert(country)
+			partGroups[partKey]!.insert(part)
 		}
 		
-		print("Continents:")
-		for continent in continentCountries {
-			print("\t\(continent.key): \(continent.value.count) countries (e.g. \(continent.value.first!.name))")
+		print("Groups (\(targetLevel.rawValue)):")
+		for group in partGroups {
+			print("\t\(group.key): \(group.value.count) parts (e.g. \(group.value.first!.name))")
 		}
 		
-		print("Building continent contours...")
-		var continentFeatures = Set<ToolGeoFeature>()
-		for countryList in continentCountries {
-			let contourRings = countryList.value.flatMap { $0.polygons.map { $0.exteriorRing } }
+		print("Building group contours...")
+		var groupFeatures = Set<ToolGeoFeature>()
+		for partList in partGroups {
+			let contourRings = partList.value.flatMap { $0.polygons.map { $0.exteriorRing } }
 			
-			let continentRings = buildContourOf(rings: contourRings, report: report, countryList.key)
-			print("Collected \(contourRings.count) country rings into \(continentRings.count) continent rings.")
-			let geometry = continentRings.map { Polygon(exteriorRing: $0, interiorRings: []) }
-			let continent = ToolGeoFeature(level: .Continent,
+			let groupRings = buildContourOf(rings: contourRings, report: report, partList.key)
+			print("Collected \(contourRings.count) part rings into \(groupRings.count) group rings.")
+			let geometry = groupRings.map { Polygon(exteriorRing: $0, interiorRings: []) }
+			
+			let properties: ToolGeoFeature.GeoStringProperties
+			if targetLevel == .Country {
+				properties = propertiesMap[partList.key] ?? [:]
+			} else {
+				properties = ["CONTINENT" : partList.key,
+											"name" : partList.key]
+			}
+			if properties.isEmpty { print("Cannot find properties for \(partList.key)") }
+			let grouped = ToolGeoFeature(level: targetLevel,
 																		 polygons: geometry,
 																		 tessellation: nil,
 																		 places: nil,
 																		 children: nil,
-																		 stringProperties: ["name" : countryList.key],
+																		 stringProperties: properties,
 																		 valueProperties: [:])
-			continentFeatures.insert(continent)
+			groupFeatures.insert(grouped)
 		}
 		
-		output = continentFeatures
+		output = groupFeatures
 		
 		report(1.0, "Done.", true)
 	}
 }
-
 
 func countEdgeCardinalities(rings: [VertexRing]) -> [Edge : Int] {
 	var cardinalities: [Edge : Int] = [:]
@@ -87,10 +102,10 @@ func countEdgeCardinalities(rings: [VertexRing]) -> [Edge : Int] {
 func buildContiguousEdgeRings(edges: [Edge], report: ProgressReport, _ reportName: String = "") -> [VertexRing] {
 	var rings: [VertexRing] = []
 	var workVertices: [Vertex] = []
-	var workEdges: [Int : Edge] = [:]
+	var workEdges: [Int : [Edge]] = [:]
 	
 	for e in edges {
-		workEdges[e.v0.hashValue] = e
+		workEdges[e.v0.hashValue, default: []].append(e)
 	}
 	
 	// Select the starting vertex
@@ -99,13 +114,15 @@ func buildContiguousEdgeRings(edges: [Edge], report: ProgressReport, _ reportNam
 	while (!workEdges.isEmpty) {
 		// Find the edge leading from the last vertex
 		let nextEdge = Edge(workVertices.last!, workVertices.last!)
-		if let foundEdge = workEdges[nextEdge.v0.hashValue] {
+		if let foundEdge = workEdges[nextEdge.v0.hashValue]?.popLast() {
 			workVertices.append(foundEdge.v1)
-			workEdges.removeValue(forKey: foundEdge.v0.hashValue)
+			if workEdges[nextEdge.v0.hashValue]!.isEmpty {
+				workEdges.removeValue(forKey: foundEdge.v0.hashValue)
+			}
 		} else {
 			// If there is no edge leading away, this ring has closed. Restart.
 			rings.append(VertexRing(vertices: workVertices))
-			if let restartEdge = workEdges.first?.value {
+			if let restartEdge = workEdges.first?.value.first {
 				workVertices = [restartEdge.v0]
 			} else {
 				break

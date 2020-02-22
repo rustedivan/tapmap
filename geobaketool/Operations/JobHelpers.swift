@@ -15,6 +15,8 @@ struct ToolGeoFeature : Equatable, Hashable {
 		case Country = "country"
 		case Region = "region"
 	}
+	typealias GeoStringProperties = [String : String]
+	typealias GeoValueProperties = [String : Double]
 	
 	let level: Level
 	let polygons: [Polygon]
@@ -22,15 +24,15 @@ struct ToolGeoFeature : Equatable, Hashable {
 	var places: GeoPlaceCollection?
 	var children: Set<ToolGeoFeature>?
 	
-	let stringProperties: [String : String]
-	let valueProperties: [String : Double]
+	let stringProperties: GeoStringProperties
+	let valueProperties: GeoValueProperties
 	
 	var name : String {
 		return stringProperties["name"] ?? stringProperties["NAME"] ?? "Unnamed"
 	}
 	
 	var countryKey : String {
-		return stringProperties["adm0_a3"] ?? stringProperties["ADM0_A3"] ?? "No admin"
+		return stringProperties["COUNTRY"] ?? stringProperties["adm0_a3"] ?? stringProperties["ADM0_A3"] ?? "No admin"
 	}
 	
 	var continentKey : String {
