@@ -1,40 +1,55 @@
 ROAD TO FINAL
 
 # POI rendering
-## Fixed screen scale
-## Fixed size + rank scale
-## Define rank sizes
-## Render sprites
+## √ Fixed screen scale
+## √ Fixed size + rank scale
+## Fixed rank size + zoom bump
+-- markers can grow to twice their size when fully zoomed in (compensate for half of the zoom?)
 
 # Region labelling
-## Pipeline calculation of major axis (center-point, angle, length of axis)
-## Center label on the major axis
-## Cull label if too long (can use UILabel's limitations?)
+## Add POIs for all regions
 ## Two lines' worth of linebreak
+## Fade out these when zooming in
+## Send label types to zoom view
 
 # Metal rewrite
 # This is all of May...
+## Render sprites
+- For POIs
 
 # LOD support
 ## Define reshape settings for LOD levels
 ## Run pipeline for each LOD level
-## Load entire world for each LOD level
+--- push place distribution down below all tessellation
+--- run tessellation in a loop
+--- give ToolGeoRegion an array of tessellations at different LODs
+--- push them into the chunk table under LOD key
 ## Suffix LOD to streaming key
 ## Use zoom to select LOD level
 ## Switch LOD level for entire map renderer
+--- don't mix LOD levels in the same frame
 ## Don't swap render level while a LOD level is missing
+--- separate the "wanted" LOD level from the rendered LOD level
+--- when LOD request changes, pull in those chunks
+--- don't switch rendering level until streamed goes still
 
 # Spherical projection
 ## If at all possible?
 ## Otherwise, lock to Winkel-Tripel
-### Winkel-Tripel looks like a bastard to invert (for click mapping)
+--- Winkel-Tripel looks like a bastard to invert (for click mapping)
 
 # Outline rendering
-## Outline geometry knows what rank they belong to
-## Pass width as uniform per ring
+## Selection renderer generates outlines from known region "level""
+-- pass to SelectionRenderer.select(...)
+-- use to scale the miter ribs
+## Pass width as uniform
+-- ribs are already scaled to their normalized thickness
 ## Pass color based on rank
+-- color should be set from SelectionRenderer.select too, directly on the render primitive
 ## Arc length UVs
+-- arc length determined by lat/lon distance
 ## Scale outline width on tap
+-- scale the outline width uniform with a progress variable
 ## Move outline generation to queue op
 
 # Creative brief
@@ -52,20 +67,23 @@ ROAD TO FINAL
 ## Store userstate to iCloud
 ## Knock out geoworld from userstate on startup
 
-# Country collation
-## Generalize variable names
-
 # Rendering improvements
 ## Outline feathering
+-- can be done with an outline texture
 ## Texture UV's
+-- can draw full-screen quad behind map? as a clear-op?
 ## 60Hz updates
+-- setting on the viewcontroller
 ## Splash screen until streamer goes still
 ## Evict LRU render primitive
+-- if memory used goes over high-water mark, evict 20% of the pool
 
 # Content patches
 ## Move Gibraltar into Europe
 ## Nudge coastal cities
 
+# √ Country collation
+## Generalize variable names
 
 ## Tile streaming
 *The world tree could be used to speed up loading.*
