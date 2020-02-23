@@ -137,7 +137,9 @@ class PoiRenderer {
 	}
 	
 	func updateStyle(zoomLevel: Float) {
-		poiBaseSize = 2.0 / zoomLevel
+		let poiScreenSize: Float = 2.0
+		poiBaseSize = poiScreenSize / (zoomLevel)
+		poiBaseSize += min(zoomLevel * 0.01, 0.1)	// Boost POI sizes a bit when zooming in
 	}
 	
 	func renderWorld(visibleSet: Set<Int>, inProjection projection: GLKMatrix4) {
