@@ -7,7 +7,6 @@
 //
 
 varying lowp vec4 colorVarying;
-varying lowp float rank;
 uniform lowp float rankThreshold;
 
 void main()
