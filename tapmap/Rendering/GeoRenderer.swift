@@ -25,7 +25,7 @@ extension UIColor {
 
 enum VertexAttribs: GLuint {
 	case position = 1
-	case miter = 2
+	case normal = 2
 	case scalar = 3
 }
 
@@ -60,7 +60,7 @@ func loadShaders(shaderName: String) -> GLuint {
 	// Bind attribute locations.
 	// This needs to be done prior to linking.
 	glBindAttribLocation(program, VertexAttribs.position.rawValue, "position")
-	glBindAttribLocation(program, VertexAttribs.miter.rawValue, "miter")
+	glBindAttribLocation(program, VertexAttribs.normal.rawValue, "normal")
 	glBindAttribLocation(program, VertexAttribs.scalar.rawValue, "scalar")
 	
 	// Link program.

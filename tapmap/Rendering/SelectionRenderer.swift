@@ -43,7 +43,7 @@ class SelectionRenderer {
 		let countourVertices = tessellation.contours.map({$0.vertices})
 		let outlineGeometry = countourVertices.map(thinOutline)
 		
-		outlinePrimitives = outlineGeometry.map( { (contour: [OutlineVertex]) -> OutlineRenderPrimitive in
+		outlinePrimitives = outlineGeometry.map( { (contour: [ScaleVertex]) -> OutlineRenderPrimitive in
 			return OutlineRenderPrimitive(vertices: contour,
 																		 ownerHash: 0,
 																		 debugName: "Contour")

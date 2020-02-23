@@ -10,7 +10,7 @@ import OpenGLES
 import GLKit
 
 struct PoiPlane: Hashable {
-	let primitive: IndexedRenderPrimitive
+	let primitive: IndexedRenderPrimitive<ScaleVertex>
 	let rank: Int
 	var ownerHash: Int { return primitive.ownerHash }
 	let poiHashes: [Int]
@@ -48,8 +48,9 @@ class PoiRenderer {
 	var poiPlanePrimitives : [PoiPlane]
 	var poiVisibility: [Int : Visibility] = [:]
 	let poiProgram: GLuint
-	let poiUniforms : (modelViewMatrix: GLint, color: GLint, rankThreshold: GLint, progress: GLint)
+	let poiUniforms : (modelViewMatrix: GLint, color: GLint, rankThreshold: GLint, progress: GLint, poiBaseSize: GLint)
 	var rankThreshold: Float = 0.0
+	var poiBaseSize: Float = 0.0
 	
 	init?(withVisibleContinents continents: [Int: GeoContinent],
 				countries: [Int: GeoCountry],
@@ -63,6 +64,7 @@ class PoiRenderer {
 		poiUniforms.color = glGetUniformLocation(poiProgram, "poiColor")
 		poiUniforms.rankThreshold = glGetUniformLocation(poiProgram, "rankThreshold")
 		poiUniforms.progress = glGetUniformLocation(poiProgram, "progress")
+		poiUniforms.poiBaseSize = glGetUniformLocation(poiProgram, "baseSize")
 		
 		let visibleContinentPoiPlanes = continents.flatMap { $0.value.poiRenderPlanes() }
 		let visibleCountryPoiPlanes = countries.flatMap { $0.value.poiRenderPlanes() }
@@ -134,6 +136,12 @@ class PoiRenderer {
 		}
 	}
 	
+	func updateStyle(zoomLevel: Float) {
+		let poiScreenSize: Float = 2.0
+		poiBaseSize = poiScreenSize / (zoomLevel)
+		poiBaseSize += min(zoomLevel * 0.01, 0.1)	// Boost POI sizes a bit when zooming in
+	}
+	
 	func renderWorld(visibleSet: Set<Int>, inProjection projection: GLKMatrix4) {
 		glPushGroupMarkerEXT(0, "Render POI plane")
 		glUseProgram(poiProgram)
@@ -154,6 +162,7 @@ class PoiRenderer {
 								GLfloat(components[2]),
 								GLfloat(components[3]))
 		glUniform1f(poiUniforms.rankThreshold, rankThreshold)
+		glUniform1f(poiUniforms.poiBaseSize, poiBaseSize)
 		
 		let visiblePrimitives = poiPlanePrimitives.filter({ visibleSet.contains($0.ownerHash) })
 																							.filter({ poiVisibility[$0.hashValue] != nil })
@@ -181,14 +190,16 @@ func bucketPlaceMarkers(places: Set<GeoPlace>) -> [Int: Set<GeoPlace>] {
 	return bins
 }
 
-func buildPlaceMarkers(places: Set<GeoPlace>) -> ([Vertex], [UInt32], [Float]) {
-	let vertices = places.reduce([]) { (accumulator: [Vertex], place: GeoPlace) in
-		let size = log10(Float(place.rank) / 10.0)
-		let v0 = Vertex(0.0, size)
-		let v1 = Vertex(size, 0.0)
-		let v2 = Vertex(0.0, -size)
-		let v3 = Vertex(-size, 0.0)
-		let verts = [v0, v1, v2, v3].map { $0 + place.location }
+func buildPlaceMarkers(places: Set<GeoPlace>) -> ([ScaleVertex], [UInt32]) {
+	let vertices = places.reduce([]) { (accumulator: [ScaleVertex], place: GeoPlace) in
+		let size = 1.0 / Float(place.rank)
+		let v0 = ScaleVertex(0.0, 0.0, normalX: -size, normalY: -size)
+		let v1 = ScaleVertex(0.0, 0.0, normalX: size, normalY: -size)
+		let v2 = ScaleVertex(0.0, 0.0, normalX: size, normalY: size)
+		let v3 = ScaleVertex(0.0, 0.0, normalX: -size, normalY: size)
+		let verts = [v0, v1, v2, v3].map {
+			ScaleVertex(place.location.x, place.location.y, normalX: $0.normalX, normalY: $0.normalY)
+		}
 		return accumulator + verts
 	}
 	
@@ -200,19 +211,15 @@ func buildPlaceMarkers(places: Set<GeoPlace>) -> ([Vertex], [UInt32], [Float]) {
 		return accumulator + offsetIndices
 	}
 	
-	let scalars = places.reduce([]) { (accumulator: [Float], place: GeoPlace) in
-		accumulator + Array(repeating: Float(place.rank), count: 4)
-	}
-	
-	return (vertices, indices, scalars)
+	return (vertices, indices)
 }
 
 func sortPlacesIntoPoiPlanes<T: GeoIdentifiable>(_ places: Set<GeoPlace>, in container: T) -> [PoiPlane] {
 	let rankedPlaces = bucketPlaceMarkers(places: places)
 	return rankedPlaces.map { (rank, places) in
-		let (vertices, indices, scalars) = buildPlaceMarkers(places: places)
-		let primitive = IndexedRenderPrimitive(vertices: vertices,
-																						indices: indices, scalarAttribs: scalars,
+		let (vertices, indices) = buildPlaceMarkers(places: places)
+		let primitive = IndexedRenderPrimitive<ScaleVertex>(vertices: vertices,
+																						indices: indices,
 																						color: rank.hashColor.tuple(),
 																						ownerHash: container.geographyId.hashed,	// The hash of the owning region
 																						debugName: "\(container.name) - poi plane @ \(rank)")

@@ -16,7 +16,7 @@ class OutlineRenderPrimitive {
 	
 	let name: String
 	
-	init(vertices: [OutlineVertex], ownerHash hash: Int, debugName: String) {
+	init(vertices: [ScaleVertex], ownerHash hash: Int, debugName: String) {
 		ownerHash = hash
 		name = debugName
 		
@@ -28,7 +28,7 @@ class OutlineRenderPrimitive {
 		glGenBuffers(1, &vertexBuffer)
 		glBindBuffer(GLenum(GL_ARRAY_BUFFER), vertexBuffer)
 		glBufferData(GLenum(GL_ARRAY_BUFFER),
-								 GLsizeiptr(MemoryLayout<OutlineVertex>.stride * vertices.count),
+								 GLsizeiptr(MemoryLayout<ScaleVertex>.stride * vertices.count),
 								 vertices,
 								 GLenum(GL_STATIC_DRAW))
 		
@@ -52,7 +52,7 @@ func render(primitive: OutlineRenderPrimitive) {
 	
 	glEnableClientState(GLenum(GL_VERTEX_ARRAY))
 	glEnableVertexAttribArray(VertexAttribs.position.rawValue)
-	glEnableVertexAttribArray(VertexAttribs.miter.rawValue)
+	glEnableVertexAttribArray(VertexAttribs.normal.rawValue)
 	
 	glBindBuffer(GLenum(GL_ELEMENT_ARRAY_BUFFER), 0)
 	
@@ -60,14 +60,14 @@ func render(primitive: OutlineRenderPrimitive) {
 	// Point out vertex positions
 	glVertexAttribPointer(VertexAttribs.position.rawValue, 2,
 												GLenum(GL_FLOAT), GLboolean(GL_FALSE),
-												GLsizei(MemoryLayout<OutlineVertex>.stride), BUFFER_OFFSET(0))
-	glVertexAttribPointer(VertexAttribs.miter.rawValue, 2,
+												GLsizei(MemoryLayout<ScaleVertex>.stride), BUFFER_OFFSET(0))
+	glVertexAttribPointer(VertexAttribs.normal.rawValue, 2,
 												GLenum(GL_FLOAT), GLboolean(GL_FALSE),
-												GLsizei(MemoryLayout<OutlineVertex>.stride), BUFFER_OFFSET(UInt32(MemoryLayout<Float>.stride * 2)))
+												GLsizei(MemoryLayout<ScaleVertex>.stride), BUFFER_OFFSET(UInt32(MemoryLayout<Float>.stride * 2)))
 	
 	glDrawArrays(GLenum(GL_TRIANGLE_STRIP),
 							 0,
 							 primitive.elementCount)
-	glDisableVertexAttribArray(VertexAttribs.miter.rawValue)
+	glDisableVertexAttribArray(VertexAttribs.normal.rawValue)
 }
 

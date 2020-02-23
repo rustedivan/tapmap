@@ -7,18 +7,17 @@
 //
 
 attribute vec4 position;
-attribute float scalar;
+attribute vec2 normal;
 
 varying lowp vec4 colorVarying;
-varying lowp float rank;
 
 uniform mat4 modelViewProjectionMatrix;
 uniform lowp vec4 poiColor;
 uniform lowp float progress;
+uniform lowp float baseSize;
 
 void main()
 {
 		colorVarying = vec4(poiColor.xyz, progress);
-		rank = scalar;
-		gl_Position = modelViewProjectionMatrix * position;
+		gl_Position = modelViewProjectionMatrix * (position + vec4(normal, 0.0, 0.0) * baseSize);
 }

@@ -186,6 +186,7 @@ class MapViewController: GLKViewController, GLKViewControllerDelegate {
 																											zoomedTo: zoom)
 		effectRenderer.updatePrimitives()
 		selectionRenderer.updateStyle(zoomLevel: zoom)
+		poiRenderer.updateStyle(zoomLevel: zoom)
 		poiRenderer.updateFades()
 		labelView.updateLabels(for: poiRenderer.activePoiHashes,
 													 inArea: visibleLongLat(viewBounds: view.bounds))

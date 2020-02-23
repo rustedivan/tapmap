@@ -56,15 +56,15 @@ func makeMiterRib(_ v0: Vertex, _ v1: Vertex, _ v2: Vertex) -> Rib {
 	return Rib(v1, inner, outer)
 }
 
-func makeMiteredTriStrip(ribs: [Rib]) -> [OutlineVertex] {
-	return ribs.reduce([]) { (acc: [OutlineVertex], cur) in
-		let innerFatVertex = OutlineVertex(cur.p.x, cur.p.y, miterX: cur.miterIn.x, miterY: cur.miterIn.y)
-		let outerFatVertex = OutlineVertex(cur.p.x, cur.p.y, miterX: cur.miterOut.x, miterY: cur.miterOut.y)
+func makeMiteredTriStrip(ribs: [Rib]) -> [ScaleVertex] {
+	return ribs.reduce([]) { (acc: [ScaleVertex], cur) in
+		let innerFatVertex = ScaleVertex(cur.p.x, cur.p.y, normalX: cur.miterIn.x, normalY: cur.miterIn.y)
+		let outerFatVertex = ScaleVertex(cur.p.x, cur.p.y, normalX: cur.miterOut.x, normalY: cur.miterOut.y)
 		return acc + [innerFatVertex, outerFatVertex]
 	}
 }
 
-func generateOutlineGeometry(outline: [Vertex]) -> [OutlineVertex] {
+func generateOutlineGeometry(outline: [Vertex]) -> [ScaleVertex] {
 	guard outline.count >= 2 else { return [] }
 	
 	let firstRib = makeRib(outline[0], outline[1])
@@ -81,7 +81,7 @@ func generateOutlineGeometry(outline: [Vertex]) -> [OutlineVertex] {
 	return makeMiteredTriStrip(ribs: ribs)
 }
 
-func generateClosedOutlineGeometry(outline: [Vertex], width: Vertex.Precision) -> [OutlineVertex] {
+func generateClosedOutlineGeometry(outline: [Vertex], width: Vertex.Precision) -> [ScaleVertex] {
 	guard outline.count >= 3 else { return [] }
 	
 	let firstRib = makeMiterRib(outline.last!, outline.first!, outline[1])
