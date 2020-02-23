@@ -7,7 +7,7 @@
 //
 
 attribute vec4 position;
-attribute vec2 miter;
+attribute vec2 normal;
 
 varying mediump vec4 colorVar;
 
@@ -18,5 +18,5 @@ uniform lowp float edgeWidth;
 void main()
 {
 		colorVar = edgeColor;
-		gl_Position = modelViewProjectionMatrix * (position + vec4(miter, 0.0, 0.0) * edgeWidth);
+		gl_Position = modelViewProjectionMatrix * (position + vec4(normal, 0.0, 0.0) * edgeWidth);
 }

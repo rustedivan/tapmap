@@ -31,15 +31,15 @@ struct Vertex : Equatable {
 	}
 }
 
-struct OutlineVertex {
+struct ScaleVertex {
 	let x: Float
 	let y: Float
-	let miterX: Float
-	let miterY: Float
+	let normalX: Float
+	let normalY: Float
 	
-	init(_ _x: Float, _ _y: Float, miterX _mx: Float, miterY _my: Float) {
+	init(_ _x: Float, _ _y: Float, normalX _nx: Float, normalY _ny: Float) {
 		x = _x; y = _y;
-		miterX = _mx; miterY = _my;
+		normalX = _nx; normalY = _ny;
 	}
 }
 
