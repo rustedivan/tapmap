@@ -93,6 +93,8 @@ class OperationParseOSMJson : Operation {
 		let logPopulation: Double? = population != nil ? log10(Double(population!)) : nil
 		
 		switch (kind, adminLevel, logPopulation) {
+		case (.Region, _, _):
+			return 0
 		case (.Capital, _, let logPop?) where logPop > 6.5:	// Capital over 5M population
 			return 1
 		case (.Capital, _, _):															// Normal capital

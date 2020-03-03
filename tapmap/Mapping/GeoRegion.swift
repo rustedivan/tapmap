@@ -192,6 +192,7 @@ struct GeoPlace : Codable, Equatable, Hashable {
 		case Capital
 		case City
 		case Town
+		case Region
 	}
 	
 	let location: Vertex
