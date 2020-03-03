@@ -8,7 +8,14 @@ ROAD TO FINAL
 
 # Region labelling
 ## Add POIs for all regions
+-- Barycenter is not a good fit for this job
+-- Instead, scan for the widest horizontal line through the polygon
+-- and center on that line
+-- Add POI category for .Region
+-- ...add it to the list
 ## Two lines' worth of linebreak
+-- ...only for region UILabels
+-- Maybe a separate queue of region labels?
 ## Fade out these when zooming in
 ## Send label types to zoom view
 
