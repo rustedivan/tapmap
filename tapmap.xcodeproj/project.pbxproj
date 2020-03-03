@@ -78,6 +78,7 @@
 		14985FED22F0ED0C00F68A1F /* IndexedRenderPrimitive.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14985FEC22F0ED0C00F68A1F /* IndexedRenderPrimitive.swift */; };
 		14985FEF22F0ED4A00F68A1F /* OutlineRenderPrimitive.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14985FEE22F0ED4A00F68A1F /* OutlineRenderPrimitive.swift */; };
 		149CBDDD23CB230000A7AABB /* LabelView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 149CBDDC23CB230000A7AABB /* LabelView.swift */; };
+		14BAA333240EF95000DC64B9 /* OperationFitLabels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14BAA332240EF95000DC64B9 /* OperationFitLabels.swift */; };
 		14C6656422B97D890054D7F2 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 14C6656222B97D890054D7F2 /* Main.storyboard */; };
 		14C6656622B97D8A0054D7F2 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 14C6656522B97D8A0054D7F2 /* Assets.xcassets */; };
 		14C6656922B97D8A0054D7F2 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 14C6656722B97D8A0054D7F2 /* LaunchScreen.storyboard */; };
@@ -170,6 +171,7 @@
 		14985FEE22F0ED4A00F68A1F /* OutlineRenderPrimitive.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OutlineRenderPrimitive.swift; sourceTree = "<group>"; };
 		14985FF522F0F35700F68A1F /* OutlineGeometry.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OutlineGeometry.swift; sourceTree = "<group>"; };
 		149CBDDC23CB230000A7AABB /* LabelView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LabelView.swift; sourceTree = "<group>"; };
+		14BAA332240EF95000DC64B9 /* OperationFitLabels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OperationFitLabels.swift; sourceTree = "<group>"; };
 		14C6655B22B97D890054D7F2 /* tapmap.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = tapmap.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		14C6656322B97D890054D7F2 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
 		14C6656522B97D8A0054D7F2 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
@@ -422,6 +424,7 @@
 				14C6659922B97E660054D7F2 /* OperationAssembleGroups.swift */,
 				14C665A022B97E660054D7F2 /* OperationBakeGeometry.swift */,
 				14C665A222B97E670054D7F2 /* OperationDistributePlaces.swift */,
+				14BAA332240EF95000DC64B9 /* OperationFitLabels.swift */,
 				14C6659E22B97E660054D7F2 /* OperationFixupHierarchy.swift */,
 				14C665A422B97E670054D7F2 /* OperationParseGeoJson.swift */,
 				14C665A322B97E670054D7F2 /* OperationParseOSMJson.swift */,
@@ -778,6 +781,7 @@
 				142A21F023DC61A3000DA4FA /* ChunkTable.swift in Sources */,
 				14C665C922B97ED40054D7F2 /* JobHelpers.swift in Sources */,
 				1489380B22B98217009278A0 /* Serialization.swift in Sources */,
+				14BAA333240EF95000DC64B9 /* OperationFitLabels.swift in Sources */,
 				147B819223DA03B700942C9B /* QuadTree.swift in Sources */,
 				1489380922B98112009278A0 /* GeoRegion.swift in Sources */,
 				14C665AD22B97E670054D7F2 /* OperationTessellateRegions.swift in Sources */,
