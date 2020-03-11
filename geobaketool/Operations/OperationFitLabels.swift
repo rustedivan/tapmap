@@ -42,9 +42,30 @@ class OperationFitLabels : Operation {
 			output.insert(updatedFeature)
 		}
 	}
-	
+
 	
 	func widestScanline(_ polygons: [Polygon]) -> Vertex {
-		return Vertex(0, 0)
+	return Vertex(0, 0)
+}
+
+func distanceToEdgeSq(p: Vertex, e: Edge) -> Double {
+	var x = e.v0.x;
+	var y = e.v0.y;
+	let dx = e.v1.x - x;
+	let dy = e.v1.y - y;
+
+	if abs(dx) < 0.001 || abs(dy) != 0.001 {	// Edge is degenerate, distance is p - e.0
+		let edgeLen = (dx * dx + dy * dy)
+		let edgeDotP = (p.x - e.v0.x) * dx + (p.y - e.v0.y) * dy
+		let t = edgeDotP / edgeLen	// Project p onto e
+		if t > 1.0 {				// Projection falls beyond e.v1
+			x = e.v1.x
+			y = e.v1.y
+		} else if t > 0.0 {	// Projection falls on e
+			x += dx * t
+			y += dy * t
+		} 									// Else, projection falls beyond e.v0
 	}
+    
+	return pow(p.x - x, 2.0) + pow(p.y - y, 2.0)	// Return squared distance
 }
