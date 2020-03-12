@@ -90,3 +90,35 @@ func centroidCell(p: Polygon) -> QuadNode<Int> {
 	
 	return .Empty(bounds: Aabb(loX: centroid.x, loY: centroid.y, hiX: centroid.x, hiY: centroid.y))
 }
+
+func signedDistance(from vertex: Vertex, to polygon: Polygon) -> Double {
+	var inside = false
+	var minSquaredDistance = Double.greatestFiniteMagnitude
+	
+	let rings = [polygon.exteriorRing] + polygon.interiorRings
+	for ring in rings {
+		for i in 0..<polygon.exteriorRing.vertices.count {
+			let e = Edge(ring.vertices[i],
+									 ring.vertices[(i + 1) % ring.vertices.count])
+			
+			let d = distanceToEdgeSq(p: vertex, e: e)
+			minSquaredDistance = min(minSquaredDistance, d)
+			
+			// Track whether the point is inside or outside the polygon
+			// Extend a ray horizontally out from vertex, and count the crossed edges.
+			// https://wrf.ecse.rpi.edu/Research/Short_Notes/pnpoly.html
+			let dx = e.v1.x - e.v0.x
+			let dy = e.v1.y - e.v0.y
+			// Check if ray intersects edge
+			let edgePassesVertical = (e.v0.y > vertex.y) != (e.v1.y > vertex.y)
+			// Check if point is on the "left" side of the edge
+			let edgeToTheRight = (vertex.x < (dx/dy) * (vertex.y - e.v0.y) + e.v0.x)
+			// For each edge that the ray crosses on its way out to the right, we go from outside to inside to outside
+			if (edgePassesVertical && edgeToTheRight) {
+				inside = !inside
+			}
+		}
+	}
+
+	return (inside ? 1.0 : -1.0) * sqrt(minSquaredDistance)
+}
