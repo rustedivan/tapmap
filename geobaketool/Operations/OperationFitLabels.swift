@@ -29,7 +29,7 @@ class OperationFitLabels : Operation {
 		guard !isCancelled else { print("Cancelled before starting"); return }
 
 		for feature in worldFeatures {
-			let labelCenter = widestScanline(feature.polygons)
+			let labelCenter = poleOfInaccessibility(feature.polygons)
 			let regionMarker = GeoPlace(location: labelCenter, name: feature.name, kind: .Region, rank: 0)
 			let editedPlaces = feature.places!.union([regionMarker])
 			let updatedFeature = ToolGeoFeature(level: feature.level,
@@ -42,9 +42,42 @@ class OperationFitLabels : Operation {
 			output.insert(updatedFeature)
 		}
 	}
+}
 
+// Mapbox: new algorithm for finding a visual center of a polygon
+//   Vladimir Agafonkin (blog.mapbox.com)
+func poleOfInaccessibility(_ polygons: [Polygon]) -> Vertex {
+	// First, select the largest polygon to focus on (rough estimate, just to get rid of islands
+	var largestBoundingBox = Aabb()
+	var largestPolyArea = 0.0
+	var largestPolyIndex = -1
+	for (i, p) in polygons.enumerated() {
+		let boundingBox = p.exteriorRing.vertices.reduce(Aabb()) { (acc, v) -> Aabb in
+			return Aabb(loX: min(v.x, acc.minX),
+									loY: min(v.y, acc.minY),
+									hiX: max(v.x, acc.maxX),
+									hiY: max(v.y, acc.maxY))
+		}
+		let boxArea = (boundingBox.maxX - boundingBox.minX) * (boundingBox.maxY - boundingBox.minY)
+		if (boxArea > largestPolyArea) {
+			largestBoundingBox = boundingBox
+			largestPolyArea = boxArea
+			largestPolyIndex = i
+		}
+	}
 	
-	func widestScanline(_ polygons: [Polygon]) -> Vertex {
+	if (largestPolyArea <= 0.01) {
+		return largestBoundingBox.midpoint
+	}
+	
+	let representativePolygon = polygons[largestPolyIndex]
+	
+	// Cover the polygon with quadnodes
+	let side = max(largestBoundingBox.maxX - largestBoundingBox.minX, largestBoundingBox.maxY - largestBoundingBox.minY)
+	let coveringAabb = Aabb(loX: largestBoundingBox.midpoint.x - side/2.0,
+													loY: largestBoundingBox.midpoint.y - side/2.0,
+													hiX: largestBoundingBox.midpoint.x + side/2.0,
+													hiY: largestBoundingBox.midpoint.y + side/2.0)
 	return Vertex(0, 0)
 }
 
