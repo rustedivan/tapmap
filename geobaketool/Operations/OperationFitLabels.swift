@@ -46,6 +46,12 @@ class OperationFitLabels : Operation {
 
 // Mapbox: new algorithm for finding a visual center of a polygon
 //   Vladimir Agafonkin (blog.mapbox.com)
+struct NodeDistances: Codable, Hashable {
+	let toPolygon: Double
+	let maxInNode: Double
+}
+typealias LabellingNode = QuadNode<NodeDistances>
+
 func poleOfInaccessibility(_ polygons: [Polygon]) -> Vertex {
 	// First, select the largest polygon to focus on (rough estimate, just to get rid of islands
 	var largestBoundingBox = Aabb()
@@ -78,9 +84,23 @@ func poleOfInaccessibility(_ polygons: [Polygon]) -> Vertex {
 													loY: largestBoundingBox.midpoint.y - side/2.0,
 													hiX: largestBoundingBox.midpoint.x + side/2.0,
 													hiY: largestBoundingBox.midpoint.y + side/2.0)
+	let fullCover = LabellingNode.Empty(bounds: coveringAabb)
+	let quadrantCells = fullCover.subnodes()
+	
+	var nodeQueue = Array<LabellingNode>([quadrantCells.tl, quadrantCells.tr, quadrantCells.bl, quadrantCells.br])
 	return Vertex(0, 0)
 }
 
+func calculateNodeDistances(quadNode: LabellingNode, polygon: Polygon) -> LabellingNode {
+	let subNodes = quadNode.subnodes()
+	let distanceToPolygon = signedDistance(from: quadNode.bounds.midpoint, to: polygon)
+	let max = distanceToPolygon + (quadNode.bounds.maxX - quadNode.bounds.minX) * sqrt(2.0)
+	let nodeDistances = NodeDistances(toPolygon: distanceToPolygon, maxInNode: max)
+	return QuadNode.Node(bounds: quadNode.bounds,
+											 values: Set([nodeDistances]),
+											 tl: subNodes.tl, tr: subNodes.tr,
+											 bl: subNodes.bl, br: subNodes.br)
+}
 func distanceToEdgeSq(p: Vertex, e: Edge) -> Double {
 	var x = e.v0.x;
 	var y = e.v0.y;
