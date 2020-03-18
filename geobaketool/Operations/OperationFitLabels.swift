@@ -102,7 +102,7 @@ func poleOfInaccessibility(_ polygons: [Polygon]) -> Vertex {
 		// Check if this node is better than the best so far
 		guard case let QuadNode.Node(_, candidateDistances, _, _, _, _) = node else { continue }
 		let candidateDistance = candidateDistances.first!.toPolygon
-		if candidateDistance < bestDistance {
+		if candidateDistance > bestDistance {
 			bestNode = node
 			bestDistance = candidateDistance
 		}
@@ -186,7 +186,7 @@ func signedDistance(from vertex: Vertex, to polygon: Polygon) -> Double {
 	
 	let rings = [polygon.exteriorRing] + polygon.interiorRings
 	for ring in rings {
-		for i in 0..<polygon.exteriorRing.vertices.count {
+		for i in 0..<ring.vertices.count {
 			let e = Edge(ring.vertices[i],
 									 ring.vertices[(i + 1) % ring.vertices.count])
 			
