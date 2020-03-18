@@ -9,15 +9,15 @@
 import Foundation
 
 class OperationFitLabels : Operation {
-	let worldFeatures : Set<ToolGeoFeature>
+	let labelFeatures : Set<ToolGeoFeature>
 	
 	var output : Set<ToolGeoFeature>
 	let report : ProgressReport
 	
-	init(worldCollection: Set<ToolGeoFeature>,
+	init(features: Set<ToolGeoFeature>,
 			 reporter: @escaping ProgressReport) {
 		
-		worldFeatures = worldCollection
+		labelFeatures = features
 		report = reporter
 		
 		output = []
@@ -28,7 +28,7 @@ class OperationFitLabels : Operation {
 	override func main() {
 		guard !isCancelled else { print("Cancelled before starting"); return }
 
-		for feature in worldFeatures {
+		for feature in labelFeatures {
 			let labelCenter = poleOfInaccessibility(feature.polygons)
 			let regionMarker = GeoPlace(location: labelCenter, name: feature.name, kind: .Region, rank: 0)
 			let editedPlaces = feature.places!.union([regionMarker])
@@ -40,6 +40,11 @@ class OperationFitLabels : Operation {
 																					stringProperties: feature.stringProperties,
 																					valueProperties: feature.valueProperties)
 			output.insert(updatedFeature)
+			if (output.count > 0) {
+				let reportLine = "\(feature.name) labelled"
+				report((Double(output.count) / Double(labelFeatures.count)), reportLine, false)
+			}
+
 		}
 	}
 }

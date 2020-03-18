@@ -140,9 +140,21 @@ func bakeGeometry() throws {
 		return
 	}
 	
-	let fixupJob = OperationFixupHierarchy(continentCollection: tessellatedContinents,
-																				 countryCollection: tessellatedCountries,
-																				 regionCollection: tessellatedRegionsWithPlaces,
+	// MARK: Label regions
+	let continentLabelJob = OperationFitLabels(features: tessellatedContinents, reporter: reportLoad)
+	let countryLabelJob = OperationFitLabels(features: tessellatedCountries, reporter: reportLoad)
+	let regionLabelJob = OperationFitLabels(features: tessellatedRegionsWithPlaces, reporter: reportLoad)
+	
+	bakeQueue.addOperations([continentLabelJob, countryLabelJob, regionLabelJob],
+													waitUntilFinished: true)
+	
+	let labelledContinents = continentLabelJob.output
+	let labelledCountries = countryLabelJob.output
+	let labelledRegions = regionLabelJob.output
+	
+	let fixupJob = OperationFixupHierarchy(continentCollection: labelledContinents,
+																				 countryCollection: labelledCountries,
+																				 regionCollection: labelledRegions,
 																				 reporter: reportLoad)
 	fixupJob.start()
 	
