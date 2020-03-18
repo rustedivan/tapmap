@@ -86,9 +86,37 @@ func poleOfInaccessibility(_ polygons: [Polygon]) -> Vertex {
 													hiY: largestBoundingBox.midpoint.y + side/2.0)
 	let fullCover = LabellingNode.Empty(bounds: coveringAabb)
 	let quadrantCells = fullCover.subnodes()
+	let quadrantNodes = [quadrantCells.tl, quadrantCells.tr,
+											 quadrantCells.bl, quadrantCells.br]
+		.map { calculateNodeDistances(quadNode: $0, polygon: representativePolygon) }
 	
-	var nodeQueue = Array<LabellingNode>([quadrantCells.tl, quadrantCells.tr, quadrantCells.bl, quadrantCells.br])
-	return Vertex(0, 0)
+	var nodeQueue = Array<LabellingNode>(quadrantNodes)
+	nodeQueue.sort(by: sortLabellingNode)	// Emulate a priority queue
+	
+	let startNode = centroidCell(p: representativePolygon)
+	var bestNode = calculateNodeDistances(quadNode: startNode, polygon: representativePolygon)
+	guard case let .Node(_, bestDistances, _, _, _, _) = bestNode else { exit(1) }
+	var bestDistance = bestDistances.first!.toPolygon
+	
+	while let node = nodeQueue.popLast() {
+		guard case let QuadNode.Node(_, candidateDistances, _, _, _, _) = node else { continue }
+		let candidateDistance = candidateDistances.first!.toPolygon
+		if candidateDistance < bestDistance {
+			bestNode = node
+			bestDistance = candidateDistance
+		}
+		
+		if (candidateDistances.first!.maxInNode - bestDistance <= 1.0) { continue }
+		
+		let subCells = node.subnodes()
+		let subNodes = [subCells.tl, subCells.tr,
+										subCells.bl, subCells.br]
+			.map { calculateNodeDistances(quadNode: $0, polygon: representativePolygon) }
+		nodeQueue.append(contentsOf: subNodes)
+		nodeQueue.sort(by: sortLabellingNode)	// Emulate a priority queue
+	}
+	
+	return bestNode.bounds.midpoint
 }
 
 func calculateNodeDistances(quadNode: LabellingNode, polygon: Polygon) -> LabellingNode {
@@ -101,6 +129,15 @@ func calculateNodeDistances(quadNode: LabellingNode, polygon: Polygon) -> Labell
 											 tl: subNodes.tl, tr: subNodes.tr,
 											 bl: subNodes.bl, br: subNodes.br)
 }
+
+func sortLabellingNode(lhs: LabellingNode, rhs: LabellingNode) -> Bool {
+	guard case let QuadNode.Node(_, lhsDistance, _, _, _, _) = lhs,
+				case let QuadNode.Node(_, rhsDistance, _, _, _, _) = rhs else {
+		return true
+	}
+	return lhsDistance.first!.toPolygon < rhsDistance.first!.toPolygon
+}
+
 func distanceToEdgeSq(p: Vertex, e: Edge) -> Double {
 	var x = e.v0.x;
 	var y = e.v0.y;
@@ -123,7 +160,7 @@ func distanceToEdgeSq(p: Vertex, e: Edge) -> Double {
 	return pow(p.x - x, 2.0) + pow(p.y - y, 2.0)	// Return squared distance
 }
 
-func centroidCell(p: Polygon) -> QuadNode<Int> {
+func centroidCell(p: Polygon) -> LabellingNode {
 	let ring = p.exteriorRing
 	
 	var cx = 0.0
