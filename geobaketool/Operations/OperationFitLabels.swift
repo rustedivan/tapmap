@@ -76,29 +76,25 @@ func poleOfInaccessibility(_ polygons: [Polygon]) -> Vertex {
 		return largestBoundingBox.midpoint
 	}
 	
-	let representativePolygon = polygons[largestPolyIndex]
+	let polygon = polygons[largestPolyIndex]	// This is the largest polygon in the region, so target that.
 	
-	// Cover the polygon with quadnodes
+	// Seed the search with one square quadnode that covers the polygon
 	let side = max(largestBoundingBox.maxX - largestBoundingBox.minX, largestBoundingBox.maxY - largestBoundingBox.minY)
 	let coveringAabb = Aabb(loX: largestBoundingBox.midpoint.x - side/2.0,
 													loY: largestBoundingBox.midpoint.y - side/2.0,
 													hiX: largestBoundingBox.midpoint.x + side/2.0,
 													hiY: largestBoundingBox.midpoint.y + side/2.0)
-	let fullCover = LabellingNode.Empty(bounds: coveringAabb)
-	let quadrantCells = fullCover.subnodes()
-	let quadrantNodes = [quadrantCells.tl, quadrantCells.tr,
-											 quadrantCells.bl, quadrantCells.br]
-		.map { calculateNodeDistances(quadNode: $0, polygon: representativePolygon) }
+	let fullCover = calculateNodeDistances(quadNode: LabellingNode.Empty(bounds: coveringAabb), polygon: polygon)
+	var nodeQueue = Array<LabellingNode>([fullCover])
 	
-	var nodeQueue = Array<LabellingNode>(quadrantNodes)
-	nodeQueue.sort(by: sortLabellingNode)	// Emulate a priority queue
-	
-	let startNode = centroidCell(p: representativePolygon)
-	var bestNode = calculateNodeDistances(quadNode: startNode, polygon: representativePolygon)
+	let startNode = centroidCell(p: polygon) // Initial guess on the polygon centroid
+	var bestNode = calculateNodeDistances(quadNode: startNode, polygon: polygon)
 	guard case let .Node(_, bestDistances, _, _, _, _) = bestNode else { exit(1) }
 	var bestDistance = bestDistances.first!.toPolygon
 	
+	// While there are nodes in the queue to be investigated
 	while let node = nodeQueue.popLast() {
+		// Check if this node is better than the best so far
 		guard case let QuadNode.Node(_, candidateDistances, _, _, _, _) = node else { continue }
 		let candidateDistance = candidateDistances.first!.toPolygon
 		if candidateDistance < bestDistance {
@@ -106,12 +102,14 @@ func poleOfInaccessibility(_ polygons: [Polygon]) -> Vertex {
 			bestDistance = candidateDistance
 		}
 		
+		// This node has no possible children further away from the polygon's edge than the best so far
 		if (candidateDistances.first!.maxInNode - bestDistance <= 1.0) { continue }
 		
+		// Split up into four children and queue them up
 		let subCells = node.subnodes()
 		let subNodes = [subCells.tl, subCells.tr,
 										subCells.bl, subCells.br]
-			.map { calculateNodeDistances(quadNode: $0, polygon: representativePolygon) }
+			.map { calculateNodeDistances(quadNode: $0, polygon: polygon) }
 		nodeQueue.append(contentsOf: subNodes)
 		nodeQueue.sort(by: sortLabellingNode)	// Emulate a priority queue
 	}
@@ -139,25 +137,21 @@ func sortLabellingNode(lhs: LabellingNode, rhs: LabellingNode) -> Bool {
 }
 
 func distanceToEdgeSq(p: Vertex, e: Edge) -> Double {
-	var x = e.v0.x;
-	var y = e.v0.y;
-	let dx = e.v1.x - x;
-	let dy = e.v1.y - y;
+	var v = e.v0
+	let d = Vertex(e.v1.x - v.x, e.v1.y - v.y)
 
-	if abs(dx) < 0.001 || abs(dy) != 0.001 {	// Edge is degenerate, distance is p - e.0
-		let edgeLen = (dx * dx + dy * dy)
-		let edgeDotP = (p.x - e.v0.x) * dx + (p.y - e.v0.y) * dy
+	if abs(d.x) < 0.001 || abs(d.y) != 0.001 {	// Edge is degenerate, distance is p - e.0
+		let edgeLen = (d.x * d.x + d.y * d.y)
+		let edgeDotP = (p.x - e.v0.x) * d.x + (p.y - e.v0.y) * d.y
 		let t = edgeDotP / edgeLen	// Project p onto e
 		if t > 1.0 {				// Projection falls beyond e.v1
-			x = e.v1.x
-			y = e.v1.y
+			v = e.v1
 		} else if t > 0.0 {	// Projection falls on e
-			x += dx * t
-			y += dy * t
+			v = Vertex(v.x + d.x * t, v.y + d.y * t)
 		} 									// Else, projection falls beyond e.v0
 	}
     
-	return pow(p.x - x, 2.0) + pow(p.y - y, 2.0)	// Return squared distance
+	return pow(p.x - v.x, 2.0) + pow(p.y - v.y, 2.0)	// Return squared distance
 }
 
 func centroidCell(p: Polygon) -> LabellingNode {
@@ -191,18 +185,17 @@ func signedDistance(from vertex: Vertex, to polygon: Polygon) -> Double {
 			let e = Edge(ring.vertices[i],
 									 ring.vertices[(i + 1) % ring.vertices.count])
 			
-			let d = distanceToEdgeSq(p: vertex, e: e)
-			minSquaredDistance = min(minSquaredDistance, d)
+			let l = distanceToEdgeSq(p: vertex, e: e)
+			minSquaredDistance = min(minSquaredDistance, l)
 			
 			// Track whether the point is inside or outside the polygon
 			// Extend a ray horizontally out from vertex, and count the crossed edges.
 			// https://wrf.ecse.rpi.edu/Research/Short_Notes/pnpoly.html
-			let dx = e.v1.x - e.v0.x
-			let dy = e.v1.y - e.v0.y
+			let d = Vertex(e.v1.x - e.v0.x, e.v1.y - e.v0.y)
 			// Check if ray intersects edge
 			let edgePassesVertical = (e.v0.y > vertex.y) != (e.v1.y > vertex.y)
 			// Check if point is on the "left" side of the edge
-			let edgeToTheRight = (vertex.x < (dx/dy) * (vertex.y - e.v0.y) + e.v0.x)
+			let edgeToTheRight = (vertex.x < (d.x/d.y) * (vertex.y - e.v0.y) + e.v0.x)
 			// For each edge that the ray crosses on its way out to the right, we go from outside to inside to outside
 			if (edgePassesVertical && edgeToTheRight) {
 				inside = !inside
