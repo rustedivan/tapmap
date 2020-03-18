@@ -49,7 +49,7 @@ class OperationFixupHierarchy : Operation {
 			
 			var updatedCountry = country
 			updatedCountry.children = belongingRegions
-			updatedCountry.places = belongingPlaces
+			updatedCountry.places = (country.places ?? Set()).union(belongingPlaces)
 			
 			geoCountries.insert(updatedCountry)
 			

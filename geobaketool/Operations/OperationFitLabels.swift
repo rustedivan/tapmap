@@ -31,7 +31,7 @@ class OperationFitLabels : Operation {
 		for feature in labelFeatures {
 			let labelCenter = poleOfInaccessibility(feature.polygons)
 			let regionMarker = GeoPlace(location: labelCenter, name: feature.name, kind: .Region, rank: 0)
-			let editedPlaces = feature.places!.union([regionMarker])
+			let editedPlaces = (feature.places ?? Set()).union([regionMarker])
 			let updatedFeature = ToolGeoFeature(level: feature.level,
 																					polygons: feature.polygons,
 																					tessellation: feature.tessellation,
@@ -44,7 +44,6 @@ class OperationFitLabels : Operation {
 				let reportLine = "\(feature.name) labelled"
 				report((Double(output.count) / Double(labelFeatures.count)), reportLine, false)
 			}
-
 		}
 	}
 }
