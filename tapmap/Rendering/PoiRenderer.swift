@@ -49,7 +49,7 @@ class PoiRenderer {
 	var poiVisibility: [Int : Visibility] = [:]
 	let poiProgram: GLuint
 	let poiUniforms : (modelViewMatrix: GLint, color: GLint, rankThreshold: GLint, progress: GLint, poiBaseSize: GLint)
-	var rankThreshold: Float = 0.0
+	var rankThreshold: Float = -1.0
 	var poiBaseSize: Float = 0.0
 	
 	init?(withVisibleContinents continents: [Int: GeoContinent],
@@ -192,7 +192,7 @@ func bucketPlaceMarkers(places: Set<GeoPlace>) -> [Int: Set<GeoPlace>] {
 
 func buildPlaceMarkers(places: Set<GeoPlace>) -> ([ScaleVertex], [UInt32]) {
 	let vertices = places.reduce([]) { (accumulator: [ScaleVertex], place: GeoPlace) in
-		let size = 1.0 / Float(place.rank)
+		let size = 1.0 / Float(place.rank > 0 ? place.rank : 1)
 		let v0 = ScaleVertex(0.0, 0.0, normalX: -size, normalY: -size)
 		let v1 = ScaleVertex(0.0, 0.0, normalX: size, normalY: -size)
 		let v2 = ScaleVertex(0.0, 0.0, normalX: size, normalY: size)
