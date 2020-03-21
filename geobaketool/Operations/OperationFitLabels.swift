@@ -34,7 +34,7 @@ class OperationFitLabels : Operation {
 			switch feature.level {
 			case .Continent: rank = 0
 			case .Country: rank = 1
-			case .Region: rank = 3
+			case .Region: rank = 2
 			}
 			
 			let regionMarker = GeoPlace(location: labelCenter, name: feature.name, kind: .Region, rank: rank)
