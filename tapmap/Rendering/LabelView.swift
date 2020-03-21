@@ -38,8 +38,11 @@ class LabelView: UIView {
 			let newLabel = UILabel()
 			newLabel.tag = 0
 			newLabel.isHidden = true
-			newLabel.frame = CGRect(x: 0.0, y: 0.0, width: 100.0, height: 30.0)
-			newLabel.font = UIFont.systemFont(ofSize: 14.0)
+			newLabel.frame = CGRect(x: 0.0, y: 0.0, width: 200.0, height: 30.0)
+			newLabel.preferredMaxLayoutWidth = 200.0
+			newLabel.lineBreakMode = .byWordWrapping
+			newLabel.numberOfLines = 2
+			newLabel.adjustsFontSizeToFitWidth = true
 			
 			poiLabels.append(newLabel)
 			addSubview(newLabel)
@@ -106,8 +109,13 @@ class LabelView: UIView {
 			guard let marker = poiPrimitives.values.first(where: { $0.ownerHash == label.tag }) else {
 				continue
 			}
+			
+			// Layout labels (region labels hang under the center, POI labels hang from their top-left)
 			let screenPos = project(marker.worldPos)
-			label.frame.origin = screenPos
+			switch marker.kind {
+			case .Region: label.center = screenPos
+			default: label.frame.origin = screenPos
+			}
 		}
 	}
 	
@@ -115,10 +123,37 @@ class LabelView: UIView {
 		label.tag = marker.ownerHash
 		label.isHidden = false
 		
+		let alignment: NSTextAlignment
+		let textColor: UIColor
+		let strokeColor: UIColor
+		let strokeWidth: CGFloat
+		
+		switch marker.kind {
+		case .Region:
+			textColor = .gray
+			strokeColor = .white
+			strokeWidth = -1.0
+			alignment = .center
+		default:
+			textColor = .white
+			strokeColor = .darkGray
+			strokeWidth = -3.0
+			alignment = .left
+		}
+		
+		switch marker.kind {
+		case .Region: label.font = .boldSystemFont(ofSize: 18.0)
+		case .Capital: label.font = .systemFont(ofSize: 14.0)
+		case .City: label.font = .systemFont(ofSize: 12.0)
+		case .Town: label.font = .systemFont(ofSize: 10.0)
+		}
+		 
 		let strokeAttribs: [NSAttributedString.Key: Any] =
-			[.strokeColor: UIColor.black,
-			 .foregroundColor: UIColor.white,
-			 .strokeWidth: -3.0]
+			[.strokeColor: strokeColor,
+			 .foregroundColor: textColor,
+			 .strokeWidth: strokeWidth]
+		
+		label.textAlignment = alignment
 		label.attributedText = NSAttributedString(string: marker.name, attributes: strokeAttribs)
 	}
 	
