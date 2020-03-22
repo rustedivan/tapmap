@@ -12,6 +12,7 @@ import GLKit
 struct PoiPlane: Hashable {
 	let primitive: IndexedRenderPrimitive<ScaleVertex>
 	let rank: Int
+	let representsArea: Bool
 	var ownerHash: Int { return primitive.ownerHash }
 	let poiHashes: [Int]
 	
@@ -24,6 +25,21 @@ struct PoiPlane: Hashable {
 		return lhs.hashValue == rhs.hashValue
 	}
 }
+
+/*
+	The POI renderer is oriented around sets of "POI planes". A POI plane is a render primitive that
+	holds a collection of POIs that will follow the same culling/fading events. For instance,
+	all the capitals in Europe are on the same POI plane, all the cities in Bavaria are on the same plane,
+	and all the towns in Jalisco are on the same plane - because they will be made visible together, and
+	will fade in and out at the same time.
+
+	Each POI plane knows if it contains point or area markers, as area markers (country, region, park...)
+	are only visible at a zoom _range_, while point markers are visible above a zoom _threshold. This logic
+	sits in cullPlaneToZoomRange()
+
+	The PoiRenderer also provides the activePoiHashes comp-prop to export the list of exactly which POIs
+	are rendered. This list is fed to the LabelView that needs the detailed information.
+*/
 
 class PoiRenderer {
 	enum Visibility {
@@ -215,16 +231,31 @@ func buildPlaceMarkers(places: Set<GeoPlace>) -> ([ScaleVertex], [UInt32]) {
 }
 
 func sortPlacesIntoPoiPlanes<T: GeoIdentifiable>(_ places: Set<GeoPlace>, in container: T) -> [PoiPlane] {
-	let rankedPlaces = bucketPlaceMarkers(places: places)
-	return rankedPlaces.map { (rank, places) in
-		let (vertices, indices) = buildPlaceMarkers(places: places)
+	let placeMarkers = places.filter { $0.kind != .Region }
+	let areaMarkers = places.filter { $0.kind == .Region }
+	let rankedPlaces = bucketPlaceMarkers(places: placeMarkers)
+	let rankedAreas = bucketPlaceMarkers(places: areaMarkers )
+	
+	let generatePlacePlanes = makePoiPlaneFactory(forArea: false, in: container)
+	let generateAreaPlanes = makePoiPlaneFactory(forArea: true, in: container)
+	
+	let placePlanes = rankedPlaces.map(generatePlacePlanes)
+	let areaPlanes = rankedAreas.map(generateAreaPlanes)
+	
+	return areaPlanes + placePlanes
+}
+
+typealias PoiFactory = (Int, Set<GeoPlace>) -> PoiPlane
+func makePoiPlaneFactory<T:GeoIdentifiable>(forArea: Bool, in container: T) -> PoiFactory {
+	return { (rank: Int, pois: Set<GeoPlace>) -> PoiPlane in
+		let (vertices, indices) = buildPlaceMarkers(places: pois)
 		let primitive = IndexedRenderPrimitive<ScaleVertex>(vertices: vertices,
 																						indices: indices,
 																						color: rank.hashColor.tuple(),
 																						ownerHash: container.geographyId.hashed,	// The hash of the owning region
-																						debugName: "\(container.name) - poi plane @ \(rank)")
-		let hashes = places.map { $0.hashValue }
-		return PoiPlane(primitive: primitive, rank: rank, poiHashes: hashes)
+																							debugName: "\(container.name) - \(forArea ? "area" : "poi") plane @ \(rank)")
+		let hashes = pois.map { $0.hashValue }
+		return PoiPlane(primitive: primitive, rank: rank, representsArea: forArea, poiHashes: hashes)
 	}
 }
 
