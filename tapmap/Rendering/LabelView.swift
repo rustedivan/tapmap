@@ -24,7 +24,9 @@ struct LabelMarker: Comparable {
 	}
 	
 	static func < (lhs: LabelMarker, rhs: LabelMarker) -> Bool {
-		return lhs.rank < rhs.rank || (lhs.kind == .Region && rhs.kind != .Region)
+		let lhsScore = lhs.rank - (lhs.kind == .Region ? 1 : 0)	// Value regions one step higher
+		let rhsScore = rhs.rank - (rhs.kind == .Region ? 1 : 0)
+		return lhsScore <= rhsScore
 	}
 }
 
@@ -81,7 +83,7 @@ class LabelView: UIView {
 		// Pick out the top-ten markers for display
 		let activeMarkers = poiPrimitives.values.filter { activePoiHashes.contains($0.ownerHash) }
 		let visibleMarkers = activeMarkers.filter { boxContains(focus, $0.worldPos) }
-		let unlimitedMarkers = visibleMarkers.filter { zoomFilter($0, zoom) }	// $ Figure out how to cut region labels that are too close
+		let unlimitedMarkers = visibleMarkers.filter { zoomFilter($0, zoom) }
 		let prioritizedMarkers = unlimitedMarkers.sorted(by: <)
 		let markersToShow = prioritizedMarkers.prefix(LabelView.s_maxLabels)
 		let hashesToShow = markersToShow.map { $0.ownerHash }
