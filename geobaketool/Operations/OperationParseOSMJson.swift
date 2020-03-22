@@ -107,8 +107,8 @@ class OperationParseOSMJson : Operation {
 			return 5
 		case (.City, _, .some):							// City know to be below 10k population
 			return 6
-		case (.City, let level?, .none):										// City with only admin level known can be 3-6
-			return min(max(level, 3), 6)
+		case (.City, let level?, .none):										// City with only admin level known can be 3-5
+			return min(max(level, 3), 5)
 		case (.City, .none, .none):													// Cities fallback to 5
 			print("City \(name) has no admin level and no population")
 			return 5

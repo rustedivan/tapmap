@@ -133,12 +133,11 @@ class PoiRenderer {
 	}
 	
 	func updateZoomThreshold(viewZoom: Float) {
-		// Polynomial curve fit (badly) in Grapher
 		let oldRankThreshold = rankThreshold
-		rankThreshold = max(0.01 * viewZoom * viewZoom + 0.3 * viewZoom, 1.0)
+		rankThreshold = viewZoom
 		
-		let previousPois = Set(poiPlanePrimitives.filter { Float($0.rank) <= oldRankThreshold })
-		let visiblePois = Set(poiPlanePrimitives.filter { Float($0.rank) <= rankThreshold })
+		let previousPois = Set(poiPlanePrimitives.filter { cullPlaneToZoomRange(plane: $0, zoom: oldRankThreshold) })
+		let visiblePois = Set(poiPlanePrimitives.filter { cullPlaneToZoomRange(plane: $0, zoom: rankThreshold) })
 
 		let poisToHide = previousPois.subtracting(visiblePois)	// Culled this frame
 		let poisToShow = visiblePois.subtracting(previousPois) // Shown this frame
@@ -150,6 +149,26 @@ class PoiRenderer {
 		for p in poisToShow {
 			poiVisibility.updateValue(.fadeIn(startTime: Date()), forKey: p.hashValue)
 		}
+	}
+	
+	func cullPlaneToZoomRange(plane: PoiPlane, zoom: Float) -> Bool {
+		var minZoom: Float = 0.0, maxZoom: Float = 1000.0
+		switch (plane.rank, plane.representsArea) {
+		case (0...1, false): 		minZoom = 2.0			// Captials; not visible at outmost zoom
+		case (2, false): 				minZoom = 5.0			// Cities
+		case (3, false): 				minZoom = 10.0
+		case (4, false):				minZoom = 12.0
+		case (5, false): 				minZoom = 14.0
+		case (6, false): 				minZoom = 16.0
+		case (7, false):				minZoom = 40.0		// Towns
+		case (8, false): 				minZoom = 60.0
+		case (0, true):					maxZoom = 7.0
+		case (1, true):					minZoom = 3.0;  maxZoom = 30.0
+		case (_, true): 				minZoom = 15.0; maxZoom = 40.0
+		case (_, _): 						minZoom = 1000.0
+		}
+		
+		return minZoom <= zoom && zoom <= maxZoom
 	}
 	
 	func updateStyle(zoomLevel: Float) {
@@ -250,9 +269,9 @@ func makePoiPlaneFactory<T:GeoIdentifiable>(forArea: Bool, in container: T) -> P
 	return { (rank: Int, pois: Set<GeoPlace>) -> PoiPlane in
 		let (vertices, indices) = buildPlaceMarkers(places: pois)
 		let primitive = IndexedRenderPrimitive<ScaleVertex>(vertices: vertices,
-																						indices: indices,
-																						color: rank.hashColor.tuple(),
-																						ownerHash: container.geographyId.hashed,	// The hash of the owning region
+																							indices: indices,
+																							color: rank.hashColor.tuple(),
+																							ownerHash: container.geographyId.hashed,	// The hash of the owning region
 																							debugName: "\(container.name) - \(forArea ? "area" : "poi") plane @ \(rank)")
 		let hashes = pois.map { $0.hashValue }
 		return PoiPlane(primitive: primitive, rank: rank, representsArea: forArea, poiHashes: hashes)
