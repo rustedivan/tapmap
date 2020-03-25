@@ -44,12 +44,13 @@ class OperationFixupHierarchy : Operation {
 			// ...and all the larger places in those regions
 			let belongingPlaces = Set(belongingRegions
 				.flatMap { $0.places ?? [] }
-				.filter { $0.kind != .Town }
+				.filter { $0.kind != .Town }	// Don't promote towns and region labels
+				.filter { $0.kind != .Region }
 			)
 			
 			var updatedCountry = country
 			updatedCountry.children = belongingRegions
-			updatedCountry.places = belongingPlaces
+			updatedCountry.places = (country.places ?? Set()).union(belongingPlaces)
 			
 			geoCountries.insert(updatedCountry)
 			
@@ -74,7 +75,7 @@ class OperationFixupHierarchy : Operation {
 			
 			var updatedContinent = continent
 			updatedContinent.children = belongingCountries
-			updatedContinent.places = belongingPlaces
+			updatedContinent.places = (continent.places ?? Set()).union(belongingPlaces)
 			geoContinents.insert(updatedContinent)
 			
 			remainingCountries.subtract(belongingCountries)

@@ -68,23 +68,23 @@ indirect enum QuadNode<T: Hashable & Codable>: Codable {
 							a.maxY <= b.minY)
 	}
 	
-	func subcells() -> (tl: Aabb, tr: Aabb, bl: Aabb, br: Aabb) {
+	func subnodes() -> (tl: QuadNode, tr: QuadNode, bl: QuadNode, br: QuadNode) {
 		let b = bounds
-		let tlOut = Aabb(loX: b.minX, loY: b.midpoint.y, hiX: b.midpoint.x, hiY: b.maxY)
-		let trOut = Aabb(loX: b.midpoint.x, loY: b.midpoint.y, hiX: b.maxX, hiY: b.maxY)
-		let blOut = Aabb(loX: b.minX, loY: b.minY, hiX: b.midpoint.x, hiY: b.midpoint.y)
-		let brOut = Aabb(loX: b.midpoint.x, loY: b.minY, hiX: b.maxX, hiY: b.midpoint.y)
+		let tlOut = QuadNode.Empty(bounds: Aabb(loX: b.minX, loY: b.midpoint.y, hiX: b.midpoint.x, hiY: b.maxY))
+		let trOut = QuadNode.Empty(bounds: Aabb(loX: b.midpoint.x, loY: b.midpoint.y, hiX: b.maxX, hiY: b.maxY))
+		let blOut = QuadNode.Empty(bounds: Aabb(loX: b.minX, loY: b.minY, hiX: b.midpoint.x, hiY: b.midpoint.y))
+		let brOut = QuadNode.Empty(bounds: Aabb(loX: b.midpoint.x, loY: b.minY, hiX: b.maxX, hiY: b.midpoint.y))
 		return (tlOut, trOut, blOut, brOut)
 	}
 }
 
 func splitNode<T>(_ node: QuadNode<T>) -> QuadNode<T> {
-	let subCells = node.subcells()
+	let subCells = node.subnodes()
 	return QuadNode.Node(bounds: node.bounds, values: [],
-												tl: .Empty(bounds: subCells.tl),
-												tr: .Empty(bounds: subCells.tr),
-												bl: .Empty(bounds: subCells.bl),
-												br: .Empty(bounds: subCells.br))
+												tl: subCells.tl,
+												tr: subCells.tr,
+												bl: subCells.bl,
+												br: subCells.br)
 }
 
 struct QuadTree<T: Hashable & Codable>: Codable {

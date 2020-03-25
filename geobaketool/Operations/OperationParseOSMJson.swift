@@ -93,6 +93,8 @@ class OperationParseOSMJson : Operation {
 		let logPopulation: Double? = population != nil ? log10(Double(population!)) : nil
 		
 		switch (kind, adminLevel, logPopulation) {
+		case (.Region, _, _):
+			return 0
 		case (.Capital, _, let logPop?) where logPop > 6.5:	// Capital over 5M population
 			return 1
 		case (.Capital, _, _):															// Normal capital
@@ -105,8 +107,8 @@ class OperationParseOSMJson : Operation {
 			return 5
 		case (.City, _, .some):							// City know to be below 10k population
 			return 6
-		case (.City, let level?, .none):										// City with only admin level known can be 3-6
-			return min(max(level, 3), 6)
+		case (.City, let level?, .none):										// City with only admin level known can be 3-5
+			return min(max(level, 3), 5)
 		case (.City, .none, .none):													// Cities fallback to 5
 			print("City \(name) has no admin level and no population")
 			return 5
