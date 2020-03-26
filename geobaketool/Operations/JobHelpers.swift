@@ -9,8 +9,8 @@
 typealias ProgressReport = (Double, String, Bool) -> ()
 typealias ErrorReport = (String, String) -> ()
 
-struct ToolGeoFeature : Equatable, Hashable {
-	enum Level: String {
+struct ToolGeoFeature : Equatable, Hashable, Codable {
+	enum Level: String, Codable {
 		case Continent = "continent"
 		case Country = "country"
 		case Region = "region"

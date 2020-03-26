@@ -100,6 +100,7 @@
 		14C665C922B97ED40054D7F2 /* JobHelpers.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14C665C822B97ED40054D7F2 /* JobHelpers.swift */; };
 		14C665CB22B97F250054D7F2 /* GeometryTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14C665CA22B97F250054D7F2 /* GeometryTests.swift */; };
 		14EACFB123CEDFEA00E25F53 /* LabelViewTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14EACFB023CEDFEA00E25F53 /* LabelViewTests.swift */; };
+		14EDA502242C8F38000B3954 /* tessellate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14EDA501242C8F38000B3954 /* tessellate.swift */; };
 		14F8918B22F0F3F7008CCCF3 /* OutlineGeometry.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14985FF522F0F35700F68A1F /* OutlineGeometry.swift */; };
 		42305820DDFD7F37DDEE8F12 /* Pods_tapmap.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 45C1147D5A2C7928668CBD52 /* Pods_tapmap.framework */; };
 		6E3D2604F042410DA2CB9E02 /* libPods-geobaketool.a in Frameworks */ = {isa = PBXBuildFile; fileRef = FDA501576A2A6E0A34168D0E /* libPods-geobaketool.a */; };
@@ -202,6 +203,7 @@
 		14C665C822B97ED40054D7F2 /* JobHelpers.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = JobHelpers.swift; sourceTree = "<group>"; };
 		14C665CA22B97F250054D7F2 /* GeometryTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = GeometryTests.swift; sourceTree = "<group>"; };
 		14EACFB023CEDFEA00E25F53 /* LabelViewTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LabelViewTests.swift; sourceTree = "<group>"; };
+		14EDA501242C8F38000B3954 /* tessellate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = tessellate.swift; sourceTree = "<group>"; };
 		1A82755FB7C3A9F0402A2323 /* Pods-geobaketool.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-geobaketool.debug.xcconfig"; path = "Target Support Files/Pods-geobaketool/Pods-geobaketool.debug.xcconfig"; sourceTree = "<group>"; };
 		45C1147D5A2C7928668CBD52 /* Pods_tapmap.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_tapmap.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		61006EAAEC018C02F6937370 /* libPods-geobaketool-geobaketoolTests.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-geobaketool-geobaketoolTests.a"; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -400,6 +402,7 @@
 				14C6659D22B97E660054D7F2 /* config.swift */,
 				14C6659B22B97E660054D7F2 /* download.swift */,
 				14C6659622B97E660054D7F2 /* reshape.swift */,
+				14EDA501242C8F38000B3954 /* tessellate.swift */,
 				14C6659722B97E660054D7F2 /* bake.swift */,
 				14C665C622B97EC30054D7F2 /* toolgeometry.swift */,
 				14C6659822B97E660054D7F2 /* nullrenderer.swift */,
@@ -767,6 +770,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				14EDA502242C8F38000B3954 /* tessellate.swift in Sources */,
 				14C665C522B97EA00054D7F2 /* main.swift in Sources */,
 				1489381322B982F8009278A0 /* nullrenderer.swift in Sources */,
 				14C665C722B97EC30054D7F2 /* toolgeometry.swift in Sources */,
