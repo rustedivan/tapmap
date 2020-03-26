@@ -19,6 +19,7 @@ func reshapeGeometry(params: ArraySlice<String>) throws {
 	let config = PipelineConfig.shared
 	let method = config.configString("reshape.method") ?? ""
 	let simplificationStrengths = config.configValues("reshape.lodlevels") ?? [5]
+	let lodLevels = simplificationStrengths.sorted(by: >)	// Low lod levels = higher quality
 	
 	guard let shapeFiles = try? FileManager.default.contentsOfDirectory(at: PipelineConfig.shared.sourceGeometryUrl,
 			includingPropertiesForKeys: nil,
@@ -37,7 +38,7 @@ func reshapeGeometry(params: ArraySlice<String>) throws {
 	}
 	
 	// Reshape into each LOD level
-	for (lod, s) in simplificationStrengths.enumerated() {
+	for (lod, s) in lodLevels.enumerated() {
 		try reshapeFile(input: countryFile, strength: s, method: method, output: "\(config.reshapedCountriesFilename)-\(lod).json")
 		try reshapeFile(input: regionFile, strength: s, method: method, output: "\(config.reshapedRegionsFilename!)-\(lod).json")
 	}
