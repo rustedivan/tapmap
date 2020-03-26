@@ -9,7 +9,7 @@
 import Foundation
 import Dispatch
 
-enum GeoBakeDownloadError : Error {
+enum GeoDownloadPipelineError : Error {
 	case timedOut(host: String)
 	case downloadFailed(key: String)
 	case queryFailed(message: String)
@@ -38,10 +38,10 @@ func downloadFiles(params: ArraySlice<String>) throws {
 		downloadTask.resume()
 		let result = semaphore.wait(timeout: DispatchTime.now() + DispatchTimeInterval.seconds(600))
 		guard result == DispatchTimeoutResult.success else {
-			throw GeoBakeDownloadError.timedOut(host: url.host ?? "No host")
+			throw GeoDownloadPipelineError.timedOut(host: url.host ?? "No host")
 		}
 		guard let archiveTempPath = reporter.tempFilePath else {
-			throw GeoBakeDownloadError.downloadFailed(key: url.lastPathComponent)
+			throw GeoDownloadPipelineError.downloadFailed(key: url.lastPathComponent)
 		}
 
 		let geometryTempPath = try unpackFile(archiveUrl: archiveTempPath)
@@ -61,10 +61,10 @@ func downloadFiles(params: ArraySlice<String>) throws {
 		
 		let result = semaphore.wait(timeout: DispatchTime.now() + DispatchTimeInterval.seconds(600))
 		guard result == DispatchTimeoutResult.success else {
-			throw GeoBakeDownloadError.timedOut(host: url.host ?? "No host")
+			throw GeoDownloadPipelineError.timedOut(host: url.host ?? "No host")
 		}
 		guard let queryTempPath = reporter.tempFilePath else {
-			throw GeoBakeDownloadError.queryFailed(message: dst)
+			throw GeoDownloadPipelineError.queryFailed(message: dst)
 		}
 		
 		try pickJsonFiles(from: queryTempPath, named: dst, to: geometryFilesPath)
@@ -118,7 +118,7 @@ func unpackFile(archiveUrl: URL) throws -> URL {
 	unzipTask.waitUntilExit()
 	
 	if unzipTask.terminationStatus != 0 {
-		throw GeoBakeDownloadError.unpackFailed
+		throw GeoDownloadPipelineError.unpackFailed
 	}
 	
 	return unzipTask.currentDirectoryURL!.appendingPathComponent(tempArea)

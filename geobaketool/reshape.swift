@@ -8,7 +8,7 @@
 
 import Foundation
 
-enum GeoBakeReshapeError : Error {
+enum GeoReshapePipelineError : Error {
 	case noNodePath
 	case noMapshaperInstall
 	case missingShapeFile(level: String)
@@ -24,16 +24,16 @@ func reshapeGeometry(params: ArraySlice<String>) throws {
 			includingPropertiesForKeys: nil,
 			options: [])
 		.filter({ $0.pathExtension == "shp" }) else {
-			throw GeoBakeReshapeError.noShapeFiles
+			throw GeoReshapePipelineError.noShapeFiles
 	}
 	guard !shapeFiles.isEmpty else {
-		throw GeoBakeReshapeError.noShapeFiles
+		throw GeoReshapePipelineError.noShapeFiles
 	}
 	guard let countryFile = (shapeFiles.first { $0.absoluteString.contains("admin_0") }) else {
-		throw GeoBakeReshapeError.missingShapeFile(level: "admin_0")
+		throw GeoReshapePipelineError.missingShapeFile(level: "admin_0")
 	}
 	guard let regionFile = (shapeFiles.first { $0.absoluteString.contains("admin_1") }) else {
-		throw GeoBakeReshapeError.missingShapeFile(level: "admin_1")
+		throw GeoReshapePipelineError.missingShapeFile(level: "admin_1")
 	}
 	
 	try reshapeFile(input: countryFile, strength: countryStrength, method: method, output: PipelineConfig.shared.reshapedCountriesFilename)
@@ -63,13 +63,13 @@ func reshapeFile(input: URL, strength: Int, method: String, output: String) thro
 
 func findMapshaperInstall() throws -> URL {
 	guard let mapshaperPath = PipelineConfig.shared.configString("reshape.node") else {
-		throw GeoBakeReshapeError.noNodePath
+		throw GeoReshapePipelineError.noNodePath
 	}
 	let mapShaper = URL(fileURLWithPath: mapshaperPath,
 											relativeTo: FileManager.default.homeDirectoryForCurrentUser)
 	
 	if !FileManager.default.fileExists(atPath: "\(mapShaper.path)/mapshaper") {
-		throw GeoBakeReshapeError.noMapshaperInstall
+		throw GeoReshapePipelineError.noMapshaperInstall
 	}
 	
 	return mapShaper

@@ -169,8 +169,8 @@ func bakeGeometry() throws {
 																			 saveUrl: outputUrl,
 																			 reporter: reportLoad,
 																			 errorReporter: reportError)
-	workQueue.addOperation(geoBaker)
-	workQueue.waitUntilAllOperationsAreFinished()
+	bakeQueue.addOperation(geoBaker)
+	bakeQueue.waitUntilAllOperationsAreFinished()
 	
 	print("Wrote world-file to \(outputUrl.path)")
 }
