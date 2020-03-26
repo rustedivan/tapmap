@@ -59,6 +59,18 @@ class PipelineConfig {
 		return confInt
 	}
 	
+	func configValues(_ key : String) -> [Int]? {
+		var out : [Int]? = nil
+		if let arr = dictionary.value(forKeyPath: key) as? NSArray {
+			out = arr as? [Int]
+			if out == nil {
+				print("Pipeline configuration error: \"\(key)\" must be an integer array.")
+				exit(1)
+			}
+		}
+		return out
+	}
+	
 	func configArray(_ key : String) -> [String]? {
 		var out : [String]? = nil
 		if let arr = dictionary.value(forKeyPath: key) as? NSArray {

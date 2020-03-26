@@ -16,9 +16,9 @@ enum GeoReshapePipelineError : Error {
 }
 
 func reshapeGeometry(params: ArraySlice<String>) throws {
-	let method = PipelineConfig.shared.configString("reshape.method") ?? ""
-	let countryStrength = PipelineConfig.shared.configValue("reshape.simplify-countries")
-	let regionStrength = PipelineConfig.shared.configValue("reshape.simplify-regions")
+	let config = PipelineConfig.shared
+	let method = config.configString("reshape.method") ?? ""
+	let simplificationStrengths = config.configValues("reshape.lodlevels") ?? [5]
 	
 	guard let shapeFiles = try? FileManager.default.contentsOfDirectory(at: PipelineConfig.shared.sourceGeometryUrl,
 			includingPropertiesForKeys: nil,
@@ -36,8 +36,11 @@ func reshapeGeometry(params: ArraySlice<String>) throws {
 		throw GeoReshapePipelineError.missingShapeFile(level: "admin_1")
 	}
 	
-	try reshapeFile(input: countryFile, strength: countryStrength, method: method, output: PipelineConfig.shared.reshapedCountriesFilename)
-	try reshapeFile(input: regionFile, strength: regionStrength, method: method, output: PipelineConfig.shared.reshapedRegionsFilename!)
+	// Reshape into each LOD level
+	for (lod, s) in simplificationStrengths.enumerated() {
+		try reshapeFile(input: countryFile, strength: s, method: method, output: "\(config.reshapedCountriesFilename)-\(lod).json")
+		try reshapeFile(input: regionFile, strength: s, method: method, output: "\(config.reshapedRegionsFilename!)-\(lod).json")
+	}
 }
 
 func reshapeFile(input: URL, strength: Int, method: String, output: String) throws {
