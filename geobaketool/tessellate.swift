@@ -64,20 +64,13 @@ func tessellateGeometry(params: ArraySlice<String>) throws {
 	let countryAssemblyJob = OperationAssembleGroups(parts: regions, targetLevel: .Country, properties: countryProperties, reporter: reportLoad)
 	geometryQueue.addOperation(countryAssemblyJob)
 	geometryQueue.waitUntilAllOperationsAreFinished()
-	guard let generatedCountries = countryAssemblyJob.output else {
-		print("Country assembly failed")
-		return
-	}
+	let generatedCountries = countryAssemblyJob.output!
 
 	// MARK: Continent assembly
 	let continentAssemblyJob = OperationAssembleGroups(parts: generatedCountries, targetLevel: .Continent, properties: [:], reporter: reportLoad)
 	geometryQueue.addOperation(continentAssemblyJob)
 	geometryQueue.waitUntilAllOperationsAreFinished()
-
-	guard let generatedContinents = continentAssemblyJob.output else {
-		print("Continent assembly failed")
-		return
-	}
+	let generatedContinents = continentAssemblyJob.output!
 
 	// MARK: Tessellate geometry
 	let continentTessJob = OperationTessellateRegions(generatedContinents, reporter: reportLoad, errorReporter: reportError)
@@ -98,7 +91,6 @@ func tessellateGeometry(params: ArraySlice<String>) throws {
 	guard let tessellatedRegions = regionTessJob.output else {
 		throw GeoTessellatePipelineError.tessellationFailed(dataset: "regions")
 	}
-	
 	let archives = [
 		(tessellatedRegions, "regions"),
 		(tessellatedCountries, "countries"),
