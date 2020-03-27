@@ -16,17 +16,18 @@ enum GeoTessellatePipelineError : Error {
 }
 
 func tessellateGeometry(params: ArraySlice<String>) throws {
+	let config = PipelineConfig.shared
 	// MARK: Load JSON source files
 	print("Loading...")
 
 	progressBar(1, "Countries")
-	let countryData = try Data(contentsOf: PipelineConfig.shared.reshapedCountriesFilePath)
+	let countryData = try Data(contentsOf: config.reshapedCountriesFilePath)
 	progressBar(3, "Countries")
 	let countryJson = try JSON(data: countryData, options: .allowFragments)
 
 	progressBar(5, "Regions")
 	let regionData: Data?
-	if let regionPath = PipelineConfig.shared.reshapedRegionsFilePath {
+	if let regionPath = config.reshapedRegionsFilePath {
 		regionData = try Data(contentsOf: regionPath)
 	} else { regionData = nil }
 	progressBar(7, "Regions")
@@ -99,7 +100,7 @@ func tessellateGeometry(params: ArraySlice<String>) throws {
 }
 
 func archiveTessellations(_ tessellations: Set<ToolGeoFeature>, into output: String) throws {
-	let fileOutUrl = PipelineConfig.shared.sourceGeometryUrl.appendingPathComponent("\(output).tessarchive")
+	let fileOutUrl = config.sourceGeometryUrl.appendingPathComponent("\(output).tessarchive")
 	do {
 		let archive = try PropertyListEncoder().encode(tessellations)
 		try archive.write(to: fileOutUrl)
