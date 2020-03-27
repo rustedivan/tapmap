@@ -35,28 +35,11 @@ func tessellateGeometry(params: ArraySlice<String>) throws {
 		let lodLevel = lod.0
 		let countryFile = lod.1.0
 		let regionFile = lod.1.1
+		
 		// MARK: Load JSON source files
-		print("Loading LOD level \(lodLevel)...")
-
-		progressBar(1, "Countries")
-		let countryData = try Data(contentsOf: countryFile)
-		progressBar(3, "Countries")
-		let countryJson = try JSON(data: countryData, options: .allowFragments)
-
-		progressBar(5, "Regions")
-		let regionData = try Data(contentsOf: regionFile)
-		progressBar(7, "Regions")
-		let regionJson = try JSON(data: regionData, options: .allowFragments)
-
-		progressBar(10, "√ Loading done\n")
-
-		print("\nBuilding geography collections...")
-		let countryParser = OperationParseGeoJson(json: countryJson,
-																							as: .Country,
-																							reporter: reportLoad)
-		let regionParser =  OperationParseGeoJson(json: regionJson,
-																							as: .Region,
-																							reporter: reportLoad)
+		print("Building geometry for LOD level \(lodLevel)...")
+		let countryParser = try shapefileParser(url: countryFile, type: .Country)
+		let regionParser =  try shapefileParser(url: regionFile, type: .Region)
 		
 		let workQueue = OperationQueue()
 		workQueue.name = "Json load queue"
@@ -113,6 +96,15 @@ func tessellateGeometry(params: ArraySlice<String>) throws {
 			(tessellatedContinents, "continents", lodLevel)]
 		try _ = archives.map(archiveTessellations)
 	}
+}
+
+func shapefileParser(url: URL, type: ToolGeoFeature.Level) throws -> OperationParseGeoJson {
+	let data = try Data(contentsOf: url)
+	let json = try JSON(data: data, options: .allowFragments)
+	let parser = OperationParseGeoJson(json: json,
+																		 as: type,
+																		 reporter: reportLoad)
+	return parser
 }
 
 func archiveTessellations(_ tessellations: Set<ToolGeoFeature>, into output: String, lod: Int) throws {
