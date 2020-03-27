@@ -47,40 +47,28 @@ func tessellateGeometry(params: ArraySlice<String>) throws {
 		workQueue.maxConcurrentOperationCount = 1
 		workQueue.addOperations([countryParser, regionParser], waitUntilFinished: true)
 
-		guard let countries = countryParser.output else {
+		guard let loadedCountries = countryParser.output else {
 			throw GeoTessellatePipelineError.datasetFailed(dataset: "countries")
 		}
-		guard let regions = regionParser.output else {
+		guard let loadedRegions = regionParser.output else {
 			throw GeoTessellatePipelineError.datasetFailed(dataset: "regions")
 		}
 
 		// MARK: Country and continent assembly
-		let countryProperties = Dictionary(countries.map { ($0.countryKey, $0.stringProperties) },	// Needed to group newly created countries into continents
+		let countryProperties = Dictionary(loadedCountries.map { ($0.countryKey, $0.stringProperties) },	// Needed to group newly created countries into continents
 																			 uniquingKeysWith: { (first, _) in first })
-		let generatedCountries = assembleGroups(parts: regions, type: .Country, properties: countryProperties)
-		let generatedContinents = assembleGroups(parts: generatedCountries, type: .Continent, properties: [:])
+		let countries = assembleGroups(parts: loadedRegions, type: .Country, properties: countryProperties)
+		let continents = assembleGroups(parts: countries, type: .Continent, properties: [:])
 
 		// MARK: Tessellate geometry
-		let geometryQueue = OperationQueue()
-		geometryQueue.name = "Geometry queue"
-		let continentTessJob = OperationTessellateRegions(generatedContinents, reporter: reportLoad, errorReporter: reportError)
-		let countryTessJob = OperationTessellateRegions(generatedCountries, reporter: reportLoad, errorReporter: reportError)
-		let regionTessJob = OperationTessellateRegions(regions, reporter: reportLoad, errorReporter: reportError)
-		geometryQueue.addOperations([continentTessJob, countryTessJob, regionTessJob], waitUntilFinished: true)
-
-		guard let tessellatedContinents = continentTessJob.output else {
-			throw GeoTessellatePipelineError.tessellationFailed(dataset: "continents")
-		}
-		guard let tessellatedCountries = countryTessJob.output else {
-			throw GeoTessellatePipelineError.tessellationFailed(dataset: "countries")
-		}
-		guard let tessellatedRegions = regionTessJob.output else {
-			throw GeoTessellatePipelineError.tessellationFailed(dataset: "regions")
-		}
+		let (tessContinents, tessCountries, tessRegions) = try tessellateLodLevel(continents: continents,
+																																							countries: countries,
+																																							regions: loadedRegions)
+		
 		let archives = [
-			(tessellatedRegions, "regions", lodLevel),
-			(tessellatedCountries, "countries", lodLevel),
-			(tessellatedContinents, "continents", lodLevel)]
+			(tessRegions, "regions", lodLevel),
+			(tessCountries, "countries", lodLevel),
+			(tessContinents, "continents", lodLevel)]
 		try _ = archives.map(archiveTessellations)
 	}
 }
@@ -100,6 +88,30 @@ func assembleGroups(parts: Set<ToolGeoFeature>,
 	let assemblyJob = OperationAssembleGroups(parts: parts, targetLevel: type, properties: properties, reporter: reportLoad)
 	assemblyJob.start()
 	return assemblyJob.output!
+}
+
+func tessellateLodLevel(continents: Set<ToolGeoFeature>,
+												countries: Set<ToolGeoFeature>,
+												regions: Set<ToolGeoFeature>) throws -> (Set<ToolGeoFeature>, Set<ToolGeoFeature>, Set<ToolGeoFeature>) {
+	let geometryQueue = OperationQueue()
+	geometryQueue.name = "Geometry queue"
+	
+	let continentTessJob = OperationTessellateRegions(continents, reporter: reportLoad, errorReporter: reportError)
+	let countryTessJob = OperationTessellateRegions(countries, reporter: reportLoad, errorReporter: reportError)
+	let regionTessJob = OperationTessellateRegions(regions, reporter: reportLoad, errorReporter: reportError)
+	geometryQueue.addOperations([continentTessJob, countryTessJob, regionTessJob], waitUntilFinished: true)
+
+	guard let tessellatedContinents = continentTessJob.output else {
+		throw GeoTessellatePipelineError.tessellationFailed(dataset: "continents")
+	}
+	guard let tessellatedCountries = countryTessJob.output else {
+		throw GeoTessellatePipelineError.tessellationFailed(dataset: "countries")
+	}
+	guard let tessellatedRegions = regionTessJob.output else {
+		throw GeoTessellatePipelineError.tessellationFailed(dataset: "regions")
+	}
+	
+	return (tessellatedContinents, tessellatedCountries, tessellatedRegions)
 }
 
 func archiveTessellations(_ tessellations: Set<ToolGeoFeature>, into output: String, lod: Int) throws {
