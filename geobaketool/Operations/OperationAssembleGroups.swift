@@ -65,7 +65,7 @@ class OperationAssembleGroups : Operation {
 			if properties.isEmpty { print("Cannot find properties for \(partList.key)") }
 			let grouped = ToolGeoFeature(level: targetLevel,
 																		 polygons: geometry,
-																		 tessellation: nil,
+																		 tessellations: [],
 																		 places: nil,
 																		 children: nil,
 																		 stringProperties: properties,

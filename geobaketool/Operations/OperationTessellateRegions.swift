@@ -41,7 +41,7 @@ class OperationTessellateRegions : Operation {
 				report(progress, "\(totalTris) triangles @ \(shortName)", false)
 				return ToolGeoFeature(level: feature.level,
 															polygons: feature.polygons,
-															tessellation: tessellation,
+															tessellations: [tessellation],
 															places: nil,
 															children: nil,
 															stringProperties: feature.stringProperties,

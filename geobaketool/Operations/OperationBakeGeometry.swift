@@ -88,7 +88,7 @@ class OperationBakeGeometry : Operation {
 		
 		// Build continents
 		for continent in toolWorld {
-			guard let continentTessellation = continent.tessellation else {
+			guard let continentTessellation = continent.tessellations.first else { // Use LOD0 for picking AABBS
 				print("\(continent.name) has no tessellation - skipping...")
 				continue
 			}
@@ -96,7 +96,7 @@ class OperationBakeGeometry : Operation {
 			// Build countries
 			var countryResult = Set<GeoCountry>()
 			for country in continent.children ?? [] {
-				guard let countryTessellation = country.tessellation else {
+				guard let countryTessellation = country.tessellations.first else {
 					print("\(country.name) has no tessellation - skipping...")
 					continue
 				}
@@ -104,7 +104,7 @@ class OperationBakeGeometry : Operation {
 				// Build regions
 				var regionResult = Set<GeoRegion>()
 				for region in country.children ?? [] {
-					guard let regionTessellation = region.tessellation else {
+					guard let regionTessellation = region.tessellations.first else {
 						print("\(region.name) has no tessellation - skipping...")
 						continue
 					}

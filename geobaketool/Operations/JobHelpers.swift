@@ -20,7 +20,7 @@ struct ToolGeoFeature : Equatable, Hashable, Codable {
 	
 	let level: Level
 	let polygons: [Polygon]
-	var tessellation: GeoTessellation?
+	var tessellations: [GeoTessellation]
 	var places: GeoPlaceCollection?
 	var children: Set<ToolGeoFeature>?
 	

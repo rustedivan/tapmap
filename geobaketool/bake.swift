@@ -122,7 +122,6 @@ func bakeGeometry() throws {
 }
 
 func addLodLevels(to targets: Set<ToolGeoFeature>, from sources: Set<ToolGeoFeature>) -> Set<ToolGeoFeature> {
-	//	 $ Pick out the lower-LOD TGF sibling of the LOD0
 	for target in targets {
 		let regionHash = target.geographyId
 		guard let lodRegionIdx = sources.firstIndex(where: { $0.geographyId.hashed == regionHash.hashed }) else {
