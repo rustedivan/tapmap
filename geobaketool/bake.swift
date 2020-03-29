@@ -49,7 +49,7 @@ func bakeGeometry() throws {
 		throw GeoTessellatePipelineError.datasetFailed(dataset: "cities")
 	}
 
-	let baseLod = 2 // $ Unarchive the LOD0 instead
+	let baseLod = 0
 	print("Unarchiving tessellations at LOD\(baseLod)")
 	let tessellatedRegions = try unarchiveTessellations(from: "regions", lod: baseLod)
 	let tessellatedCountries = try unarchiveTessellations(from: "countries", lod: baseLod)
@@ -98,9 +98,9 @@ func bakeGeometry() throws {
 		loddedRegions = addLodLevels(to: loddedRegions, from: lodRegions)
 	}
 	
-	let fixupJob = OperationFixupHierarchy(continentCollection: labelledContinents,
-																				 countryCollection: labelledCountries,
-																				 regionCollection: labelledRegions,
+	let fixupJob = OperationFixupHierarchy(continentCollection: loddedContinents,
+																				 countryCollection: loddedCountries,
+																				 regionCollection: loddedRegions,
 																				 reporter: reportLoad)
 	fixupJob.start()
 	
@@ -112,6 +112,7 @@ func bakeGeometry() throws {
 	// MARK: Bake and write
 	print("\nTessellating geometry...")
 	let geoBaker = OperationBakeGeometry(world: world,
+																			 lodCount: lodCount,
 																			 saveUrl: outputUrl,
 																			 reporter: reportLoad,
 																			 errorReporter: reportError)
@@ -122,15 +123,19 @@ func bakeGeometry() throws {
 }
 
 func addLodLevels(to targets: Set<ToolGeoFeature>, from sources: Set<ToolGeoFeature>) -> Set<ToolGeoFeature> {
-	for target in targets {
+	var out = Set<ToolGeoFeature>()
+	for var target in targets {
 		let regionHash = target.geographyId
 		guard let lodRegionIdx = sources.firstIndex(where: { $0.geographyId.hashed == regionHash.hashed }) else {
 			print("Could not find LOD match for \(target.name)")
 			continue
 		}
-		let _ = sources[lodRegionIdx]
+
+		let lodTessellation = sources[lodRegionIdx].tessellations.first!
+		target.tessellations.append(lodTessellation)
+		out.insert(target)
 	}
-	return targets
+	return out
 }
 
 func unarchiveTessellations(from input: String, lod: Int) throws -> Set<ToolGeoFeature> {

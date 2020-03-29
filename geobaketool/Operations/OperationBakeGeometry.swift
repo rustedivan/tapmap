@@ -10,15 +10,18 @@ import Foundation
 
 class OperationBakeGeometry : Operation {
 	let input : Set<ToolGeoFeature>
+	let lodCount: Int
 	let saveUrl : URL
 	let report : ProgressReport
 	let reportError : ErrorReport
 	
 	init(world worldToBake: Set<ToolGeoFeature>,
+			 lodCount lods: Int,
 			 saveUrl url: URL,
 	     reporter: @escaping ProgressReport,
 	     errorReporter: @escaping ErrorReport) {
 		input = worldToBake
+		lodCount = lods
 		saveUrl = url
 		report = reporter
 		reportError = errorReporter
@@ -31,7 +34,7 @@ class OperationBakeGeometry : Operation {
 		
 		// Bake job should only do this conversion and save
 		let bakedWorld = buildWorld(from: input)
-		let tessellations = buildTessellationTable(from: input)
+		let tessellations = buildTessellationTable(from: input, lodCount: lodCount)
 		let worldTree = buildTree(from: bakedWorld)
 		
 		print("\n")
@@ -154,48 +157,48 @@ class OperationBakeGeometry : Operation {
 		return worldQuadTree
 	}
 	
-	func buildTessellationTable(from toolWorld: Set<ToolGeoFeature>) -> ChunkTable {
-		var continentTessellations: [(String, GeoTessellation)] = []
-		var countryTessellations: [(String, GeoTessellation)] = []
-		var regionTessellations: [(String, GeoTessellation)] = []
-		
-		// Serialize the tree into a list so continents come before countries come before regions.
-		// This will improve cache/VM locality when pulling chunks from the baked file.
-		
-		continentTessellations.append(contentsOf: toolWorld.map { ($0.geographyId.key, $0.tessellation!) })
-		for continent in toolWorld {
-			let countries = continent.children ?? []
-			countryTessellations.append(contentsOf: countries.map { ($0.geographyId.key, $0.tessellation!) })
-			for country in continent.children ?? [] {
-				let regions = country.children ?? []
-				regionTessellations.append(contentsOf: regions.map { ($0.geographyId.key, $0.tessellation!) })
-			}
-		}
-		
-		print("Packing tessellations...")
-		print(" - \(continentTessellations.count) continents")
-		print(" - \(countryTessellations.count) countries")
-		print(" - \(regionTessellations.count) regions")
-		
+	func buildTessellationTable(from toolWorld: Set<ToolGeoFeature>, lodCount: Int) -> ChunkTable {
 		let chunkTable = ChunkTable()
-		var level = ""
-		do {
-			level = "continent"
-			for (key, tess) in continentTessellations {
-				try chunkTable.addChunk(forKey: key, chunk: tess)
+
+		for lodLevel in stride(from: lodCount - 1, through: 0, by: -1) {	// Insert cheap LODs (high number) before heavy LODs (0)
+			var continentTessellations: [(String, GeoTessellation)] = []
+			var countryTessellations: [(String, GeoTessellation)] = []
+			var regionTessellations: [(String, GeoTessellation)] = []
+			
+			continentTessellations.append(contentsOf: toolWorld.map { ($0.geographyId.key, $0.tessellations[lodLevel]) })
+			for continent in toolWorld {
+				let countries = continent.children ?? []
+				countryTessellations.append(contentsOf: countries.map { ($0.geographyId.key, $0.tessellations[lodLevel]) })
+				for country in continent.children ?? [] {
+					let regions = country.children ?? []
+					regionTessellations.append(contentsOf: regions.map { ($0.geographyId.key, $0.tessellations[lodLevel]) })
+				}
 			}
 			
-			level = "country"
-			for (key, tess) in countryTessellations {
-				try chunkTable.addChunk(forKey: key, chunk: tess)
-			}
+			print("Packing tessellations at LOD\(lodLevel)...")
+			print(" - \(continentTessellations.count) continents")
+			print(" - \(countryTessellations.count) countries")
+			print(" - \(regionTessellations.count) regions")
 			
-			level = "region"
-			for (key, tess) in regionTessellations {
-				try chunkTable.addChunk(forKey: key, chunk: tess)
+			var level = ""
+			do {
+				level = "continent"
+				for (key, tess) in continentTessellations {
+					try chunkTable.addChunk(forKey: "\(key)-\(lodLevel)", chunk: tess)	// Store each chunk suffixed with its LOD level
+				}
+				
+				level = "country"
+				for (key, tess) in countryTessellations {
+					try chunkTable.addChunk(forKey: "\(key)-\(lodLevel)", chunk: tess)
+				}
+				
+				level = "region"
+				for (key, tess) in regionTessellations {
+					try chunkTable.addChunk(forKey: "\(key)-\(lodLevel)", chunk: tess)
+				}
+			} catch (let error) {
+				print("Failed to encode \(level) geometry: \(error.localizedDescription)")
 			}
-		} catch (let error) {
-			print("Failed to encode \(level) geometry: \(error.localizedDescription)")
 		}
 		
 		print("Built chunk table of \(ByteCountFormatter.string(fromByteCount: Int64(chunkTable.cursor), countStyle: .file))")
