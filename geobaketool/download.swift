@@ -132,7 +132,7 @@ func prepareGeometryDirectory() throws -> URL {
 }
 
 func pickGeometryFiles(from src: URL, to dst: URL) throws {
-	let allFiles = try FileManager.default.contentsOfDirectory(at: src, includingPropertiesForKeys: nil, options: [])
+	let allFiles = try FileManager.default.contentsOfDirectory(at: src, includingPropertiesForKeys: nil)
 	let usefulFiles = allFiles.filter { $0.pathExtension == "shp" || $0.pathExtension == "dbf" }
 	
 	_ = try usefulFiles.map {

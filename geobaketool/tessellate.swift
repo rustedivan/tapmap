@@ -18,8 +18,7 @@ enum GeoTessellatePipelineError : Error {
 func tessellateGeometry(params: ArraySlice<String>) throws {
 	let config = PipelineConfig.shared
 	guard let tessellationPaths = try? FileManager.default.contentsOfDirectory(at: config.sourceGeometryUrl,
-			includingPropertiesForKeys: nil,
-			options: [])
+			includingPropertiesForKeys: nil)
 		.filter({ $0.pathExtension == "json" && $0.absoluteString.contains("reshaped") }) else {
 			throw GeoTessellatePipelineError.datasetFailed(dataset: "reshaped files")
 	}

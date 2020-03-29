@@ -22,8 +22,7 @@ func reshapeGeometry(params: ArraySlice<String>) throws {
 	let lodLevels = simplificationStrengths.sorted(by: >)	// Low lod levels = higher quality
 	
 	guard let shapeFiles = try? FileManager.default.contentsOfDirectory(at: PipelineConfig.shared.sourceGeometryUrl,
-			includingPropertiesForKeys: nil,
-			options: [])
+			includingPropertiesForKeys: nil)
 		.filter({ $0.pathExtension == "shp" }) else {
 			throw GeoReshapePipelineError.noShapeFiles
 	}
