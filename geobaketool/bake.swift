@@ -121,9 +121,17 @@ func bakeGeometry() throws {
 	print("Wrote world-file to \(outputUrl.path)")
 }
 
-func addLodLevels(to target: Set<ToolGeoFeature>, from sources: Set<ToolGeoFeature>) -> Set<ToolGeoFeature> {
+func addLodLevels(to targets: Set<ToolGeoFeature>, from sources: Set<ToolGeoFeature>) -> Set<ToolGeoFeature> {
 	//	 $ Pick out the lower-LOD TGF sibling of the LOD0
-	return target
+	for target in targets {
+		let regionHash = target.geographyId
+		guard let lodRegionIdx = sources.firstIndex(where: { $0.geographyId.hashed == regionHash.hashed }) else {
+			print("Could not find LOD match for \(target.name)")
+			continue
+		}
+		let _ = sources[lodRegionIdx]
+	}
+	return targets
 }
 
 func unarchiveTessellations(from input: String, lod: Int) throws -> Set<ToolGeoFeature> {
