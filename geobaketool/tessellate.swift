@@ -26,11 +26,13 @@ func tessellateGeometry(params: ArraySlice<String>) throws {
 	
 	let reshapedCountryPaths = tessellationPaths.filter { $0.absoluteString.contains(config.reshapedCountriesFilename) }
 	let reshapedRegionPaths = tessellationPaths.filter { $0.absoluteString.contains(config.reshapedRegionsFilename!) }
-	let filepaths = Array(zip(reshapedCountryPaths, reshapedRegionPaths))
+	let lodSortedCountries = reshapedCountryPaths.sorted { $0.absoluteString < $1.absoluteString }
+	let lodSortedRegions = reshapedRegionPaths.sorted { $0.absoluteString < $1.absoluteString }
+	let filepaths = Array(zip(lodSortedCountries, lodSortedRegions))
 	let lodLevels = Array(0..<filepaths.underestimatedCount)
 	let lodJobs = zip(lodLevels, filepaths)
 	
-	print("Tessellating geometries (\(lodLevels.count) LOD levels found")
+	print("Tessellating geometries (\(lodLevels.count) LOD levels found)")
 	for lod in lodJobs {
 		let lodLevel = lod.0
 		let countryFile = lod.1.0
