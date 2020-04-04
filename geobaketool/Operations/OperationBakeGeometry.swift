@@ -158,7 +158,7 @@ class OperationBakeGeometry : Operation {
 	}
 	
 	func buildTessellationTable(from toolWorld: Set<ToolGeoFeature>, lodCount: Int) -> ChunkTable {
-		let chunkTable = ChunkTable()
+		let chunkTable = ChunkTable(withLodCount: lodCount)
 
 		for lodLevel in stride(from: lodCount - 1, through: 0, by: -1) {	// Insert cheap LODs (high number) before heavy LODs (0)
 			var continentTessellations: [(String, GeoTessellation)] = []

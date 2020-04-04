@@ -98,7 +98,7 @@ class GeometryStreamer {
 	}
 	
 	func evictPrimitive(for streamHash: RegionHash) {
-		for lod in 0..<3 {	// $ Use number of available lods
+		for lod in 0 ..< chunkTable.lodCount {
 			let loddedStreamHash = regionHashLodKey(streamHash, atLod: lod)
 			primitiveCache.removeValue(forKey: loddedStreamHash)
 			geometryCache.removeValue(forKey: loddedStreamHash)
