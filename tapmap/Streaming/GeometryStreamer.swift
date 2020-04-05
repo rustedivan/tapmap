@@ -20,12 +20,12 @@ class GeometryStreamer {
 		}
 	}
 	
-	let wantedLodSetting: Int = 0
-	let actualLodLevel: Int = 0
 	let fileData: Data	// fileData is memory-mapped so no need to attach a FileHandle here
 	let fileHeader: WorldHeader
 	let chunkTable: ChunkTable
 	let streamQueue: OperationQueue
+	var wantedLodSetting: Int = 0
+	var actualLodLevel: Int = 0
 	var pendingChunks: Set<Int> = []
 	var primitiveCache: [Int : ArrayedRenderPrimitive] = [:]
 	var geometryCache: [Int : GeoTessellation] = [:]
@@ -141,6 +141,16 @@ class GeometryStreamer {
 			print("Could not load tessellation: \(error.localizedDescription)")
 			return nil
 		}
+	}
+	
+	func zoomedTo(_ zoom: Float) {
+		switch zoom {
+		case 0..<4.0: wantedLodSetting = 2
+		case 4.0..<8.0: wantedLodSetting = 1
+		default: wantedLodSetting = 0
+		}
+		
+		actualLodLevel = wantedLodSetting
 	}
 	
 	// For pulling chunks from the geometry archive

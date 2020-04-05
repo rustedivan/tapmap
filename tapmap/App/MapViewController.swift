@@ -231,6 +231,9 @@ extension MapViewController : UIScrollViewDelegate {
 		if let renderer = poiRenderer {
 			renderer.updateZoomThreshold(viewZoom: zoom)
 		}
+		if let streamer = geometryStreamer {
+			streamer.zoomedTo(zoom)
+		}
 		
 		AppDelegate.sharedUIState.cullWorldTree(focus: visibleLongLat(viewBounds: view.bounds))
 		needsRender = true

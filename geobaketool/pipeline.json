@@ -8,7 +8,7 @@
 	"reshape": {
 		"node" : ".nvm/versions/node/v7.8.0/bin/",
 		"method" : "visvalingam",
-		"lodlevels" : [15, 10, 5]
+		"lodlevels" : [30, 4, 1]
 	},
 	"input-countries": "reshaped-countries",
 	"input-regions": "reshaped-regions",
