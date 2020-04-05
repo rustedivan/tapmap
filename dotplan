@@ -26,19 +26,66 @@ ROAD TO FINAL
 
 # LOD support
 ## Define reshape settings for LOD levels
+√ 3 LOD levels (low, mid, high)
+√ reshape settings a pairing between LOD key and simplify-value
 ## Run pipeline for each LOD level
---- push place distribution down below all tessellation
---- run tessellation in a loop
---- give ToolGeoRegion an array of tessellations at different LODs
---- push them into the chunk table under LOD key
-## Suffix LOD to streaming key
+  √ push place distribution down below all tessellation
+  √ run tessellation in a loop
+  √ give ToolGeoRegion an array of tessellations at different LODs
+  √ push them into the chunk table under LOD key
+  √ run POI distribution against the high tessellation
+## √ Suffix LOD to streaming key
 ## Use zoom to select LOD level
+
+## LOD selection and rendering strategy
+  Mixing LODs looks bad on interior borders, since LOD0 and LOD2 for neighboring
+  countries will exhibit gaps. Therefore, the entire streamer needs to switch
+  LOD level within a frame. That doesn't mean that the loading needs to occurr in
+  a frame, though. The streamer tracks the "expected LOD" level based on zoom, but
+  does not change the "actual LOD" while there are still LODs missing.
+  
+  When the streamer gets a request for a render primitive, it returns the primitive
+  for the "actual LOD" level. If the streamer has already switched to a better LOD,
+  there may be primitive misses. In that case, it walks up the LOD ladder until a
+  primitive is found. This behaviour may exhibit border gaps for a moment.
+  
+  Tests on iPhone 7 hardware suggests that the worst case is a second or so
+  when loading all European countries at an artificially high LOD level. Tests also
+  show that the worst case is a stream queue 30 chunks deep. Without parallel loading,
+  30 chunks at 1 streamer update/frame comes out to about a second of loading, so
+  that parallellism should be investigated.
+  
+  A mitigation can be to stream, but not render, with a slightly expanded focusBox.
+  UIState should rename visibleSet to residentSet, and the MapRenderer should cull
+  the residentSet to the actual screen. That way GeometryStreamer can pre-stream
+  around the edges of the screen.
+  
+  As a final trick, GeometryStreamer should prioritize new chunks based on their
+  distance from the camera, offset by a projection of the camera's movement during
+  the past 1-2 seconds. That way, GeometryStreamer can prefetch geometry from
+  memory based on a guess of what will be viewed next.
+  
+  After that, I can't imagine any improvements that aren't based on covering up
+  mismatched LOD levels with a fat border, that must also scale with zoom.
+  
+  
+
 ## Switch LOD level for entire map renderer
 --- don't mix LOD levels in the same frame
 ## Don't swap render level while a LOD level is missing
 --- separate the "wanted" LOD level from the rendered LOD level
 --- when LOD request changes, pull in those chunks
 --- don't switch rendering level until streamed goes still
+
+## Alternative strategy
+- if a region is not available at a certain LOD, go up one level
+- rendering fat outlines could cover up the mismatches at interior borders
+-- having the fat outlines always-ready at LOD0 comes out to
+--- ~50kB for continents
+--- ~5kB for countries
+--- ~1kB for regions
+--- ...which is megabyte-scale for the worst case
+- don't evict the previous geometry until the new ones are completely loaded
 
 # Spherical projection
 ## If at all possible?
@@ -58,6 +105,7 @@ ROAD TO FINAL
 ## Scale outline width on tap
 -- scale the outline width uniform with a progress variable
 ## Move outline generation to queue op
+## Different style for coastlines?
 
 # Creative brief
 ## Shading
@@ -68,6 +116,10 @@ ROAD TO FINAL
 ## Selected state
 ## Color scheme
 ## Labelling scheme
+
+# Archive compression
+- Triangle indices to UInt16
+- Vertices down to Float16
 
 # Persistence
 ## Store userstate to user defaults
