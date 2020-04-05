@@ -119,7 +119,7 @@ class GeometryStreamer {
 		
 		pendingChunks.insert(runtimeLodKey)
 		let streamOp = BlockOperation {
-			if let tessellation = self.streamGeometry(chunkName) {
+			if let tessellation = self.loadGeometry(chunkName) {
 				OperationQueue.main.addOperation {
 					let c = regionId.hashed.hashColor.tuple()
 					let primitive = ArrayedRenderPrimitive(vertices: tessellation.vertices, color: c, ownerHash: regionId.hashed, debugName: chunkName)
@@ -134,7 +134,7 @@ class GeometryStreamer {
 		streamQueue.addOperation(streamOp)
 	}
 	
-	private func streamGeometry(_ name: String) -> GeoTessellation? {
+	private func loadGeometry(_ name: String) -> GeoTessellation? {
 		do {
 			return try chunkTable.pullChunk(name)
 		} catch (let error) {

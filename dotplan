@@ -41,13 +41,21 @@ ROAD TO FINAL
   Mixing LODs looks bad on interior borders, since LOD0 and LOD2 for neighboring
   countries will exhibit gaps. Therefore, the entire streamer needs to switch
   LOD level within a frame. That doesn't mean that the loading needs to occurr in
-  a frame, though. The streamer tracks the "expected LOD" level based on zoom, but
+  a frame, though. The streamer tracks the "wanted LOD" level based on zoom, but
   does not change the "actual LOD" while there are still LODs missing.
   
   When the streamer gets a request for a render primitive, it returns the primitive
-  for the "actual LOD" level. If the streamer has already switched to a better LOD,
-  there may be primitive misses. In that case, it walks up the LOD ladder until a
-  primitive is found. This behaviour may exhibit border gaps for a moment.
+  for the "actual LOD" level. If the "wanted LOD" is different from the actual LOD,
+  it puts in a stream request for the same primitive, but at the wanted LOD. If that
+  stream request is accepted (that is, the LOD is still missing), "LOD switch pending"
+  flag is raised. If the flag is unset at the end of the frame, the actual LOD level
+  is set to the wanted level, so the render quality is changed in the next frame.
+  The flag is set, it is cleared at the end of the frame.
+  
+  If the streamer has already switched to a better LOD, there may be primitive misses
+  when the renderer asks for a primitive. In that case, the streamer walks up the
+  LOD ladder until a primitive is found. This behaviour may exhibit border
+  gaps for a short moment.
   
   Tests on iPhone 7 hardware suggests that the worst case is a second or so
   when loading all European countries at an artificially high LOD level. Tests also
