@@ -191,6 +191,7 @@ class MapViewController: GLKViewController, GLKViewControllerDelegate {
 		labelView.updateLabels(for: poiRenderer.activePoiHashes,
 													 inArea: visibleLongLat(viewBounds: view.bounds),
 													 atZoom: zoom)
+		geometryStreamer.updateLodLevel()
 		
 		idleIfStill(willRender: needsRender, frameCount: controller.framesDisplayed)
 	}

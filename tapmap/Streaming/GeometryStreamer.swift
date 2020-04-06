@@ -24,8 +24,9 @@ class GeometryStreamer {
 	let fileHeader: WorldHeader
 	let chunkTable: ChunkTable
 	let streamQueue: OperationQueue
-	var wantedLodSetting: Int = 0
+	var wantedLodLevel: Int = 0
 	var actualLodLevel: Int = 0
+	var lodCacheMiss: Bool = false
 	var pendingChunks: Set<Int> = []
 	var primitiveCache: [Int : ArrayedRenderPrimitive] = [:]
 	var geometryCache: [Int : GeoTessellation] = [:]
@@ -53,6 +54,9 @@ class GeometryStreamer {
 		let loadedTable = try! PropertyListDecoder().decode(ChunkTable.self, from: loadedTableBytes)
 		chunkTable = loadedTable
 		print("  - geometry streamer has \(chunkTable.chunkMap.count) tesselation entries")
+		actualLodLevel = chunkTable.lodCount - 1
+		wantedLodLevel = actualLodLevel
+		print("  - geometry streamer has \(chunkTable.lodCount) LOD levels; start at LOD\(actualLodLevel)")
 		chunkTable.chunkData = fileData.subdata(in: fileHeader.dataOffset..<fileHeader.dataOffset + fileHeader.dataSize)
 		print("  - chunk data attached with \(ByteCountFormatter.string(fromByteCount: Int64(chunkTable.chunkData.count), countStyle: .memory))")
 		
@@ -80,21 +84,25 @@ class GeometryStreamer {
 		return loadedWorld
 	}
 	
-	func renderPrimitive(for streamHash: RegionHash, queueIfMissing: Bool = true) -> ArrayedRenderPrimitive? {
-		let loddedStreamHash = regionHashLodKey(streamHash, atLod: actualLodLevel)
-		if let primitive = primitiveCache[loddedStreamHash] {
-			return primitive
-		} else if (queueIfMissing) {
+	func renderPrimitive(for streamHash: RegionHash) -> ArrayedRenderPrimitive? {
+		if lodSwitchCacheMiss(streamHash) {
+			
 			// Only stream primitives that are actually opened
 			if let region = AppDelegate.sharedUserState.availableRegions[streamHash] {
 				streamPrimitive(for: region.geographyId)
+				lodCacheMiss = true
 			} else if let country = AppDelegate.sharedUserState.availableCountries[streamHash] {
 				streamPrimitive(for: country.geographyId)
+				lodCacheMiss = true
 			} else if let continent = AppDelegate.sharedUserState.availableContinents[streamHash] {
 				streamPrimitive(for: continent.geographyId)
+				lodCacheMiss = true
 			}
 		}
-		return nil
+		
+		let actualStreamHash = regionHashLodKey(streamHash, atLod: actualLodLevel)
+		let renderPrimitive = primitiveCache[actualStreamHash]
+		return renderPrimitive
 	}
 	
 	func evictPrimitive(for streamHash: RegionHash) {
@@ -111,8 +119,8 @@ class GeometryStreamer {
 	}
 	
 	func streamPrimitive(for regionId: RegionId) {
-		let chunkName = chunkLodName(regionId, atLod: wantedLodSetting)
-		let runtimeLodKey = regionHashLodKey(regionId.hashed, atLod: wantedLodSetting)
+		let chunkName = chunkLodName(regionId, atLod: wantedLodLevel)
+		let runtimeLodKey = regionHashLodKey(regionId.hashed, atLod: wantedLodLevel)
 		if pendingChunks.contains(runtimeLodKey) {
 			return
 		}
@@ -143,14 +151,29 @@ class GeometryStreamer {
 		}
 	}
 	
+	func updateLodLevel() -> Bool {
+		if actualLodLevel != wantedLodLevel {
+			if !lodCacheMiss {
+				actualLodLevel = wantedLodLevel
+				return true
+			} else {
+				lodCacheMiss = false
+			}
+		}
+		return false
+	}
+	
 	func zoomedTo(_ zoom: Float) {
 		switch zoom {
-		case 0..<4.0: wantedLodSetting = 2
-		case 4.0..<8.0: wantedLodSetting = 1
-		default: wantedLodSetting = 0
+		case 0..<4.0: wantedLodLevel = 2
+		case 4.0..<8.0: wantedLodLevel = 1
+		default: wantedLodLevel = 0
 		}
-		
-		actualLodLevel = wantedLodSetting
+	}
+	
+	func lodSwitchCacheMiss(_ streamHash: RegionHash) -> Bool {
+		let wantedStreamHash = regionHashLodKey(streamHash, atLod: wantedLodLevel)
+		return primitiveCache[wantedStreamHash] == nil
 	}
 	
 	// For pulling chunks from the geometry archive
