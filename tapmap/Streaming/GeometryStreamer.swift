@@ -165,18 +165,23 @@ extension GeometryStreamer {
 			if !lodCacheMiss {
 				actualLodLevel = wantedLodLevel
 				return true
-			} else {
-				lodCacheMiss = false
 			}
 		}
+		lodCacheMiss = false
 		return false
 	}
 	
 	func zoomedTo(_ zoom: Float) {
+		let setToLevel: Int
 		switch zoom {
-		case 0..<4.0: wantedLodLevel = 2
-		case 4.0..<8.0: wantedLodLevel = 1
-		default: wantedLodLevel = 0
+		case 0..<4.0: setToLevel = 2
+		case 4.0..<8.0: setToLevel = 1
+		default: setToLevel = 0
+		}
+		
+		if wantedLodLevel != setToLevel {
+			wantedLodLevel = setToLevel
+			lodCacheMiss = true
 		}
 	}
 	
