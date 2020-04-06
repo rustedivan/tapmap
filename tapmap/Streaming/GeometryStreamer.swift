@@ -24,9 +24,9 @@ class GeometryStreamer {
 	let fileHeader: WorldHeader
 	let chunkTable: ChunkTable
 	let streamQueue: OperationQueue
-	var wantedLodLevel: Int = 0
-	var actualLodLevel: Int = 0
-	var lodCacheMiss: Bool = false
+	var wantedLodLevel: Int
+	var actualLodLevel: Int = 10
+	var lodCacheMiss: Bool = true
 	var pendingChunks: Set<Int> = []
 	var primitiveCache: [Int : ArrayedRenderPrimitive] = [:]
 	var geometryCache: [Int : GeoTessellation] = [:]
@@ -54,8 +54,8 @@ class GeometryStreamer {
 		let loadedTable = try! PropertyListDecoder().decode(ChunkTable.self, from: loadedTableBytes)
 		chunkTable = loadedTable
 		print("  - geometry streamer has \(chunkTable.chunkMap.count) tesselation entries")
-		actualLodLevel = chunkTable.lodCount - 1
-		wantedLodLevel = actualLodLevel
+		
+		wantedLodLevel = chunkTable.lodCount - 1
 		print("  - geometry streamer has \(chunkTable.lodCount) LOD levels; start at LOD\(actualLodLevel)")
 		chunkTable.chunkData = fileData.subdata(in: fileHeader.dataOffset..<fileHeader.dataOffset + fileHeader.dataSize)
 		print("  - chunk data attached with \(ByteCountFormatter.string(fromByteCount: Int64(chunkTable.chunkData.count), countStyle: .memory))")
@@ -86,7 +86,7 @@ class GeometryStreamer {
 	
 	func renderPrimitive(for regionHash: RegionHash) -> ArrayedRenderPrimitive? {
 		if primitiveHasWantedLod(for: regionHash) == false {
-			lodCacheMiss = streamMissingPrimitive(for: regionHash)
+			lodCacheMiss = lodCacheMiss || streamMissingPrimitive(for: regionHash)
 		}
 		
 		let actualRegionHash = regionHashLodKey(regionHash, atLod: actualLodLevel)
