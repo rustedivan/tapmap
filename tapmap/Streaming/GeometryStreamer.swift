@@ -138,17 +138,16 @@ class GeometryStreamer {
 			let chunkName = chunkLodName(regionId, atLod: wantedLodLevel)
 			let runtimeLodKey = regionHashLodKey(regionId.hashed, atLod: wantedLodLevel)
 			pendingChunks.insert(runtimeLodKey)
-		
+			
 			let streamOp = BlockOperation {
 				if let tessellation = self.loadGeometry(chunkName) {
-					self.geometryCache[runtimeLodKey] = tessellation
-					self.pendingChunks.remove(runtimeLodKey)
-					
-					// Create the render primitive on the main/OpenGL thread
+					// Create the render primitive and update bookkeping on the OpenGL/main thread
 					OperationQueue.main.addOperation {
 						let c = regionId.hashed.hashColor.tuple()
 						let primitive = ArrayedRenderPrimitive(vertices: tessellation.vertices, color: c, ownerHash: regionId.hashed, debugName: chunkName)
 						self.primitiveCache[runtimeLodKey] = primitive
+						self.geometryCache[runtimeLodKey] = tessellation
+						self.pendingChunks.remove(runtimeLodKey)
 					}
 				} else {
 					print("No geometry chunk available for \(chunkName)")
