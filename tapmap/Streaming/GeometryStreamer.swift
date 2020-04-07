@@ -172,15 +172,14 @@ class GeometryStreamer {
 
 // MARK: LOD management
 extension GeometryStreamer {
-	func updateLodLevel() -> Bool {
+	func updateLodLevel() {
 		if actualLodLevel != wantedLodLevel {
 			if !lodCacheMiss {
 				actualLodLevel = wantedLodLevel
-				return true
+				return
 			}
 		}
 		lodCacheMiss = false
-		return false
 	}
 	
 	func zoomedTo(_ zoom: Float) {
