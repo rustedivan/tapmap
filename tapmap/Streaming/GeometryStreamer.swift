@@ -7,6 +7,7 @@
 //
 
 import Foundation
+import Dispatch
 
 class GeometryStreamer {
 	static private var _shared: GeometryStreamer!
@@ -23,7 +24,7 @@ class GeometryStreamer {
 	let fileData: Data	// fileData is memory-mapped so no need to attach a FileHandle here
 	let fileHeader: WorldHeader
 	let chunkTable: ChunkTable
-	let streamQueue: OperationQueue
+	let streamQueue: DispatchQueue
 	var wantedLodLevel: Int
 	var actualLodLevel: Int = 10
 	var lodCacheMiss: Bool = true
@@ -61,11 +62,8 @@ class GeometryStreamer {
 		chunkTable.chunkData = fileData.subdata(in: fileHeader.dataOffset..<fileHeader.dataOffset + fileHeader.dataSize)
 		print("  - chunk data attached with \(ByteCountFormatter.string(fromByteCount: Int64(chunkTable.chunkData.count), countStyle: .memory))")
 		
-		streamQueue = OperationQueue()
-		streamQueue.name = "Geometry streaming"
-		streamQueue.qualityOfService = .userInitiated
-		streamQueue.maxConcurrentOperationCount = OperationQueue.defaultMaxConcurrentOperationCount
-		print("  - empty streaming op-queue setup, max \(streamQueue.maxConcurrentOperationCount) concurrent loads")
+		streamQueue = DispatchQueue(label: "Geometry streaming", qos: .userInitiated, attributes: .concurrent)
+		print("  - empty streaming op-queue setup")
 		
 		GeometryStreamer._shared = self
 		
@@ -139,10 +137,10 @@ class GeometryStreamer {
 			let runtimeLodKey = regionHashLodKey(regionId.hashed, atLod: wantedLodLevel)
 			pendingChunks.insert(runtimeLodKey)
 			
-			let streamOp = BlockOperation {
+			streamQueue.async {
 				if let tessellation = self.loadGeometry(chunkName) {
 					// Create the render primitive and update bookkeping on the OpenGL/main thread
-					OperationQueue.main.addOperation {
+					DispatchQueue.main.async {
 						let c = regionId.hashed.hashColor.tuple()
 						let primitive = ArrayedRenderPrimitive(vertices: tessellation.vertices, color: c, ownerHash: regionId.hashed, debugName: chunkName)
 						self.primitiveCache[runtimeLodKey] = primitive
@@ -153,7 +151,6 @@ class GeometryStreamer {
 					print("No geometry chunk available for \(chunkName)")
 				}
 			}
-			streamQueue.addOperation(streamOp)
 		}
 		
 		newChunkRequests = []
