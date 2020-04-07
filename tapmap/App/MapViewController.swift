@@ -192,6 +192,7 @@ class MapViewController: GLKViewController, GLKViewControllerDelegate {
 													 inArea: visibleLongLat(viewBounds: view.bounds),
 													 atZoom: zoom)
 		geometryStreamer.updateLodLevel()
+		geometryStreamer.updateStreaming()
 		
 		idleIfStill(willRender: needsRender, frameCount: controller.framesDisplayed)
 	}

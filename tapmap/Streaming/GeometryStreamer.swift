@@ -27,6 +27,7 @@ class GeometryStreamer {
 	var wantedLodLevel: Int
 	var actualLodLevel: Int = 10
 	var lodCacheMiss: Bool = true
+	var newChunkRequests: [RegionId] = []
 	var pendingChunks: Set<Int> = []
 	var primitiveCache: [Int : ArrayedRenderPrimitive] = [:]
 	var geometryCache: [Int : GeoTessellation] = [:]
@@ -123,27 +124,39 @@ class GeometryStreamer {
 	}
 	
 	func streamPrimitive(for regionId: RegionId) {
-		let chunkName = chunkLodName(regionId, atLod: wantedLodLevel)
 		let runtimeLodKey = regionHashLodKey(regionId.hashed, atLod: wantedLodLevel)
 		if pendingChunks.contains(runtimeLodKey) {
 			return
 		}
 		
-		pendingChunks.insert(runtimeLodKey)
-		let streamOp = BlockOperation {
-			if let tessellation = self.loadGeometry(chunkName) {
-				OperationQueue.main.addOperation {
-					let c = regionId.hashed.hashColor.tuple()
-					let primitive = ArrayedRenderPrimitive(vertices: tessellation.vertices, color: c, ownerHash: regionId.hashed, debugName: chunkName)
-					self.primitiveCache[runtimeLodKey] = primitive
+		newChunkRequests.append(regionId)
+	}
+	
+	func updateStreaming() {
+		for regionId in newChunkRequests {
+			let chunkName = chunkLodName(regionId, atLod: wantedLodLevel)
+			let runtimeLodKey = regionHashLodKey(regionId.hashed, atLod: wantedLodLevel)
+			pendingChunks.insert(runtimeLodKey)
+		
+			let streamOp = BlockOperation {
+				if let tessellation = self.loadGeometry(chunkName) {
 					self.geometryCache[runtimeLodKey] = tessellation
 					self.pendingChunks.remove(runtimeLodKey)
+					
+					// Create the render primitive on the main/OpenGL thread
+					OperationQueue.main.addOperation {
+						let c = regionId.hashed.hashColor.tuple()
+						let primitive = ArrayedRenderPrimitive(vertices: tessellation.vertices, color: c, ownerHash: regionId.hashed, debugName: chunkName)
+						self.primitiveCache[runtimeLodKey] = primitive
+					}
+				} else {
+					print("No geometry chunk available for \(chunkName)")
 				}
-			} else {
-				print("No geometry chunk available for \(chunkName)")
 			}
+			streamQueue.addOperation(streamOp)
 		}
-		streamQueue.addOperation(streamOp)
+		
+		newChunkRequests = []
 	}
 	
 	private func loadGeometry(_ name: String) -> GeoTessellation? {
@@ -154,8 +167,6 @@ class GeometryStreamer {
 			return nil
 		}
 	}
-	
-	
 }
 
 // MARK: LOD management
