@@ -9,7 +9,6 @@
 import Foundation
 
 indirect enum QuadNode<T: Hashable & Codable>: Codable {
-	typealias Element = T
 	enum CodingKeys: CodingKey {
 		case bounds
 		case values
