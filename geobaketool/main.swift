@@ -17,27 +17,36 @@ do {
 			try downloadFiles(params: commands.dropFirst())
 		case "reshape":
 			try reshapeGeometry(params: commands.dropFirst())
+		case "tessellate":
+			try tessellateGeometry(params: commands.dropFirst())
 		case "bake":
 			try bakeGeometry()
 		default: print("Usage")
 		}
 	}
-} catch GeoBakeDownloadError.timedOut(let host) {
-		print("Connection to \(host) timed out after 60 seconds")
-} catch GeoBakeDownloadError.downloadFailed(let key) {
+} catch GeoDownloadPipelineError.timedOut(let host) {
+	print("Connection to \(host) timed out after 60 seconds")
+} catch GeoDownloadPipelineError.downloadFailed(let key) {
 	print("Could not download url referenced in \"\(key)\" in pipeline.json")
-} catch GeoBakeDownloadError.unpackFailed {
+} catch GeoDownloadPipelineError.unpackFailed {
 	print("Could not unzip the downloaded geometry file archive.")
-} catch GeoBakeReshapeError.noNodePath {
+} catch GeoReshapePipelineError.noNodePath {
 	print("No mapshaper path set in pipeline.config. Please set user-relative path to mapshaper in \"reshape.mapshaper\".")
-} catch GeoBakeReshapeError.noMapshaperInstall {
+} catch GeoReshapePipelineError.noMapshaperInstall {
 	print("No mapshaper install available on PATH. Please run 'npm install -g mapshaper'")
-} catch GeoBakeReshapeError.missingShapeFile(let level) {
+} catch GeoReshapePipelineError.missingShapeFile(let level) {
 	print("Could not find a \"\(level)\"-level shapefile. Please re-download.")
-} catch GeoBakeReshapeError.noShapeFiles {
+} catch GeoReshapePipelineError.noShapeFiles {
 	print("Could not find any shapefiles. Please re-download.")
-} catch GeoBakePipelineError.datasetFailed(let dataset) {
-	print("Could not bake the \"\(dataset)\" dataset.")
-} catch {
+} catch GeoTessellatePipelineError.datasetFailed(let dataset) {
+	print("Could not tessellate the \"\(dataset)\" dataset.")
+} catch GeoTessellatePipelineError.tessellationFailed(let dataset) {
+	print("Tessellation failed for the \"\(dataset)\" dataset.")
+} catch GeoTessellatePipelineError.archivingFailed(let dataset) {
+	print("Could not archive \"\(dataset)\" tessellation for following step.")
+} catch GeoBakePipelineError.tessellationMissing {
+	print("No tessellation archives found.")
+}
+catch {
 	print("Could not bake geometry: \(error.localizedDescription)")
 }

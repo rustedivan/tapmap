@@ -191,6 +191,8 @@ class MapViewController: GLKViewController, GLKViewControllerDelegate {
 		labelView.updateLabels(for: poiRenderer.activePoiHashes,
 													 inArea: visibleLongLat(viewBounds: view.bounds),
 													 atZoom: zoom)
+		geometryStreamer.updateLodLevel()
+		geometryStreamer.updateStreaming()
 		
 		idleIfStill(willRender: needsRender, frameCount: controller.framesDisplayed)
 	}
@@ -230,6 +232,9 @@ extension MapViewController : UIScrollViewDelegate {
 		zoom = Float(scrollView.zoomScale)
 		if let renderer = poiRenderer {
 			renderer.updateZoomThreshold(viewZoom: zoom)
+		}
+		if let streamer = geometryStreamer {
+			streamer.zoomedTo(zoom)
 		}
 		
 		AppDelegate.sharedUIState.cullWorldTree(focus: visibleLongLat(viewBounds: view.bounds))

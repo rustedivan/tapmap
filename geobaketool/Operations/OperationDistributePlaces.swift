@@ -30,7 +30,7 @@ class OperationDistributePlaces : Operation {
 		var updatedFeatures = Set<ToolGeoFeature>()
 		let numPlaces = remainingPlaces.count
 		for region in input {
-			guard let regionTessellation = region.tessellation else {
+			guard let regionTessellation = region.tessellations.first else {	// Use best LOD to place POIs
 				print("Missing tessellation in \(region.name)")
 				continue
 			}

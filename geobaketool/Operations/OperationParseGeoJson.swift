@@ -108,7 +108,7 @@ class OperationParseGeoJson : Operation {
 		
 		return ToolGeoFeature(level: level,
 													polygons: loadedPolygons,
-													tessellation: nil,
+													tessellations: [],
 													places: nil,
 													children: nil,
 													stringProperties: stringProps,

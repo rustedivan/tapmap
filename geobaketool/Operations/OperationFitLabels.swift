@@ -41,7 +41,7 @@ class OperationFitLabels : Operation {
 			let editedPlaces = (feature.places ?? Set()).union([regionMarker])
 			let updatedFeature = ToolGeoFeature(level: feature.level,
 																					polygons: feature.polygons,
-																					tessellation: feature.tessellation,
+																					tessellations: feature.tessellations,
 																					places: editedPlaces,
 																					children: feature.children,
 																					stringProperties: feature.stringProperties,

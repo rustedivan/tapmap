@@ -21,11 +21,17 @@ struct WorldHeader {
 
 class ChunkTable: Codable {
 	enum CodingKeys: CodingKey {
+		case lodCount
 		case chunkMap
 	}
 	var cursor: Int = 0
+	var lodCount: Int
 	var chunkMap: [String : Range<Int>] = [:]
 	var chunkData: Data = Data()
+	
+	init(withLodCount lods: Int) {
+		lodCount = lods
+	}
 	
 	func addChunk<T:Encodable>(forKey key: String, chunk: T) throws {
 		let encodedChunk = try PropertyListEncoder().encode(chunk)

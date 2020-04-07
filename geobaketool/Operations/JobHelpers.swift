@@ -9,8 +9,8 @@
 typealias ProgressReport = (Double, String, Bool) -> ()
 typealias ErrorReport = (String, String) -> ()
 
-struct ToolGeoFeature : Equatable, Hashable {
-	enum Level: String {
+struct ToolGeoFeature : Equatable, Hashable, Codable {
+	enum Level: String, Codable {
 		case Continent = "continent"
 		case Country = "country"
 		case Region = "region"
@@ -20,7 +20,7 @@ struct ToolGeoFeature : Equatable, Hashable {
 	
 	let level: Level
 	let polygons: [Polygon]
-	var tessellation: GeoTessellation?
+	var tessellations: [GeoTessellation]
 	var places: GeoPlaceCollection?
 	var children: Set<ToolGeoFeature>?
 	

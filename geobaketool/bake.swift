@@ -10,9 +10,9 @@ import Foundation
 import SwiftyJSON
 
 enum GeoBakePipelineError : Error {
+	case tessellationMissing
 	case outputPathMissing
 	case outputPathInvalid(path: String)
-	case datasetFailed(dataset: String)
 }
 
 func reportError(_ feature: String, _ error: String) {
@@ -28,108 +28,33 @@ func bakeGeometry() throws {
 		throw GeoBakePipelineError.outputPathInvalid(path: outputUrl.path)
 	}
 	
-	// MARK: Load JSON souce files
-	print("Loading...")
-	
-	progressBar(1, "Countries")
-	let countryData = try Data(contentsOf: PipelineConfig.shared.reshapedCountriesFilePath)
-	progressBar(3, "Countries")
-	let countryJson = try JSON(data: countryData, options: .allowFragments)
-	
-	progressBar(5, "Regions")
-	let regionData: Data?
-	if let regionPath = PipelineConfig.shared.reshapedRegionsFilePath {
-		regionData = try Data(contentsOf: regionPath)
-	} else { regionData = nil }
-	progressBar(7, "Regions")
-	let regionJson = regionData != nil ? try JSON(data: regionData!, options: .allowFragments) : JSON({})
-	
-	progressBar(8, "Cities")
-	let citiesData: Data?
-	if let citiesPath = PipelineConfig.shared.queriedCitiesFilePath {
-		citiesData = try Data(contentsOf: citiesPath)
-	} else { citiesData = nil }
-	progressBar(9, "Cities")
-	let citiesJson = citiesData != nil ? try JSON(data: citiesData!, options: .allowFragments) : JSON({})
-	
-	progressBar(10, "√ Loading done\n")
-	
-	print("\nBuilding geography collections...")
-	let countryParser = OperationParseGeoJson(json: countryJson,
-																						as: .Country,
-																						reporter: reportLoad)
-	let regionParser =  OperationParseGeoJson(json: regionJson,
-																						as: .Region,
-																						reporter: reportLoad)
-	let citiesParser =  OperationParseOSMJson(json: citiesJson,
-																						kind: .City,
-																						reporter: reportLoad)
-	
-	let workQueue = OperationQueue()
-	workQueue.name = "Json load queue"
-	workQueue.qualityOfService = .userInitiated
-	workQueue.maxConcurrentOperationCount = 1
-	workQueue.addOperations([countryParser, regionParser, citiesParser], waitUntilFinished: true)
-	
-	guard let countries = countryParser.output else {
-		throw GeoBakePipelineError.datasetFailed(dataset: "countries")
-	}
-	guard let regions = regionParser.output else {
-		throw GeoBakePipelineError.datasetFailed(dataset: "regions")
-	}
-	guard let cities = citiesParser.output else {
-		throw GeoBakePipelineError.datasetFailed(dataset: "cities")
-	}
-	
-	
 	let bakeQueue = OperationQueue()
 	bakeQueue.name = "Baking queue"
 	
-	// MARK: Country assembly
-	let countryProperties = Dictionary(countries.map { ($0.countryKey, $0.stringProperties) },	// Needed to group newly created countries into continents
-																		 uniquingKeysWith: { (first, _) in first })
-	let countryAssemblyJob = OperationAssembleGroups(parts: regions, targetLevel: .Country, properties: countryProperties, reporter: reportLoad)
-	bakeQueue.addOperation(countryAssemblyJob)
-	bakeQueue.waitUntilAllOperationsAreFinished()
-	guard let generatedCountries = countryAssemblyJob.output else {
-		print("Country assembly failed")
-		return
-	}
-	
-	// MARK: Continent assembly
-	let continentAssemblyJob = OperationAssembleGroups(parts: generatedCountries, targetLevel: .Continent, properties: [:], reporter: reportLoad)
-	bakeQueue.addOperation(continentAssemblyJob)
-	bakeQueue.waitUntilAllOperationsAreFinished()
-	
-	guard let generatedContinents = continentAssemblyJob.output else {
-		print("Continent assembly failed")
-		return
-	}
-	
-	// MARK: Tessellate geometry
-	let continentTessJob = OperationTessellateRegions(generatedContinents, reporter: reportLoad, errorReporter: reportError)
-	let countryTessJob = OperationTessellateRegions(generatedCountries, reporter: reportLoad, errorReporter: reportError)
-	let regionTessJob = OperationTessellateRegions(regions, reporter: reportLoad, errorReporter: reportError)
-	
-	continentTessJob.addDependency(continentAssemblyJob)
-	
-	bakeQueue.addOperations([continentTessJob, countryTessJob, regionTessJob],
-													waitUntilFinished: true)
-	
-	guard let tessellatedContinents = continentTessJob.output else {
-		print("Continent tessellation failed.")
-		return
-	}
-	guard let tessellatedCountries = countryTessJob.output else {
-		print("Country tessellation failed.")
-		return
-	}
-	guard let tessellatedRegions = regionTessJob.output else {
-		print("Region tessellation failed.")
-		return
-	}
-	
 	// MARK: Distribute places of interest
+	progressBar(1, "Cities")
+	let citiesData: Data?
+	if let citiesPath = PipelineConfig.shared.queriedCitiesFilePath {
+		citiesData = try Data(contentsOf: citiesPath.appendingPathExtension("json"))
+	} else { citiesData = nil }
+	progressBar(2, "Cities")
+	let citiesJson = citiesData != nil ? try JSON(data: citiesData!, options: .allowFragments) : JSON({})
+
+	let citiesParser =  OperationParseOSMJson(json: citiesJson,
+																						kind: .City,
+																						reporter: reportLoad)
+	bakeQueue.addOperations([citiesParser], waitUntilFinished: true)
+	
+	guard let cities = citiesParser.output else {
+		throw GeoTessellatePipelineError.datasetFailed(dataset: "cities")
+	}
+
+	let baseLod = 0
+	print("Unarchiving tessellations at LOD\(baseLod)")
+	let tessellatedRegions = try unarchiveTessellations(from: "regions", lod: baseLod)
+	let tessellatedCountries = try unarchiveTessellations(from: "countries", lod: baseLod)
+	let tessellatedContinents = try unarchiveTessellations(from: "continents", lod: baseLod)
+	
 	let placeDistributionJob = OperationDistributePlaces(regions: tessellatedRegions,
 																											 places: cities,
 																											 reporter: reportLoad)
@@ -152,9 +77,33 @@ func bakeGeometry() throws {
 	let labelledCountries = countryLabelJob.output
 	let labelledRegions = regionLabelJob.output
 	
-	let fixupJob = OperationFixupHierarchy(continentCollection: labelledContinents,
-																				 countryCollection: labelledCountries,
-																				 regionCollection: labelledRegions,
+	// MARK: Add LOD geometry
+	// Load the remaining LODs for their tessellations only
+	guard let tessellationPaths = try? FileManager.default.contentsOfDirectory(at: PipelineConfig.shared.sourceGeometryUrl, includingPropertiesForKeys: nil)
+		.filter({ $0.pathExtension == "tessarchive" }) else {
+			throw GeoBakePipelineError.tessellationMissing
+	}
+	guard !tessellationPaths.isEmpty else {
+		throw GeoBakePipelineError.tessellationMissing
+	}
+	
+	var loddedContinents = labelledContinents
+	var loddedCountries = labelledCountries
+	var loddedRegions = labelledRegions
+	let lodCount = tessellationPaths.count / 3 // Round down, only load LODs for which we have all data
+	for geometryLod in 1..<lodCount {
+		let lodRegions = try unarchiveTessellations(from: "regions", lod: geometryLod)
+		let lodCountries = try unarchiveTessellations(from: "countries", lod: geometryLod)
+		let lodContinents = try unarchiveTessellations(from: "continents", lod: geometryLod)
+		
+		loddedContinents = addLodLevels(to: loddedContinents, from: lodContinents)
+		loddedCountries = addLodLevels(to: loddedCountries, from: lodCountries)
+		loddedRegions = addLodLevels(to: loddedRegions, from: lodRegions)
+	}
+	
+	let fixupJob = OperationFixupHierarchy(continentCollection: loddedContinents,
+																				 countryCollection: loddedCountries,
+																				 regionCollection: loddedRegions,
 																				 reporter: reportLoad)
 	fixupJob.start()
 	
@@ -166,11 +115,36 @@ func bakeGeometry() throws {
 	// MARK: Bake and write
 	print("\nTessellating geometry...")
 	let geoBaker = OperationBakeGeometry(world: world,
+																			 lodCount: lodCount,
 																			 saveUrl: outputUrl,
 																			 reporter: reportLoad,
 																			 errorReporter: reportError)
-	workQueue.addOperation(geoBaker)
-	workQueue.waitUntilAllOperationsAreFinished()
+	bakeQueue.addOperation(geoBaker)
+	bakeQueue.waitUntilAllOperationsAreFinished()
 	
 	print("Wrote world-file to \(outputUrl.path)")
+}
+
+func addLodLevels(to targets: Set<ToolGeoFeature>, from sources: Set<ToolGeoFeature>) -> Set<ToolGeoFeature> {
+	var out = Set<ToolGeoFeature>()
+	for var target in targets {
+		let regionHash = target.geographyId
+		guard let lodRegionIdx = sources.firstIndex(where: { $0.geographyId.hashed == regionHash.hashed }) else {
+			print("Could not find LOD match for \(target.name)")
+			continue
+		}
+
+		let lodTessellation = sources[lodRegionIdx].tessellations.first!
+		target.tessellations.append(lodTessellation)
+		out.insert(target)
+	}
+	return out
+}
+
+func unarchiveTessellations(from input: String, lod: Int) throws -> Set<ToolGeoFeature> {
+	print("Unarchiving tessellations for \(input) @ LOD\(lod)")
+	let fileInUrl = PipelineConfig.shared.sourceGeometryUrl.appendingPathComponent("\(input)-\(lod).tessarchive")
+	let archive = NSData(contentsOf: fileInUrl)!
+	let tessellations = try PropertyListDecoder().decode(Set<ToolGeoFeature>.self, from: archive as Data)
+	return tessellations
 }

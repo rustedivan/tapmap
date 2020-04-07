@@ -8,11 +8,10 @@
 	"reshape": {
 		"node" : ".nvm/versions/node/v7.8.0/bin/",
 		"method" : "visvalingam",
-		"simplify-countries" : 5,
-		"simplify-regions" : 5
+		"lodlevels" : [30, 4, 1]
 	},
-	"input-countries": "reshaped-countries.json",
-	"input-regions": "reshaped-regions.json",
-	"input-cities": "osm-cities.json",
+	"input-countries": "reshaped-countries",
+	"input-regions": "reshaped-regions",
+	"input-cities": "osm-cities",
 	"output": "Development/tapmap/tapmap/Raw/world.geo"
 }

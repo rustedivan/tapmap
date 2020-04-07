@@ -70,7 +70,7 @@ struct VertexRing : Codable {
 	}
 }
 
-struct Polygon {
+struct Polygon: Codable {
 	var exteriorRing: VertexRing
 	var interiorRings: [VertexRing]
 	

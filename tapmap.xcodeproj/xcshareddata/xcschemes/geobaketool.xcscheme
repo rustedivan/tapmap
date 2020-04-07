@@ -93,6 +93,10 @@
             isEnabled = "NO">
          </CommandLineArgument>
          <CommandLineArgument
+            argument = "tessellate"
+            isEnabled = "NO">
+         </CommandLineArgument>
+         <CommandLineArgument
             argument = "bake"
             isEnabled = "YES">
          </CommandLineArgument>
