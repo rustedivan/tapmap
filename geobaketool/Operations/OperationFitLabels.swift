@@ -63,6 +63,16 @@ struct NodeDistances: Codable, Hashable {
 }
 typealias LabellingNode = QuadNode<NodeDistances>
 
+extension QuadNode: Comparable, Equatable where QuadNode.Element == NodeDistances {
+	static func < (lhs: Self, rhs: Self) -> Bool {
+		return true
+	}
+	
+	static func == (lhs: Self, rhs: Self) -> Bool {
+		return true
+	}
+}
+
 func poleOfInaccessibility(_ polygons: [Polygon]) -> Vertex {
 	// First, select the largest polygon to focus on (rough estimate, just to get rid of islands
 	var largestBoundingBox = Aabb()
@@ -96,7 +106,7 @@ func poleOfInaccessibility(_ polygons: [Polygon]) -> Vertex {
 													hiX: largestBoundingBox.midpoint.x + side/2.0,
 													hiY: largestBoundingBox.midpoint.y + side/2.0)
 	let fullCover = calculateNodeDistances(quadNode: LabellingNode.Empty(bounds: coveringAabb), polygon: polygon)
-	var nodeQueue = Array<LabellingNode>([fullCover])
+	var nodeQueue = PriorityQueue<LabellingNode>(ascending: true, startingValues: [fullCover])
 	
 	let startNode = centroidCell(p: polygon) // Initial guess on the polygon centroid
 	var bestNode = calculateNodeDistances(quadNode: startNode, polygon: polygon)
@@ -104,7 +114,7 @@ func poleOfInaccessibility(_ polygons: [Polygon]) -> Vertex {
 	var bestDistance = bestDistances.first!.toPolygon
 	
 	// While there are nodes in the queue to be investigated
-	while let node = nodeQueue.popLast() {
+	while let node = nodeQueue.pop() {
 		// Check if this node is better than the best so far
 		guard case let QuadNode.Node(_, candidateDistances, _, _, _, _) = node else { continue }
 		let candidateDistance = candidateDistances.first!.toPolygon
@@ -121,8 +131,9 @@ func poleOfInaccessibility(_ polygons: [Polygon]) -> Vertex {
 		let subNodes = [subCells.tl, subCells.tr,
 										subCells.bl, subCells.br]
 			.map { calculateNodeDistances(quadNode: $0, polygon: polygon) }
-		nodeQueue.append(contentsOf: subNodes)
-		nodeQueue.sort(by: sortLabellingNode)	// Emulate a priority queue
+		for s in subNodes {
+			nodeQueue.push(s)
+		}
 	}
 	
 	return bestNode.bounds.midpoint
@@ -137,14 +148,6 @@ func calculateNodeDistances(quadNode: LabellingNode, polygon: Polygon) -> Labell
 											 values: Set([nodeDistances]),
 											 tl: subNodes.tl, tr: subNodes.tr,
 											 bl: subNodes.bl, br: subNodes.br)
-}
-
-func sortLabellingNode(lhs: LabellingNode, rhs: LabellingNode) -> Bool {
-	guard case let QuadNode.Node(_, lhsDistance, _, _, _, _) = lhs,
-				case let QuadNode.Node(_, rhsDistance, _, _, _, _) = rhs else {
-		return true
-	}
-	return lhsDistance.first!.toPolygon < rhsDistance.first!.toPolygon
 }
 
 func distanceToEdgeSq(p: Vertex, e: Edge) -> Double {
