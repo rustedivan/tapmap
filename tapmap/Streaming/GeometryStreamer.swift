@@ -87,7 +87,8 @@ class GeometryStreamer {
 	
 	func renderPrimitive(for regionHash: RegionHash) -> ArrayedRenderPrimitive? {
 		if primitiveHasWantedLod(for: regionHash) == false {
-			lodCacheMiss = lodCacheMiss || streamMissingPrimitive(for: regionHash)
+			let needsNewChunk = streamMissingPrimitive(for: regionHash)
+			lodCacheMiss = needsNewChunk || lodCacheMiss
 		}
 		
 		let actualRegionHash = regionHashLodKey(regionHash, atLod: actualLodLevel)
