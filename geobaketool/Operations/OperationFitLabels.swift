@@ -42,7 +42,7 @@ class OperationFitLabels : Operation {
 			let updatedFeature = ToolGeoFeature(level: feature.level,
 																					polygons: feature.polygons,
 																					tessellations: feature.tessellations,
-																					places: editedPlaces, 	// $ No need to do lensing for these
+																					places: editedPlaces,
 																					children: feature.children,
 																					stringProperties: feature.stringProperties,
 																					valueProperties: feature.valueProperties)

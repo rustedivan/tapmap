@@ -25,7 +25,7 @@ do {
 		}
 	}
 } catch GeoDownloadPipelineError.timedOut(let host) {
-		print("Connection to \(host) timed out after 60 seconds")
+	print("Connection to \(host) timed out after 60 seconds")
 } catch GeoDownloadPipelineError.downloadFailed(let key) {
 	print("Could not download url referenced in \"\(key)\" in pipeline.json")
 } catch GeoDownloadPipelineError.unpackFailed {
@@ -39,7 +39,14 @@ do {
 } catch GeoReshapePipelineError.noShapeFiles {
 	print("Could not find any shapefiles. Please re-download.")
 } catch GeoTessellatePipelineError.datasetFailed(let dataset) {
-	print("Could not bake the \"\(dataset)\" dataset.")
-} catch {
+	print("Could not tessellate the \"\(dataset)\" dataset.")
+} catch GeoTessellatePipelineError.tessellationFailed(let dataset) {
+	print("Tessellation failed for the \"\(dataset)\" dataset.")
+} catch GeoTessellatePipelineError.archivingFailed(let dataset) {
+	print("Could not archive \"\(dataset)\" tessellation for following step.")
+} catch GeoBakePipelineError.tessellationMissing {
+	print("No tessellation archives found.")
+}
+catch {
 	print("Could not bake geometry: \(error.localizedDescription)")
 }

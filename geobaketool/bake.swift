@@ -10,7 +10,7 @@ import Foundation
 import SwiftyJSON
 
 enum GeoBakePipelineError : Error {
-	case tessellationMissing	// $ Handle in main loop
+	case tessellationMissing
 	case outputPathMissing
 	case outputPathInvalid(path: String)
 }
@@ -82,6 +82,9 @@ func bakeGeometry() throws {
 	guard let tessellationPaths = try? FileManager.default.contentsOfDirectory(at: PipelineConfig.shared.sourceGeometryUrl, includingPropertiesForKeys: nil)
 		.filter({ $0.pathExtension == "tessarchive" }) else {
 			throw GeoBakePipelineError.tessellationMissing
+	}
+	guard !tessellationPaths.isEmpty else {
+		throw GeoBakePipelineError.tessellationMissing
 	}
 	
 	var loddedContinents = labelledContinents

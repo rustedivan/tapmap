@@ -11,8 +11,8 @@ import SwiftyJSON
 
 enum GeoTessellatePipelineError : Error {
 	case datasetFailed(dataset: String)
-	case tessellationFailed(dataset: String)	// $ handle in main loop
-	case archivingFailed(dataset: String)			// $ handle in main loop
+	case tessellationFailed(dataset: String)
+	case archivingFailed(dataset: String)
 }
 
 func tessellateGeometry(params: ArraySlice<String>) throws {
