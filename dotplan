@@ -1,5 +1,76 @@
 ROAD TO FINAL
 
+# Outline rendering
+- rename MapRenderer to RegionRenderer
+- create outline struct
+- separate border renderer and selection renderer
+- selection renderer holds one outline struct
+- border renderer holds map of outline structs
+- pull outline generation out to sepearate Geometry/ file
+
+- country borders
+-- outline primitive with UVs
+-- only expanded inwards (maybe a pixel or two outwards) to avoid overlap
+-- pull tessellations from geometry streamer
+-- build border primitives from that, mapped in with the lod from Geostreamer
+--- the tricky part is that geostreamer can't track the primitives for us, and maybe never should have
+	 (nah, it's good. the tessellation is the stored geometry, the border case is
+    the odd one out - generating a new tessellation from vertex ring data)
+--- if that tessellation doesn't have a border primitive at Geostreamer's actualLodLevel,
+    enqueue it for extrusion
+--- if a border LOD isn't available, queue it and render at the previous LOD level. this
+    puts the borders a frame behind the region renderer, but that's OK since the border(s) will
+    cover up the new region outline (both countries on a border will cover up their halves)
++++ move geometryStreamer's updates to the end of the frame (AFTER the render pass)
+--- or wait until all borders have been generated, at risk of a frame hitch
+--- not sure what "previous LOD level" should mean though. don't update the border renderer's
+    lod level until all borders in a frame agree?
+---- actualLodLevel and wantedLodLevel, and reading wantedLodLevel from the GS' actualLodLevel
+---- in this way we can slave border and selection renderers to the GS
+--- but I think waiting for all border generations is better, opening a country is already
+    expensive
+
+- memory management
+-- build render primitive bookie with frame-count access markers
+-- the RPB can provide lists of primitives to nuke when under memory pressure
+
+- continent outlines
+-- fat, single color, scaled outline
+
+- generation
+-- move outline generation to dispatch block
+-- same idea as geometry streamer (per-LOD hash)
+
+
+
+# Ocean rendering
+- pale bathygraphic map
+- shifting blur waves
+- ocean outlines
+
+
+
+
+## Selection renderer generates outlines from known region "level""
+-√ pass to SelectionRenderer.select(...)
+-√ use to scale the miter ribs
+## Pass width as uniform
+-- ribs are already scaled to their normalized thickness
+-- scale up by width
+## Pass color based on rank
+-- color should be set from SelectionRenderer.select too, directly on the render primitive
+## Arc length UVs
+-- arc length determined by lat/lon distance
+## Scale outline width on tap
+-- scale the outline width uniform with a progress variable
+## Move outline generation to dispatch block
+## Different style for coastlines?
+-- seems difficult to do in geometry without re-analysing every edge's cardinality in yet another pass
+-- possible to fake in fragment pass by taking the largest vertex ring in the continents
+   at, say, LOD1, generating outline primitives from them and drawing them in a pass
+   below the map geometry
+-- this is essentially Y2K-style contour rendering - it'll miss lakes but can live without that
+
 # POI rendering
 ## √ Fixed screen scale
 ## √ Fixed size + rank scale
@@ -100,20 +171,7 @@ ROAD TO FINAL
 ## Otherwise, lock to Winkel-Tripel
 --- Winkel-Tripel looks like a bastard to invert (for click mapping)
 
-# Outline rendering
-## Selection renderer generates outlines from known region "level""
--- pass to SelectionRenderer.select(...)
--- use to scale the miter ribs
-## Pass width as uniform
--- ribs are already scaled to their normalized thickness
-## Pass color based on rank
--- color should be set from SelectionRenderer.select too, directly on the render primitive
-## Arc length UVs
--- arc length determined by lat/lon distance
-## Scale outline width on tap
--- scale the outline width uniform with a progress variable
-## Move outline generation to queue op
-## Different style for coastlines?
+
 
 # Creative brief
 ## Shading
@@ -151,6 +209,7 @@ ROAD TO FINAL
 ## Nudge coastal cities
 ## Move labels
 ## Remove POIs
+## Split Seven Seas continent into their own seas
 
 # √ Country collation
 ## Generalize variable names
