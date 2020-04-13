@@ -16,7 +16,7 @@ class MapViewController: GLKViewController, GLKViewControllerDelegate {
 	
 	// Presentation
 	var geoWorld: GeoWorld!
-	var mapRenderer: MapRenderer!
+	var regionRenderer: RegionRenderer!
 	var poiRenderer: PoiRenderer!
 	var effectRenderer: EffectRenderer!
 	var selectionRenderer: SelectionRenderer!
@@ -78,7 +78,7 @@ class MapViewController: GLKViewController, GLKViewControllerDelegate {
 		delegate = self
 		
 		EAGLContext.setCurrent(self.context)
-		mapRenderer = MapRenderer()
+		regionRenderer = RegionRenderer()
 		poiRenderer = PoiRenderer(withVisibleContinents: userState.availableContinents,
 															countries: userState.availableCountries,
 															regions: userState.availableRegions)
@@ -202,7 +202,7 @@ class MapViewController: GLKViewController, GLKViewControllerDelegate {
 		glClear(GLbitfield(GL_COLOR_BUFFER_BIT) | GLbitfield(GL_DEPTH_BUFFER_BIT))
 		
 		let visibleRegions = AppDelegate.sharedUIState.visibleRegionHashes
-		mapRenderer.renderWorld(visibleSet: visibleRegions, inProjection: modelViewProjectionMatrix)
+		regionRenderer.renderWorld(visibleSet: visibleRegions, inProjection: modelViewProjectionMatrix)
 		poiRenderer.renderWorld(visibleSet: visibleRegions, inProjection: modelViewProjectionMatrix)
 		effectRenderer.renderWorld(inProjection: modelViewProjectionMatrix)
 		selectionRenderer.renderSelection(inProjection: modelViewProjectionMatrix)

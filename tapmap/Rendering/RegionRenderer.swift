@@ -1,5 +1,5 @@
 //
-//  MapRenderer.swift
+//  RegionRenderer.swift
 //  tapmap
 //
 //  Created by Ivan Milles on 2018-01-27.
@@ -9,7 +9,7 @@
 import OpenGLES
 import GLKit
 
-class MapRenderer {
+class RegionRenderer {
 	let mapProgram: GLuint
 	let mapUniforms : (modelViewMatrix: GLint, color: GLint, highlighted: GLint, time: GLint)
 	
