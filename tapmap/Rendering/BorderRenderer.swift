@@ -38,10 +38,58 @@ class BorderRenderer {
 	}
 	
 	func updateStyle(zoomLevel: Float) {
-		borderWidth = 0.2 / zoomLevel
+		borderWidth = 0.4 / zoomLevel
 	}
 	
-	func renderBorders(inProjection projection: GLKMatrix4) {
+	func prepareGeometry(for updateSet: Set<Int>) {
+		let streamer = GeometryStreamer.shared
+		for borderHash in updateSet {
+			let loddedBorderHash = borderHashLodKey(borderHash, atLod: streamer.actualLodLevel)
+			if borderPrimitives[loddedBorderHash] == nil {
+				if let tessellation = streamer.tessellation(for: borderHash) {
+					let borderOutline = { (outline: [Vertex]) in generateClosedOutlineGeometry(outline: outline, width: 0.4) }
+					let countourVertices = tessellation.contours.map({$0.vertices})
+					let outlineGeometry: RegionContours = countourVertices.map(borderOutline)
+					
+					let outlinePrimitive = OutlineRenderPrimitive(contours: outlineGeometry,
+																												ownerHash: 0,
+																												debugName: "Border")
+					borderPrimitives[loddedBorderHash] = outlinePrimitive
+				}
+			}
+			
+		}
+	}
+	
+	func renderBorders(visibleSet: Set<Int>, inProjection projection: GLKMatrix4) {
+		glPushGroupMarkerEXT(0, "Render borders")
+		glUseProgram(borderProgram)
 		
+		var mutableProjection = projection // The 'let' argument is not safe to pass into withUnsafePointer. No copy, since copy-on-write.
+		withUnsafePointer(to: &mutableProjection, {
+			$0.withMemoryRebound(to: Float.self, capacity: 16, {
+				glUniformMatrix4fv(borderUniforms.modelViewMatrix, 1, 0, $0)
+			})
+		})
+		
+		let components : [GLfloat] = [0.0, 0.0, 1.0, 1.0]
+		glUniform4f(borderUniforms.color,
+								GLfloat(components[0]),
+								GLfloat(components[1]),
+								GLfloat(components[2]),
+								GLfloat(components[3]))
+		glUniform1f(borderUniforms.width, borderWidth)
+		
+		let loddedBorderKeys = visibleSet.map { borderHashLodKey($0, atLod: GeometryStreamer.shared.actualLodLevel) }
+		for key in loddedBorderKeys {
+			guard let primitive = borderPrimitives[key] else { continue }
+			render(primitive: primitive)
+		}
+		
+		glPopGroupMarkerEXT()
+	}
+	
+	func borderHashLodKey(_ regionHash: RegionHash, atLod lod: Int) -> Int {
+		return "\(regionHash)-\(lod)".hashValue
 	}
 }
