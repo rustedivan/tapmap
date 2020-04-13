@@ -1,13 +1,16 @@
 ROAD TO FINAL
 
 # Outline rendering
+Preparations on Master
 - rename MapRenderer to RegionRenderer
-- create outline struct
-- separate border renderer and selection renderer
-- selection renderer holds one outline struct
-- border renderer holds map of outline structs
 - pull outline generation out to sepearate Geometry/ file
+- create outline struct
+- OutlineRenderPrimitive should be able to render multiple tristrips for multiple rings
+- selection renderer holds one outline struct
 
+Work on branch
+- separate border renderer and selection renderer
+- border renderer holds map of outline structs
 - country borders
 -- outline primitive with UVs
 -- only expanded inwards (maybe a pixel or two outwards) to avoid overlap
