@@ -186,9 +186,14 @@ class MapViewController: GLKViewController, GLKViewControllerDelegate {
 																											mapSize: mapSpace.size,
 																											centeredOn: offset,
 																											zoomedTo: zoom)
+		
+		let available = AppDelegate.sharedUserState.availableSet
+		let visible = AppDelegate.sharedUIState.visibleRegionHashes
+		let updateSet = available.intersection(visible)
 		effectRenderer.updatePrimitives()
 		selectionRenderer.updateStyle(zoomLevel: zoom)
 		borderRenderer.updateStyle(zoomLevel: zoom)
+		borderRenderer.prepareGeometry(for: updateSet)
 		poiRenderer.updateStyle(zoomLevel: zoom)
 		poiRenderer.updateFades()
 		labelView.updateLabels(for: poiRenderer.activePoiHashes,
@@ -204,10 +209,13 @@ class MapViewController: GLKViewController, GLKViewControllerDelegate {
 		glClearColor(0.0, 0.1, 0.6, 1.0)
 		glClear(GLbitfield(GL_COLOR_BUFFER_BIT) | GLbitfield(GL_DEPTH_BUFFER_BIT))
 		
-		let visibleRegions = AppDelegate.sharedUIState.visibleRegionHashes
-		regionRenderer.renderWorld(visibleSet: visibleRegions, inProjection: modelViewProjectionMatrix)
-		borderRenderer.renderBorders(inProjection: modelViewProjectionMatrix)
-		poiRenderer.renderWorld(visibleSet: visibleRegions, inProjection: modelViewProjectionMatrix)
+		let available = AppDelegate.sharedUserState.availableSet
+		let visible = AppDelegate.sharedUIState.visibleRegionHashes
+		let renderSet = available.intersection(visible)
+		
+		regionRenderer.renderWorld(visibleSet: renderSet, inProjection: modelViewProjectionMatrix)
+		borderRenderer.renderBorders(visibleSet: renderSet, inProjection: modelViewProjectionMatrix)
+		poiRenderer.renderWorld(visibleSet: renderSet, inProjection: modelViewProjectionMatrix)
 		effectRenderer.renderWorld(inProjection: modelViewProjectionMatrix)
 		selectionRenderer.renderSelection(inProjection: modelViewProjectionMatrix)
 		labelView.renderLabels(projection: mapToView)

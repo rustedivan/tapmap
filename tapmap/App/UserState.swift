@@ -13,7 +13,13 @@ class UserState {
 	var availableContinents: [Int : GeoContinent] = [:]
 	var availableCountries: [Int : GeoCountry] = [:]
 	var availableRegions: [Int : GeoRegion] = [:]
-
+	
+	var availableSet: Set<Int> {
+		return Set<Int>(availableContinents.keys)
+						 .union(availableCountries.keys)
+						 .union(availableRegions.keys)
+	}
+	
 	func buildWorldAvailability(withWorld geoWorld: GeoWorld) {
 		let allContinents = geoWorld.children
 		let closedContinents = allContinents.filter { placeVisited($0) == false }
