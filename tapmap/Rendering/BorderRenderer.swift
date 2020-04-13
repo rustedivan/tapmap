@@ -47,7 +47,7 @@ class BorderRenderer {
 			let loddedBorderHash = borderHashLodKey(borderHash, atLod: streamer.actualLodLevel)
 			if borderPrimitives[loddedBorderHash] == nil {
 				if let tessellation = streamer.tessellation(for: borderHash) {
-					let borderOutline = { (outline: [Vertex]) in generateClosedOutlineGeometry(outline: outline, width: 0.4) }
+					let borderOutline = { (outline: [Vertex]) in generateClosedOutlineGeometry(outline: outline, innerExtent: 1.0, outerExtent: 0.1) }
 					let countourVertices = tessellation.contours.map({$0.vertices})
 					let outlineGeometry: RegionContours = countourVertices.map(borderOutline)
 					

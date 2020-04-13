@@ -43,15 +43,18 @@ func makeRib(_ v0: Vertex, _ v1: Vertex) -> Rib {
 	return Rib(v0, inner, outer)
 }
 
-func makeMiterRib(_ v0: Vertex, _ v1: Vertex, _ v2: Vertex) -> Rib {
+func makeMiterRib(_ v0: Vertex, _ v1: Vertex, _ v2: Vertex, _ lIn: Float, _ lOut: Float) -> Rib {
 	let incomingNormal = normal(vectorSub(v1, v0))
 	let tangent = anchorTangent(v0: v0, v1: v1, v2: v2)
 	let miter = Vertex(-tangent.y, tangent.x)
-	var miterLength = 1.0 / dotProduct(miter, incomingNormal)
-	miterLength = min(miterLength, 2.0)
+	let miterLength = 1.0 / dotProduct(miter, incomingNormal)
+	var miterLengthIn = miterLength * lIn
+	var miterLengthOut = miterLength * lOut
+	miterLengthIn = min(miterLengthIn, 2.0)
+	miterLengthOut = min(miterLengthOut, 2.0)
 	
-	let inner = Vertex(-miter.x * miterLength, -miter.y * miterLength)
-	let outer = Vertex(+miter.x * miterLength, +miter.y * miterLength)
+	let inner = Vertex(-miter.x * miterLengthIn, -miter.y * miterLengthIn)
+	let outer = Vertex(+miter.x * miterLengthOut, +miter.y * miterLengthOut)
 	
 	return Rib(v1, inner, outer)
 }
@@ -70,7 +73,7 @@ func generateOutlineGeometry(outline: [Vertex]) -> [ScaleVertex] {
 	let firstRib = makeRib(outline[0], outline[1])
 	var miterRibs: [Rib] = []
 	for i in 1..<outline.count - 1 {
-		let miterRib = makeMiterRib(outline[i - 1], outline[i], outline[i + 1])
+		let miterRib = makeMiterRib(outline[i - 1], outline[i], outline[i + 1], 0.5, 0.5)
 		miterRibs.append(miterRib)
 	}
 	
@@ -81,18 +84,18 @@ func generateOutlineGeometry(outline: [Vertex]) -> [ScaleVertex] {
 	return makeMiteredTriStrip(ribs: ribs)
 }
 
-func generateClosedOutlineGeometry(outline: [Vertex], width: Vertex.Precision) -> Outline {
+func generateClosedOutlineGeometry(outline: [Vertex], innerExtent: Float, outerExtent: Float) -> Outline {
 	guard outline.count >= 3 else { return [] }
 	
-	let firstRib = makeMiterRib(outline.last!, outline.first!, outline[1])
+	let firstRib = makeMiterRib(outline.last!, outline.first!, outline[1], innerExtent, outerExtent)
 	var miterRibs: [Rib] = []
 	for i in 1..<outline.count - 1 {
-		let miterRib = makeMiterRib(outline[i - 1], outline[i], outline[i + 1])
+		let miterRib = makeMiterRib(outline[i - 1], outline[i], outline[i + 1], innerExtent, outerExtent)
 		miterRibs.append(miterRib)
 	}
 	
-	let endRib = makeMiterRib(outline[outline.count - 2], outline.last!, outline.first!)
-	let closeRib = makeMiterRib(outline[outline.count - 1], outline.first!, outline[1])
+	let endRib = makeMiterRib(outline[outline.count - 2], outline.last!, outline.first!, innerExtent, outerExtent)
+	let closeRib = makeMiterRib(outline[outline.count - 1], outline.first!, outline[1], innerExtent, outerExtent)
 	
 	let ribs = [firstRib] + miterRibs + [endRib, closeRib]
 	return makeMiteredTriStrip(ribs: ribs)
