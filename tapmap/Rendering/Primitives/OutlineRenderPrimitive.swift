@@ -12,17 +12,23 @@ class OutlineRenderPrimitive {
 	let ownerHash: Int
 	
 	var vertexBuffer: GLuint = 0
-	let elementCount: GLsizei
+	let elementCounts: [GLsizei]
 	
 	let name: String
 	
-	init(vertices: [ScaleVertex], ownerHash hash: Int, debugName: String) {
+	init(contours: RegionContours, ownerHash hash: Int, debugName: String) {
 		ownerHash = hash
 		name = debugName
 		
-		guard !vertices.isEmpty else {
-			elementCount = 0
-			return
+		guard !contours.isEmpty else { elementCounts = []; return	}
+		
+		// Concatenate all vertex rings into one buffer
+		var vertices: [ScaleVertex] = []
+		var ringLengths: [GLsizei] = []
+		for ring in contours {
+			guard !ring.isEmpty else { continue }
+			vertices.append(contentsOf: ring)
+			ringLengths.append(GLsizei(ring.count))
 		}
 		
 		glGenBuffers(1, &vertexBuffer)
@@ -33,8 +39,7 @@ class OutlineRenderPrimitive {
 								 GLenum(GL_STATIC_DRAW))
 		
 		glBindBuffer(GLenum(GL_ELEMENT_ARRAY_BUFFER), 0)
-		
-		elementCount = GLsizei(vertices.count)
+		elementCounts = ringLengths
 		
 		glLabelObjectEXT(GLenum(GL_BUFFER_OBJECT_EXT), vertexBuffer, 0, "\(debugName).vertices")
 	}
@@ -46,7 +51,7 @@ class OutlineRenderPrimitive {
 
 
 func render(primitive: OutlineRenderPrimitive) {
-	guard primitive.elementCount > 0 else {
+	guard !primitive.elementCounts.isEmpty else {
 		return
 	}
 	
@@ -65,9 +70,13 @@ func render(primitive: OutlineRenderPrimitive) {
 												GLenum(GL_FLOAT), GLboolean(GL_FALSE),
 												GLsizei(MemoryLayout<ScaleVertex>.stride), BUFFER_OFFSET(UInt32(MemoryLayout<Float>.stride * 2)))
 	
-	glDrawArrays(GLenum(GL_TRIANGLE_STRIP),
-							 0,
-							 primitive.elementCount)
+	var cursor: GLsizei = 0
+	for range in primitive.elementCounts {
+		glDrawArrays(GLenum(GL_TRIANGLE_STRIP),
+								 cursor,
+								 range)
+		cursor += range
+	}
 	glDisableVertexAttribArray(VertexAttribs.normal.rawValue)
 }
 

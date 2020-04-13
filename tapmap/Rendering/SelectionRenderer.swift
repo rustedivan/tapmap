@@ -10,13 +10,12 @@ import OpenGLES
 import GLKit
 
 class SelectionRenderer {
-	var outlinePrimitives: [OutlineRenderPrimitive]
+	var outlinePrimitive: OutlineRenderPrimitive?
 	let outlineProgram: GLuint
 	let outlineUniforms : (modelViewMatrix: GLint, color: GLint, width: GLint)
 	var outlineWidth: Float
 	
 	init?() {
-		outlinePrimitives = []
 		outlineWidth = 0.0
 		
 		outlineProgram = loadShaders(shaderName: "EdgeShader")
@@ -41,17 +40,15 @@ class SelectionRenderer {
 		
 		let thinOutline = { (outline: [Vertex]) in generateClosedOutlineGeometry(outline: outline, width: 0.2) }
 		let countourVertices = tessellation.contours.map({$0.vertices})
-		let outlineGeometry = countourVertices.map(thinOutline)
+		let outlineGeometry: RegionContours = countourVertices.map(thinOutline)
 		
-		outlinePrimitives = outlineGeometry.map( { (contour: [ScaleVertex]) -> OutlineRenderPrimitive in
-			return OutlineRenderPrimitive(vertices: contour,
-																		 ownerHash: 0,
-																		 debugName: "Contour")
-			})
+		outlinePrimitive = OutlineRenderPrimitive(contours: outlineGeometry,
+																							ownerHash: 0,
+																							debugName: "Selection contours")
 	}
 	
 	func clear() {
-		outlinePrimitives = []
+		outlinePrimitive = nil
 	}
 	
 	func updateStyle(zoomLevel: Float) {
@@ -59,6 +56,7 @@ class SelectionRenderer {
 	}
 	
 	func renderSelection(inProjection projection: GLKMatrix4) {
+		guard let primitive = outlinePrimitive else { return }
 		glPushGroupMarkerEXT(0, "Render outlines")
 		glUseProgram(outlineProgram)
 		
@@ -76,7 +74,7 @@ class SelectionRenderer {
 								GLfloat(components[2]),
 								GLfloat(components[3]))
 		glUniform1f(outlineUniforms.width, outlineWidth)
-		_ = outlinePrimitives.map { render(primitive: $0) }
+		render(primitive: primitive)
 	
 		glPopGroupMarkerEXT()
 	}

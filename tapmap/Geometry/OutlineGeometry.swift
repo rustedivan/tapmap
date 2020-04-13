@@ -81,7 +81,7 @@ func generateOutlineGeometry(outline: [Vertex]) -> [ScaleVertex] {
 	return makeMiteredTriStrip(ribs: ribs)
 }
 
-func generateClosedOutlineGeometry(outline: [Vertex], width: Vertex.Precision) -> [ScaleVertex] {
+func generateClosedOutlineGeometry(outline: [Vertex], width: Vertex.Precision) -> Outline {
 	guard outline.count >= 3 else { return [] }
 	
 	let firstRib = makeMiterRib(outline.last!, outline.first!, outline[1])
@@ -98,3 +98,5 @@ func generateClosedOutlineGeometry(outline: [Vertex], width: Vertex.Precision) -
 	return makeMiteredTriStrip(ribs: ribs)
 }
 
+typealias Outline = [ScaleVertex]
+typealias RegionContours = [[ScaleVertex]]
