@@ -20,6 +20,7 @@ class MapViewController: GLKViewController, GLKViewControllerDelegate {
 	var poiRenderer: PoiRenderer!
 	var effectRenderer: EffectRenderer!
 	var selectionRenderer: SelectionRenderer!
+	var borderRenderer: BorderRenderer!
 	var dummyView: UIView!
 	
 	// Navigation
@@ -88,6 +89,7 @@ class MapViewController: GLKViewController, GLKViewControllerDelegate {
 		poiRenderer.updateZoomThreshold(viewZoom: Float(scrollView!.zoomScale))
 		effectRenderer = EffectRenderer()
 		selectionRenderer = SelectionRenderer()
+		borderRenderer = BorderRenderer()
 	}
 	
 	override func didReceiveMemoryWarning() {
@@ -186,6 +188,7 @@ class MapViewController: GLKViewController, GLKViewControllerDelegate {
 																											zoomedTo: zoom)
 		effectRenderer.updatePrimitives()
 		selectionRenderer.updateStyle(zoomLevel: zoom)
+		borderRenderer.updateStyle(zoomLevel: zoom)
 		poiRenderer.updateStyle(zoomLevel: zoom)
 		poiRenderer.updateFades()
 		labelView.updateLabels(for: poiRenderer.activePoiHashes,
@@ -203,6 +206,7 @@ class MapViewController: GLKViewController, GLKViewControllerDelegate {
 		
 		let visibleRegions = AppDelegate.sharedUIState.visibleRegionHashes
 		regionRenderer.renderWorld(visibleSet: visibleRegions, inProjection: modelViewProjectionMatrix)
+		borderRenderer.renderBorders(inProjection: modelViewProjectionMatrix)
 		poiRenderer.renderWorld(visibleSet: visibleRegions, inProjection: modelViewProjectionMatrix)
 		effectRenderer.renderWorld(inProjection: modelViewProjectionMatrix)
 		selectionRenderer.renderSelection(inProjection: modelViewProjectionMatrix)

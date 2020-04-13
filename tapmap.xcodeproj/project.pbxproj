@@ -79,6 +79,7 @@
 		14985FEF22F0ED4A00F68A1F /* OutlineRenderPrimitive.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14985FEE22F0ED4A00F68A1F /* OutlineRenderPrimitive.swift */; };
 		149CBDDD23CB230000A7AABB /* LabelView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 149CBDDC23CB230000A7AABB /* LabelView.swift */; };
 		14BAA333240EF95000DC64B9 /* OperationFitLabels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14BAA332240EF95000DC64B9 /* OperationFitLabels.swift */; };
+		14BD433A2444AD50007A3D67 /* BorderRenderer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14BD43392444AD50007A3D67 /* BorderRenderer.swift */; };
 		14C6656422B97D890054D7F2 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 14C6656222B97D890054D7F2 /* Main.storyboard */; };
 		14C6656622B97D8A0054D7F2 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 14C6656522B97D8A0054D7F2 /* Assets.xcassets */; };
 		14C6656922B97D8A0054D7F2 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 14C6656722B97D8A0054D7F2 /* LaunchScreen.storyboard */; };
@@ -173,6 +174,7 @@
 		14985FF522F0F35700F68A1F /* OutlineGeometry.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OutlineGeometry.swift; sourceTree = "<group>"; };
 		149CBDDC23CB230000A7AABB /* LabelView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LabelView.swift; sourceTree = "<group>"; };
 		14BAA332240EF95000DC64B9 /* OperationFitLabels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OperationFitLabels.swift; sourceTree = "<group>"; };
+		14BD43392444AD50007A3D67 /* BorderRenderer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BorderRenderer.swift; sourceTree = "<group>"; };
 		14C6655B22B97D890054D7F2 /* tapmap.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = tapmap.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		14C6656322B97D890054D7F2 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
 		14C6656522B97D8A0054D7F2 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
@@ -288,6 +290,7 @@
 			children = (
 				148937EA22B97FDF009278A0 /* GeoRenderer.swift */,
 				148937E722B97FDF009278A0 /* RegionRenderer.swift */,
+				14BD43392444AD50007A3D67 /* BorderRenderer.swift */,
 				148937EE22B97FDF009278A0 /* PoiRenderer.swift */,
 				144B5D5722D9E092001E2A85 /* SelectionRenderer.swift */,
 				149CBDDC23CB230000A7AABB /* LabelView.swift */,
@@ -741,6 +744,7 @@
 				1489380322B97FDF009278A0 /* PoiRenderer.swift in Sources */,
 				148937FF22B97FDF009278A0 /* GeoRenderer.swift in Sources */,
 				148937FB22B97FDF009278A0 /* EffectRenderer.swift in Sources */,
+				14BD433A2444AD50007A3D67 /* BorderRenderer.swift in Sources */,
 				1489380722B97FE0009278A0 /* UserState.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
