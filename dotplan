@@ -11,6 +11,7 @@ Preparations on Master
 Work on branch
 - separate border renderer and selection renderer
 - border renderer holds map of outline structs
+- 
 - country borders
 -- outline primitive with UVs
 -- only expanded inwards (maybe a pixel or two outwards) to avoid overlap
@@ -44,6 +45,7 @@ Work on branch
 -- move outline generation to dispatch block
 -- same idea as geometry streamer (per-LOD hash)
 
+- rename L3 regions to provinces (continent, country, province)
 
 
 # Ocean rendering
