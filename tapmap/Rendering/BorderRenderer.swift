@@ -14,6 +14,8 @@ class BorderRenderer {
 	let borderProgram: GLuint
 	let borderUniforms : (modelViewMatrix: GLint, color: GLint, width: GLint)
 	var borderWidth: Float
+	var actualBorderLod: Int = 10
+	var wantedBorderLod: Int
 	
 	let borderQueue: DispatchQueue
 	var pendingBorders: Set<Int> = []
@@ -34,6 +36,7 @@ class BorderRenderer {
 		borderPrimitives = [:]
 		
 		borderQueue = DispatchQueue(label: "Border construction", qos: .userInitiated, attributes: .concurrent)
+		wantedBorderLod = GeometryStreamer.shared.wantedLodLevel
 	}
 	
 	deinit {
@@ -48,15 +51,18 @@ class BorderRenderer {
 	
 	func prepareGeometry(for updateSet: Set<Int>) {
 		let streamer = GeometryStreamer.shared
-		let lodLevel = streamer.actualLodLevel
+		let lodLevel = streamer.wantedLodLevel
+		var borderLodMiss = false
+		
 		for borderHash in updateSet {
 			let loddedBorderHash = borderHashLodKey(borderHash, atLod: lodLevel)
 			if borderPrimitives[loddedBorderHash] == nil {
+				borderLodMiss = true
 				if pendingBorders.contains(loddedBorderHash) {
 					continue
 				}
 				
-				if let tessellation = streamer.tessellation(for: borderHash) {
+				if let tessellation = streamer.tessellation(for: borderHash, atLod: lodLevel) {
 					pendingBorders.insert(loddedBorderHash)
 					borderQueue.async {
 						let borderOutline = { (outline: [Vertex]) in generateClosedOutlineGeometry(outline: outline, innerExtent: 1.0, outerExtent: 0.1) }
@@ -75,6 +81,10 @@ class BorderRenderer {
 				}
 			}
 		}
+		if !borderLodMiss && actualBorderLod != streamer.wantedLodLevel {
+			actualBorderLod = streamer.wantedLodLevel
+			print("Border renderer switched to LOD\(actualBorderLod)")
+		}
 	}
 	
 	func renderBorders(visibleSet: Set<Int>, inProjection projection: GLKMatrix4) {
@@ -88,7 +98,7 @@ class BorderRenderer {
 			})
 		})
 		
-		let components : [GLfloat] = [0.0, 0.0, 1.0, 1.0]
+		let components : [GLfloat] = [1.0, 1.0, 1.0, 1.0]
 		glUniform4f(borderUniforms.color,
 								GLfloat(components[0]),
 								GLfloat(components[1]),
@@ -96,7 +106,7 @@ class BorderRenderer {
 								GLfloat(components[3]))
 		glUniform1f(borderUniforms.width, borderWidth)
 		
-		let loddedBorderKeys = visibleSet.map { borderHashLodKey($0, atLod: GeometryStreamer.shared.actualLodLevel) }
+		let loddedBorderKeys = visibleSet.map { borderHashLodKey($0, atLod: actualBorderLod) }
 		for key in loddedBorderKeys {
 			guard let primitive = borderPrimitives[key] else { continue }
 			render(primitive: primitive)
