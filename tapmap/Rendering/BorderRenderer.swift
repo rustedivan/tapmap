@@ -15,6 +15,9 @@ class BorderRenderer {
 	let borderUniforms : (modelViewMatrix: GLint, color: GLint, width: GLint)
 	var borderWidth: Float
 	
+	let borderQueue: DispatchQueue
+	var pendingBorders: Set<Int> = []
+
 	init?() {
 		borderWidth = 0.0
 		
@@ -29,6 +32,8 @@ class BorderRenderer {
 		borderUniforms.width = glGetUniformLocation(borderProgram, "edgeWidth")
 		
 		borderPrimitives = [:]
+		
+		borderQueue = DispatchQueue(label: "Border construction", qos: .userInitiated, attributes: .concurrent)
 	}
 	
 	deinit {
@@ -43,21 +48,32 @@ class BorderRenderer {
 	
 	func prepareGeometry(for updateSet: Set<Int>) {
 		let streamer = GeometryStreamer.shared
+		let lodLevel = streamer.actualLodLevel
 		for borderHash in updateSet {
-			let loddedBorderHash = borderHashLodKey(borderHash, atLod: streamer.actualLodLevel)
+			let loddedBorderHash = borderHashLodKey(borderHash, atLod: lodLevel)
 			if borderPrimitives[loddedBorderHash] == nil {
+				if pendingBorders.contains(loddedBorderHash) {
+					continue
+				}
+				
 				if let tessellation = streamer.tessellation(for: borderHash) {
-					let borderOutline = { (outline: [Vertex]) in generateClosedOutlineGeometry(outline: outline, innerExtent: 1.0, outerExtent: 0.1) }
-					let countourVertices = tessellation.contours.map({$0.vertices})
-					let outlineGeometry: RegionContours = countourVertices.map(borderOutline)
-					
-					let outlinePrimitive = OutlineRenderPrimitive(contours: outlineGeometry,
-																												ownerHash: 0,
-																												debugName: "Border")
-					borderPrimitives[loddedBorderHash] = outlinePrimitive
+					pendingBorders.insert(loddedBorderHash)
+					borderQueue.async {
+						let borderOutline = { (outline: [Vertex]) in generateClosedOutlineGeometry(outline: outline, innerExtent: 1.0, outerExtent: 0.1) }
+						let countourVertices = tessellation.contours.map({$0.vertices})
+						let outlineGeometry: RegionContours = countourVertices.map(borderOutline)
+
+						// Create the render primitive and update book-keeping on the OpenGL/main thread
+						DispatchQueue.main.async {
+							let outlinePrimitive = OutlineRenderPrimitive(contours: outlineGeometry,
+																														ownerHash: 0,
+																														debugName: "Border \(borderHash)@\(lodLevel)")
+							self.borderPrimitives[loddedBorderHash] = outlinePrimitive
+							self.pendingBorders.remove(loddedBorderHash)
+						}
+					}
 				}
 			}
-			
 		}
 	}
 	
