@@ -117,8 +117,8 @@ class GeometryStreamer {
 		}
 	}
 	
-	func tessellation(for regionHash: RegionHash) -> GeoTessellation? {
-		let key = regionHashLodKey(regionHash, atLod: actualLodLevel)
+	func tessellation(for regionHash: RegionHash, atLod lod: Int) -> GeoTessellation? {
+		let key = regionHashLodKey(regionHash, atLod: lod)
 		return geometryCache[key]
 	}
 	

@@ -33,7 +33,7 @@ func pickFromTessellations<T:GeoIdentifiable>(p: Vertex, candidates: Set<T>) -> 
 	let streamer = GeometryStreamer.shared
 	for candidate in candidates {
 		let hash = candidate.geographyId.hashed
-		guard let tessellation = streamer.tessellation(for: hash) else {
+		guard let tessellation = streamer.tessellation(for: hash, atLod: streamer.actualLodLevel) else {
 			continue
 		}
 		if triangleSoupHitTest(point: p, inVertices: tessellation.vertices) {

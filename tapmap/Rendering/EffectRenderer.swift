@@ -49,8 +49,9 @@ class EffectRenderer {
 	}
 	
 	func addOpeningEffect(for regionHash: RegionHash) {
-		guard let tessellation = GeometryStreamer.shared.tessellation(for: regionHash) else { return }
-		guard let primitive = GeometryStreamer.shared.renderPrimitive(for: regionHash) else { return }
+		let streamer = GeometryStreamer.shared
+		guard let tessellation = streamer.tessellation(for: regionHash, atLod: streamer.actualLodLevel) else { return }
+		guard let primitive = streamer.renderPrimitive(for: regionHash) else { return }
 		runningEffects.append(RegionEffect(primitive: primitive, center: tessellation.midpoint, startTime: Date(), duration: 1.0))
 	}
 	
