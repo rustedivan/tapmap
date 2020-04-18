@@ -87,8 +87,8 @@ class BorderRenderer {
 		}
 	}
 	
-	func renderBorders(visibleSet: Set<Int>, inProjection projection: GLKMatrix4) {
-		glPushGroupMarkerEXT(0, "Render borders")
+	func renderCountryBorders(visibleSet: Set<Int>, inProjection projection: GLKMatrix4) {
+		glPushGroupMarkerEXT(0, "Render country borders")
 		glUseProgram(borderProgram)
 		
 		var mutableProjection = projection // The 'let' argument is not safe to pass into withUnsafePointer. No copy, since copy-on-write.
@@ -106,7 +106,8 @@ class BorderRenderer {
 								GLfloat(components[3]))
 		glUniform1f(borderUniforms.width, borderWidth)
 		
-		let loddedBorderKeys = visibleSet.map { borderHashLodKey($0, atLod: actualBorderLod) }
+		let visibleCountries = visibleSet.filter { AppDelegate.sharedUserState.availableCountries.keys.contains( $0 ) }
+		let loddedBorderKeys = visibleCountries.map { borderHashLodKey($0, atLod: actualBorderLod) }
 		for key in loddedBorderKeys {
 			guard let primitive = borderPrimitives[key] else { continue }
 			render(primitive: primitive)

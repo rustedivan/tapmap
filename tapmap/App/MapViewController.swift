@@ -214,7 +214,7 @@ class MapViewController: GLKViewController, GLKViewControllerDelegate {
 		let renderSet = available.intersection(visible)
 		
 		regionRenderer.renderWorld(visibleSet: renderSet, inProjection: modelViewProjectionMatrix)
-		borderRenderer.renderBorders(visibleSet: renderSet, inProjection: modelViewProjectionMatrix)
+		borderRenderer.renderCountryBorders(visibleSet: renderSet, inProjection: modelViewProjectionMatrix)
 		poiRenderer.renderWorld(visibleSet: renderSet, inProjection: modelViewProjectionMatrix)
 		effectRenderer.renderWorld(inProjection: modelViewProjectionMatrix)
 		selectionRenderer.renderSelection(inProjection: modelViewProjectionMatrix)
