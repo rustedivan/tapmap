@@ -15,7 +15,7 @@ class MapViewController: GLKViewController, GLKViewControllerDelegate {
 	@IBOutlet var labelView: LabelView!
 	
 	// Presentation
-	var geoWorld: GeoWorld!
+	var world: RuntimeWorld!
 	var regionRenderer: RegionRenderer!
 	var poiRenderer: PoiRenderer!
 	var effectRenderer: EffectRenderer!
@@ -47,10 +47,10 @@ class MapViewController: GLKViewController, GLKViewControllerDelegate {
 		
 		geometryStreamer = GeometryStreamer(attachFile: path)!
 		
+		let geoWorld = geometryStreamer.loadGeoWorld()
+		world = RuntimeWorld(withGeoWorld: geoWorld)
 		uiState.worldQuadTree = geometryStreamer.loadWorldTree()
-		geoWorld = geometryStreamer.loadGeoWorld()
-		userState.buildWorldAvailability(withWorld: geoWorld)
-		
+		userState.buildWorldAvailability(withWorld: world)
 		
 		self.context = EAGLContext(api: .openGLES2)
 		

@@ -30,6 +30,7 @@
 		1468830D23B4BC4100105E04 /* DebugRenderer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1468830C23B4BC4100105E04 /* DebugRenderer.swift */; };
 		1468831023B4D9E400105E04 /* DebugShader.vsh in Resources */ = {isa = PBXBuildFile; fileRef = 1468830E23B4D9E400105E04 /* DebugShader.vsh */; };
 		1468831123B4D9E400105E04 /* DebugShader.fsh in Resources */ = {isa = PBXBuildFile; fileRef = 1468830F23B4D9E400105E04 /* DebugShader.fsh */; };
+		146EA26A244AF14C009196BC /* RuntimeWorld.swift in Sources */ = {isa = PBXBuildFile; fileRef = 146EA269244AF14C009196BC /* RuntimeWorld.swift */; };
 		147B819223DA03B700942C9B /* QuadTree.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14532D9923B515BE00943ADC /* QuadTree.swift */; };
 		147B819523DA043500942C9B /* WorldTree.swift in Sources */ = {isa = PBXBuildFile; fileRef = 147B819423DA043500942C9B /* WorldTree.swift */; };
 		147B819623DA043500942C9B /* WorldTree.swift in Sources */ = {isa = PBXBuildFile; fileRef = 147B819423DA043500942C9B /* WorldTree.swift */; };
@@ -147,6 +148,7 @@
 		1468830C23B4BC4100105E04 /* DebugRenderer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DebugRenderer.swift; sourceTree = "<group>"; };
 		1468830E23B4D9E400105E04 /* DebugShader.vsh */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.glsl; path = DebugShader.vsh; sourceTree = "<group>"; };
 		1468830F23B4D9E400105E04 /* DebugShader.fsh */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.glsl; path = DebugShader.fsh; sourceTree = "<group>"; };
+		146EA269244AF14C009196BC /* RuntimeWorld.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RuntimeWorld.swift; sourceTree = "<group>"; };
 		147B819423DA043500942C9B /* WorldTree.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorldTree.swift; sourceTree = "<group>"; };
 		148937DF22B97FDF009278A0 /* Geometry.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Geometry.swift; sourceTree = "<group>"; };
 		148937E022B97FDF009278A0 /* AppTypes.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AppTypes.swift; sourceTree = "<group>"; };
@@ -311,6 +313,7 @@
 				148937F222B97FDF009278A0 /* AppDelegate.swift */,
 				148937F322B97FDF009278A0 /* UserState.swift */,
 				148937F422B97FDF009278A0 /* Serialization.swift */,
+				146EA269244AF14C009196BC /* RuntimeWorld.swift */,
 			);
 			path = App;
 			sourceTree = "<group>";
@@ -743,6 +746,7 @@
 				148937F622B97FDF009278A0 /* AppTypes.swift in Sources */,
 				1489380322B97FDF009278A0 /* PoiRenderer.swift in Sources */,
 				148937FF22B97FDF009278A0 /* GeoRenderer.swift in Sources */,
+				146EA26A244AF14C009196BC /* RuntimeWorld.swift in Sources */,
 				148937FB22B97FDF009278A0 /* EffectRenderer.swift in Sources */,
 				14BD433A2444AD50007A3D67 /* BorderRenderer.swift in Sources */,
 				1489380722B97FE0009278A0 /* UserState.swift in Sources */,

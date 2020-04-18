@@ -10,18 +10,18 @@ import Foundation
 
 class UserState {
 	var visitedPlaces: [Int : Bool] = [:]
-	var availableContinents: [Int : GeoContinent] = [:]
-	var availableCountries: [Int : GeoCountry] = [:]
-	var availableRegions: [Int : GeoRegion] = [:]
+	var availableContinents: Set<Int> = []
+	var availableCountries: Set<Int> = []
+	var availableRegions: Set<Int> = []
 	
 	var availableSet: Set<Int> {
-		return Set<Int>(availableContinents.keys)
-						 .union(availableCountries.keys)
-						 .union(availableRegions.keys)
+		return Set<Int>(availableContinents)
+						 .union(availableCountries)
+						 .union(availableRegions)
 	}
 	
-	func buildWorldAvailability(withWorld geoWorld: GeoWorld) {
-		let allContinents = geoWorld.children
+	func buildWorldAvailability(withWorld world: RuntimeWorld) {
+		let allContinents = Set(world.allContinents.values)
 		let closedContinents = allContinents.filter { placeVisited($0) == false }
 		let openContinents = allContinents.subtracting(closedContinents)
 		
@@ -32,9 +32,9 @@ class UserState {
 		let allRegions = Set(openCountries.flatMap { $0.children })
 		let closedRegions = allRegions.filter { placeVisited($0) == false }
 		
-		availableContinents = Dictionary(uniqueKeysWithValues: closedContinents.map { ($0.geographyId.hashed, $0) })
-		availableCountries = Dictionary(uniqueKeysWithValues: closedCountries.map { ($0.geographyId.hashed, $0) })
-		availableRegions = Dictionary(uniqueKeysWithValues: closedRegions.map { ($0.geographyId.hashed, $0) })
+		availableContinents = Set(closedContinents.map { $0.geographyId.hashed })
+		availableCountries = Set(closedCountries.map { $0.geographyId.hashed })
+		availableRegions = Set(closedRegions.map { $0.geographyId.hashed })
 	}
 	
 	func placeVisited<T:GeoIdentifiable>(_ p: T) -> Bool {
@@ -48,14 +48,14 @@ class UserState {
 	func openPlace<T:GeoNode>(_ p: T) {
 		switch (p) {
 		case let continent as GeoContinent:
-			availableContinents.removeValue(forKey: continent.geographyId.hashed)
+			availableContinents.remove(continent.geographyId.hashed)
 			for newCountry in continent.children {
-				availableCountries[newCountry.geographyId.hashed] = newCountry
+				availableCountries.insert(newCountry.geographyId.hashed)
 			}
 		case let country as GeoCountry:
-			availableCountries.removeValue(forKey: country.geographyId.hashed)
+			availableCountries.remove(country.geographyId.hashed)
 			for newRegion in country.children {
-				availableRegions[newRegion.geographyId.hashed] = newRegion
+				availableRegions.insert(newRegion.geographyId.hashed)
 			}
 		default:
 			break
