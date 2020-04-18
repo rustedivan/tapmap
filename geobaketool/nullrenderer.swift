@@ -53,10 +53,11 @@ struct PoiPlane {
 }
 
 class GeometryStreamer {
+	let actualLodLevel = 0
 	static var shared: GeometryStreamer { get {
 		return GeometryStreamer()
 	}}
-	func tessellation(for: Int) -> ArrayedRenderPrimitive? {
+	func tessellation(for: Int, atLod: Int) -> ArrayedRenderPrimitive? {
 		return nil
 	}
 }
