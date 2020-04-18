@@ -32,6 +32,7 @@ class GeometryStreamer {
 	var pendingChunks: Set<Int> = []
 	var primitiveCache: [Int : ArrayedRenderPrimitive] = [:]
 	var geometryCache: [Int : GeoTessellation] = [:]
+	var regionIdLookup: [RegionHash : RegionId] = [:]	// To avoid dependency on RuntimeWorldl
 	var streaming: Bool { get {
 		return !pendingChunks.isEmpty
 	}}
@@ -80,6 +81,16 @@ class GeometryStreamer {
 	func loadGeoWorld() -> GeoWorld {
 		let loadedWorldBytes = fileData.subdata(in: fileHeader.worldOffset..<fileHeader.worldOffset + fileHeader.worldSize)
 		let loadedWorld = try! PropertyListDecoder().decode(GeoWorld.self, from: loadedWorldBytes)
+		
+		// Create a lookup from RegionHash to RegionId to go to ChunkName
+		let continentList = loadedWorld.children
+		let countryList = continentList.flatMap { $0.children }
+		let regionList = countryList.flatMap { $0.children }
+		var regionHashToRegionId: [RegionHash : RegionId] = [:]
+		regionHashToRegionId.merge(continentList.map { ($0.geographyId.hashed, $0.geographyId) }, uniquingKeysWith: { (lhs, rhs) in lhs})
+		regionHashToRegionId.merge(countryList.map { ($0.geographyId.hashed, $0.geographyId) }, uniquingKeysWith: { (lhs, rhs) in lhs})
+		regionHashToRegionId.merge(regionList.map { ($0.geographyId.hashed, $0.geographyId) }, uniquingKeysWith: { (lhs, rhs) in lhs})
+		regionIdLookup = regionHashToRegionId
 		return loadedWorld
 	}
 	
@@ -96,14 +107,15 @@ class GeometryStreamer {
 	
 	func streamMissingPrimitive(for regionHash: RegionHash) -> Bool {
 		// Only stream primitives that are actually opened
-		if let region = AppDelegate.sharedUserState.availableRegions[regionHash] {
-			streamPrimitive(for: region.geographyId)
-			return true
-		} else if let country = AppDelegate.sharedUserState.availableCountries[regionHash] {
-			streamPrimitive(for: country.geographyId)
-			return true
-		} else if let continent = AppDelegate.sharedUserState.availableContinents[regionHash] {
-			streamPrimitive(for: continent.geographyId)
+		let userState = AppDelegate.sharedUserState
+		if	userState.availableContinents.contains(regionHash) ||
+				userState.availableCountries.contains(regionHash) ||
+				userState.availableRegions.contains(regionHash) {
+			guard let regionId = regionIdLookup[regionHash] else {
+				print("RegionId lookup failed for hash \(regionHash)")
+				return false
+			}
+			streamPrimitive(for: regionId)
 			return true
 		}
 		return false
