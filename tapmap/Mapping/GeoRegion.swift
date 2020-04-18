@@ -19,7 +19,7 @@ struct RegionId: Codable {
 		key = fatKey.components(separatedBy: .punctuationCharacters).joined(separator: "")
 								.components(separatedBy: .whitespaces).joined(separator: "-")
 								.lowercased()
-		hashed = RegionId.rabinKarp(key)
+		hashed = RegionId.djb2Hash(key)
 	}
 	
 	func encode(to encoder: Encoder) throws {
@@ -30,19 +30,14 @@ struct RegionId: Codable {
 	init(from decoder: Decoder) throws {
 		var container = try decoder.unkeyedContainer()
 		key = try container.decode(String.self)
-		hashed = RegionId.rabinKarp(key)
+		hashed = RegionId.djb2Hash(key)
 	}
 	
-	private static func rabinKarp(_ key: String) -> RegionHash {
-		// Swift's Hasher is not deterministic across executions,
-		// so use this polynomial hash function for streaming keys.
-		// (Rabin-Karp at base 13)
-		let base = 13
-
-		var hash = 0
+	private static func djb2Hash(_ key: String) -> RegionHash {
+		var hash = 5381
 		for char in key {
 			let charCode = Int(char.unicodeScalars.first!.value)
-			hash = (hash * base + charCode) % Int(Int16.max)
+			hash = hash &* 33 &+ charCode	// Note the overflow operators
 		}
 
 		return hash
