@@ -80,12 +80,12 @@ class MapViewController: GLKViewController, GLKViewControllerDelegate {
 		
 		EAGLContext.setCurrent(self.context)
 		regionRenderer = RegionRenderer()
-		poiRenderer = PoiRenderer(withVisibleContinents: userState.availableContinents,
-															countries: userState.availableCountries,
-															regions: userState.availableRegions)
-		labelView.buildPoiPrimitives(withVisibleContinents: userState.availableContinents,
-																 countries: userState.availableCountries,
-																 regions: userState.availableRegions)
+		poiRenderer = PoiRenderer(withVisibleContinents: world.availableContinents,
+															countries: world.availableCountries,
+															regions: world.availableRegions)
+		labelView.buildPoiPrimitives(withVisibleContinents: world.availableContinents,
+																 countries: world.availableCountries,
+																 regions: world.availableRegions)
 		poiRenderer.updateZoomThreshold(viewZoom: Float(scrollView!.zoomScale))
 		effectRenderer = EffectRenderer()
 		selectionRenderer = SelectionRenderer()
@@ -120,39 +120,30 @@ class MapViewController: GLKViewController, GLKViewControllerDelegate {
 			defer { GeometryCounters.end() }
 			
 			// Filter out sets of closed, visible regions that contain the tap
-			let candidateContinents = Set(userState.availableContinents		// Closed continents
-				.filter { uiState.visibleRegionHashes.contains($0.key) }		// Visible continents
-				.filter { boxContains($0.value.aabb, tapPoint) }						// Under the tap position
-				.values)
-			let candidateCountries = Set(userState.availableCountries
-				.filter { uiState.visibleRegionHashes.contains($0.key) }
-				.filter { boxContains($0.value.aabb, tapPoint) }
-				.values)
-			let candidateRegions = Set(userState.availableRegions
-				.filter { uiState.visibleRegionHashes.contains($0.key) }
-				.filter { boxContains($0.value.aabb, tapPoint) }
-				.values)
-			
+			let candidateContinents = Set(world.visibleContinents.filter { boxContains($0.value.aabb, tapPoint) }.values)
+			let candidateCountries = Set(world.visibleCountries.filter { boxContains($0.value.aabb, tapPoint) }.values)
+			let candidateRegions = Set(world.visibleRegions.filter { boxContains($0.value.aabb, tapPoint) }.values)
+
 			if let hitHash = pickFromTessellations(p: tapPoint, candidates: candidateContinents) {
-				let hitContinent = userState.availableContinents[hitHash]!
+				let hitContinent = world.availableContinents[hitHash]!
 				if processSelection(of: hitContinent, user: userState, ui: uiState) {
 					processVisit(of: hitContinent, user: userState, ui: uiState)
 				}
 			} else if let hitHash = pickFromTessellations(p: tapPoint, candidates: candidateCountries) {
-				let hitCountry = userState.availableCountries[hitHash]!
+				let hitCountry = world.availableCountries[hitHash]!
 				if processSelection(of: hitCountry, user: userState, ui: uiState) {
 					processVisit(of: hitCountry, user: userState, ui: uiState)
 				}
 			} else if let hitHash = pickFromTessellations(p: tapPoint, candidates: candidateRegions) {
-				let hitRegion = userState.availableRegions[hitHash]!
+				let hitRegion = world.availableRegions[hitHash]!
 				_ = processSelection(of: hitRegion, user: userState, ui: uiState)
 			} else {
 				uiState.clearSelection()
 				selectionRenderer.clear()
 			}
+			
+			uiState.cullWorldTree(focus: visibleLongLat(viewBounds: view.bounds))
 		}
-		
-		AppDelegate.sharedUIState.cullWorldTree(focus: visibleLongLat(viewBounds: view.bounds))
 	}
 	
 	func processSelection<T:GeoIdentifiable>(of hit: T, user: UserState, ui: UIState) -> Bool {
@@ -212,9 +203,12 @@ class MapViewController: GLKViewController, GLKViewControllerDelegate {
 		let available = AppDelegate.sharedUserState.availableSet
 		let visible = AppDelegate.sharedUIState.visibleRegionHashes
 		let renderSet = available.intersection(visible)
+		let visibleContinents = Set(world.visibleContinents.values)
+		let visibleCountries = Set(world.visibleCountries.values)
 		
+		borderRenderer.renderContinentBorders(visibleContinents, inProjection: modelViewProjectionMatrix)
 		regionRenderer.renderWorld(visibleSet: renderSet, inProjection: modelViewProjectionMatrix)
-		borderRenderer.renderCountryBorders(visibleSet: renderSet, inProjection: modelViewProjectionMatrix)
+		borderRenderer.renderCountryBorders(visibleCountries, inProjection: modelViewProjectionMatrix)
 		poiRenderer.renderWorld(visibleSet: renderSet, inProjection: modelViewProjectionMatrix)
 		effectRenderer.renderWorld(inProjection: modelViewProjectionMatrix)
 		selectionRenderer.renderSelection(inProjection: modelViewProjectionMatrix)
