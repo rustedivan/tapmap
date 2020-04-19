@@ -33,7 +33,7 @@ Work on branch
 ---- in this way we can slave border and selection renderers to the GS
 --- but I think waiting for all border generations is better, opening a country is already
     expensive
--- only generate borders for countries
+-√ only generate borders for countries
 
 - memory management
 -- build render primitive bookie with frame-count access markers
@@ -46,9 +46,14 @@ Work on branch
 -- move outline generation to dispatch block
 -- same idea as geometry streamer (per-LOD hash)
 
+# Master branch pickups after merging
 - rename L3 regions to provinces (continent, country, province)
 - city regions seem to be holes in continents and countries
 - make type for baked geometry hash
+- fall back to rendering worse LOD instead of missing
+- only give continent outlines to the largest poly (sort polys by area in tessellation step and only outline the first poly's exterior ring)
+- fix comments in RuntimeWorld
+- borders should ramp between min/max screenspace width, not fixed regardless of zoom
 
 # Ocean rendering
 - pale bathygraphic map
@@ -217,6 +222,7 @@ Work on branch
 ## Move labels
 ## Remove POIs
 ## Split Seven Seas continent into their own seas
+## Figure out how to handle Clipperton and friends (see "skipping..." in bake log)
 
 # √ Country collation
 ## Generalize variable names
