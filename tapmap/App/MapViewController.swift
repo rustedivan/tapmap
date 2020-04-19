@@ -178,13 +178,12 @@ class MapViewController: GLKViewController, GLKViewControllerDelegate {
 																											centeredOn: offset,
 																											zoomedTo: zoom)
 		
-		let available = AppDelegate.sharedUserState.availableSet
 		let visible = AppDelegate.sharedUIState.visibleRegionHashes
-		let updateSet = available.intersection(visible)
+		let borderedContinents = world.allContinents.filter { visible.contains($0.key) }	// All visible continents (even if visited)
 		effectRenderer.updatePrimitives()
 		selectionRenderer.updateStyle(zoomLevel: zoom)
 		borderRenderer.updateStyle(zoomLevel: zoom)
-		borderRenderer.prepareGeometry(for: updateSet)
+		borderRenderer.prepareGeometry(visibleContinents: borderedContinents, visibleCountries: world.visibleCountries)
 		poiRenderer.updateStyle(zoomLevel: zoom)
 		poiRenderer.updateFades()
 		labelView.updateLabels(for: poiRenderer.activePoiHashes,
@@ -203,12 +202,12 @@ class MapViewController: GLKViewController, GLKViewControllerDelegate {
 		let available = AppDelegate.sharedUserState.availableSet
 		let visible = AppDelegate.sharedUIState.visibleRegionHashes
 		let renderSet = available.intersection(visible)
-		let visibleContinents = Set(world.visibleContinents.values)
-		let visibleCountries = Set(world.visibleCountries.values)
+		let borderedContinents = visible.intersection(world.allContinents.keys)	// All visible continents (even if visited)
+		let borderedCountries = Set(world.visibleCountries.keys)
 		
-		borderRenderer.renderContinentBorders(visibleContinents, inProjection: modelViewProjectionMatrix)
+		borderRenderer.renderContinentBorders(borderedContinents, inProjection: modelViewProjectionMatrix)
 		regionRenderer.renderWorld(visibleSet: renderSet, inProjection: modelViewProjectionMatrix)
-		borderRenderer.renderCountryBorders(visibleCountries, inProjection: modelViewProjectionMatrix)
+		borderRenderer.renderCountryBorders(borderedCountries, inProjection: modelViewProjectionMatrix)
 		poiRenderer.renderWorld(visibleSet: renderSet, inProjection: modelViewProjectionMatrix)
 		effectRenderer.renderWorld(inProjection: modelViewProjectionMatrix)
 		selectionRenderer.renderSelection(inProjection: modelViewProjectionMatrix)

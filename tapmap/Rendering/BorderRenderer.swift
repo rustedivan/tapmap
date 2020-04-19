@@ -49,11 +49,12 @@ class BorderRenderer {
 		borderWidth = 0.4 / zoomLevel
 	}
 	
-	func prepareGeometry(for updateSet: Set<Int>) {
+	func prepareGeometry(visibleContinents: [Int : GeoContinent], visibleCountries: [Int : GeoCountry]) {	// $ These should be RegionHash:
 		let streamer = GeometryStreamer.shared
 		let lodLevel = streamer.wantedLodLevel
 		var borderLodMiss = false
 		
+		let updateSet: [Int] = Array(visibleContinents.keys) + Array(visibleCountries.keys)
 		for borderHash in updateSet {
 			let loddedBorderHash = borderHashLodKey(borderHash, atLod: lodLevel)
 			if borderPrimitives[loddedBorderHash] == nil {
@@ -65,7 +66,18 @@ class BorderRenderer {
 				if let tessellation = streamer.tessellation(for: borderHash, atLod: lodLevel) {
 					pendingBorders.insert(loddedBorderHash)
 					borderQueue.async {
-						let borderOutline = { (outline: [Vertex]) in generateClosedOutlineGeometry(outline: outline, innerExtent: 1.0, outerExtent: 0.1) }
+						let innerWidth: Float
+						let outerWidth: Float
+						
+						if visibleContinents[borderHash] != nil {
+							innerWidth = 0.1
+							outerWidth = 3.0
+						} else {
+							innerWidth = 1.0
+							outerWidth = 0.1
+						}
+						
+						let borderOutline = { (outline: [Vertex]) in generateClosedOutlineGeometry(outline: outline, innerExtent: innerWidth, outerExtent: outerWidth) }
 						let countourVertices = tessellation.contours.map({$0.vertices})
 						let outlineGeometry: RegionContours = countourVertices.map(borderOutline)
 
@@ -81,13 +93,14 @@ class BorderRenderer {
 				}
 			}
 		}
+		
 		if !borderLodMiss && actualBorderLod != streamer.wantedLodLevel {
 			actualBorderLod = streamer.wantedLodLevel
 			print("Border renderer switched to LOD\(actualBorderLod)")
 		}
 	}
 	
-	func renderContinentBorders(_ continents: Set<GeoContinent>, inProjection projection: GLKMatrix4) {
+	func renderContinentBorders(_ continents: Set<Int>, inProjection projection: GLKMatrix4) {
 		glPushGroupMarkerEXT(0, "Render continent borders")
 		glUseProgram(borderProgram)
 		
@@ -98,7 +111,7 @@ class BorderRenderer {
 			})
 		})
 		
-		let components : [GLfloat] = [1.0, 1.0, 1.0, 1.0]
+		let components : [GLfloat] = [0.0, 0.5, 0.7, 1.0]
 		glUniform4f(borderUniforms.color,
 								GLfloat(components[0]),
 								GLfloat(components[1]),
@@ -106,7 +119,8 @@ class BorderRenderer {
 								GLfloat(components[3]))
 		glUniform1f(borderUniforms.width, borderWidth)
 		
-		let loddedBorderKeys = continents.map { borderHashLodKey($0.geographyId.hashed, atLod: actualBorderLod) }
+		let continentOutlineLod = max(actualBorderLod, 0)	// $ Turn up the limit once border width is under control (set min/max outline width and ramp between )
+		let loddedBorderKeys = continents.map { borderHashLodKey($0, atLod: continentOutlineLod) }
 		for key in loddedBorderKeys {
 			guard let primitive = borderPrimitives[key] else { continue }
 			render(primitive: primitive)
@@ -115,7 +129,7 @@ class BorderRenderer {
 		glPopGroupMarkerEXT()
 	}
 	
-	func renderCountryBorders(_ countries: Set<GeoCountry>, inProjection projection: GLKMatrix4) {
+	func renderCountryBorders(_ countries: Set<Int>, inProjection projection: GLKMatrix4) {
 		glPushGroupMarkerEXT(0, "Render country borders")
 		glUseProgram(borderProgram)
 		
@@ -134,7 +148,7 @@ class BorderRenderer {
 								GLfloat(components[3]))
 		glUniform1f(borderUniforms.width, borderWidth)
 		
-		let loddedBorderKeys = countries.map { borderHashLodKey($0.geographyId.hashed, atLod: actualBorderLod) }
+		let loddedBorderKeys = countries.map { borderHashLodKey($0, atLod: actualBorderLod) }
 		for key in loddedBorderKeys {
 			guard let primitive = borderPrimitives[key] else { continue }
 			render(primitive: primitive)
