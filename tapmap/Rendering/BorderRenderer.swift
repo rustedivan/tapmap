@@ -87,7 +87,35 @@ class BorderRenderer {
 		}
 	}
 	
-	func renderCountryBorders(visibleSet: Set<Int>, inProjection projection: GLKMatrix4) {
+	func renderContinentBorders(_ continents: Set<GeoContinent>, inProjection projection: GLKMatrix4) {
+		glPushGroupMarkerEXT(0, "Render continent borders")
+		glUseProgram(borderProgram)
+		
+		var mutableProjection = projection // The 'let' argument is not safe to pass into withUnsafePointer. No copy, since copy-on-write.
+		withUnsafePointer(to: &mutableProjection, {
+			$0.withMemoryRebound(to: Float.self, capacity: 16, {
+				glUniformMatrix4fv(borderUniforms.modelViewMatrix, 1, 0, $0)
+			})
+		})
+		
+		let components : [GLfloat] = [1.0, 1.0, 1.0, 1.0]
+		glUniform4f(borderUniforms.color,
+								GLfloat(components[0]),
+								GLfloat(components[1]),
+								GLfloat(components[2]),
+								GLfloat(components[3]))
+		glUniform1f(borderUniforms.width, borderWidth)
+		
+		let loddedBorderKeys = continents.map { borderHashLodKey($0.geographyId.hashed, atLod: actualBorderLod) }
+		for key in loddedBorderKeys {
+			guard let primitive = borderPrimitives[key] else { continue }
+			render(primitive: primitive)
+		}
+		
+		glPopGroupMarkerEXT()
+	}
+	
+	func renderCountryBorders(_ countries: Set<GeoCountry>, inProjection projection: GLKMatrix4) {
 		glPushGroupMarkerEXT(0, "Render country borders")
 		glUseProgram(borderProgram)
 		
@@ -106,8 +134,7 @@ class BorderRenderer {
 								GLfloat(components[3]))
 		glUniform1f(borderUniforms.width, borderWidth)
 		
-		let visibleCountries = visibleSet.filter { AppDelegate.sharedUserState.availableCountries.keys.contains( $0 ) }
-		let loddedBorderKeys = visibleCountries.map { borderHashLodKey($0, atLod: actualBorderLod) }
+		let loddedBorderKeys = countries.map { borderHashLodKey($0.geographyId.hashed, atLod: actualBorderLod) }
 		for key in loddedBorderKeys {
 			guard let primitive = borderPrimitives[key] else { continue }
 			render(primitive: primitive)
