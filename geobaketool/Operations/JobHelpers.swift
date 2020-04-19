@@ -54,6 +54,12 @@ struct ToolGeoFeature : Equatable, Hashable, Codable {
 	}
 	
 	var geographyId: RegionId {
-		return RegionId(level.rawValue, name)
+		let parent: String
+		switch level {
+		case .Continent: parent = "Earth"
+		case .Country: parent = continentKey
+		case .Region: parent = countryKey
+		}
+		return RegionId(parent, level.rawValue, name)
 	}
 }
