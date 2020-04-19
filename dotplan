@@ -14,9 +14,9 @@ Work on branch
 - 
 - country borders
 -- outline primitive with UVs
--- only expanded inwards (maybe a pixel or two outwards) to avoid overlap
--- pull tessellations from geometry streamer
--- build border primitives from that, mapped in with the lod from Geostreamer
+-√ only expanded inwards (maybe a pixel or two outwards) to avoid overlap
+-√ pull tessellations from geometry streamer
+-√ build border primitives from that, mapped in with the lod from Geostreamer
 --- the tricky part is that geostreamer can't track the primitives for us, and maybe never should have
 	 (nah, it's good. the tessellation is the stored geometry, the border case is
     the odd one out - generating a new tessellation from vertex ring data)
@@ -33,6 +33,7 @@ Work on branch
 ---- in this way we can slave border and selection renderers to the GS
 --- but I think waiting for all border generations is better, opening a country is already
     expensive
+-- only generate borders for countries
 
 - memory management
 -- build render primitive bookie with frame-count access markers
@@ -46,7 +47,8 @@ Work on branch
 -- same idea as geometry streamer (per-LOD hash)
 
 - rename L3 regions to provinces (continent, country, province)
-
+- city regions seem to be holes in continents and countries
+- make type for baked geometry hash
 
 # Ocean rendering
 - pale bathygraphic map
