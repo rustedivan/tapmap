@@ -57,7 +57,11 @@ class OperationAssembleGroups : Operation {
 			
 			let properties: ToolGeoFeature.GeoStringProperties
 			if targetLevel == .Country {
-				properties = propertiesMap[partList.key] ?? [:]
+				guard let partProperties = propertiesMap[partList.key] else {
+					print("Region \(partList.key) does not belong to any country. Skipping...")
+					continue
+				}
+				properties = partProperties
 			} else {
 				properties = ["CONTINENT" : partList.key,
 											"name" : partList.key]
