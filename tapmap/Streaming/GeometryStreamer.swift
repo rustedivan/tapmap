@@ -107,18 +107,12 @@ class GeometryStreamer {
 	
 	func streamMissingPrimitive(for regionHash: RegionHash) -> Bool {
 		// Only stream primitives that are actually opened
-		let userState = AppDelegate.sharedUserState
-		if	userState.availableContinents.contains(regionHash) ||
-				userState.availableCountries.contains(regionHash) ||
-				userState.availableRegions.contains(regionHash) {
-			guard let regionId = regionIdLookup[regionHash] else {
-				print("RegionId lookup failed for hash \(regionHash)")
-				return false
-			}
-			streamPrimitive(for: regionId)
-			return true
+		guard let regionId = regionIdLookup[regionHash] else {
+			print("RegionId lookup failed for hash \(regionHash)")
+			return false
 		}
-		return false
+		streamPrimitive(for: regionId)
+		return true
 	}
 	
 	func evictPrimitive(for regionHash: RegionHash) {
