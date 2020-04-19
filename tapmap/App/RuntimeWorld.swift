@@ -27,6 +27,7 @@ class RuntimeWorld {
 		allRegions = Dictionary(uniqueKeysWithValues: regionList.map { ($0.geographyId.hashed, $0) })
 	}
 	
+	// $ Recreating availability lists on every call is not great.
 	var availableContinents: [Int: GeoContinent] { get {
 		let user = AppDelegate.sharedUserState
 		return allContinents.filter { user.availableContinents.contains($0.key) }
@@ -42,6 +43,7 @@ class RuntimeWorld {
 		return allRegions.filter { user.availableRegions.contains($0.key) }
 	}}
 	
+	// $ Likewise, these visibility filters could be recreated at the end of frame or zoom
 	var visibleContinents: [Int: GeoContinent] { get {
 		let ui = AppDelegate.sharedUIState
 		return availableContinents.filter { ui.visibleRegionHashes.contains($0.key) }
