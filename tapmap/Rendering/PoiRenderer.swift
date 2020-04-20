@@ -68,9 +68,9 @@ class PoiRenderer {
 	var rankThreshold: Float = -1.0
 	var poiBaseSize: Float = 0.0
 	
-	init?(withVisibleContinents continents: [Int: GeoContinent],
-				countries: [Int: GeoCountry],
-				regions: [Int: GeoRegion]) {
+	init?(withVisibleContinents continents: GeoContinentMap,
+				countries: GeoCountryMap,
+				regions: GeoRegionMap) {
 		poiProgram = loadShaders(shaderName: "PoiShader")
 		guard poiProgram != 0 else {
 			print("Failed to load POI shaders")

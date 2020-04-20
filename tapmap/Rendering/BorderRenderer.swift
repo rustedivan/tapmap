@@ -49,7 +49,7 @@ class BorderRenderer {
 		borderWidth = 0.4 / zoomLevel
 	}
 	
-	func prepareGeometry(visibleContinents: [Int : GeoContinent], visibleCountries: [Int : GeoCountry]) {	// $ These should be RegionHash:
+	func prepareGeometry(visibleContinents: GeoContinentMap, visibleCountries: GeoCountryMap) {
 		let streamer = GeometryStreamer.shared
 		let lodLevel = streamer.wantedLodLevel
 		var borderLodMiss = false

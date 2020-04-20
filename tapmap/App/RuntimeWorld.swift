@@ -8,10 +8,14 @@
 
 import Foundation
 
+typealias GeoContinentMap = [RegionHash : GeoContinent]
+typealias GeoCountryMap = [RegionHash : GeoCountry]
+typealias GeoRegionMap = [RegionHash : GeoRegion]
+
 class RuntimeWorld {
-	let allContinents: [Int : GeoContinent]
-	let allCountries: [Int : GeoCountry]
-	let allRegions: [Int : GeoRegion]
+	let allContinents: GeoContinentMap
+	let allCountries: GeoCountryMap
+	let allRegions: GeoRegionMap
 	let geoWorld: GeoWorld
 	
 	init(withGeoWorld world: GeoWorld) {
@@ -28,33 +32,33 @@ class RuntimeWorld {
 	}
 	
 	// $ Recreating availability lists on every call is not great.
-	var availableContinents: [Int: GeoContinent] { get {
+	var availableContinents: GeoContinentMap { get {
 		let user = AppDelegate.sharedUserState
 		return allContinents.filter { user.availableContinents.contains($0.key) }
 	}}
 	
-	var availableCountries: [Int: GeoCountry] { get {
+	var availableCountries: GeoCountryMap { get {
 		let user = AppDelegate.sharedUserState
 		return allCountries.filter { user.availableCountries.contains($0.key) }
 	}}
 	
-	var availableRegions: [Int: GeoRegion] { get {
+	var availableRegions: GeoRegionMap { get {
 		let user = AppDelegate.sharedUserState
 		return allRegions.filter { user.availableRegions.contains($0.key) }
 	}}
 	
 	// $ Likewise, these visibility filters could be recreated at the end of frame or zoom
-	var visibleContinents: [Int: GeoContinent] { get {
+	var visibleContinents: GeoContinentMap { get {
 		let ui = AppDelegate.sharedUIState
 		return availableContinents.filter { ui.visibleRegionHashes.contains($0.key) }
 	}}
 	
-	var visibleCountries: [Int: GeoCountry] { get {
+	var visibleCountries: GeoCountryMap { get {
 		let ui = AppDelegate.sharedUIState
 		return availableCountries.filter { ui.visibleRegionHashes.contains($0.key) }
 	}}
 	
-	var visibleRegions: [Int: GeoRegion] { get {
+	var visibleRegions: GeoRegionMap { get {
 		let ui = AppDelegate.sharedUIState
 		return availableRegions.filter { ui.visibleRegionHashes.contains($0.key) }
 	}}

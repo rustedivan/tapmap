@@ -51,9 +51,9 @@ class LabelView: UIView {
 		}
 	}
 	
-	func buildPoiPrimitives(withVisibleContinents continents: [Int: GeoContinent],
-													countries: [Int: GeoCountry],
-													regions: [Int: GeoRegion]) {
+	func buildPoiPrimitives(withVisibleContinents continents: GeoContinentMap,
+													countries: GeoCountryMap,
+													regions: GeoRegionMap) {
 		
 		// Collect a flat list of all POIs and their hash keys
 		let continentPois = continents.flatMap { $0.value.places }
