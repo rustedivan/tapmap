@@ -90,7 +90,7 @@ class OperationBakeGeometry : Operation {
 		var worldResult = Set<GeoContinent>()
 		
 		// Build continents
-		for (key, continent) in toolWorld {
+		for (_, continent) in toolWorld {
 			guard let continentTessellation = continent.tessellations.first else { // Use LOD0 for picking AABBS
 				print("\(continent.name) has no tessellation - skipping...")
 				continue
@@ -105,22 +105,22 @@ class OperationBakeGeometry : Operation {
 				}
 				
 				// Build regions
-				var regionResult = Set<GeoRegion>()
-				for region in country.children ?? [] {
-					guard let regionTessellation = region.tessellations.first else {
-						print("\(region.name) has no tessellation - skipping...")
+				var provinceResult = Set<GeoProvince>()
+				for province in country.children ?? [] {
+					guard let regionTessellation = province.tessellations.first else {
+						print("\(province.name) has no tessellation - skipping...")
 						continue
 					}
 					
-					let geoRegion = GeoRegion(name: region.name,
-																		places: region.places ?? [],
-																		geographyId: RegionId(region.countryKey, "region", region.name),
+					let geoRegion = GeoProvince(name: province.name,
+																		places: province.places ?? [],
+																		geographyId: RegionId(province.countryKey, "province", province.name),
 																		aabb: regionTessellation.aabb)
-					regionResult.insert(geoRegion)
+					provinceResult.insert(geoRegion)
 				}
 				
 				let geoCountry = GeoCountry(name: country.name,
-																		children: regionResult,
+																		children: provinceResult,
 																		places: country.places ?? [],
 																		geographyId: RegionId(country.continentKey, "country", country.name),
 																		aabb: countryTessellation.aabb)
@@ -142,8 +142,8 @@ class OperationBakeGeometry : Operation {
 		
 		for continent in bakedWorld.children {
 			for country in continent.children {
-				for region in country.children {
-					let regionBox = RegionBounds(regionHash: region.geographyId.hashed, bounds: region.aabb)
+				for province in country.children {
+					let regionBox = RegionBounds(regionHash: province.geographyId.hashed, bounds: province.aabb)
 					worldQuadTree.insert(value: regionBox, region: regionBox.bounds)
 				}
 				
@@ -192,7 +192,7 @@ class OperationBakeGeometry : Operation {
 					try chunkTable.addChunk(forKey: "\(key)-\(lodLevel)", chunk: tess)
 				}
 				
-				level = "region"
+				level = "province"
 				for (key, tess) in regionTessellations {
 					try chunkTable.addChunk(forKey: "\(key)-\(lodLevel)", chunk: tess)
 				}

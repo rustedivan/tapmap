@@ -12,12 +12,12 @@ class UserState {
 	var visitedPlaces: [Int : Bool] = [:]
 	var availableContinents: Set<Int> = []
 	var availableCountries: Set<Int> = []
-	var availableRegions: Set<Int> = []
+	var availableProvinces: Set<Int> = []
 	
 	var availableSet: Set<Int> {
 		return Set<Int>(availableContinents)
 						 .union(availableCountries)
-						 .union(availableRegions)
+						 .union(availableProvinces)
 	}
 	
 	func buildWorldAvailability(withWorld world: RuntimeWorld) {
@@ -29,12 +29,12 @@ class UserState {
 		let closedCountries = allCountries.filter { placeVisited($0) == false }
 		let openCountries = allCountries.subtracting(closedCountries)
 		
-		let allRegions = Set(openCountries.flatMap { $0.children })
-		let closedRegions = allRegions.filter { placeVisited($0) == false }
+		let allProvinces = Set(openCountries.flatMap { $0.children })
+		let closedProvinces = allProvinces.filter { placeVisited($0) == false }
 		
 		availableContinents = Set(closedContinents.map { $0.geographyId.hashed })
 		availableCountries = Set(closedCountries.map { $0.geographyId.hashed })
-		availableRegions = Set(closedRegions.map { $0.geographyId.hashed })
+		availableProvinces = Set(closedProvinces.map { $0.geographyId.hashed })
 	}
 	
 	func placeVisited<T:GeoIdentifiable>(_ p: T) -> Bool {
@@ -55,14 +55,14 @@ class UserState {
 		case let country as GeoCountry:
 			availableCountries.remove(country.geographyId.hashed)
 			for newRegion in country.children {
-				availableRegions.insert(newRegion.geographyId.hashed)
+				availableProvinces.insert(newRegion.geographyId.hashed)
 			}
 		default:
 			break
 		}
 	}
 	
-	func visitPlace(_ p: GeoRegion) {
+	func visitPlace(_ p: GeoProvince) {
 		visitedPlaces[p.geographyId.hashed] = true
 	}
 }

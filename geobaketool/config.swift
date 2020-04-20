@@ -95,8 +95,8 @@ class PipelineConfig {
 	var reshapedCountriesFilePath : URL {
 		return applicationSupportUrl.appendingPathComponent(PipelineConfig.shared.reshapedCountriesFilename)
 	}
-	var reshapedRegionsFilePath : URL? {
-		guard let file = PipelineConfig.shared.reshapedRegionsFilename else { return nil }
+	var reshapedProvincesFilePath : URL? {
+		guard let file = PipelineConfig.shared.reshapedProvincesFilename else { return nil }
 		return applicationSupportUrl.appendingPathComponent(file)
 	}
 	var queriedCitiesFilePath : URL? {
@@ -111,7 +111,7 @@ class PipelineConfig {
 	
 	// Constants
 	var reshapedCountriesFilename: String { return configString("input-countries")! }
-	var reshapedRegionsFilename: String? { return configString("input-regions") }
+	var reshapedProvincesFilename: String? { return configString("input-provinces") }
 	var reshapedCitiesFilename: String? { return configString("input-cities") }
 }
 

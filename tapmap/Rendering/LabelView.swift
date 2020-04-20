@@ -53,13 +53,13 @@ class LabelView: UIView {
 	
 	func buildPoiPrimitives(withVisibleContinents continents: GeoContinentMap,
 													countries: GeoCountryMap,
-													regions: GeoRegionMap) {
+													provinces: GeoProvinceMap) {
 		
 		// Collect a flat list of all POIs and their hash keys
 		let continentPois = continents.flatMap { $0.value.places }
 		let countryPois = countries.flatMap { $0.value.places }
-		let regionPois = regions.flatMap { $0.value.places }
-		let allPois = continentPois + countryPois + regionPois
+		let provincePois = provinces.flatMap { $0.value.places }
+		let allPois = continentPois + countryPois + provincePois
 		let allPoiPrimitives = allPois.map { ($0.hashValue, LabelMarker(for: $0)) }
 		
 		// Insert them into the primitive dictionary, ignoring any later duplicates

@@ -30,7 +30,7 @@ func downloadFiles(params: ArraySlice<String>) throws {
 	
 	// Download and unpack NaturalEarth data
 	let archiveUrls = [PipelineConfig.shared.configUrl("source.countries"),
-										 PipelineConfig.shared.configUrl("source.regions")]
+										 PipelineConfig.shared.configUrl("source.provinces")]
 	
 	let _ = try archiveUrls.map({ (url: URL?) -> () in
 		guard let url = url else { return }

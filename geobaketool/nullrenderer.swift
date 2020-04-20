@@ -30,7 +30,7 @@ class OutlineRenderPrimitive {
 	}
 }
 
-extension GeoRegion {
+extension GeoProvince {
 	func poiRenderPlanes() -> [PoiPlane] {
 		return []
 	}

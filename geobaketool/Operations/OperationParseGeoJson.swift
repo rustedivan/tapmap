@@ -68,7 +68,7 @@ class OperationParseGeoJson : Operation {
 		switch level {
 		case .Continent: break
 		case .Country: guard PipelineConfig.shared.configArray("bake.countries")?.contains(featureName) ?? true else { return nil }
-		case .Region: guard PipelineConfig.shared.configArray("bake.regions")?.contains(featureName) ?? true else { return nil }
+		case .Province: guard PipelineConfig.shared.configArray("bake.regions")?.contains(featureName) ?? true else { return nil }
 		}
 		
 		let loadedPolygons: [Polygon]

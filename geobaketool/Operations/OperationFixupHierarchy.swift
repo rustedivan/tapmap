@@ -11,19 +11,19 @@ import Foundation
 class OperationFixupHierarchy : Operation {
 	let continentList : ToolGeoFeatureMap
 	let countryList : ToolGeoFeatureMap
-	let regionList : ToolGeoFeatureMap
+	let provinceList : ToolGeoFeatureMap
 	
 	var output : ToolGeoFeatureMap?
 	let report : ProgressReport
 	
 	init(continentCollection: ToolGeoFeatureMap,
 			 countryCollection: ToolGeoFeatureMap,
-			 regionCollection: ToolGeoFeatureMap,
+			 provinceCollection: ToolGeoFeatureMap,
 			 reporter: @escaping ProgressReport) {
 		
 		continentList = continentCollection
 		countryList = countryCollection
-		regionList = regionCollection
+		provinceList = provinceCollection
 		report = reporter
 		
 		output = [:]
@@ -34,33 +34,33 @@ class OperationFixupHierarchy : Operation {
 	override func main() {
 		guard !isCancelled else { print("Cancelled before starting"); return }
 
-		// Collect regions into their countries
-		var remainingRegions = Set(regionList.values)
+		// Collect provinces into their countries
+		var remainingProvinces = Set(provinceList.values)
 		var geoCountries = ToolGeoFeatureMap()
-		let numRegions = remainingRegions.count
+		let numProvinces = remainingProvinces.count
 		for (key, country) in countryList {
-			// Countries consist of their regions...
-			let belongingRegions = remainingRegions.filter { $0.countryKey == country.countryKey }
-			// ...and all the larger places in those regions
-			let belongingPlaces = Set(belongingRegions
+			// Countries consist of their provinces...
+			let belongingProvinces = remainingProvinces.filter { $0.countryKey == country.countryKey }
+			// ...and all the larger places in those provinces
+			let belongingPlaces = Set(belongingProvinces
 				.flatMap { $0.places ?? [] }
 				.filter { $0.kind != .Town }	// Don't promote towns and region labels
 				.filter { $0.kind != .Region }
 			)
 			
 			var updatedCountry = country
-			updatedCountry.children = belongingRegions
+			updatedCountry.children = belongingProvinces
 			updatedCountry.places = (country.places ?? Set()).union(belongingPlaces)
 			
 			geoCountries[key] = updatedCountry
 			
-			remainingRegions.subtract(belongingRegions)
+			remainingProvinces.subtract(belongingProvinces)
 			
-			if (numRegions > 0) {
-				report(1.0 - (Double(remainingRegions.count) / Double(numRegions)), country.name, false)
+			if (numProvinces > 0) {
+				report(1.0 - (Double(remainingProvinces.count) / Double(numProvinces)), country.name, false)
 			}
 		}
-		report(1.0, "Collected \(numRegions - remainingRegions.count) regions into \(geoCountries.count) countries", true)
+		report(1.0, "Collected \(numProvinces - remainingProvinces.count) provinces into \(geoCountries.count) countries", true)
 		
 		// Collect countries into their continents
 		var remainingCountries = Set(geoCountries.values)
@@ -90,16 +90,16 @@ class OperationFixupHierarchy : Operation {
 		report(1.0, "Assembled completed world.", true)
 		print("             - Continent regions:  \(continentList.count)")
 		print("             - Country regions:  \(countryList.count)")
-		print("             - Province regions: \(regionList.count)")
+		print("             - Province regions: \(provinceList.count)")
 		
-		if !remainingRegions.isEmpty {
+		if !remainingCountries.isEmpty {
 			print("Remaining countries:")
 			print(remainingCountries.map { "\($0.name) - \($0.continentKey)" })
 		}
 
-		if !remainingRegions.isEmpty {
-			print("Remaining regions:")
-			print(remainingRegions.map { "\($0.name) - \($0.countryKey)" })
+		if !remainingProvinces.isEmpty {
+			print("Remaining provinces:")
+			print(remainingProvinces.map { "\($0.name) - \($0.countryKey)" })
 		}
 		
 		print("\n")

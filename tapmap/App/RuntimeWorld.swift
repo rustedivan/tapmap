@@ -10,12 +10,12 @@ import Foundation
 
 typealias GeoContinentMap = [RegionHash : GeoContinent]
 typealias GeoCountryMap = [RegionHash : GeoCountry]
-typealias GeoRegionMap = [RegionHash : GeoRegion]
+typealias GeoProvinceMap = [RegionHash : GeoProvince]
 
 class RuntimeWorld {
 	let allContinents: GeoContinentMap
 	let allCountries: GeoCountryMap
-	let allRegions: GeoRegionMap
+	let allProvinces: GeoProvinceMap
 	let geoWorld: GeoWorld
 	
 	init(withGeoWorld world: GeoWorld) {
@@ -27,8 +27,8 @@ class RuntimeWorld {
 		let countryList = continentList.flatMap { $0.children }
 		allCountries = Dictionary(uniqueKeysWithValues: countryList.map { ($0.geographyId.hashed, $0) })
 		
-		let regionList = countryList.flatMap { $0.children }
-		allRegions = Dictionary(uniqueKeysWithValues: regionList.map { ($0.geographyId.hashed, $0) })
+		let provinceList = countryList.flatMap { $0.children }
+		allProvinces = Dictionary(uniqueKeysWithValues: provinceList.map { ($0.geographyId.hashed, $0) })
 	}
 	
 	// $ Recreating availability lists on every call is not great.
@@ -42,9 +42,9 @@ class RuntimeWorld {
 		return allCountries.filter { user.availableCountries.contains($0.key) }
 	}}
 	
-	var availableRegions: GeoRegionMap { get {
+	var availableProvinces: GeoProvinceMap { get {
 		let user = AppDelegate.sharedUserState
-		return allRegions.filter { user.availableRegions.contains($0.key) }
+		return allProvinces.filter { user.availableProvinces.contains($0.key) }
 	}}
 	
 	// $ Likewise, these visibility filters could be recreated at the end of frame or zoom
@@ -58,8 +58,8 @@ class RuntimeWorld {
 		return availableCountries.filter { ui.visibleRegionHashes.contains($0.key) }
 	}}
 	
-	var visibleRegions: GeoRegionMap { get {
+	var visibleProvinces: GeoProvinceMap { get {
 		let ui = AppDelegate.sharedUIState
-		return availableRegions.filter { ui.visibleRegionHashes.contains($0.key) }
+		return availableProvinces.filter { ui.visibleRegionHashes.contains($0.key) }
 	}}
 }

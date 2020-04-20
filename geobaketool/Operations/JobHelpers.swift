@@ -13,7 +13,7 @@ struct ToolGeoFeature : Equatable, Hashable, Codable {
 	enum Level: String, Codable {
 		case Continent = "continent"
 		case Country = "country"
-		case Region = "region"
+		case Province = "province"
 	}
 	typealias GeoStringProperties = [String : String]
 	typealias GeoValueProperties = [String : Double]
@@ -58,7 +58,7 @@ struct ToolGeoFeature : Equatable, Hashable, Codable {
 		switch level {
 		case .Continent: parent = "Earth"
 		case .Country: parent = continentKey
-		case .Region: parent = countryKey
+		case .Province: parent = countryKey
 		}
 		return RegionId(parent, level.rawValue, name)
 	}

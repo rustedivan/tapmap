@@ -33,7 +33,7 @@ class OperationAssembleGroups : Operation {
 		
 		print("Assembling parts into groups (\(targetLevel.rawValue))")
 		var partGroups = [String : Set<ToolGeoFeature>]()
-		for (key, part) in input {
+		for (_, part) in input {
 			let partKey = (targetLevel == ToolGeoFeature.Level.Continent) ? part.continentKey : part.countryKey
 			if partGroups[partKey] == nil {
 				partGroups[partKey] = []

@@ -118,13 +118,13 @@ protocol GeoNode : GeoIdentifiable {
 }
 
 
-struct GeoRegion : GeoIdentifiable, GeoPlaceContainer, Codable, Equatable {
+struct GeoProvince : GeoIdentifiable, GeoPlaceContainer, Codable, Equatable {
 	let name: String
 	let places: Set<GeoPlace>
 	let geographyId: RegionId
 	let aabb: Aabb
 	
-	public static func == (lhs: GeoRegion, rhs: GeoRegion) -> Bool {
+	public static func == (lhs: GeoProvince, rhs: GeoProvince) -> Bool {
 		return lhs.name == rhs.name && lhs.aabb.midpoint == rhs.aabb.midpoint
 	}
 	
@@ -134,9 +134,9 @@ struct GeoRegion : GeoIdentifiable, GeoPlaceContainer, Codable, Equatable {
 }
 
 struct GeoCountry : GeoNode, GeoPlaceContainer, Codable, Equatable {
-	typealias SubType = GeoRegion
+	typealias SubType = GeoProvince
 	let name: String
-	let children: Set<GeoRegion>
+	let children: Set<GeoProvince>
 	let places: Set<GeoPlace>
 	let geographyId: RegionId
 	let aabb: Aabb

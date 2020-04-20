@@ -32,14 +32,14 @@ func reshapeGeometry(params: ArraySlice<String>) throws {
 	guard let countryFile = (shapeFiles.first { $0.absoluteString.contains("admin_0") }) else {
 		throw GeoReshapePipelineError.missingShapeFile(level: "admin_0")
 	}
-	guard let regionFile = (shapeFiles.first { $0.absoluteString.contains("admin_1") }) else {
+	guard let provinceFile = (shapeFiles.first { $0.absoluteString.contains("admin_1") }) else {
 		throw GeoReshapePipelineError.missingShapeFile(level: "admin_1")
 	}
 	
 	// Reshape into each LOD level
 	for (lod, s) in lodLevels.enumerated() {
 		try reshapeFile(input: countryFile, strength: s, method: method, output: "\(config.reshapedCountriesFilename)-\(lod).json")
-		try reshapeFile(input: regionFile, strength: s, method: method, output: "\(config.reshapedRegionsFilename!)-\(lod).json")
+		try reshapeFile(input: provinceFile, strength: s, method: method, output: "\(config.reshapedProvincesFilename!)-\(lod).json")
 	}
 }
 

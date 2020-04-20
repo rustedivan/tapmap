@@ -51,16 +51,16 @@ func bakeGeometry() throws {
 
 	let baseLod = 0
 	print("Unarchiving tessellations at LOD\(baseLod)")
-	let tessellatedRegions = try unarchiveTessellations(from: "regions", lod: baseLod)
+	let tessellatedProvinces = try unarchiveTessellations(from: "provinces", lod: baseLod)
 	let tessellatedCountries = try unarchiveTessellations(from: "countries", lod: baseLod)
 	let tessellatedContinents = try unarchiveTessellations(from: "continents", lod: baseLod)
 	
-	let placeDistributionJob = OperationDistributePlaces(regions: tessellatedRegions,
+	let placeDistributionJob = OperationDistributePlaces(regions: tessellatedProvinces,
 																											 places: cities,
 																											 reporter: reportLoad)
 	placeDistributionJob.start()
 	
-	guard let tessellatedRegionsWithPlaces = placeDistributionJob.output else {
+	guard let tessellatedProvincesWithPlaces = placeDistributionJob.output else {
 		print("Place distribution into regions failed.")
 		return
 	}
@@ -68,14 +68,14 @@ func bakeGeometry() throws {
 	// MARK: Label regions
 	let continentLabelJob = OperationFitLabels(features: tessellatedContinents, reporter: reportLoad)
 	let countryLabelJob = OperationFitLabels(features: tessellatedCountries, reporter: reportLoad)
-	let regionLabelJob = OperationFitLabels(features: tessellatedRegionsWithPlaces, reporter: reportLoad)
+	let provinceLabelJob = OperationFitLabels(features: tessellatedProvincesWithPlaces, reporter: reportLoad)
 	
-	bakeQueue.addOperations([continentLabelJob, countryLabelJob, regionLabelJob],
+	bakeQueue.addOperations([continentLabelJob, countryLabelJob, provinceLabelJob],
 													waitUntilFinished: true)
 	
 	let labelledContinents = continentLabelJob.output
 	let labelledCountries = countryLabelJob.output
-	let labelledRegions = regionLabelJob.output
+	let labelledProvinces = provinceLabelJob.output
 	
 	// MARK: Add LOD geometry
 	// Load the remaining LODs for their tessellations only
@@ -89,21 +89,21 @@ func bakeGeometry() throws {
 	
 	var loddedContinents = labelledContinents
 	var loddedCountries = labelledCountries
-	var loddedRegions = labelledRegions
+	var loddedProvinces = labelledProvinces
 	let lodCount = tessellationPaths.count / 3 // Round down, only load LODs for which we have all data
 	for geometryLod in 1..<lodCount {
-		let lodRegions = try unarchiveTessellations(from: "regions", lod: geometryLod)
+		let lodProvinces = try unarchiveTessellations(from: "provinces", lod: geometryLod)
 		let lodCountries = try unarchiveTessellations(from: "countries", lod: geometryLod)
 		let lodContinents = try unarchiveTessellations(from: "continents", lod: geometryLod)
 		
 		loddedContinents = addLodLevels(to: loddedContinents, from: lodContinents)
 		loddedCountries = addLodLevels(to: loddedCountries, from: lodCountries)
-		loddedRegions = addLodLevels(to: loddedRegions, from: lodRegions)
+		loddedProvinces = addLodLevels(to: loddedProvinces, from: lodProvinces)
 	}
 	
 	let fixupJob = OperationFixupHierarchy(continentCollection: loddedContinents,
 																				 countryCollection: loddedCountries,
-																				 regionCollection: loddedRegions,
+																				 provinceCollection: loddedProvinces,
 																				 reporter: reportLoad)
 	fixupJob.start()
 	

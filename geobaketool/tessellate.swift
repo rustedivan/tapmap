@@ -24,7 +24,7 @@ func tessellateGeometry(params: ArraySlice<String>) throws {
 	}
 	
 	let reshapedCountryPaths = tessellationPaths.filter { $0.absoluteString.contains(config.reshapedCountriesFilename) }
-	let reshapedRegionPaths = tessellationPaths.filter { $0.absoluteString.contains(config.reshapedRegionsFilename!) }
+	let reshapedRegionPaths = tessellationPaths.filter { $0.absoluteString.contains(config.reshapedProvincesFilename!) }
 	let lodSortedCountries = reshapedCountryPaths.sorted { $0.absoluteString < $1.absoluteString }
 	let lodSortedRegions = reshapedRegionPaths.sorted { $0.absoluteString < $1.absoluteString }
 	let filepaths = Array(zip(lodSortedCountries, lodSortedRegions))
@@ -40,7 +40,7 @@ func tessellateGeometry(params: ArraySlice<String>) throws {
 		// MARK: Load JSON source files
 		print("Building geometry for LOD level \(lodLevel)...")
 		let countryParser = try shapefileParser(url: countryFile, type: .Country)
-		let regionParser =  try shapefileParser(url: regionFile, type: .Region)
+		let regionParser =  try shapefileParser(url: regionFile, type: .Province)
 		
 		let workQueue = OperationQueue()
 		workQueue.name = "Json load queue"
@@ -52,7 +52,7 @@ func tessellateGeometry(params: ArraySlice<String>) throws {
 			throw GeoTessellatePipelineError.datasetFailed(dataset: "countries")
 		}
 		guard let loadedRegions = regionParser.output else {
-			throw GeoTessellatePipelineError.datasetFailed(dataset: "regions")
+			throw GeoTessellatePipelineError.datasetFailed(dataset: "provinces")
 		}
 
 		// MARK: Country and continent assembly
@@ -67,7 +67,7 @@ func tessellateGeometry(params: ArraySlice<String>) throws {
 																																							regions: loadedRegions)
 		
 		let archives = [
-			(tessRegions, "regions", lodLevel),
+			(tessRegions, "provinces", lodLevel),
 			(tessCountries, "countries", lodLevel),
 			(tessContinents, "continents", lodLevel)]
 		try _ = archives.map(archiveTessellations)
@@ -109,7 +109,7 @@ func tessellateLodLevel(continents: ToolGeoFeatureMap,
 		throw GeoTessellatePipelineError.tessellationFailed(dataset: "countries")
 	}
 	guard let tessellatedRegions = regionTessJob.output else {
-		throw GeoTessellatePipelineError.tessellationFailed(dataset: "regions")
+		throw GeoTessellatePipelineError.tessellationFailed(dataset: "provinces")
 	}
 	
 	return (tessellatedContinents, tessellatedCountries, tessellatedRegions)

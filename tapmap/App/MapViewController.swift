@@ -82,10 +82,10 @@ class MapViewController: GLKViewController, GLKViewControllerDelegate {
 		regionRenderer = RegionRenderer()
 		poiRenderer = PoiRenderer(withVisibleContinents: world.availableContinents,
 															countries: world.availableCountries,
-															regions: world.availableRegions)
+															provinces: world.availableProvinces)
 		labelView.buildPoiPrimitives(withVisibleContinents: world.availableContinents,
 																 countries: world.availableCountries,
-																 regions: world.availableRegions)
+																 provinces: world.availableProvinces)
 		poiRenderer.updateZoomThreshold(viewZoom: Float(scrollView!.zoomScale))
 		effectRenderer = EffectRenderer()
 		selectionRenderer = SelectionRenderer()
@@ -122,7 +122,7 @@ class MapViewController: GLKViewController, GLKViewControllerDelegate {
 			// Filter out sets of closed, visible regions that contain the tap
 			let candidateContinents = Set(world.visibleContinents.filter { boxContains($0.value.aabb, tapPoint) }.values)
 			let candidateCountries = Set(world.visibleCountries.filter { boxContains($0.value.aabb, tapPoint) }.values)
-			let candidateRegions = Set(world.visibleRegions.filter { boxContains($0.value.aabb, tapPoint) }.values)
+			let candidateRegions = Set(world.visibleProvinces.filter { boxContains($0.value.aabb, tapPoint) }.values)
 
 			if let hitHash = pickFromTessellations(p: tapPoint, candidates: candidateContinents) {
 				let hitContinent = world.availableContinents[hitHash]!
@@ -135,7 +135,7 @@ class MapViewController: GLKViewController, GLKViewControllerDelegate {
 					processVisit(of: hitCountry, user: userState, ui: uiState)
 				}
 			} else if let hitHash = pickFromTessellations(p: tapPoint, candidates: candidateRegions) {
-				let hitRegion = world.availableRegions[hitHash]!
+				let hitRegion = world.availableProvinces[hitHash]!
 				_ = processSelection(of: hitRegion, user: userState, ui: uiState)
 			} else {
 				uiState.clearSelection()

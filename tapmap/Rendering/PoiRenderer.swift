@@ -70,7 +70,7 @@ class PoiRenderer {
 	
 	init?(withVisibleContinents continents: GeoContinentMap,
 				countries: GeoCountryMap,
-				regions: GeoRegionMap) {
+				provinces: GeoProvinceMap) {
 		poiProgram = loadShaders(shaderName: "PoiShader")
 		guard poiProgram != 0 else {
 			print("Failed to load POI shaders")
@@ -84,9 +84,9 @@ class PoiRenderer {
 		
 		let visibleContinentPoiPlanes = continents.flatMap { $0.value.poiRenderPlanes() }
 		let visibleCountryPoiPlanes = countries.flatMap { $0.value.poiRenderPlanes() }
-		let visibleRegionPoiPlanes = regions.flatMap { $0.value.poiRenderPlanes() }
+		let visibleProvincePoiPlanes = provinces.flatMap { $0.value.poiRenderPlanes() }
 		
-		poiPlanePrimitives = visibleContinentPoiPlanes + visibleCountryPoiPlanes + visibleRegionPoiPlanes
+		poiPlanePrimitives = visibleContinentPoiPlanes + visibleCountryPoiPlanes + visibleProvincePoiPlanes
 	}
 	
 	deinit {
