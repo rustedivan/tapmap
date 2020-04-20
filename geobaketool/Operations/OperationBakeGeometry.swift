@@ -9,13 +9,13 @@
 import Foundation
 
 class OperationBakeGeometry : Operation {
-	let input : Set<ToolGeoFeature>
+	let input : ToolGeoFeatureMap
 	let lodCount: Int
 	let saveUrl : URL
 	let report : ProgressReport
 	let reportError : ErrorReport
 	
-	init(world worldToBake: Set<ToolGeoFeature>,
+	init(world worldToBake: ToolGeoFeatureMap,
 			 lodCount lods: Int,
 			 saveUrl url: URL,
 	     reporter: @escaping ProgressReport,
@@ -86,11 +86,11 @@ class OperationBakeGeometry : Operation {
 												dataOffset: dataOffset, dataSize: dataSize)
 	}
 	
-	func buildWorld(from toolWorld: Set<ToolGeoFeature>) -> GeoWorld {
+	func buildWorld(from toolWorld: ToolGeoFeatureMap) -> GeoWorld {
 		var worldResult = Set<GeoContinent>()
 		
 		// Build continents
-		for continent in toolWorld {
+		for (key, continent) in toolWorld {
 			guard let continentTessellation = continent.tessellations.first else { // Use LOD0 for picking AABBS
 				print("\(continent.name) has no tessellation - skipping...")
 				continue
@@ -157,7 +157,7 @@ class OperationBakeGeometry : Operation {
 		return worldQuadTree
 	}
 	
-	func buildTessellationTable(from toolWorld: Set<ToolGeoFeature>, lodCount: Int) -> ChunkTable {
+	func buildTessellationTable(from toolWorld: ToolGeoFeatureMap, lodCount: Int) -> ChunkTable {
 		let chunkTable = ChunkTable(withLodCount: lodCount)
 
 		for lodLevel in stride(from: lodCount - 1, through: 0, by: -1) {	// Insert cheap LODs (high number) before heavy LODs (0)
@@ -165,8 +165,8 @@ class OperationBakeGeometry : Operation {
 			var countryTessellations: [(String, GeoTessellation)] = []
 			var regionTessellations: [(String, GeoTessellation)] = []
 			
-			continentTessellations.append(contentsOf: toolWorld.map { ($0.geographyId.key, $0.tessellations[lodLevel]) })
-			for continent in toolWorld {
+			continentTessellations.append(contentsOf: toolWorld.values.map { ($0.geographyId.key, $0.tessellations[lodLevel]) })
+			for (_, continent) in toolWorld {
 				let countries = continent.children ?? []
 				countryTessellations.append(contentsOf: countries.map { ($0.geographyId.key, $0.tessellations[lodLevel]) })
 				for country in continent.children ?? [] {

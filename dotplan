@@ -1,9 +1,10 @@
 ROAD TO FINAL
 
 # Master branch pickups after merging
+√ make type for baked geometry hash
+√ fix the O(nn) lookup in the LOD baker
 - rename L3 regions to provinces (continent, country, province)
 - city regions seem to be holes in continents and countries
-- make type for baked geometry hash
 - fall back to rendering worse LOD instead of missing
 - only give continent outlines to the largest poly (sort polys by area in tessellation step and only outline the first poly's exterior ring)
 - fix comments in RuntimeWorld

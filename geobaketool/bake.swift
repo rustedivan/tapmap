@@ -125,26 +125,25 @@ func bakeGeometry() throws {
 	print("Wrote world-file to \(outputUrl.path)")
 }
 
-func addLodLevels(to targets: Set<ToolGeoFeature>, from sources: Set<ToolGeoFeature>) -> Set<ToolGeoFeature> {
-	var out = Set<ToolGeoFeature>()
-	for var target in targets {
-		let regionHash = target.geographyId
-		guard let lodRegionIdx = sources.firstIndex(where: { $0.geographyId.hashed == regionHash.hashed }) else {
+func addLodLevels(to targets: ToolGeoFeatureMap, from sources: ToolGeoFeatureMap) -> ToolGeoFeatureMap {
+	var out = ToolGeoFeatureMap()
+	for (key, var target) in targets {
+		guard let sourceFeature = sources[target.geographyId.hashed] else {
 			print("Could not find LOD match for \(target.name)")
 			continue
 		}
 
-		let lodTessellation = sources[lodRegionIdx].tessellations.first!
+		let lodTessellation = sourceFeature.tessellations.first!
 		target.tessellations.append(lodTessellation)
-		out.insert(target)
+		out[key] = target
 	}
 	return out
 }
 
-func unarchiveTessellations(from input: String, lod: Int) throws -> Set<ToolGeoFeature> {
+func unarchiveTessellations(from input: String, lod: Int) throws -> ToolGeoFeatureMap {
 	print("Unarchiving tessellations for \(input) @ LOD\(lod)")
 	let fileInUrl = PipelineConfig.shared.sourceGeometryUrl.appendingPathComponent("\(input)-\(lod).tessarchive")
 	let archive = NSData(contentsOf: fileInUrl)!
-	let tessellations = try PropertyListDecoder().decode(Set<ToolGeoFeature>.self, from: archive as Data)
+	let tessellations = try PropertyListDecoder().decode(ToolGeoFeatureMap.self, from: archive as Data)
 	return tessellations
 }

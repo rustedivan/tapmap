@@ -10,11 +10,11 @@ import Foundation
 
 class OperationDistributePlaces : Operation {
 	let report : ProgressReport
-	let input: Set<ToolGeoFeature>
+	let input: ToolGeoFeatureMap
 	let places: GeoPlaceCollection
-	var output: Set<ToolGeoFeature>?
+	var output: ToolGeoFeatureMap?
 	
-	init(regions _regions: Set<ToolGeoFeature>, places _places: GeoPlaceCollection, reporter: @escaping ProgressReport) {
+	init(regions _regions: ToolGeoFeatureMap, places _places: GeoPlaceCollection, reporter: @escaping ProgressReport) {
 		input = _regions
 		places = _places
 		report = reporter
@@ -27,9 +27,9 @@ class OperationDistributePlaces : Operation {
 		GeometryCounters.begin()
 		
 		var remainingPlaces = Set<GeoPlace>(places)
-		var updatedFeatures = Set<ToolGeoFeature>()
+		var updatedFeatures = ToolGeoFeatureMap()
 		let numPlaces = remainingPlaces.count
-		for region in input {
+		for (key, region) in input {
 			guard let regionTessellation = region.tessellations.first else {	// Use best LOD to place POIs
 				print("Missing tessellation in \(region.name)")
 				continue
@@ -47,7 +47,7 @@ class OperationDistributePlaces : Operation {
 			
 			var updatedFeature = region
 			updatedFeature.places = belongingPlaces
-			updatedFeatures.insert(updatedFeature)
+			updatedFeatures[key] = updatedFeature
 			
 			remainingPlaces = remainingPlaces.subtracting(belongingPlaces)
 			

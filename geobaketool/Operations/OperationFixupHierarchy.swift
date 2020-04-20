@@ -9,16 +9,16 @@
 import Foundation
 
 class OperationFixupHierarchy : Operation {
-	let continentList : Set<ToolGeoFeature>
-	let countryList : Set<ToolGeoFeature>
-	let regionList : Set<ToolGeoFeature>
+	let continentList : ToolGeoFeatureMap
+	let countryList : ToolGeoFeatureMap
+	let regionList : ToolGeoFeatureMap
 	
-	var output : Set<ToolGeoFeature>?
+	var output : ToolGeoFeatureMap?
 	let report : ProgressReport
 	
-	init(continentCollection: Set<ToolGeoFeature>,
-			 countryCollection: Set<ToolGeoFeature>,
-			 regionCollection: Set<ToolGeoFeature>,
+	init(continentCollection: ToolGeoFeatureMap,
+			 countryCollection: ToolGeoFeatureMap,
+			 regionCollection: ToolGeoFeatureMap,
 			 reporter: @escaping ProgressReport) {
 		
 		continentList = continentCollection
@@ -26,7 +26,7 @@ class OperationFixupHierarchy : Operation {
 		regionList = regionCollection
 		report = reporter
 		
-		output = []
+		output = [:]
 		
 		super.init()
 	}
@@ -35,12 +35,12 @@ class OperationFixupHierarchy : Operation {
 		guard !isCancelled else { print("Cancelled before starting"); return }
 
 		// Collect regions into their countries
-		var remainingRegions = regionList
-		var geoCountries = Set<ToolGeoFeature>()
+		var remainingRegions = Set(regionList.values)
+		var geoCountries = ToolGeoFeatureMap()
 		let numRegions = remainingRegions.count
-		for country in countryList {
+		for (key, country) in countryList {
 			// Countries consist of their regions...
-			let belongingRegions = remainingRegions.filter {	$0.countryKey == country.countryKey	}
+			let belongingRegions = remainingRegions.filter { $0.countryKey == country.countryKey }
 			// ...and all the larger places in those regions
 			let belongingPlaces = Set(belongingRegions
 				.flatMap { $0.places ?? [] }
@@ -52,7 +52,7 @@ class OperationFixupHierarchy : Operation {
 			updatedCountry.children = belongingRegions
 			updatedCountry.places = (country.places ?? Set()).union(belongingPlaces)
 			
-			geoCountries.insert(updatedCountry)
+			geoCountries[key] = updatedCountry
 			
 			remainingRegions.subtract(belongingRegions)
 			
@@ -63,10 +63,10 @@ class OperationFixupHierarchy : Operation {
 		report(1.0, "Collected \(numRegions - remainingRegions.count) regions into \(geoCountries.count) countries", true)
 		
 		// Collect countries into their continents
-		var remainingCountries = geoCountries
-		var geoContinents = Set<ToolGeoFeature>()
+		var remainingCountries = Set(geoCountries.values)
+		var geoContinents = ToolGeoFeatureMap()
 		let numCountries = remainingCountries.count
-		for continent in continentList {
+		for (key, continent) in continentList {
 			let belongingCountries = remainingCountries.filter { $0.continentKey == continent.continentKey }
 			let belongingPlaces = Set(belongingCountries
 				.flatMap { $0.places ?? [] }
@@ -76,7 +76,7 @@ class OperationFixupHierarchy : Operation {
 			var updatedContinent = continent
 			updatedContinent.children = belongingCountries
 			updatedContinent.places = (continent.places ?? Set()).union(belongingPlaces)
-			geoContinents.insert(updatedContinent)
+			geoContinents[key] = updatedContinent
 			
 			remainingCountries.subtract(belongingCountries)
 			if (numCountries > 0) {

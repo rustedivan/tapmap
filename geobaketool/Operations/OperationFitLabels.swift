@@ -9,18 +9,18 @@
 import Foundation
 
 class OperationFitLabels : Operation {
-	let labelFeatures : Set<ToolGeoFeature>
+	let input : ToolGeoFeatureMap
 	
-	var output : Set<ToolGeoFeature>
+	var output : ToolGeoFeatureMap
 	let report : ProgressReport
 	
-	init(features: Set<ToolGeoFeature>,
+	init(features: ToolGeoFeatureMap,
 			 reporter: @escaping ProgressReport) {
 		
-		labelFeatures = features
+		input = features
 		report = reporter
 		
-		output = []
+		output = [:]
 		
 		super.init()
 	}
@@ -28,7 +28,7 @@ class OperationFitLabels : Operation {
 	override func main() {
 		guard !isCancelled else { print("Cancelled before starting"); return }
 
-		for feature in labelFeatures {
+		for (key, feature) in input {	// $ Search for "(key," to find all lens fixes
 			let labelCenter = poleOfInaccessibility(feature.polygons)
 			let rank: Int
 			switch feature.level {
@@ -37,7 +37,7 @@ class OperationFitLabels : Operation {
 			case .Region: rank = 2
 			}
 			
-			let regionMarker = GeoPlace(location: labelCenter, name: feature.name, kind: .Region, rank: rank)
+			let regionMarker = GeoPlace(location: labelCenter, name: feature.name, kind: .Region, rank: rank)	// $ no need to lens stuff
 			let editedPlaces = (feature.places ?? Set()).union([regionMarker])
 			let updatedFeature = ToolGeoFeature(level: feature.level,
 																					polygons: feature.polygons,
@@ -46,10 +46,10 @@ class OperationFitLabels : Operation {
 																					children: feature.children,
 																					stringProperties: feature.stringProperties,
 																					valueProperties: feature.valueProperties)
-			output.insert(updatedFeature)
+			output[key] = updatedFeature
 			if (output.count > 0) {
 				let reportLine = "\(feature.name) labelled"
-				report((Double(output.count) / Double(labelFeatures.count)), reportLine, false)
+				report((Double(output.count) / Double(input.count)), reportLine, false)
 			}
 		}
 	}
