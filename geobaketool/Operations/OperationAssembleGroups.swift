@@ -9,13 +9,13 @@
 import Foundation
 
 class OperationAssembleGroups : Operation {
-	let input : Set<ToolGeoFeature>
-	var output : Set<ToolGeoFeature>?
+	let input : ToolGeoFeatureMap
+	var output : ToolGeoFeatureMap?
 	let report : ProgressReport
 	let propertiesMap: [String : ToolGeoFeature.GeoStringProperties]
 	let targetLevel : ToolGeoFeature.Level
 	
-	init(parts: Set<ToolGeoFeature>,
+	init(parts: ToolGeoFeatureMap,
 			 targetLevel: ToolGeoFeature.Level,
 			 properties: [String : ToolGeoFeature.GeoStringProperties],
 			 reporter: @escaping ProgressReport) {
@@ -33,7 +33,7 @@ class OperationAssembleGroups : Operation {
 		
 		print("Assembling parts into groups (\(targetLevel.rawValue))")
 		var partGroups = [String : Set<ToolGeoFeature>]()
-		for part in input {
+		for (key, part) in input {
 			let partKey = (targetLevel == ToolGeoFeature.Level.Continent) ? part.continentKey : part.countryKey
 			if partGroups[partKey] == nil {
 				partGroups[partKey] = []
@@ -47,7 +47,7 @@ class OperationAssembleGroups : Operation {
 		}
 		
 		print("Building group contours...")
-		var groupFeatures = Set<ToolGeoFeature>()
+		var groupFeatures = ToolGeoFeatureMap()
 		for partList in partGroups {
 			let contourRings = partList.value.flatMap { $0.polygons.map { $0.exteriorRing } }
 			
@@ -74,7 +74,7 @@ class OperationAssembleGroups : Operation {
 																		 children: nil,
 																		 stringProperties: properties,
 																		 valueProperties: [:])
-			groupFeatures.insert(grouped)
+			groupFeatures[grouped.geographyId.hashed] = grouped
 		}
 		
 		output = groupFeatures

@@ -63,3 +63,5 @@ struct ToolGeoFeature : Equatable, Hashable, Codable {
 		return RegionId(parent, level.rawValue, name)
 	}
 }
+
+typealias ToolGeoFeatureMap = [RegionHash : ToolGeoFeature]

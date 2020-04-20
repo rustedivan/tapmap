@@ -56,7 +56,7 @@ func tessellateGeometry(params: ArraySlice<String>) throws {
 		}
 
 		// MARK: Country and continent assembly
-		let countryProperties = Dictionary(loadedCountries.map { ($0.countryKey, $0.stringProperties) },	// Needed to group newly created countries into continents
+		let countryProperties = Dictionary(loadedCountries.values.map { ($0.countryKey, $0.stringProperties) },	// Needed to group newly created countries into continents
 																			 uniquingKeysWith: { (first, _) in first })
 		let countries = assembleGroups(parts: loadedRegions, type: .Country, properties: countryProperties)
 		let continents = assembleGroups(parts: countries, type: .Continent, properties: [:])
@@ -83,17 +83,17 @@ func shapefileParser(url: URL, type: ToolGeoFeature.Level) throws -> OperationPa
 	return parser
 }
 
-func assembleGroups(parts: Set<ToolGeoFeature>,
+func assembleGroups(parts: ToolGeoFeatureMap,
 										type: ToolGeoFeature.Level,
-										properties: [String : ToolGeoFeature.GeoStringProperties]) -> Set<ToolGeoFeature> {
+										properties: [String : ToolGeoFeature.GeoStringProperties]) -> ToolGeoFeatureMap {
 	let assemblyJob = OperationAssembleGroups(parts: parts, targetLevel: type, properties: properties, reporter: reportLoad)
 	assemblyJob.start()
 	return assemblyJob.output!
 }
 
-func tessellateLodLevel(continents: Set<ToolGeoFeature>,
-												countries: Set<ToolGeoFeature>,
-												regions: Set<ToolGeoFeature>) throws -> (Set<ToolGeoFeature>, Set<ToolGeoFeature>, Set<ToolGeoFeature>) {
+func tessellateLodLevel(continents: ToolGeoFeatureMap,
+												countries: ToolGeoFeatureMap,
+												regions: ToolGeoFeatureMap) throws -> (ToolGeoFeatureMap, ToolGeoFeatureMap, ToolGeoFeatureMap) {
 	let geometryQueue = OperationQueue()
 	geometryQueue.name = "Geometry queue"
 	
@@ -115,7 +115,7 @@ func tessellateLodLevel(continents: Set<ToolGeoFeature>,
 	return (tessellatedContinents, tessellatedCountries, tessellatedRegions)
 }
 
-func archiveTessellations(_ tessellations: Set<ToolGeoFeature>, into output: String, lod: Int) throws {
+func archiveTessellations(_ tessellations: ToolGeoFeatureMap, into output: String, lod: Int) throws {
 	let fileOutUrl = PipelineConfig.shared.sourceGeometryUrl.appendingPathComponent("\(output)-\(lod).tessarchive")
 	do {
 		let archive = try PropertyListEncoder().encode(tessellations)

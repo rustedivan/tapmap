@@ -11,12 +11,12 @@ import LibTessSwift
 import simd
 
 class OperationTessellateRegions : Operation {
-	let input : Set<ToolGeoFeature>
-	var output : Set<ToolGeoFeature>?
+	let input : ToolGeoFeatureMap
+	var output : ToolGeoFeatureMap?
 	let report : ProgressReport
 	let reportError : ErrorReport
 	
-	init(_ featuresToTessellate: Set<ToolGeoFeature>, reporter: @escaping ProgressReport, errorReporter: @escaping ErrorReport) {
+	init(_ featuresToTessellate: ToolGeoFeatureMap, reporter: @escaping ProgressReport, errorReporter: @escaping ErrorReport) {
 		input = featuresToTessellate
 		output = input
 		report = reporter
@@ -31,7 +31,7 @@ class OperationTessellateRegions : Operation {
 		
 		let numFeatures = input.count
 		var doneFeatures = 0
-		let tessellationResult = input.compactMap { feature -> ToolGeoFeature? in
+		let tessellationResult = input.values.compactMap { feature -> ToolGeoFeature? in
 			if let tessellation = tessellate(feature) {
 				totalTris += tessellation.vertices.count
 				doneFeatures += 1
@@ -41,7 +41,7 @@ class OperationTessellateRegions : Operation {
 				report(progress, "\(totalTris) triangles @ \(shortName)", false)
 				return ToolGeoFeature(level: feature.level,
 															polygons: feature.polygons,
-															tessellations: [tessellation],
+															tessellations: [tessellation],	// $ Necessary to lens this?
 															places: nil,
 															children: nil,
 															stringProperties: feature.stringProperties,
@@ -52,7 +52,7 @@ class OperationTessellateRegions : Operation {
 			}
 		}
 		
-		output = Set(tessellationResult)
+		output = Dictionary(uniqueKeysWithValues: tessellationResult.map { ($0.geographyId.hashed, $0) })
 		
 		report(1.0, "Tessellated \(totalTris) triangles.", true)
 	}

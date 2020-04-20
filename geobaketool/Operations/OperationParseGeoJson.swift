@@ -13,7 +13,7 @@ class OperationParseGeoJson : Operation {
 	let input : JSON
 	let report : ProgressReport
 	let level : ToolGeoFeature.Level
-	var output : Set<ToolGeoFeature>?
+	var output : ToolGeoFeatureMap?
 
 	init(json _json: JSON, as _level: ToolGeoFeature.Level, reporter: @escaping ProgressReport) {
 		input = _json
@@ -30,22 +30,22 @@ class OperationParseGeoJson : Operation {
 	}
 	
 	fileprivate func parseFeatures(json: JSON,
-																 dataSet: ToolGeoFeature.Level) -> Set<ToolGeoFeature>? {
+																 dataSet: ToolGeoFeature.Level) -> ToolGeoFeatureMap? {
 		guard json["type"] == "FeatureCollection" else {
 			print("Warning: Root node is not multi-feature")
-			return Set<ToolGeoFeature>()	// This is OK.
+			return ToolGeoFeatureMap()	// This is OK.
 		}
 		guard let featureArray = json["features"].array else {
 			print("Error: Did not find the \"features\" array")
 			return nil
 		}
 		
-		var loadedFeatures : Set<ToolGeoFeature> = []
+		var loadedFeatures : ToolGeoFeatureMap = [:]
 		let numFeatures = featureArray.count
 		
 		for featureJson in featureArray {
 			if let loadedFeature = parseFeature(featureJson, into: level) {
-				loadedFeatures.insert(loadedFeature)
+				loadedFeatures[loadedFeature.geographyId.hashed] = loadedFeature
 				report(Double(loadedFeatures.count) / Double(numFeatures), loadedFeature.name, false)
 			}
 		}
