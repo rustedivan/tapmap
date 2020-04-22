@@ -101,9 +101,17 @@ func bakeGeometry() throws {
 		loddedProvinces = addLodLevels(to: loddedProvinces, from: lodProvinces)
 	}
 	
-	let fixupJob = OperationFixupHierarchy(continentCollection: loddedContinents,
-																				 countryCollection: loddedCountries,
-																				 provinceCollection: loddedProvinces,
+	// Filter on pipeline settings before baking into file
+	let continentFilter = PipelineConfig.shared.configArray("bake.continents")
+	let countriesFilter = PipelineConfig.shared.configArray("bake.countries")
+	let provincesFilter = PipelineConfig.shared.configArray("bake.provinces")
+	let filteredContinents = loddedContinents.filter { continentFilter?.contains($0.value.name) ?? true }
+	let filteredCountries = loddedCountries.filter { countriesFilter?.contains($0.value.name) ?? true }
+	let filteredProvinces = loddedProvinces.filter { provincesFilter?.contains($0.value.name) ?? true }
+	
+	let fixupJob = OperationFixupHierarchy(continentCollection: filteredContinents,
+																				 countryCollection: filteredCountries,
+																				 provinceCollection: filteredProvinces,
 																				 reporter: reportLoad)
 	fixupJob.start()
 	
