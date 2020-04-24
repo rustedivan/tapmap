@@ -114,7 +114,7 @@ class OperationBakeGeometry : Operation {
 					
 					let geoRegion = GeoProvince(name: province.name,
 																		places: province.places ?? [],
-																		geographyId: RegionId(province.countryKey, "province", province.name),
+																		geographyId: RegionId(code: province.uniqueCode, "province", province.name),
 																		aabb: regionTessellation.aabb)
 					provinceResult.insert(geoRegion)
 				}
@@ -122,7 +122,7 @@ class OperationBakeGeometry : Operation {
 				let geoCountry = GeoCountry(name: country.name,
 																		children: provinceResult,
 																		places: country.places ?? [],
-																		geographyId: RegionId(country.continentKey, "country", country.name),
+																		geographyId: RegionId(code: country.uniqueCode, "country", country.name),
 																		aabb: countryTessellation.aabb)
 				countryResult.insert(geoCountry)
 			}
@@ -130,7 +130,7 @@ class OperationBakeGeometry : Operation {
 			let geoContinent = GeoContinent(name: continent.name,
 																			children: countryResult,
 																			places: continent.places ?? [],
-																			geographyId: RegionId("Earth", "continent", continent.name),
+																			geographyId: RegionId(code: continent.uniqueCode, "continent", continent.name),
 																			aabb: continentTessellation.aabb)
 			worldResult.insert(geoContinent)
 		}

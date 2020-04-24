@@ -14,8 +14,8 @@ struct RegionId: Codable {
 	let key: String
 	var hashed: Int = 0
 	
-	init(_ parent: String, _ level: String, _ name: String) {
-		let fatKey = "\(parent) \(level) \(name)"
+	init(code: String, _ level: String, _ name: String) {
+		let fatKey = "\(level) \(code) \(name)"
 		key = fatKey.components(separatedBy: .punctuationCharacters).joined(separator: "")
 								.components(separatedBy: .whitespaces).joined(separator: "-")
 								.lowercased()
@@ -171,7 +171,7 @@ struct GeoWorld : GeoNode, Codable {
 	let name: String
 	var aabb : Aabb { return Aabb(loX: -180.0, loY: -85.0, hiX: 180.0, hiY: 85.0) }
 	let children: Set<GeoContinent>
-	let geographyId = RegionId("universe", "planet", "Earth")
+	let geographyId = RegionId(code: "UU00", "planet", "Earth")	// Use "Universe 0" as FIPS code
 	
 	func hash(into hasher: inout Hasher) {
 		hasher.combine(geographyId.key)

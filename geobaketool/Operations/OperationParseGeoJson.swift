@@ -40,17 +40,21 @@ class OperationParseGeoJson : Operation {
 			return nil
 		}
 		
-		var loadedFeatures : ToolGeoFeatureMap = [:]
 		let numFeatures = featureArray.count
-		
-		for featureJson in featureArray {
-			if let loadedFeature = parseFeature(featureJson, into: level) {
-				loadedFeatures[loadedFeature.geographyId.hashed] = loadedFeature
-				report(Double(loadedFeatures.count) / Double(numFeatures), loadedFeature.name, false)
+		var parseCount = 0
+		let parsedFeatures = featureArray.compactMap { (featureJson) -> (RegionHash, ToolGeoFeature)? in
+			guard let f = parseFeature(featureJson, into: level) else {
+				return nil
 			}
+			report(Double(parseCount) / Double(numFeatures), f.name, false)
+			parseCount += 1
+			return (f.geographyId.hashed, f)
 		}
 		
-		return loadedFeatures
+		return ToolGeoFeatureMap(parsedFeatures) { (lhs, rhs) -> ToolGeoFeature in
+			print("Key collision between \(lhs.geographyId.key) and \(rhs.geographyId.key)")
+			return lhs
+		}
 	}
 	
 	fileprivate func parseFeature(_ json: JSON, into level: ToolGeoFeature.Level) -> ToolGeoFeature? {
