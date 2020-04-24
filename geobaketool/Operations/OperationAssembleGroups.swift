@@ -49,16 +49,16 @@ class OperationAssembleGroups : Operation {
 		print("Building group contours...")
 		var groupFeatures = ToolGeoFeatureMap()
 		for partList in partGroups {
-			let contourRings = partList.value.flatMap { $0.polygons.map { $0.exteriorRing } }
-			
+			let contourRings = partList.value.flatMap { $0.polygons.flatMap { [$0.exteriorRing] + $0.interiorRings } }
+
 			let groupRings = buildContourOf(rings: contourRings, report: report, partList.key)
 			print("Collected \(contourRings.count) part rings into \(groupRings.count) group rings.")
-			let geometry = groupRings.map { Polygon(exteriorRing: $0, interiorRings: []) }
+			let geometry = groupRings.map { Polygon(exteriorRing: $0, interiorRings: []) }	// $ OK, is this a problem?
 			
 			let properties: ToolGeoFeature.GeoStringProperties
 			if targetLevel == .Country {
 				guard let partProperties = propertiesMap[partList.key] else {
-					print("Region \(partList.key) does not belong to any country. Skipping...")
+					print("Province \(partList.key) does not belong to any country. Skipping...")
 					continue
 				}
 				properties = partProperties
