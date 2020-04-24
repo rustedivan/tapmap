@@ -3,12 +3,13 @@ ROAD TO FINAL
 # Master branch pickups after merging
 √ make type for baked geometry hash
 √ fix the O(nn) lookup in the LOD baker
-- rename L3 regions to provinces (continent, country, province)
-- city regions seem to be holes in continents and countries
+√ rename L3 regions to provinces (continent, country, province)
+√ city regions seem to be holes in continents and countries
 - fall back to rendering worse LOD instead of missing
 - only give continent outlines to the largest poly (sort polys by area in tessellation step and only outline the first poly's exterior ring)
 - fix comments in RuntimeWorld
 - borders should ramp between min/max screenspace width, not fixed regardless of zoom
+- move pole of inaccessibility calc to tessellation step as visualCenter, use for label and opening effect
 
 # Ocean rendering
 - pale bathygraphic map
@@ -451,9 +452,9 @@ Left to do:
 -- that is, geoWorld is the source data, and the dictionary is a userstate cache
 -- worldTree should be renamed worldQuadTree, it's not the most important source
 -- visibleRegions should be visibleRegionHashes, it's just the hashes of currently rendered regions
--- the new data source is availableRegions -> Int:GeoIdentifiable
+-- the new data source is availableProvinces -> Int:GeoIdentifiable
 --- IFF it is possible to still cast GeoIdentifiables to PlaceContainers and GeoTessellations
---- Because it it necessary to query against availableRegions and pull out poi lists and render primitives
+--- Because it it necessary to query against availableProvinces and pull out poi lists and render primitives
 --- after all this, MapRenderer doesn't have to do the tree traversal to init the renderPrimitives list!
 - point query
 -- spearfish quadtree nodes from worldTree.visibleHashes
