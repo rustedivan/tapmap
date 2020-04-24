@@ -51,20 +51,20 @@ func tessellateGeometry(params: ArraySlice<String>) throws {
 		guard let loadedCountries = countryParser.output else {
 			throw GeoTessellatePipelineError.datasetFailed(dataset: "countries")
 		}
-		guard let loadedRegions = regionParser.output else {
+		guard let loadedProvinces = regionParser.output else {
 			throw GeoTessellatePipelineError.datasetFailed(dataset: "provinces")
 		}
-
+		
 		// MARK: Country and continent assembly
 		let countryProperties = Dictionary(loadedCountries.values.map { ($0.countryKey, $0.stringProperties) },	// Needed to group newly created countries into continents
 																			 uniquingKeysWith: { (first, _) in first })
-		let countries = assembleGroups(parts: loadedRegions, type: .Country, properties: countryProperties)
+		let countries = assembleGroups(parts: loadedProvinces, type: .Country, properties: countryProperties)
 		let continents = assembleGroups(parts: countries, type: .Continent, properties: [:])
 
 		// MARK: Tessellate geometry
 		let (tessContinents, tessCountries, tessRegions) = try tessellateLodLevel(continents: continents,
 																																							countries: countries,
-																																							regions: loadedRegions)
+																																							regions: loadedProvinces)
 		
 		let archives = [
 			(tessRegions, "provinces", lodLevel),
