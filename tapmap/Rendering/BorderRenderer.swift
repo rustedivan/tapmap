@@ -63,7 +63,7 @@ class BorderRenderer {
 					continue
 				}
 				
-				if let tessellation = streamer.tessellation(for: borderHash, atLod: lodLevel) {
+				if let tessellation = streamer.tessellation(for: borderHash, atLod: lodLevel, streamIfMissing: true) {
 					pendingBorders.insert(loddedBorderHash)
 					borderQueue.async {
 						let innerWidth: Float
@@ -96,7 +96,6 @@ class BorderRenderer {
 		
 		if !borderLodMiss && actualBorderLod != streamer.wantedLodLevel {
 			actualBorderLod = streamer.wantedLodLevel
-			print("Border renderer switched to LOD\(actualBorderLod)")
 		}
 	}
 	

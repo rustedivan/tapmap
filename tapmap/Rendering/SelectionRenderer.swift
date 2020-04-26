@@ -10,10 +10,12 @@ import OpenGLES
 import GLKit
 
 class SelectionRenderer {
-	var outlinePrimitive: OutlineRenderPrimitive?
 	let outlineProgram: GLuint
 	let outlineUniforms : (modelViewMatrix: GLint, color: GLint, width: GLint)
+	
+	var outlinePrimitive: OutlineRenderPrimitive?
 	var outlineWidth: Float
+	var lodLevel: Int
 	
 	init?() {
 		outlineWidth = 0.0
@@ -24,6 +26,7 @@ class SelectionRenderer {
 			return nil
 		}
 		
+		lodLevel = GeometryStreamer.shared.wantedLodLevel
 		outlineUniforms.modelViewMatrix = glGetUniformLocation(outlineProgram, "modelViewProjectionMatrix")
 		outlineUniforms.color = glGetUniformLocation(outlineProgram, "edgeColor")
 		outlineUniforms.width = glGetUniformLocation(outlineProgram, "edgeWidth")
@@ -44,7 +47,7 @@ class SelectionRenderer {
 		let outlineGeometry: RegionContours = countourVertices.map(thinOutline)
 		
 		outlinePrimitive = OutlineRenderPrimitive(contours: outlineGeometry,
-																							ownerHash: 0,
+																							ownerHash: regionHash,
 																							debugName: "Selection contours")
 	}
 	
@@ -54,6 +57,11 @@ class SelectionRenderer {
 	
 	func updateStyle(zoomLevel: Float) {
 		outlineWidth = 0.2 / zoomLevel
+		
+		if let selectionHash = outlinePrimitive?.ownerHash, lodLevel != GeometryStreamer.shared.actualLodLevel {
+			select(regionHash: selectionHash)
+			lodLevel = GeometryStreamer.shared.actualLodLevel
+		}
 	}
 	
 	func renderSelection(inProjection projection: GLKMatrix4) {
