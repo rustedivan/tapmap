@@ -69,16 +69,18 @@ class BorderRenderer {
 						let innerWidth: Float
 						let outerWidth: Float
 						
+						let countourVertices: [[Vertex]]
 						if visibleContinents[borderHash] != nil {
 							innerWidth = 0.1
 							outerWidth = 3.0
+							countourVertices = [(tessellation.contours.first?.vertices ?? [])]
 						} else {
 							innerWidth = 1.0
 							outerWidth = 0.1
+							countourVertices = tessellation.contours.map({$0.vertices})
 						}
 						
 						let borderOutline = { (outline: [Vertex]) in generateClosedOutlineGeometry(outline: outline, innerExtent: innerWidth, outerExtent: outerWidth) }
-						let countourVertices = tessellation.contours.map({$0.vertices})
 						let outlineGeometry: RegionContours = countourVertices.map(borderOutline)
 
 						// Create the render primitive and update book-keeping on the OpenGL/main thread

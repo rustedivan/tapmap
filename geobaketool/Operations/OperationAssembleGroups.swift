@@ -54,6 +54,7 @@ class OperationAssembleGroups : Operation {
 			let groupRings = buildContourOf(rings: contourRings, report: report, partList.key)
 			print("Collected \(contourRings.count) part rings into \(groupRings.count) group rings.")
 			let geometry = groupRings.map { Polygon(exterior: $0, interiors: []) }	// $ OK, is this a problem?
+			let sortedGeometry = geometry.sorted { $0.area < $1.area }
 			
 			let properties: ToolGeoFeature.GeoStringProperties
 			if targetLevel == .Country {
@@ -68,7 +69,7 @@ class OperationAssembleGroups : Operation {
 			}
 			if properties.isEmpty { print("Cannot find properties for \(partList.key)") }
 			let grouped = ToolGeoFeature(level: targetLevel,
-																		 polygons: geometry,
+																		 polygons: sortedGeometry,
 																		 tessellations: [],
 																		 places: nil,
 																		 children: nil,
