@@ -73,6 +73,22 @@ struct VertexRing : Codable {
 struct Polygon: Codable {
 	var exteriorRing: VertexRing
 	var interiorRings: [VertexRing]
+	let area: Double
+	
+	init(exterior: VertexRing, interiors: [VertexRing]) {
+		exteriorRing = exterior
+		interiorRings = interiors
+		
+		var a = 0.0
+		for i in 0..<exteriorRing.vertices.count {
+			let e = Edge(exteriorRing.vertices[i],
+									 exteriorRing.vertices[(i + 1) % exteriorRing.vertices.count])
+			// Shoelace formula
+			let determinant = (e.v0.x * e.v1.y - e.v1.x * e.v0.y)
+			a += determinant
+		}
+		area = a
+	}
 	
 	func totalVertexCount() -> Int {
 			return exteriorRing.vertices.count +
@@ -119,18 +135,12 @@ func tessellate(_ feature: ToolGeoFeature) -> GeoTessellation? {
 		return nil
 	}
 	
-	var contourEdges: [Edge] = []
 	for polygon in feature.polygons {
 		let exterior = polygon.exteriorRing.contour
 		tess.addContour(exterior)
 		let interiorContours = polygon.interiorRings.map{ $0.contour }
 		for interior in interiorContours {
 			tess.addContour(interior)
-		}
-		
-		for i in 0..<polygon.exteriorRing.vertices.count {
-			contourEdges.append(Edge(polygon.exteriorRing.vertices[i],
-															 polygon.exteriorRing.vertices[(i + 1) % polygon.exteriorRing.vertices.count]))
 		}
 	}
 	

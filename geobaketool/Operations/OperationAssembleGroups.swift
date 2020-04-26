@@ -53,7 +53,7 @@ class OperationAssembleGroups : Operation {
 
 			let groupRings = buildContourOf(rings: contourRings, report: report, partList.key)
 			print("Collected \(contourRings.count) part rings into \(groupRings.count) group rings.")
-			let geometry = groupRings.map { Polygon(exteriorRing: $0, interiorRings: []) }	// $ OK, is this a problem?
+			let geometry = groupRings.map { Polygon(exterior: $0, interiors: []) }	// $ OK, is this a problem?
 			
 			let properties: ToolGeoFeature.GeoStringProperties
 			if targetLevel == .Country {

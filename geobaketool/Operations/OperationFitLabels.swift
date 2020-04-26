@@ -170,7 +170,6 @@ func centroidCell(p: Polygon) -> LabellingNode {
 	
 	var cx = 0.0
 	var cy = 0.0
-	var area = 0.0
 	for i in 0..<ring.vertices.count {
 		let e = Edge(ring.vertices[i],
 								 ring.vertices[(i + 1) % ring.vertices.count])
@@ -178,10 +177,9 @@ func centroidCell(p: Polygon) -> LabellingNode {
 		let determinant = (e.v0.x * e.v1.y - e.v1.x * e.v0.y)
 		cx += (e.v0.x + e.v1.x) * determinant
 		cy += (e.v0.y + e.v1.y) * determinant
-		area += determinant
 	}
 	
-	let centroid = Vertex(cx / (6.0 * area), cy / (6.0 * area))
+	let centroid = Vertex(cx / (6.0 * p.area), cy / (6.0 * p.area))
 	
 	return .Empty(bounds: Aabb(loX: centroid.x, loY: centroid.y, hiX: centroid.x, hiY: centroid.y))
 }
