@@ -98,7 +98,7 @@ struct GeoTessellation : Codable {
 	let vertices: [Vertex]
 	let contours: [VertexRing]
 	let aabb: Aabb
-	let midpoint: Vertex
+	let visualCenter: Vertex
 }
 
 protocol GeoIdentifiable : Hashable {

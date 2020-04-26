@@ -52,7 +52,7 @@ class EffectRenderer {
 		let streamer = GeometryStreamer.shared
 		guard let tessellation = streamer.tessellation(for: regionHash, atLod: streamer.actualLodLevel) else { return }
 		guard let primitive = streamer.renderPrimitive(for: regionHash) else { return }
-		runningEffects.append(RegionEffect(primitive: primitive, center: tessellation.midpoint, startTime: Date(), duration: 1.0))
+		runningEffects.append(RegionEffect(primitive: primitive, center: tessellation.visualCenter, startTime: Date(), duration: 1.0))
 	}
 	
 	func updatePrimitives() {

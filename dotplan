@@ -7,10 +7,11 @@ ROAD TO FINAL
 √ city regions seem to be holes in continents and countries
 √ border LOD broken again
 x fall back to rendering worse LOD instead of missing
-- only give continent outlines to the largest poly (sort polys by area in tessellation step and only outline the first poly's exterior ring)
+√ only give continent outlines to the largest poly (sort polys by area in tessellation step and only outline the first poly's exterior ring)
+√ move pole of inaccessibility calc to tessellation step as visualCenter, use for label and opening effect
 - fix comments in RuntimeWorld
 - borders should ramp between min/max screenspace width, not fixed regardless of zoom
-- move pole of inaccessibility calc to tessellation step as visualCenter, use for label and opening effect
+- make runtime setting for the number of outlines to draw for each continent (Africa=2, Asia=5 and so on)
 
 # Ocean rendering
 - pale bathygraphic map
