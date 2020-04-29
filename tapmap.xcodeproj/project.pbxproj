@@ -308,9 +308,9 @@
 		148937EF22B97FDF009278A0 /* App */ = {
 			isa = PBXGroup;
 			children = (
+				148937F222B97FDF009278A0 /* AppDelegate.swift */,
 				148937F022B97FDF009278A0 /* MapViewController.swift */,
 				148937F122B97FDF009278A0 /* UIState.swift */,
-				148937F222B97FDF009278A0 /* AppDelegate.swift */,
 				148937F322B97FDF009278A0 /* UserState.swift */,
 				148937F422B97FDF009278A0 /* Serialization.swift */,
 				146EA269244AF14C009196BC /* RuntimeWorld.swift */,

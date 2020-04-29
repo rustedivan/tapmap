@@ -9,10 +9,15 @@
 import Foundation
 
 class UIState {
-	private var selectedRegionHash: Int = 0
-	var worldQuadTree: WorldTree!								// For spatial lookups
-	var visibleRegionHashes: Set<Int> = Set()		// Cache of currently visible regions
+	private var selectedRegionHash: RegionHash = 0
+	private var worldQuadTree: WorldTree!								// For spatial lookups
+	var visibleRegionHashes: Set<RegionHash> = Set()		// Cache of currently visible regions
+	
 	var delegate: UIStateDelegate!
+	
+	func buildQuadTree(withTree tree: WorldTree) {
+		self.worldQuadTree = tree
+	}
 	
 	func cullWorldTree(focus: Aabb) {
 		// Update region cache

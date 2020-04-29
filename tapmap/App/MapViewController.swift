@@ -36,32 +36,49 @@ class MapViewController: GLKViewController, GLKViewControllerDelegate {
 	// Rendering
 	var modelViewProjectionMatrix: GLKMatrix4 = GLKMatrix4Identity
 	var context: EAGLContext? = nil
-	var geometryStreamer: GeometryStreamer!
+	var geometryStreamer: GeometryStreamer
 	
-	override func viewDidLoad() {
-		super.viewDidLoad()
+	required init?(coder: NSCoder) {
+		let path = Bundle.main.path(forResource: "world", ofType: "geo")!
+		guard let streamer = GeometryStreamer(attachFile: path) else {
+			print("Could not attach geometry streamer to \(path)")
+			return nil
+		}
+		self.geometryStreamer = streamer
+		
+		let geoWorld = geometryStreamer.loadGeoWorld()
+		let worldTree = geometryStreamer.loadWorldTree()
+		world = RuntimeWorld(withGeoWorld: geoWorld)
+		
 		let userState = AppDelegate.sharedUserState
 		let uiState = AppDelegate.sharedUIState
 		
-		let path = Bundle.main.path(forResource: "world", ofType: "geo")!
-		
-		geometryStreamer = GeometryStreamer(attachFile: path)!
-		
-		let geoWorld = geometryStreamer.loadGeoWorld()
-		world = RuntimeWorld(withGeoWorld: geoWorld)
-		uiState.worldQuadTree = geometryStreamer.loadWorldTree()
+		userState.delegate = world
 		userState.buildWorldAvailability(withWorld: world)
+		uiState.delegate = world
+		uiState.buildQuadTree(withTree: worldTree)
 		
-		self.context = EAGLContext(api: .openGLES2)
+		super.init(coder: coder)
+	}
+	
+	override func viewDidLoad() {
+		super.viewDidLoad()
 		
-		if !(self.context != nil) {
+		delegate = self
+		
+		// OpenGL context setup
+		let view = self.view as! GLKView
+		if let newContext = EAGLContext(api: .openGLES2) {
+			self.context = newContext
+			view.context = newContext
+			view.drawableDepthFormat = .format24
+			EAGLContext.setCurrent(newContext)
+		} else {
 			print("Failed to create ES context")
+			exit(1)
 		}
 		
-		let view = self.view as! GLKView
-		view.context = self.context!
-		view.drawableDepthFormat = .format24
-		
+		// Scroll view setup
 		dummyView = UIView(frame: view.frame)
 		scrollView.contentSize = dummyView.frame.size
 		scrollView.addSubview(dummyView)
@@ -76,9 +93,7 @@ class MapViewController: GLKViewController, GLKViewControllerDelegate {
 		scrollView.zoomScale = zoomLimits.0
 		scrollView.maximumZoomScale = zoomLimits.1
 		
-		delegate = self
-		
-		EAGLContext.setCurrent(self.context)
+		// Create renderers
 		regionRenderer = RegionRenderer()
 		poiRenderer = PoiRenderer(withVisibleContinents: world.availableContinents,
 															countries: world.availableCountries,
@@ -90,6 +105,10 @@ class MapViewController: GLKViewController, GLKViewControllerDelegate {
 		effectRenderer = EffectRenderer()
 		selectionRenderer = SelectionRenderer()
 		borderRenderer = BorderRenderer()
+		
+		// Prepare UI for rendering the map
+		AppDelegate.sharedUIState.cullWorldTree(focus: visibleLongLat(viewBounds: view.bounds))
+		needsRender = true
 	}
 	
 	override func didReceiveMemoryWarning() {
@@ -238,10 +257,9 @@ extension MapViewController : UIScrollViewDelegate {
 		if let renderer = poiRenderer {
 			renderer.updateZoomThreshold(viewZoom: zoom)
 		}
-		if let streamer = geometryStreamer {
-			streamer.zoomedTo(zoom)
-		}
-		
+
+		geometryStreamer.zoomedTo(zoom)
+
 		AppDelegate.sharedUIState.cullWorldTree(focus: visibleLongLat(viewBounds: view.bounds))
 		needsRender = true
 	}

@@ -9,9 +9,10 @@ ROAD TO FINAL
 x fall back to rendering worse LOD instead of missing
 √ only give continent outlines to the largest poly (sort polys by area in tessellation step and only outline the first poly's exterior ring)
 √ move pole of inaccessibility calc to tessellation step as visualCenter, use for label and opening effect
-- fix comments in RuntimeWorld
-- borders should ramp between min/max screenspace width, not fixed regardless of zoom
-- make runtime setting for the number of outlines to draw for each continent (Africa=2, Asia=5 and so on)
+√ fix comments in RuntimeWorld
+- runtime setting: borders should ramp between min/max screenspace width, not fixed regardless of zoom
+- runtime setting: number of outlines to draw for each continent (Africa=2, Asia=5 and so on)
+- runtime setting: zoom limits
 
 # Ocean rendering
 - pale bathygraphic map
@@ -152,6 +153,7 @@ Work on branch
 # This is all of May...
 ## Render sprites
 - For POIs
+- is it possible to drop all the custom zoom stuff in favour of MTKView's dirtyrects?
 
 # LOD support
 ## Define reshape settings for LOD levels

@@ -9,14 +9,15 @@
 import Foundation
 
 class UserState {
-	var visitedPlaces: [Int : Bool] = [:]
-	var availableContinents: Set<Int> = []
-	var availableCountries: Set<Int> = []
-	var availableProvinces: Set<Int> = []
+	var visitedPlaces: [RegionHash : Bool] = [:]
+	var availableContinents: Set<RegionHash> = []
+	var availableCountries: Set<RegionHash> = []
+	var availableProvinces: Set<RegionHash> = []
 	
-	var availableSet: Set<Int> {
-		return Set<Int>(availableContinents)
 	var delegate: UserStateDelegate!
+	
+	var availableSet: Set<RegionHash> {
+		return Set<RegionHash>(availableContinents)
 						 .union(availableCountries)
 						 .union(availableProvinces)
 	}
