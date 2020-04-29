@@ -13,9 +13,21 @@ typealias GeoCountryMap = [RegionHash : GeoCountry]
 typealias GeoProvinceMap = [RegionHash : GeoProvince]
 
 class RuntimeWorld {
+	// Complete set
 	let allContinents: GeoContinentMap
 	let allCountries: GeoCountryMap
 	let allProvinces: GeoProvinceMap
+	
+	// Closed set
+	var availableContinents: GeoContinentMap = [:]
+	var availableCountries: GeoCountryMap = [:]
+	var availableProvinces: GeoProvinceMap = [:]
+	
+	// Visible set
+	var visibleContinents: GeoContinentMap = [:]
+	var visibleCountries: GeoCountryMap = [:]
+	var visibleProvinces: GeoProvinceMap = [:]
+	
 	let geoWorld: GeoWorld
 	
 	init(withGeoWorld world: GeoWorld) {
@@ -30,36 +42,19 @@ class RuntimeWorld {
 		let provinceList = countryList.flatMap { $0.children }
 		allProvinces = Dictionary(uniqueKeysWithValues: provinceList.map { ($0.geographyId.hashed, $0) })
 	}
-	
-	// $ Recreating availability lists on every call is not great.
-	var availableContinents: GeoContinentMap { get {
-		let user = AppDelegate.sharedUserState
-		return allContinents.filter { user.availableContinents.contains($0.key) }
-	}}
-	
-	var availableCountries: GeoCountryMap { get {
-		let user = AppDelegate.sharedUserState
-		return allCountries.filter { user.availableCountries.contains($0.key) }
-	}}
-	
-	var availableProvinces: GeoProvinceMap { get {
-		let user = AppDelegate.sharedUserState
-		return allProvinces.filter { user.availableProvinces.contains($0.key) }
-	}}
-	
-	// $ Likewise, these visibility filters could be recreated at the end of frame or zoom
-	var visibleContinents: GeoContinentMap { get {
-		let ui = AppDelegate.sharedUIState
-		return availableContinents.filter { ui.visibleRegionHashes.contains($0.key) }
-	}}
-	
-	var visibleCountries: GeoCountryMap { get {
-		let ui = AppDelegate.sharedUIState
-		return availableCountries.filter { ui.visibleRegionHashes.contains($0.key) }
-	}}
-	
-	var visibleProvinces: GeoProvinceMap { get {
-		let ui = AppDelegate.sharedUIState
-		return availableProvinces.filter { ui.visibleRegionHashes.contains($0.key) }
-	}}
 }
+
+extension RuntimeWorld: UIStateDelegate, UserStateDelegate {
+	func availabilityDidChange(availableSet: Set<RegionHash>) {
+		availableContinents = allContinents.filter { availableSet.contains($0.key) }
+		availableCountries = allCountries.filter { availableSet.contains($0.key) }
+		availableProvinces = allProvinces.filter { availableSet.contains($0.key) }
+	}
+	
+	func visibilityDidChange(visibleSet: Set<RegionHash>) {
+		visibleContinents = availableContinents.filter { visibleSet.contains($0.key) }
+		visibleCountries = availableCountries.filter { visibleSet.contains($0.key) }
+		visibleProvinces = availableProvinces.filter { visibleSet.contains($0.key) }
+	}
+}
+	

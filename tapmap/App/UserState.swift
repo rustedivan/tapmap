@@ -16,6 +16,7 @@ class UserState {
 	
 	var availableSet: Set<Int> {
 		return Set<Int>(availableContinents)
+	var delegate: UserStateDelegate!
 						 .union(availableCountries)
 						 .union(availableProvinces)
 	}
@@ -35,6 +36,8 @@ class UserState {
 		availableContinents = Set(closedContinents.map { $0.geographyId.hashed })
 		availableCountries = Set(closedCountries.map { $0.geographyId.hashed })
 		availableProvinces = Set(closedProvinces.map { $0.geographyId.hashed })
+		
+		delegate.availabilityDidChange(availableSet: availableSet)
 	}
 	
 	func placeVisited<T:GeoIdentifiable>(_ p: T) -> Bool {
@@ -60,9 +63,16 @@ class UserState {
 		default:
 			break
 		}
+		
+		delegate.availabilityDidChange(availableSet: availableSet)
 	}
 	
 	func visitPlace(_ p: GeoProvince) {
 		visitedPlaces[p.geographyId.hashed] = true
 	}
 }
+
+protocol UserStateDelegate {
+	func availabilityDidChange(availableSet: Set<RegionHash>)
+}
+

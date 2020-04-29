@@ -12,10 +12,12 @@ class UIState {
 	private var selectedRegionHash: Int = 0
 	var worldQuadTree: WorldTree!								// For spatial lookups
 	var visibleRegionHashes: Set<Int> = Set()		// Cache of currently visible regions
+	var delegate: UIStateDelegate!
 	
 	func cullWorldTree(focus: Aabb) {
 		// Update region cache
 		visibleRegionHashes = queryWorldTree(focus: focus)
+		delegate.visibilityDidChange(visibleSet: visibleRegionHashes)
 	}
 	
 	func queryWorldTree(focus: Aabb) -> Set<Int> {
@@ -69,4 +71,8 @@ func debugQuadNode(_ node: QuadNode<Int>, at focus: Aabb) {
 		debugQuadNode(bl, at: focus)
 		debugQuadNode(br, at: focus)
 	}
+}
+
+protocol UIStateDelegate {
+	func visibilityDidChange(visibleSet: Set<RegionHash>)
 }
