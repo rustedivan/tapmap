@@ -1,18 +1,32 @@
 ROAD TO FINAL
 
-# Master branch pickups after merging
-√ make type for baked geometry hash
-√ fix the O(nn) lookup in the LOD baker
-√ rename L3 regions to provinces (continent, country, province)
-√ city regions seem to be holes in continents and countries
-√ border LOD broken again
-x fall back to rendering worse LOD instead of missing
-√ only give continent outlines to the largest poly (sort polys by area in tessellation step and only outline the first poly's exterior ring)
-√ move pole of inaccessibility calc to tessellation step as visualCenter, use for label and opening effect
-√ fix comments in RuntimeWorld
-- runtime setting: borders should ramp between min/max screenspace width, not fixed regardless of zoom
-- runtime setting: number of outlines to draw for each continent (Africa=2, Asia=5 and so on)
-- runtime setting: zoom limits
+# Metal rewrite
+## Render passes
+- ocean pass (single texture, color x 2, time, zoom, [position + uv])
+- continent border pass (single texture, color, [position + miter + uv], border width)
+- geography pass (single texture, color, [position + uv], highlight, visited)
+- country border pass (color, [position + miter + uv], highlight, border width)
+- POI render pass (sprite atlas, [position + miter + uv], marker size)
+- effect render pass (color, progress, scaleInPlaceMatrix, [position])
+- selection render pass (color, [position + miter + uv], border width)
+- (label view pass)
+
+## Data formats
+- one uniform block per render pass, they're not going to stay
+	as uniform through the design phase
+- fixed-scale vertex format for borders, markers, selection and opening effect
+- polygon vertex format for geography
+
+## Render primitives
+- outline render primitive (Arrayed +
+- fixed-scale marker render primitive (Indexed + scale vertex) (Maybe just drop the indexed renderer?)
+- region render primitive (Arrayed - maybe cheaper as indexed?)
+- possibly boil this down to IndexedPrimitive with scalable/non-scalabe vertices?
+
+
+
+## Other stuff
+- is it possible to drop all the custom zoom stuff in favour of MTKView's dirtyrects?
 
 # Ocean rendering
 - pale bathygraphic map
@@ -45,6 +59,11 @@ x fall back to rendering worse LOD instead of missing
 - Triangle indices to UInt16
 - Vertices down to Float16
 
+# Runtime tweaking
+- runtime setting: borders should ramp between min/max screenspace width, not fixed regardless of zoom
+- runtime setting: number of outlines to draw for each continent (Africa=2, Asia=5 and so on)
+- runtime setting: zoom limits
+
 # Persistence
 ## Store userstate to user defaults
 ## Store userstate to iCloud
@@ -70,6 +89,17 @@ x fall back to rendering worse LOD instead of missing
 ## Figure out how to handle Clipperton and friends (see "skipping..." in bake log)
 
 ----- ARCHIVE -----
+
+# Master branch pickups after merging
+√ make type for baked geometry hash
+√ fix the O(nn) lookup in the LOD baker
+√ rename L3 regions to provinces (continent, country, province)
+√ city regions seem to be holes in continents and countries
+√ border LOD broken again
+x fall back to rendering worse LOD instead of missing
+√ only give continent outlines to the largest poly (sort polys by area in tessellation step and only outline the first poly's exterior ring)
+√ move pole of inaccessibility calc to tessellation step as visualCenter, use for label and opening effect
+√ fix comments in RuntimeWorld
 
 ## Selection renderer generates outlines from known region "level""
 -√ pass to SelectionRenderer.select(...)
@@ -148,12 +178,6 @@ Work on branch
 -- Maybe a separate queue of region labels?
 ## Fade out these when zooming in
 ## Send label types to zoom view
-
-# Metal rewrite
-# This is all of May...
-## Render sprites
-- For POIs
-- is it possible to drop all the custom zoom stuff in favour of MTKView's dirtyrects?
 
 # LOD support
 ## Define reshape settings for LOD levels
