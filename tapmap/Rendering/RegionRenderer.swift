@@ -18,7 +18,6 @@ struct MapUniforms {
 
 class RegionRenderer {
 	let pipeline: MTLRenderPipelineState
-	var uniformBuffer: MTLBuffer
 	
 	init(withDevice device: MTLDevice, pixelFormat: MTLPixelFormat) {
 		let shaderLib = device.makeDefaultLibrary()!
@@ -33,10 +32,6 @@ class RegionRenderer {
 		} catch let error {
 			fatalError(error.localizedDescription)
 		}
-		
-		var uniforms = MapUniforms(mvpMatrix: simd_float4x4(), color: simd_float4(), highlighted: simd_int1())
-		uniformBuffer = device.makeBuffer(bytes: &uniforms, length: MemoryLayout.stride(ofValue: uniforms), options: .storageModeShared)!
-		uniformBuffer.label = "RegionRenderer uniform block"
 	}
 	
 	func renderWorld(visibleSet: Set<Int>, inProjection projection: simd_float4x4, inEncoder encoder: MTLRenderCommandEncoder) {
@@ -50,9 +45,7 @@ class RegionRenderer {
 		for primitive in renderPrimitives {
 			uniforms.color = SIMD4<Float>(primitive.color.r, primitive.color.g, primitive.color.b, 1.0)
 			uniforms.highlighted = AppDelegate.sharedUIState.selected(primitive.ownerHash) ? 1 : 0
-			uniformBuffer.contents().copyMemory(from: &uniforms, byteCount: MemoryLayout<MapUniforms>.stride)
-
-			encoder.setVertexBuffer(uniformBuffer, offset: 0, index: 1)
+			encoder.setVertexBytes(&uniforms, length: MemoryLayout.stride(ofValue: uniforms), index: 1)
 			render(primitive: primitive, into: encoder)
 		}
 		
