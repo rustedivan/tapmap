@@ -1,6 +1,8 @@
 ROAD TO FINAL
 
 # Metal rewrite
+- target the Apple 1 GPU family (all the way back to iPhone 5S, iPad m3)
+
 ## Render passes
 - ocean pass (single texture, color x 2, time, zoom, [position + uv])
 - continent border pass (single texture, color, [position + miter + uv], border width)
@@ -23,7 +25,14 @@ ROAD TO FINAL
 - region render primitive (Arrayed - maybe cheaper as indexed?)
 - possibly boil this down to IndexedPrimitive with scalable/non-scalabe vertices?
 
+## Parallelism
+- break border, region and POI passes into separate command queues and encode in parallel
+-- if needed, region CQ could be put into a parallel encoder itself, and run as separate jobs
+-- argument buffers seems like a good fit for blasting out all the regions
+--- could ICBs enable encoding all the regions in parallel? (No, only available in later GPU families)
 
+## Modern rendering
+- memoryless attachments?
 
 ## Other stuff
 - is it possible to drop all the custom zoom stuff in favour of MTKView's dirtyrects?
