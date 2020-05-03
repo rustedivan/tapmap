@@ -10,16 +10,17 @@
 using namespace metal;
 
 struct MapUniforms {
-	float4 color;
 	float4x4 modelViewProjectionMatrix;
+	float4 color;
+	int highlighted;
 };
 
 struct Vertex {
-	packed_float2 position;
+	float2 position;
 };
 
 struct VertexOut {
-	float4 computedPosition [[position]];
+	float4 position [[position]];
 	float4 color;
 };
 
@@ -28,7 +29,7 @@ vertex VertexOut flatVertex(const device Vertex* vertexArray [[ buffer(0) ]],
 														unsigned int vid [[ vertex_id ]]) {
 	Vertex v = vertexArray[vid];
 	VertexOut outVertex = VertexOut();
-	outVertex.computedPosition = float4(v.position, 1.0, 1.0);
+	outVertex.position = uniforms->modelViewProjectionMatrix * float4(v.position, 0.0, 1.0);
 	outVertex.color = uniforms->color;
 	return outVertex;
 }

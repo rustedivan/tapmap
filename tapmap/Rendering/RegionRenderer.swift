@@ -31,8 +31,7 @@ class RegionRenderer {
 		do {
 			try pipeline = device.makeRenderPipelineState(descriptor: pipelineDescriptor)
 		} catch let error {
-			print(error)
-			exit(1)
+			fatalError(error.localizedDescription)
 		}
 		
 		var uniforms = MapUniforms(mvpMatrix: simd_float4x4(), color: simd_float4(), highlighted: simd_int1())
@@ -42,6 +41,7 @@ class RegionRenderer {
 	
 	func renderWorld(visibleSet: Set<Int>, inProjection projection: simd_float4x4, inEncoder encoder: MTLRenderCommandEncoder) {
 		encoder.pushDebugGroup("Render world")
+		encoder.setRenderPipelineState(pipeline)
 		// Collect all streamed-in primitives for the currently visible set of non-visited regions
 		let renderPrimitives = visibleSet.compactMap { GeometryStreamer.shared.renderPrimitive(for: $0) }
 		
@@ -50,10 +50,10 @@ class RegionRenderer {
 		for primitive in renderPrimitives {
 			uniforms.color = SIMD4<Float>(primitive.color.r, primitive.color.g, primitive.color.b, 1.0)
 			uniforms.highlighted = AppDelegate.sharedUIState.selected(primitive.ownerHash) ? 1 : 0
-			uniformBuffer.contents().copyMemory(from: &uniforms, byteCount: 1 * MemoryLayout<MapUniforms>.stride)
+			uniformBuffer.contents().copyMemory(from: &uniforms, byteCount: MemoryLayout<MapUniforms>.stride)
 
 			encoder.setVertexBuffer(uniformBuffer, offset: 0, index: 1)
-			render(primitive: primitive)
+			render(primitive: primitive, into: encoder)
 		}
 		
 		encoder.popDebugGroup()

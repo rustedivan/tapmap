@@ -41,9 +41,9 @@ func buildProjectionMatrix(viewSize: CGSize, mapSize: CGSize, centeredOn center:
 	let lngOffset = Float(fittedMapSize.width / 2.0)
 	let latOffset = Float(fittedMapSize.height / 2.0)
 	
-	// Compute the model view matrix for the object rendered with GLKit
 	// (Z = -1.0 to position between the clipping planes)
-	var modelViewMatrix = GLKMatrix4Translate(GLKMatrix4Identity, 0.0, 0.0, -1.0)
+	var modelViewMatrix = GLKMatrix4Translate(GLKMatrix4Identity, 0.0, 0.0, -1.5)
+	
 	
 	// Matrix operations, applied in reverse order
 	// 3: Move to scaled UIScrollView content offset
@@ -55,7 +55,6 @@ func buildProjectionMatrix(viewSize: CGSize, mapSize: CGSize, centeredOn center:
 	
 	let out = GLKMatrix4Multiply(projectionMatrix, modelViewMatrix)
 
-	//	matrix_multiply(<#T##__x: simd_float4x4##simd_float4x4#>, <#T##__y: simd_float4x4##simd_float4x4#>)
 	return simd_float4x4(columns: (SIMD4<Float>(x: out.m00, y: out.m01, z: out.m02, w: out.m03),
 																 SIMD4<Float>(x: out.m10, y: out.m11, z: out.m12, w: out.m13),
 																 SIMD4<Float>(x: out.m20, y: out.m21, z: out.m22, w: out.m23),
