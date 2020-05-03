@@ -24,10 +24,6 @@ class BorderRenderer {
 		borderWidth = 0.0
 		
 		borderProgram = loadShaders(shaderName: "EdgeShader")
-		guard borderProgram != 0 else {
-			print("Failed to load outline shaders")
-			return nil
-		}
 		
 		borderUniforms.modelViewMatrix = glGetUniformLocation(borderProgram, "modelViewProjectionMatrix")
 		borderUniforms.color = glGetUniformLocation(borderProgram, "edgeColor")

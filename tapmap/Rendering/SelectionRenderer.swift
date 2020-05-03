@@ -21,10 +21,6 @@ class SelectionRenderer {
 		outlineWidth = 0.0
 		
 		outlineProgram = loadShaders(shaderName: "EdgeShader")
-		guard outlineProgram != 0 else {
-			print("Failed to load outline shaders")
-			return nil
-		}
 		
 		lodLevel = GeometryStreamer.shared.wantedLodLevel
 		outlineUniforms.modelViewMatrix = glGetUniformLocation(outlineProgram, "modelViewProjectionMatrix")

@@ -29,10 +29,6 @@ class EffectRenderer {
 	
 	init?() {
 		openingProgram = loadShaders(shaderName: "OpeningShader")
-		guard openingProgram != 0 else {
-			print("Failed to load opening shaders")
-			return nil
-		}
 		
 		effectUniforms.modelViewMatrix = glGetUniformLocation(openingProgram, "modelViewProjectionMatrix")
 		effectUniforms.color = glGetUniformLocation(openingProgram, "regionColor")

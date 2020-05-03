@@ -11,14 +11,10 @@ import GLKit
 
 class RegionRenderer {
 	let mapProgram: GLuint
-	let mapUniforms : (modelViewMatrix: GLint, color: GLint, highlighted: GLint, time: GLint)
+	let mapUniforms : (modelViewMatrix: GLint, color: GLint, highlighted: GLint, time: GLint)	// $ pull out to struct instead of tuple
 	
 	init?() {
 		mapProgram = loadShaders(shaderName: "MapShader")
-		guard mapProgram != 0 else {
-			print("Failed to load map shaders")
-			return nil
-		}
 		
 		mapUniforms.modelViewMatrix = glGetUniformLocation(mapProgram, "modelViewProjectionMatrix")
 		mapUniforms.color = glGetUniformLocation(mapProgram, "regionColor")

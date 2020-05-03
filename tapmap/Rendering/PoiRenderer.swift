@@ -72,10 +72,7 @@ class PoiRenderer {
 				countries: GeoCountryMap,
 				provinces: GeoProvinceMap) {
 		poiProgram = loadShaders(shaderName: "PoiShader")
-		guard poiProgram != 0 else {
-			print("Failed to load POI shaders")
-			return nil
-		}
+		
 		poiUniforms.modelViewMatrix = glGetUniformLocation(poiProgram, "modelViewProjectionMatrix")
 		poiUniforms.color = glGetUniformLocation(poiProgram, "poiColor")
 		poiUniforms.rankThreshold = glGetUniformLocation(poiProgram, "rankThreshold")
@@ -133,6 +130,10 @@ class PoiRenderer {
 	}
 	
 	func updateZoomThreshold(viewZoom: Float) {
+		if rankThreshold == viewZoom {
+			return
+		}
+		
 		let oldRankThreshold = rankThreshold
 		rankThreshold = viewZoom
 		

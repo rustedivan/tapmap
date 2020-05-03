@@ -23,12 +23,14 @@ extension UIColor {
 	}
 }
 
+// $ Replace with vertex formats (scaled/non-scaled vertices)
 enum VertexAttribs: GLuint {
 	case position = 1
 	case normal = 2
 	case scalar = 3
 }
 
+// $ just pull shader from the Metal library
 func loadShaders(shaderName: String) -> GLuint {
 	var program: GLuint = 0
 	var vertShader: GLuint = 0

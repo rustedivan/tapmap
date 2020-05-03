@@ -144,10 +144,6 @@ class DebugRenderer {
 	
 	init?() {
 		debugProgram = loadShaders(shaderName: "DebugShader")
-		guard debugProgram != 0 else {
-			print("Failed to load debug shaders")
-			return nil
-		}
 		
 		markerUniforms.modelViewMatrix = glGetUniformLocation(debugProgram, "modelViewProjectionMatrix")
 		markerUniforms.color = glGetUniformLocation(debugProgram, "markerColor")
