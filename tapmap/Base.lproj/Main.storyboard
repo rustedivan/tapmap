@@ -51,6 +51,7 @@
                     </view>
                     <connections>
                         <outlet property="labelView" destination="548-OC-ITj" id="xJ2-a6-EJv"/>
+                        <outlet property="metalView" destination="3se-qz-xqx" id="5am-IQ-O5n"/>
                         <outlet property="placeName" destination="ekB-nX-Jxg" id="wBG-gA-Mrn"/>
                         <outlet property="scrollView" destination="p98-sO-tuF" id="hSM-9M-UjH"/>
                     </connections>

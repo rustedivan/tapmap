@@ -9,6 +9,7 @@
 import MetalKit
 
 class MapViewController: UIViewController, MTKViewDelegate {
+	@IBOutlet weak var metalView: MTKView!
 	@IBOutlet var scrollView: UIScrollView!
 	@IBOutlet var placeName: UILabel!
 	@IBOutlet var labelView: LabelView!
@@ -31,7 +32,7 @@ class MapViewController: UIViewController, MTKViewDelegate {
 	var mapFrame = CGRect.zero
 	var lastRenderFrame: Int = Int.max
 	var needsRender: Bool = true { didSet {
-//		if needsRender { self.isPaused = false }
+		if needsRender { metalView.isPaused = false }
 	}}
 	
 	// Rendering
@@ -172,7 +173,7 @@ class MapViewController: UIViewController, MTKViewDelegate {
 	}
 
 	// MARK: - GLKView and GLKViewController delegate methods
-	func glkViewControllerUpdate(_ controller: UIViewController) {	// $ Hook render loop here
+	func prepareFrame() {	// $ Hook render loop here
 //		modelViewProjectionMatrix = buildProjectionMatrix(viewSize: scrollView.bounds.size,
 //																											mapSize: mapSpace.size,
 //																											centeredOn: offset,
@@ -192,13 +193,16 @@ class MapViewController: UIViewController, MTKViewDelegate {
 //		geometryStreamer.updateLodLevel()
 //		geometryStreamer.updateStreaming()
 //
-//		idleIfStill(willRender: needsRender, frameCount: controller.framesDisplayed)
+
+		if metalRenderer.shouldIdle(appUpdated: needsRender) {
+			metalView.isPaused = true
+		}
 	}
 	
 	func draw(in view: MTKView) {
-		guard let drawable = view.currentDrawable else {
-			return
-		}
+		guard let drawable = view.currentDrawable else { return }
+		
+		prepareFrame()
 		
 		metalRenderer.render(into: drawable)
 //		glClearColor(0.0, 0.1, 0.6, 1.0)
@@ -218,18 +222,8 @@ class MapViewController: UIViewController, MTKViewDelegate {
 //		selectionRenderer.renderSelection(inProjection: modelViewProjectionMatrix)
 //		labelView.renderLabels(projection: mapToView)
 //
-//		needsRender = false
+		needsRender = false
 ////		DebugRenderer.shared.renderMarkers(inProjection: modelViewProjectionMatrix)
-	}
-	
-	func idleIfStill(willRender: Bool, frameCount: Int) {
-		needsRender = effectRenderer.animating ? true : willRender
-		needsRender = geometryStreamer.streaming ? true : willRender
-		if (needsRender) {
-			lastRenderFrame = frameCount
-		} else if frameCount - lastRenderFrame > 30 {
-//			self.isPaused = true
-		}
 	}
 	
 	func mtkView(_ view: MTKView, drawableSizeWillChange size: CGSize) {

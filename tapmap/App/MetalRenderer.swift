@@ -13,6 +13,7 @@ import MetalKit
 class MetalRenderer {
 	var device: MTLDevice!
 	var commandQueue: MTLCommandQueue! // $ Pass multiple into the renderers
+	var latestFrame = Date()
 	
 	init(for view: MTKView) {
 		device = MTLCreateSystemDefaultDevice()
@@ -32,5 +33,18 @@ class MetalRenderer {
 		commandEncoder.endEncoding()
 		commandBuffer.present(drawable)
 		commandBuffer.commit()
+	}
+	
+	func shouldIdle(appUpdated: Bool) -> Bool {
+		var sleepRenderer = false
+		let needsRender = appUpdated
+//		needsRender |= effectRenderer.animating
+//		needsRender |= geometryStreamer.streaming
+		if needsRender {
+			latestFrame = Date()
+		} else if Date().timeIntervalSince(latestFrame) > 1.0 {
+			sleepRenderer = true
+		}
+		return sleepRenderer
 	}
 }
