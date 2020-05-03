@@ -15,7 +15,7 @@ class MetalRenderer {
 	var device: MTLDevice!
 	var commandQueue: MTLCommandQueue! // $ Pass multiple into the renderers
 	var latestFrame = Date()
-	var modelViewProjectionMatrix: GLKMatrix4 = GLKMatrix4Identity	// $ Drop GLK
+	var modelViewProjectionMatrix = simd_float4x4()
 
 	// App renderers
 	var regionRenderer: RegionRenderer
@@ -28,9 +28,10 @@ class MetalRenderer {
 		device = MTLCreateSystemDefaultDevice()
 		commandQueue = device.makeCommandQueue()
 		view.device = device
+		view.colorPixelFormat = .bgra8Unorm
 		
 		// Create renderers
-		regionRenderer = RegionRenderer()!
+		regionRenderer = RegionRenderer(withDevice: device, pixelFormat: view.colorPixelFormat)
 		poiRenderer = PoiRenderer(withVisibleContinents: world.availableContinents,
 															countries: world.availableCountries,
 															provinces: world.availableProvinces)!
@@ -70,14 +71,14 @@ class MetalRenderer {
 		guard let commandBuffer = commandQueue.makeCommandBuffer() else { return }
 		guard let commandEncoder = commandBuffer.makeRenderCommandEncoder(descriptor: renderPassDescriptor) else { return }
 
-		//		let available = AppDelegate.sharedUserState.availableSet
-		//		let visible = AppDelegate.sharedUIState.visibleRegionHashes
-		//		let renderSet = available.intersection(visible)
-		//		let borderedContinents = visible.intersection(world.allContinents.keys)	// All visible continents (even if visited)
-		//		let borderedCountries = Set(world.visibleCountries.keys)
-		//
+		let available = AppDelegate.sharedUserState.availableSet
+		let visible = AppDelegate.sharedUIState.visibleRegionHashes
+		let renderSet = available.intersection(visible)
+//		let borderedContinents = visible.intersection(worldState.allContinents.keys)	// All visible continents (even if visited)
+//		let borderedCountries = Set(worldState.visibleCountries.keys)
+		
 		//		borderRenderer.renderContinentBorders(borderedContinents, inProjection: modelViewProjectionMatrix)
-		//		regionRenderer.renderWorld(visibleSet: renderSet, inProjection: modelViewProjectionMatrix)
+		regionRenderer.renderWorld(visibleSet: renderSet, inProjection: modelViewProjectionMatrix, inEncoder: commandEncoder)
 		//		borderRenderer.renderCountryBorders(borderedCountries, inProjection: modelViewProjectionMatrix)
 		//		poiRenderer.renderWorld(visibleSet: renderSet, inProjection: modelViewProjectionMatrix)
 		//		effectRenderer.renderWorld(inProjection: modelViewProjectionMatrix)

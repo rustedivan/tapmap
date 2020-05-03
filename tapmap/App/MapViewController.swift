@@ -190,6 +190,10 @@ class MapViewController: UIViewController, MTKViewDelegate {
 	}
 	
 	func mtkView(_ view: MTKView, drawableSizeWillChange size: CGSize) {
+		metalRenderer.updateProjection(viewSize: size,
+																	 mapSize: mapSpace.size,
+																	 centeredOn: offset,
+																	 zoomedTo: zoom)
   }
 }
 
