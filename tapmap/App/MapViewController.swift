@@ -61,6 +61,7 @@ class MapViewController: UIViewController, MTKViewDelegate {
 		
 		let metalView = view as! MTKView
 		metalRenderer = MetalRenderer(in: metalView, forWorld: world)
+		geometryStreamer.metalDevice = metalRenderer.device
 		metalView.delegate = self
 		
 		// Scroll view setup

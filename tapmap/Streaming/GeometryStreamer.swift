@@ -8,6 +8,7 @@
 
 import Foundation
 import Dispatch
+import Metal
 
 class GeometryStreamer {
 	static private var _shared: GeometryStreamer!
@@ -21,10 +22,13 @@ class GeometryStreamer {
 		}
 	}
 	
+	var metalDevice: MTLDevice?
+	
 	let fileData: Data	// fileData is memory-mapped so no need to attach a FileHandle here
 	let fileHeader: WorldHeader
 	let chunkTable: ChunkTable
 	let streamQueue: DispatchQueue
+	
 	var wantedLodLevel: Int
 	var actualLodLevel: Int = 10
 	var lodCacheMiss: Bool = true
@@ -143,6 +147,11 @@ class GeometryStreamer {
 	}
 	
 	func updateStreaming() {
+		guard let device = self.metalDevice else {
+			print("Cannot stream geometry before Metal setup")
+			return
+		}
+		
 		for regionId in newChunkRequests {
 			let chunkName = chunkLodName(regionId, atLod: wantedLodLevel)
 			let runtimeLodKey = regionHashLodKey(regionId.hashed, atLod: wantedLodLevel)
@@ -153,7 +162,7 @@ class GeometryStreamer {
 					// Create the render primitive and update book-keeping on the OpenGL/main thread
 					DispatchQueue.main.async {
 						let c = regionId.hashed.hashColor.tuple()
-						let primitive = ArrayedRenderPrimitive(vertices: tessellation.vertices, color: c, ownerHash: regionId.hashed, debugName: chunkName)
+						let primitive = ArrayedRenderPrimitive(vertices: tessellation.vertices, device: device, color: c, ownerHash: regionId.hashed, debugName: chunkName)
 						self.primitiveCache[runtimeLodKey] = primitive
 						self.geometryCache[runtimeLodKey] = tessellation
 						self.pendingChunks.remove(ChunkRequest(runtimeLodKey))
