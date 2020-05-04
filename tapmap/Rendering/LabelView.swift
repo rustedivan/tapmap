@@ -88,6 +88,8 @@ class LabelView: UIView {
 		let markersToShow = prioritizedMarkers.prefix(LabelView.s_maxLabels)
 		let hashesToShow = markersToShow.map { $0.ownerHash }
 		
+		// $ this tag mechanism eats ~30% of the CPU...
+		
 		// First free up any labels that no longer have active markers
 		_ = poiLabels
 			.filter({$0.tag != 0 && !hashesToShow.contains($0.tag)})
@@ -95,10 +97,10 @@ class LabelView: UIView {
 		
 		// Bind new markers into free labels
 		for marker in markersToShow {
-			guard poiLabels.first(where: { $0.tag == marker.ownerHash }) == nil else {
+			guard poiLabels.first(where: { $0.tag == marker.ownerHash }) == nil else { // $ hotspot
 				continue
 			}
-			guard let freeLabel = poiLabels.first(where: { $0.tag == 0 }) else {
+			guard let freeLabel = poiLabels.first(where: { $0.tag == 0 }) else {	// $ hotspot
 				print("Marker \(marker.ownerHash) could not be bound to a free label")
 				continue
 			}
@@ -122,7 +124,7 @@ class LabelView: UIView {
 	
 	func renderLabels(projection project: (Vertex) -> CGPoint) {
 		for label in poiLabels {
-			guard let marker = poiPrimitives.values.first(where: { $0.ownerHash == label.tag }) else {
+			guard let marker = poiPrimitives.values.first(where: { $0.ownerHash == label.tag }) else { // $ hotspot
 				continue
 			}
 			

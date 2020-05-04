@@ -165,9 +165,9 @@ class MapViewController: UIViewController, MTKViewDelegate {
 																	 zoomedTo: zoom)
 		metalRenderer.prepareFrame(forWorld: world)
 		
-		labelView.updateLabels(for: metalRenderer.poiRenderer.activePoiHashes,
-													 inArea: visibleLongLat(viewBounds: view.bounds),
-													 atZoom: zoom)
+//		labelView.updateLabels(for: metalRenderer.poiRenderer.activePoiHashes,
+//													 inArea: visibleLongLat(viewBounds: view.bounds),
+//													 atZoom: zoom)
 		
 		geometryStreamer.updateLodLevel()
 		geometryStreamer.updateStreaming()
@@ -185,7 +185,7 @@ class MapViewController: UIViewController, MTKViewDelegate {
 		prepareFrame()
 		
 		metalRenderer.render(forWorld: world, into: drawable)
-		labelView.renderLabels(projection: mapToView)
+//		labelView.renderLabels(projection: mapToView)
 
 		needsRender = false
 	}
