@@ -7,7 +7,6 @@
 //
 
 import Metal
-import GLKit
 import simd
 
 struct MapUniforms {
@@ -23,8 +22,8 @@ class RegionRenderer {
 		let shaderLib = device.makeDefaultLibrary()!
 		
 		let pipelineDescriptor = MTLRenderPipelineDescriptor()
-		pipelineDescriptor.vertexFunction = shaderLib.makeFunction(name: "flatVertex")
-		pipelineDescriptor.fragmentFunction = shaderLib.makeFunction(name: "flatFragment")
+		pipelineDescriptor.vertexFunction = shaderLib.makeFunction(name: "mapVertex")
+		pipelineDescriptor.fragmentFunction = shaderLib.makeFunction(name: "mapFragment")
 		pipelineDescriptor.colorAttachments[0].pixelFormat = pixelFormat;
 		
 		do {

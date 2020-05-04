@@ -80,6 +80,7 @@
 		14985FEF22F0ED4A00F68A1F /* OutlineRenderPrimitive.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14985FEE22F0ED4A00F68A1F /* OutlineRenderPrimitive.swift */; };
 		149B3FDD245EE8B1008A299E /* MapShader.metal in Sources */ = {isa = PBXBuildFile; fileRef = 149B3FDC245EE8B1008A299E /* MapShader.metal */; };
 		149CBDDD23CB230000A7AABB /* LabelView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 149CBDDC23CB230000A7AABB /* LabelView.swift */; };
+		14B63F052460BDFF00A4A433 /* BorderShader.metal in Sources */ = {isa = PBXBuildFile; fileRef = 14B63F042460BDFF00A4A433 /* BorderShader.metal */; };
 		14BAA333240EF95000DC64B9 /* OperationFitLabels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14BAA332240EF95000DC64B9 /* OperationFitLabels.swift */; };
 		14BD433A2444AD50007A3D67 /* BorderRenderer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14BD43392444AD50007A3D67 /* BorderRenderer.swift */; };
 		14C6656422B97D890054D7F2 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 14C6656222B97D890054D7F2 /* Main.storyboard */; };
@@ -178,6 +179,7 @@
 		14985FF522F0F35700F68A1F /* OutlineGeometry.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OutlineGeometry.swift; sourceTree = "<group>"; };
 		149B3FDC245EE8B1008A299E /* MapShader.metal */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.metal; path = MapShader.metal; sourceTree = "<group>"; };
 		149CBDDC23CB230000A7AABB /* LabelView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LabelView.swift; sourceTree = "<group>"; };
+		14B63F042460BDFF00A4A433 /* BorderShader.metal */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.metal; path = BorderShader.metal; sourceTree = "<group>"; };
 		14BAA332240EF95000DC64B9 /* OperationFitLabels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OperationFitLabels.swift; sourceTree = "<group>"; };
 		14BD43392444AD50007A3D67 /* BorderRenderer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BorderRenderer.swift; sourceTree = "<group>"; };
 		14C6655B22B97D890054D7F2 /* tapmap.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = tapmap.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -337,6 +339,7 @@
 				1468830F23B4D9E400105E04 /* DebugShader.fsh */,
 				1468830E23B4D9E400105E04 /* DebugShader.vsh */,
 				149B3FDC245EE8B1008A299E /* MapShader.metal */,
+				14B63F042460BDFF00A4A433 /* BorderShader.metal */,
 			);
 			path = Shaders;
 			sourceTree = "<group>";
@@ -731,6 +734,7 @@
 			files = (
 				14985FEF22F0ED4A00F68A1F /* OutlineRenderPrimitive.swift in Sources */,
 				144B5D5A22D9E092001E2A85 /* SelectionRenderer.swift in Sources */,
+				14B63F052460BDFF00A4A433 /* BorderShader.metal in Sources */,
 				1489380622B97FE0009278A0 /* AppDelegate.swift in Sources */,
 				148937FE22B97FDF009278A0 /* ColoredHash.swift in Sources */,
 				142A21EF23DC61A3000DA4FA /* ChunkTable.swift in Sources */,

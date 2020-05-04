@@ -32,13 +32,14 @@ class MetalRenderer {
 		
 		// Create renderers
 		regionRenderer = RegionRenderer(withDevice: device, pixelFormat: view.colorPixelFormat)
+		borderRenderer = BorderRenderer(withDevice: device, pixelFormat: view.colorPixelFormat)
+		
 		poiRenderer = PoiRenderer(withVisibleContinents: world.availableContinents,
 															countries: world.availableCountries,
 															provinces: world.availableProvinces)!
 		
 		effectRenderer = EffectRenderer()!
 		selectionRenderer = SelectionRenderer()!
-		borderRenderer = BorderRenderer()!
 	}
 	
 	func updateProjection(viewSize: CGSize, mapSize: CGSize, centeredOn offset: CGPoint, zoomedTo zoom: Float) {
@@ -74,12 +75,12 @@ class MetalRenderer {
 		let available = AppDelegate.sharedUserState.availableSet
 		let visible = AppDelegate.sharedUIState.visibleRegionHashes
 		let renderSet = available.intersection(visible)
-//		let borderedContinents = visible.intersection(worldState.allContinents.keys)	// All visible continents (even if visited)
-//		let borderedCountries = Set(worldState.visibleCountries.keys)
+		let borderedContinents = visible.intersection(worldState.allContinents.keys)	// All visible continents (even if visited)
+		let borderedCountries = Set(worldState.visibleCountries.keys)
 		
-		//		borderRenderer.renderContinentBorders(borderedContinents, inProjection: modelViewProjectionMatrix)
+		borderRenderer.renderContinentBorders(borderedContinents, inProjection: modelViewProjectionMatrix, inEncoder: commandEncoder)
 		regionRenderer.renderWorld(visibleSet: renderSet, inProjection: modelViewProjectionMatrix, inEncoder: commandEncoder)
-		//		borderRenderer.renderCountryBorders(borderedCountries, inProjection: modelViewProjectionMatrix)
+		borderRenderer.renderCountryBorders(borderedCountries, inProjection: modelViewProjectionMatrix, inEncoder: commandEncoder)
 		//		poiRenderer.renderWorld(visibleSet: renderSet, inProjection: modelViewProjectionMatrix)
 		//		effectRenderer.renderWorld(inProjection: modelViewProjectionMatrix)
 		//		selectionRenderer.renderSelection(inProjection: modelViewProjectionMatrix)

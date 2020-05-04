@@ -24,7 +24,7 @@ struct VertexOut {
 	float4 color;
 };
 
-vertex VertexOut flatVertex(const device Vertex* vertexArray [[ buffer(0) ]],
+vertex VertexOut mapVertex(const device Vertex* vertexArray [[ buffer(0) ]],
 														constant MapUniforms *uniforms [[ buffer(1) ]],
 														unsigned int vid [[ vertex_id ]]) {
 	Vertex v = vertexArray[vid];
@@ -34,6 +34,6 @@ vertex VertexOut flatVertex(const device Vertex* vertexArray [[ buffer(0) ]],
 	return outVertex;
 }
 
-fragment float4 flatFragment(VertexOut interpolated [[ stage_in ]]) {
+fragment float4 mapFragment(VertexOut interpolated [[ stage_in ]]) {
 	return float4(interpolated.color);
 }
