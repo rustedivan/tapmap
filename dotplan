@@ -36,6 +36,7 @@ ROAD TO FINAL
 
 ## Other stuff
 - is it possible to drop all the custom zoom stuff in favour of MTKView's dirtyrects?
+- renderer baseclass? holds device, pipeline and knows how to load shader lib?
 
 ## LabelView's tag mechanism is incredibly expensive
 - together with projectPoint - move off main thread?

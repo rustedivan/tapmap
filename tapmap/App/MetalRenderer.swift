@@ -34,7 +34,8 @@ class MetalRenderer {
 		regionRenderer = RegionRenderer(withDevice: device, pixelFormat: view.colorPixelFormat)
 		borderRenderer = BorderRenderer(withDevice: device, pixelFormat: view.colorPixelFormat)
 		
-		poiRenderer = PoiRenderer(withVisibleContinents: world.availableContinents,
+		poiRenderer = PoiRenderer(withDevice: device, pixelFormat: view.colorPixelFormat,
+															withVisibleContinents: world.availableContinents,
 															countries: world.availableCountries,
 															provinces: world.availableProvinces)!
 		
@@ -81,7 +82,7 @@ class MetalRenderer {
 		borderRenderer.renderContinentBorders(borderedContinents, inProjection: modelViewProjectionMatrix, inEncoder: commandEncoder)
 		regionRenderer.renderWorld(visibleSet: renderSet, inProjection: modelViewProjectionMatrix, inEncoder: commandEncoder)
 		borderRenderer.renderCountryBorders(borderedCountries, inProjection: modelViewProjectionMatrix, inEncoder: commandEncoder)
-		//		poiRenderer.renderWorld(visibleSet: renderSet, inProjection: modelViewProjectionMatrix)
+		poiRenderer.renderWorld(visibleSet: renderSet, inProjection: modelViewProjectionMatrix, inEncoder: commandEncoder)
 		//		effectRenderer.renderWorld(inProjection: modelViewProjectionMatrix)
 		//		selectionRenderer.renderSelection(inProjection: modelViewProjectionMatrix)
 		

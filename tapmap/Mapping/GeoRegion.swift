@@ -7,6 +7,7 @@
 //
 
 import Foundation
+import Metal // $ Malimported
 
 // Swift's Hasher is randomized on each launch, so use these
 // for values that need to be persisted into data.
@@ -109,7 +110,7 @@ protocol GeoIdentifiable : Hashable {
 
 protocol GeoPlaceContainer {
 	var places : Set<GeoPlace> { get }
-	func poiRenderPlanes() -> [PoiPlane]
+	func poiRenderPlanes(inDevice device: MTLDevice) -> [PoiPlane]	// $ Shouldn't need to pass Metal stuff from up here
 }
 
 protocol GeoNode : GeoIdentifiable {

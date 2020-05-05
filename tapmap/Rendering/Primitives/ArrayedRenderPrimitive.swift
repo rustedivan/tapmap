@@ -11,7 +11,7 @@ import Metal
 class ArrayedRenderPrimitive {
 	let ownerHash: Int
 	
-	var vertexBuffer: MTLBuffer
+	let vertexBuffer: MTLBuffer
 	let elementCount: Int
 	
 	let color: (r: Float, g: Float, b: Float, a: Float)

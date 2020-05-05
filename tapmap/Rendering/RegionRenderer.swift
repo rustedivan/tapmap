@@ -39,7 +39,9 @@ class RegionRenderer {
 		// Collect all streamed-in primitives for the currently visible set of non-visited regions
 		let renderPrimitives = visibleSet.compactMap { GeometryStreamer.shared.renderPrimitive(for: $0) }
 		
-		var uniforms = MapUniforms(mvpMatrix: projection, color: simd_float4(), highlighted: simd_int1())
+		var uniforms = MapUniforms(mvpMatrix: projection,
+															 color: simd_float4(),
+															 highlighted: simd_int1())
 		
 		for primitive in renderPrimitives {
 			uniforms.color = SIMD4<Float>(primitive.color.r, primitive.color.g, primitive.color.b, 1.0)

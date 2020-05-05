@@ -6,8 +6,15 @@
 //  Copyright © 2019 Wildbrain. All rights reserved.
 //
 
-import OpenGLES
-import GLKit
+import Metal
+import simd
+
+struct PoiUniforms {
+	let mvpMatrix: simd_float4x4
+	let rankThreshold: simd_float1
+	let poiBaseSize: simd_float1
+	var progress: simd_float1
+}
 
 struct PoiPlane: Hashable {
 	let primitive: IndexedRenderPrimitive<ScaleVertex>
@@ -63,33 +70,37 @@ class PoiRenderer {
 	}
 	var poiPlanePrimitives : [PoiPlane]
 	var poiVisibility: [Int : Visibility] = [:]
-	let poiProgram: GLuint
-	let poiUniforms : (modelViewMatrix: GLint, color: GLint, rankThreshold: GLint, progress: GLint, poiBaseSize: GLint)
+	
+	let device: MTLDevice
+	let pipeline: MTLRenderPipelineState
+	
 	var rankThreshold: Float = -1.0
 	var poiBaseSize: Float = 0.0
 	
-	init?(withVisibleContinents continents: GeoContinentMap,
+	init?(withDevice device: MTLDevice, pixelFormat: MTLPixelFormat,
+				withVisibleContinents continents: GeoContinentMap,
 				countries: GeoCountryMap,
 				provinces: GeoProvinceMap) {
-		poiProgram = loadShaders(shaderName: "PoiShader")
 		
-		poiUniforms.modelViewMatrix = glGetUniformLocation(poiProgram, "modelViewProjectionMatrix")
-		poiUniforms.color = glGetUniformLocation(poiProgram, "poiColor")
-		poiUniforms.rankThreshold = glGetUniformLocation(poiProgram, "rankThreshold")
-		poiUniforms.progress = glGetUniformLocation(poiProgram, "progress")
-		poiUniforms.poiBaseSize = glGetUniformLocation(poiProgram, "baseSize")
+		let shaderLib = device.makeDefaultLibrary()!
 		
-		let visibleContinentPoiPlanes = continents.flatMap { $0.value.poiRenderPlanes() }
-		let visibleCountryPoiPlanes = countries.flatMap { $0.value.poiRenderPlanes() }
-		let visibleProvincePoiPlanes = provinces.flatMap { $0.value.poiRenderPlanes() }
+		let pipelineDescriptor = MTLRenderPipelineDescriptor()
+		pipelineDescriptor.vertexFunction = shaderLib.makeFunction(name: "poiVertex")
+		pipelineDescriptor.fragmentFunction = shaderLib.makeFunction(name: "poiFragment")
+		pipelineDescriptor.colorAttachments[0].pixelFormat = pixelFormat;
+		
+		do {
+			try pipeline = device.makeRenderPipelineState(descriptor: pipelineDescriptor)
+			self.device = device
+		} catch let error {
+			fatalError(error.localizedDescription)
+		}
+		
+		let visibleContinentPoiPlanes = continents.flatMap { $0.value.poiRenderPlanes(inDevice: device) }
+		let visibleCountryPoiPlanes = countries.flatMap { $0.value.poiRenderPlanes(inDevice: device) }
+		let visibleProvincePoiPlanes = provinces.flatMap { $0.value.poiRenderPlanes(inDevice: device) }
 		
 		poiPlanePrimitives = visibleContinentPoiPlanes + visibleCountryPoiPlanes + visibleProvincePoiPlanes
-	}
-	
-	deinit {
-		if poiProgram != 0 {
-			glDeleteProgram(poiProgram)
-		}
 	}
 	
 	var activePoiHashes: Set<Int> {
@@ -101,7 +112,7 @@ class PoiRenderer {
 		where T.SubType : GeoPlaceContainer {
 		let removedRegionsHash = node.geographyId.hashed
 		poiPlanePrimitives = poiPlanePrimitives.filter { $0.ownerHash != removedRegionsHash }
-		let subregionPrimitives = subRegions.flatMap { $0.poiRenderPlanes() }
+			let subregionPrimitives = subRegions.flatMap { $0.poiRenderPlanes(inDevice: device) }
 		poiPlanePrimitives.append(contentsOf: subregionPrimitives)
 		
 		for newRegion in subregionPrimitives {
@@ -178,38 +189,24 @@ class PoiRenderer {
 		poiBaseSize += min(zoomLevel * 0.01, 0.1)	// Boost POI sizes a bit when zooming in
 	}
 	
-	func renderWorld(visibleSet: Set<Int>, inProjection projection: GLKMatrix4) {
-		glPushGroupMarkerEXT(0, "Render POI plane")
-		glUseProgram(poiProgram)
-		glEnable(GLenum(GL_BLEND))
-		glBlendFunc(GLenum(GL_SRC_ALPHA), GLenum(GL_ONE_MINUS_SRC_ALPHA))
+	func renderWorld(visibleSet: Set<Int>, inProjection projection: simd_float4x4, inEncoder encoder: MTLRenderCommandEncoder) {
+		encoder.pushDebugGroup("Render POI plane")
+		encoder.setRenderPipelineState(pipeline)
 		
-		var mutableProjection = projection // The 'let' argument is not safe to pass into withUnsafePointer. No copy, since copy-on-write.
-		withUnsafePointer(to: &mutableProjection, {
-			$0.withMemoryRebound(to: Float.self, capacity: 16, {
-				glUniformMatrix4fv(poiUniforms.modelViewMatrix, 1, 0, $0)
-			})
-		})
-		
-		let components : [GLfloat] = [1.0, 1.0, 1.0, 1.0]
-		glUniform4f(poiUniforms.color,
-								GLfloat(components[0]),
-								GLfloat(components[1]),
-								GLfloat(components[2]),
-								GLfloat(components[3]))
-		glUniform1f(poiUniforms.rankThreshold, rankThreshold)
-		glUniform1f(poiUniforms.poiBaseSize, poiBaseSize)
+		var uniforms = PoiUniforms(mvpMatrix: projection,
+															 rankThreshold: rankThreshold,
+															 poiBaseSize: poiBaseSize,
+															 progress: 0.0)
 		
 		let visiblePrimitives = poiPlanePrimitives.filter({ visibleSet.contains($0.ownerHash) })
 																							.filter({ poiVisibility[$0.hashValue] != nil })
 		for poiPlane in visiblePrimitives {
 			let parameters = poiVisibility[poiPlane.hashValue]! // Ensured by visiblePoiPlanes()
-			glUniform1f(poiUniforms.progress, GLfloat(parameters.alpha()))
-			render(primitive: poiPlane.primitive)
+			uniforms.progress = Float(parameters.alpha())
+			encoder.setVertexBytes(&uniforms, length: MemoryLayout.stride(ofValue: uniforms), index: 1)
+			render(primitive: poiPlane.primitive, into: encoder)
 		}
-		
-		glDisable(GLenum(GL_BLEND))
-		glPopGroupMarkerEXT()
+		encoder.popDebugGroup()
 	}
 }
 
@@ -250,14 +247,14 @@ func buildPlaceMarkers(places: Set<GeoPlace>) -> ([ScaleVertex], [UInt32]) {
 	return (vertices, indices)
 }
 
-func sortPlacesIntoPoiPlanes<T: GeoIdentifiable>(_ places: Set<GeoPlace>, in container: T) -> [PoiPlane] {
+func sortPlacesIntoPoiPlanes<T: GeoIdentifiable>(_ places: Set<GeoPlace>, in container: T, inDevice device: MTLDevice) -> [PoiPlane] {
 	let placeMarkers = places.filter { $0.kind != .Region }
 	let areaMarkers = places.filter { $0.kind == .Region }
 	let rankedPlaces = bucketPlaceMarkers(places: placeMarkers)
 	let rankedAreas = bucketPlaceMarkers(places: areaMarkers )
 	
-	let generatePlacePlanes = makePoiPlaneFactory(forArea: false, in: container)
-	let generateAreaPlanes = makePoiPlaneFactory(forArea: true, in: container)
+	let generatePlacePlanes = makePoiPlaneFactory(forArea: false, in: container, inDevice: device)
+	let generateAreaPlanes = makePoiPlaneFactory(forArea: true, in: container, inDevice: device)
 	
 	let placePlanes = rankedPlaces.map(generatePlacePlanes)
 	let areaPlanes = rankedAreas.map(generateAreaPlanes)
@@ -266,21 +263,22 @@ func sortPlacesIntoPoiPlanes<T: GeoIdentifiable>(_ places: Set<GeoPlace>, in con
 }
 
 typealias PoiFactory = (Int, Set<GeoPlace>) -> PoiPlane
-func makePoiPlaneFactory<T:GeoIdentifiable>(forArea: Bool, in container: T) -> PoiFactory {
+func makePoiPlaneFactory<T:GeoIdentifiable>(forArea: Bool, in container: T, inDevice device: MTLDevice) -> PoiFactory {
 	return { (rank: Int, pois: Set<GeoPlace>) -> PoiPlane in
 		let (vertices, indices) = buildPlaceMarkers(places: pois)
 		let primitive = IndexedRenderPrimitive<ScaleVertex>(vertices: vertices,
-																							indices: indices,
-																							color: rank.hashColor.tuple(),
-																							ownerHash: container.geographyId.hashed,	// The hash of the owning region
-																							debugName: "\(container.name) - \(forArea ? "area" : "poi") plane @ \(rank)")
+																												device: device,
+																												indices: indices,
+																												color: rank.hashColor.tuple(),
+																												ownerHash: container.geographyId.hashed,	// The hash of the owning region
+																												debugName: "\(container.name) - \(forArea ? "area" : "poi") plane @ \(rank)")
 		let hashes = pois.map { $0.hashValue }
 		return PoiPlane(primitive: primitive, rank: rank, representsArea: forArea, poiHashes: hashes)
 	}
 }
 
 extension GeoPlaceContainer where Self : GeoIdentifiable {
-	func poiRenderPlanes() -> [PoiPlane] {
-		return sortPlacesIntoPoiPlanes(places, in: self);
+	func poiRenderPlanes(inDevice device: MTLDevice) -> [PoiPlane] {
+		return sortPlacesIntoPoiPlanes(places, in: self, inDevice: device);
 	}
 }
