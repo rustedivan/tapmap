@@ -89,7 +89,7 @@ class BorderRenderer {
 						let outlineGeometry: RegionContours = countourVertices.map(borderOutline)
 
 						// Create the render primitive and update book-keeping on the main thread
-						// $ Can resources be created on spun-off threads now?
+						// $ Can replace this return to main with a semaphor/mutex
 						DispatchQueue.main.async {
 							let outlinePrimitive = OutlineRenderPrimitive(contours: outlineGeometry,
 																														device: self.device,

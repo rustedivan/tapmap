@@ -88,6 +88,11 @@ class PoiRenderer {
 		pipelineDescriptor.vertexFunction = shaderLib.makeFunction(name: "poiVertex")
 		pipelineDescriptor.fragmentFunction = shaderLib.makeFunction(name: "poiFragment")
 		pipelineDescriptor.colorAttachments[0].pixelFormat = pixelFormat;
+		pipelineDescriptor.colorAttachments[0].isBlendingEnabled = true
+		pipelineDescriptor.colorAttachments[0].sourceRGBBlendFactor = .sourceAlpha
+		pipelineDescriptor.colorAttachments[0].sourceAlphaBlendFactor = .sourceAlpha
+		pipelineDescriptor.colorAttachments[0].destinationRGBBlendFactor = .oneMinusSourceAlpha
+		pipelineDescriptor.colorAttachments[0].destinationAlphaBlendFactor = .oneMinusSourceAlpha
 		
 		do {
 			try pipeline = device.makeRenderPipelineState(descriptor: pipelineDescriptor)
@@ -96,9 +101,9 @@ class PoiRenderer {
 			fatalError(error.localizedDescription)
 		}
 		
-		let visibleContinentPoiPlanes = continents.flatMap { $0.value.poiRenderPlanes(inDevice: device) }
-		let visibleCountryPoiPlanes = countries.flatMap { $0.value.poiRenderPlanes(inDevice: device) }
-		let visibleProvincePoiPlanes = provinces.flatMap { $0.value.poiRenderPlanes(inDevice: device) }
+		let visibleContinentPoiPlanes = continents.values.flatMap { sortPlacesIntoPoiPlanes($0.places, in: $0, inDevice: device) }
+		let visibleCountryPoiPlanes = countries.values.flatMap { sortPlacesIntoPoiPlanes($0.places, in: $0, inDevice: device) }
+		let visibleProvincePoiPlanes = provinces.values.flatMap { sortPlacesIntoPoiPlanes($0.places, in: $0, inDevice: device) }
 		
 		poiPlanePrimitives = visibleContinentPoiPlanes + visibleCountryPoiPlanes + visibleProvincePoiPlanes
 	}
@@ -108,11 +113,11 @@ class PoiRenderer {
 		return Set(visiblePoiPlanes.flatMap { $0.poiHashes })
 	}
 	
-	func updatePrimitives<T:GeoNode>(for node: T, with subRegions: Set<T.SubType>)
-		where T.SubType : GeoPlaceContainer {
+	func updatePrimitives<T:GeoNode>(for node: T, with subRegions: Set<T.SubType>) where T.SubType : GeoPlaceContainer {
 		let removedRegionsHash = node.geographyId.hashed
 		poiPlanePrimitives = poiPlanePrimitives.filter { $0.ownerHash != removedRegionsHash }
-			let subregionPrimitives = subRegions.flatMap { $0.poiRenderPlanes(inDevice: device) }
+		
+		let subregionPrimitives = subRegions.flatMap { buildPoiPlanes(of: $0) }
 		poiPlanePrimitives.append(contentsOf: subregionPrimitives)
 		
 		for newRegion in subregionPrimitives {
@@ -120,6 +125,10 @@ class PoiRenderer {
 				poiVisibility.updateValue(.visible, forKey: newRegion.hashValue)
 			}
 		}
+	}
+	
+	func buildPoiPlanes<T:GeoPlaceContainer & GeoIdentifiable>(of region: T) -> [PoiPlane] {
+		return sortPlacesIntoPoiPlanes(region.places, in: region, inDevice: device);
 	}
 	
 	func updateFades() {
@@ -274,11 +283,5 @@ func makePoiPlaneFactory<T:GeoIdentifiable>(forArea: Bool, in container: T, inDe
 																												debugName: "\(container.name) - \(forArea ? "area" : "poi") plane @ \(rank)")
 		let hashes = pois.map { $0.hashValue }
 		return PoiPlane(primitive: primitive, rank: rank, representsArea: forArea, poiHashes: hashes)
-	}
-}
-
-extension GeoPlaceContainer where Self : GeoIdentifiable {
-	func poiRenderPlanes(inDevice device: MTLDevice) -> [PoiPlane] {
-		return sortPlacesIntoPoiPlanes(places, in: self, inDevice: device);
 	}
 }

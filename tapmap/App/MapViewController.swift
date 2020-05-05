@@ -154,7 +154,8 @@ class MapViewController: UIViewController, MTKViewDelegate {
 // $			effectRenderer.addOpeningEffect(for: hit.geographyId.hashed)
 			geometryStreamer.evictPrimitive(for: hit.geographyId.hashed)
 		}
-// $		poiRenderer.updatePrimitives(for: hit, with: hit.children)
+
+		metalRenderer.poiRenderer.updatePrimitives(for: hit, with: hit.children)
 		labelView.updatePrimitives(for: hit, with: hit.children)
 	}
 
