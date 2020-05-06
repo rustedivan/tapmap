@@ -77,10 +77,10 @@ class BorderRenderer {
 						let countourVertices: [[Vertex]]
 						if visibleContinents[borderHash] != nil {
 							innerWidth = 0.1
-							outerWidth = 3.0
+							outerWidth = 1.0
 							countourVertices = [(tessellation.contours.first?.vertices ?? [])]
 						} else {
-							innerWidth = 1.0
+							innerWidth = 0.5
 							outerWidth = 0.1
 							countourVertices = tessellation.contours.map({$0.vertices})
 						}

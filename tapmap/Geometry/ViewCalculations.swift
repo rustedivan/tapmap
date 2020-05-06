@@ -55,10 +55,10 @@ func buildProjectionMatrix(viewSize: CGSize, mapSize: CGSize, centeredOn center:
 	
 	let out = GLKMatrix4Multiply(projectionMatrix, modelViewMatrix)
 
-	return simd_float4x4(columns: (SIMD4<Float>(x: out.m00, y: out.m01, z: out.m02, w: out.m03),
-																 SIMD4<Float>(x: out.m10, y: out.m11, z: out.m12, w: out.m13),
-																 SIMD4<Float>(x: out.m20, y: out.m21, z: out.m22, w: out.m23),
-																 SIMD4<Float>(x: out.m30, y: out.m31, z: out.m32, w: out.m33)))
+	return simd_float4x4(columns: (simd_float4(x: out.m00, y: out.m01, z: out.m02, w: out.m03),
+																 simd_float4(x: out.m10, y: out.m11, z: out.m12, w: out.m13),
+																 simd_float4(x: out.m20, y: out.m21, z: out.m22, w: out.m23),
+																 simd_float4(x: out.m30, y: out.m31, z: out.m32, w: out.m33)))
 }
 
 func mapZoomLimits(viewSize: CGSize, mapSize: CGSize) -> (CGFloat, CGFloat) {

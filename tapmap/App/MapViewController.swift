@@ -14,7 +14,7 @@ class MapViewController: UIViewController, MTKViewDelegate {
 	@IBOutlet var placeName: UILabel!
 	@IBOutlet var labelView: LabelView!
 	
-	var metalRenderer: MetalRenderer!
+	var metalRenderer: MetalRenderer!	// $ Better name, to clarify metalRenderer.specificRenderer
 	
 	// Presentation
 	var world: RuntimeWorld
@@ -126,7 +126,7 @@ class MapViewController: UIViewController, MTKViewDelegate {
 				_ = processSelection(of: hitRegion, user: userState, ui: uiState)
 			} else {
 				uiState.clearSelection()
-// $				selectionRenderer.clear()
+				metalRenderer.selectionRenderer.clear()
 			}
 			
 			uiState.cullWorldTree(focus: visibleLongLat(viewBounds: view.bounds))
@@ -140,7 +140,7 @@ class MapViewController: UIViewController, MTKViewDelegate {
 			return true
 		} else {
 			ui.selectRegion(hit)
-// $			selectionRenderer.select(regionHash: hit.geographyId.hashed)
+			metalRenderer.selectionRenderer.select(regionHash: hit.geographyId.hashed)	// $ weird semantics to select in the renderer
 			return false
 		}
 	}
@@ -149,6 +149,7 @@ class MapViewController: UIViewController, MTKViewDelegate {
 		where T.SubType: GeoPlaceContainer {
 
 		user.openPlace(hit)
+		metalRenderer.selectionRenderer.clear()
 		
 		if geometryStreamer.renderPrimitive(for: hit.geographyId.hashed) != nil {
 // $			effectRenderer.addOpeningEffect(for: hit.geographyId.hashed)
