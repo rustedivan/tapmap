@@ -16,6 +16,7 @@ struct MapUniforms {
 }
 
 class RegionRenderer {
+	let device: MTLDevice
 	let pipeline: MTLRenderPipelineState
 	
 	init(withDevice device: MTLDevice, pixelFormat: MTLPixelFormat) {
@@ -28,6 +29,7 @@ class RegionRenderer {
 		
 		do {
 			try pipeline = device.makeRenderPipelineState(descriptor: pipelineDescriptor)
+			self.device = device
 		} catch let error {
 			fatalError(error.localizedDescription)
 		}

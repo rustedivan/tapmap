@@ -23,6 +23,7 @@ class MetalRenderer {
 	var effectRenderer: EffectRenderer
 	var selectionRenderer: SelectionRenderer
 	var borderRenderer: BorderRenderer
+	var debugRenderer: DebugRenderer
 	
 	init(in view: MTKView, forWorld world: RuntimeWorld) {
 		device = MTLCreateSystemDefaultDevice()
@@ -40,6 +41,7 @@ class MetalRenderer {
 															provinces: world.availableProvinces)
 		
 		effectRenderer = EffectRenderer(withDevice: device, pixelFormat: view.colorPixelFormat)
+		debugRenderer = DebugRenderer(withDevice: device, pixelFormat: view.colorPixelFormat)
 	}
 	
 	func updateProjection(viewSize: CGSize, mapSize: CGSize, centeredOn offset: CGPoint, zoomedTo zoom: Float) {
@@ -85,7 +87,7 @@ class MetalRenderer {
 		effectRenderer.renderWorld(inProjection: modelViewProjectionMatrix, inEncoder: commandEncoder)
 		selectionRenderer.renderSelection(inProjection: modelViewProjectionMatrix, inEncoder: commandEncoder)
 		
-		// //		DebugRenderer.shared.renderMarkers(inProjection: modelViewProjectionMatrix)
+		//		DebugRenderer.shared.renderMarkers(inProjection: modelViewProjectionMatrix)
 		
 		commandEncoder.endEncoding()
 		commandBuffer.present(drawable)
