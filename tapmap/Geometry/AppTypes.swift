@@ -7,6 +7,7 @@
 //
 
 import Foundation
+import UIKit.UIColor
 
 struct Vertex : Equatable {
 	typealias Precision = Float
@@ -45,4 +46,19 @@ struct ScaleVertex {
 
 struct VertexRing : Codable {
 	var vertices: [Vertex]
+}
+
+struct Color {
+	let r: Float
+	let g: Float
+	let b: Float
+	let a: Float
+}
+
+extension UIColor {
+	func tuple() -> Color {
+		var out: (r: CGFloat, g: CGFloat, b: CGFloat) = (0.0, 0.0, 0.0)
+		getRed(&out.r, green: &out.g, blue: &out.b, alpha: nil)
+		return Color(r: Float(out.r), g: Float(out.g), b: Float(out.b), a: 1.0)
+	}
 }

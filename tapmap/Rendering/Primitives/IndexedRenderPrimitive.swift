@@ -15,14 +15,14 @@ class IndexedRenderPrimitive<VertexType> {
 	let elementCount: Int
 	let indexBuffer: MTLBuffer
 	
-	let color: (r: Float, g: Float, b: Float, a: Float)
+	let color: Color
 	let name: String
 	
 	// Indexed draw mode
 	init(vertices: [VertexType],
 			 device: MTLDevice,
 			 indices: [UInt32],
-			 color c: (r: Float, g: Float, b: Float, a: Float),
+			 color c: Color,
 			 ownerHash hash: Int, debugName: String) {
 		color = c
 		

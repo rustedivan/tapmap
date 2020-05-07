@@ -14,10 +14,10 @@ class ArrayedRenderPrimitive {
 	let vertexBuffer: MTLBuffer
 	let elementCount: Int
 	
-	let color: (r: Float, g: Float, b: Float, a: Float)
+	let color: Color
 	let name: String
 	
-	init(vertices: [Vertex], device: MTLDevice, color c: (r: Float, g: Float, b: Float, a: Float), ownerHash hash: Int, debugName: String) {
+	init(vertices: [Vertex], device: MTLDevice, color c: Color, ownerHash hash: Int, debugName: String) {
 		color = c
 
 		ownerHash = hash

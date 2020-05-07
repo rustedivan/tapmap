@@ -74,7 +74,7 @@ class SelectionRenderer {
 		encoder.pushDebugGroup("Render outlines")
 		encoder.setRenderPipelineState(pipeline)
 		
-		var uniforms = SelectionUniforms(mvpMatrix: projection, width: outlineWidth, color: simd_float4(arrayLiteral: 0.0, 0.0, 0.0, 1.0))
+		var uniforms = SelectionUniforms(mvpMatrix: projection, width: outlineWidth, color: Color(r: 0.0, g: 0.0, b: 0.0, a: 1.0).vector)
 		encoder.setVertexBytes(&uniforms, length: MemoryLayout.stride(ofValue: uniforms), index: 1)
 		
 		render(primitive: primitive, into: encoder)

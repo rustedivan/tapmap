@@ -8,20 +8,8 @@
 
 import Foundation
 import UIKit.UIColor
-import OpenGLES
 
-func BUFFER_OFFSET(_ i: UInt32) -> UnsafeRawPointer? {
-	return UnsafeRawPointer(bitPattern: Int(i))
-}
 
-typealias Color = (r: Float, g: Float, b: Float, a: Float)
-extension UIColor {
-	func tuple() -> Color {
-		var out: (r: CGFloat, g: CGFloat, b: CGFloat) = (0.0, 0.0, 0.0)
-		getRed(&out.r, green: &out.g, blue: &out.b, alpha: nil)
-		return Color(r: Float(out.r), g: Float(out.g), b: Float(out.b), a: 1.0)
-	}
-}
 
 // $ Replace with vertex formats (scaled/non-scaled vertices)
 enum VertexAttribs: GLuint {

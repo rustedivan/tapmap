@@ -159,7 +159,7 @@ class GeometryStreamer {
 			
 			streamQueue.async {
 				if let tessellation = self.loadGeometry(chunkName) {
-					// Create the render primitive and update book-keeping on the OpenGL/main thread
+					// Create the render primitive and update book-keeping on the main thread
 					DispatchQueue.main.async {
 						let c = regionId.hashed.hashColor.tuple()
 						let primitive = ArrayedRenderPrimitive(vertices: tessellation.vertices, device: device, color: c, ownerHash: regionId.hashed, debugName: chunkName)

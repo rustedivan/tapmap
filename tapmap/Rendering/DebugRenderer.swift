@@ -16,10 +16,10 @@ class DebugRenderPrimitive {
 	let vertexBuffer: MTLBuffer
 	let elementCount: Int
 	
-	let color: (r: Float, g: Float, b: Float, a: Float)
+	let color: Color
 	let name: String
 	
-	init(mode: MTLPrimitiveType, vertices: [Vertex], device: MTLDevice, color c: (r: Float, g: Float, b: Float, a: Float), debugName: String) {
+	init(mode: MTLPrimitiveType, vertices: [Vertex], device: MTLDevice, color c: Color, debugName: String) {
 		drawMode = mode
 		color = c
 		name = debugName
@@ -141,13 +141,13 @@ class DebugRenderer {
 		
 		// Permanent markers
 		for primitive in primitives.values {
-			uniforms.color = simd_float4(arrayLiteral: primitive.color.r, primitive.color.g, primitive.color.b, primitive.color.a)
+			uniforms.color = primitive.color.vector
 			render(primitive: primitive, into: encoder)
 		}
 		
 		// One-frame markers
 		for primitive in transientPrimitives {
-			uniforms.color = simd_float4(arrayLiteral: primitive.color.r, primitive.color.g, primitive.color.b, primitive.color.a)
+			uniforms.color = primitive.color.vector
 			render(primitive: primitive, into: encoder)
 		}
 		transientPrimitives.removeAll()
@@ -162,7 +162,7 @@ class DebugRenderer {
 		return DebugRenderPrimitive(mode: .triangle,
 																vertices: vertices,
 																device: device,
-																color: (r: 1.0, g: 0.0, b: 1.0, a: 0.5),
+																color: Color(r: 1.0, g: 0.0, b: 1.0, a: 0.5),
 																debugName: name)
 	}
 

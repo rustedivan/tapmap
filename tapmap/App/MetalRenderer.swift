@@ -9,7 +9,6 @@
 import Foundation
 import Metal
 import MetalKit
-import GLKit
 
 class MetalRenderer {
 	var device: MTLDevice!
@@ -104,5 +103,11 @@ class MetalRenderer {
 			sleepRenderer = true
 		}
 		return sleepRenderer
+	}
+}
+
+extension Color {
+	var vector: simd_float4 {
+		return simd_float4(arrayLiteral: r, g, b, a)
 	}
 }
