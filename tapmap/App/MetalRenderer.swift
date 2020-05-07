@@ -37,9 +37,9 @@ class MetalRenderer {
 		poiRenderer = PoiRenderer(withDevice: device, pixelFormat: view.colorPixelFormat,
 															withVisibleContinents: world.availableContinents,
 															countries: world.availableCountries,
-															provinces: world.availableProvinces)!
+															provinces: world.availableProvinces)
 		
-		effectRenderer = EffectRenderer()!
+		effectRenderer = EffectRenderer(withDevice: device, pixelFormat: view.colorPixelFormat)
 	}
 	
 	func updateProjection(viewSize: CGSize, mapSize: CGSize, centeredOn offset: CGPoint, zoomedTo zoom: Float) {
@@ -82,7 +82,7 @@ class MetalRenderer {
 		regionRenderer.renderWorld(visibleSet: renderSet, inProjection: modelViewProjectionMatrix, inEncoder: commandEncoder)
 		borderRenderer.renderCountryBorders(borderedCountries, inProjection: modelViewProjectionMatrix, inEncoder: commandEncoder)
 		poiRenderer.renderWorld(visibleSet: renderSet, inProjection: modelViewProjectionMatrix, inEncoder: commandEncoder)
-		//		effectRenderer.renderWorld(inProjection: modelViewProjectionMatrix)
+		effectRenderer.renderWorld(inProjection: modelViewProjectionMatrix, inEncoder: commandEncoder)
 		selectionRenderer.renderSelection(inProjection: modelViewProjectionMatrix, inEncoder: commandEncoder)
 		
 		// //		DebugRenderer.shared.renderMarkers(inProjection: modelViewProjectionMatrix)

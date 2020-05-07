@@ -77,7 +77,7 @@ class PoiRenderer {
 	var rankThreshold: Float = -1.0
 	var poiBaseSize: Float = 0.0
 	
-	init?(withDevice device: MTLDevice, pixelFormat: MTLPixelFormat,
+	init(withDevice device: MTLDevice, pixelFormat: MTLPixelFormat,
 				withVisibleContinents continents: GeoContinentMap,
 				countries: GeoCountryMap,
 				provinces: GeoProvinceMap) {

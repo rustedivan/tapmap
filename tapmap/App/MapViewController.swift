@@ -152,7 +152,7 @@ class MapViewController: UIViewController, MTKViewDelegate {
 		metalRenderer.selectionRenderer.clear()
 		
 		if geometryStreamer.renderPrimitive(for: hit.geographyId.hashed) != nil {
-// $			effectRenderer.addOpeningEffect(for: hit.geographyId.hashed)
+			metalRenderer.effectRenderer.addOpeningEffect(for: hit.geographyId.hashed)
 			geometryStreamer.evictPrimitive(for: hit.geographyId.hashed)
 		}
 

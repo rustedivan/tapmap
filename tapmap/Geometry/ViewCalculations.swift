@@ -61,6 +61,18 @@ func buildProjectionMatrix(viewSize: CGSize, mapSize: CGSize, centeredOn center:
 																 simd_float4(x: out.m30, y: out.m31, z: out.m32, w: out.m33)))
 }
 
+func buildScaleAboutPointMatrix(scale: Float, center: Vertex) -> simd_float4x4 {
+	var out = GLKMatrix4Identity;
+	out = GLKMatrix4Translate(out, center.x, center.y, 0.0)
+	out = GLKMatrix4Scale(out, scale, scale, 0.0)
+	out = GLKMatrix4Translate(out, -center.x, -center.y, 0.0)
+	
+	return simd_float4x4(columns: (simd_float4(x: out.m00, y: out.m01, z: out.m02, w: out.m03),
+																 simd_float4(x: out.m10, y: out.m11, z: out.m12, w: out.m13),
+																 simd_float4(x: out.m20, y: out.m21, z: out.m22, w: out.m23),
+																 simd_float4(x: out.m30, y: out.m31, z: out.m32, w: out.m33)))
+}
+
 func mapZoomLimits(viewSize: CGSize, mapSize: CGSize) -> (CGFloat, CGFloat) {
 	let height = viewSize.height / UIScreen.main.scale
 	return (height / mapSize.height, 50.0)

@@ -47,11 +47,10 @@ func makeMiterRib(_ v0: Vertex, _ v1: Vertex, _ v2: Vertex, _ lIn: Float, _ lOut
 	let incomingNormal = normal(vectorSub(v1, v0))
 	let tangent = anchorTangent(v0: v0, v1: v1, v2: v2)
 	let miter = Vertex(-tangent.y, tangent.x)
-	let miterLength = 1.0 / dotProduct(miter, incomingNormal)
-	var miterLengthIn = miterLength * lIn
-	var miterLengthOut = miterLength * lOut
-	miterLengthIn = min(miterLengthIn, 2.0)
-	miterLengthOut = min(miterLengthOut, 2.0)
+	var miterLength = 1.0 / dotProduct(miter, incomingNormal)
+	miterLength = min(miterLength, 3.0)
+	let miterLengthIn = miterLength * lIn
+	let miterLengthOut = miterLength * lOut
 	
 	let inner = Vertex(-miter.x * miterLengthIn, -miter.y * miterLengthIn)
 	let outer = Vertex(+miter.x * miterLengthOut, +miter.y * miterLengthOut)
