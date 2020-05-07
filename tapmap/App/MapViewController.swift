@@ -14,7 +14,7 @@ class MapViewController: UIViewController, MTKViewDelegate {
 	@IBOutlet var placeName: UILabel!
 	@IBOutlet var labelView: LabelView!
 	
-	var metalRenderer: MetalRenderer!	// $ Better name, to clarify metalRenderer.specificRenderer
+	var renderers: MetalRenderer!
 	
 	// Presentation
 	var world: RuntimeWorld
@@ -60,8 +60,8 @@ class MapViewController: UIViewController, MTKViewDelegate {
 		super.viewDidLoad()
 		
 		let metalView = view as! MTKView
-		metalRenderer = MetalRenderer(in: metalView, forWorld: world)
-		geometryStreamer.metalDevice = metalRenderer.device
+		renderers = MetalRenderer(in: metalView, forWorld: world)
+		geometryStreamer.metalDevice = renderers.device
 		metalView.delegate = self
 		
 		// Scroll view setup
@@ -126,7 +126,7 @@ class MapViewController: UIViewController, MTKViewDelegate {
 				_ = processSelection(of: hitRegion, user: userState, ui: uiState)
 			} else {
 				uiState.clearSelection()
-				metalRenderer.selectionRenderer.clear()
+				renderers.selectionRenderer.clear()
 			}
 			
 			uiState.cullWorldTree(focus: visibleLongLat(viewBounds: view.bounds))
@@ -140,7 +140,7 @@ class MapViewController: UIViewController, MTKViewDelegate {
 			return true
 		} else {
 			ui.selectRegion(hit)
-			metalRenderer.selectionRenderer.select(regionHash: hit.geographyId.hashed)	// $ weird semantics to select in the renderer
+			renderers.selectionRenderer.select(regionHash: hit.geographyId.hashed)	// $ weird semantics to select in the renderer
 			return false
 		}
 	}
@@ -149,23 +149,23 @@ class MapViewController: UIViewController, MTKViewDelegate {
 		where T.SubType: GeoPlaceContainer {
 
 		user.openPlace(hit)
-		metalRenderer.selectionRenderer.clear()
+		renderers.selectionRenderer.clear()
 		
 		if geometryStreamer.renderPrimitive(for: hit.geographyId.hashed) != nil {
-			metalRenderer.effectRenderer.addOpeningEffect(for: hit.geographyId.hashed)
+			renderers.effectRenderer.addOpeningEffect(for: hit.geographyId.hashed)
 			geometryStreamer.evictPrimitive(for: hit.geographyId.hashed)
 		}
 
-		metalRenderer.poiRenderer.updatePrimitives(for: hit, with: hit.children)
+		renderers.poiRenderer.updatePrimitives(for: hit, with: hit.children)
 		labelView.updatePrimitives(for: hit, with: hit.children)
 	}
 
 	func prepareFrame() {
-		metalRenderer.updateProjection(viewSize: scrollView.bounds.size,
+		renderers.updateProjection(viewSize: scrollView.bounds.size,
 																	 mapSize: mapSpace.size,
 																	 centeredOn: offset,
 																	 zoomedTo: zoom)
-		metalRenderer.prepareFrame(forWorld: world)
+		renderers.prepareFrame(forWorld: world)
 		
 //		labelView.updateLabels(for: metalRenderer.poiRenderer.activePoiHashes,
 //													 inArea: visibleLongLat(viewBounds: view.bounds),
@@ -176,7 +176,7 @@ class MapViewController: UIViewController, MTKViewDelegate {
 		
 		needsRender = geometryStreamer.streaming ? true : needsRender
 
-		if metalRenderer.shouldIdle(appUpdated: needsRender) {
+		if renderers.shouldIdle(appUpdated: needsRender) {
 			metalView.isPaused = true
 		}
 	}
@@ -186,14 +186,14 @@ class MapViewController: UIViewController, MTKViewDelegate {
 		
 		prepareFrame()
 		
-		metalRenderer.render(forWorld: world, into: drawable)
+		renderers.render(forWorld: world, into: drawable)
 //		labelView.renderLabels(projection: mapToView)
 
 		needsRender = false
 	}
 	
 	func mtkView(_ view: MTKView, drawableSizeWillChange size: CGSize) {
-		metalRenderer.updateProjection(viewSize: size,
+		renderers.updateProjection(viewSize: size,
 																	 mapSize: mapSpace.size,
 																	 centeredOn: offset,
 																	 zoomedTo: zoom)

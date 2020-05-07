@@ -39,7 +39,6 @@
 		148937FB22B97FDF009278A0 /* EffectRenderer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 148937E622B97FDF009278A0 /* EffectRenderer.swift */; };
 		148937FC22B97FDF009278A0 /* RegionRenderer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 148937E722B97FDF009278A0 /* RegionRenderer.swift */; };
 		148937FE22B97FDF009278A0 /* ColoredHash.swift in Sources */ = {isa = PBXBuildFile; fileRef = 148937E922B97FDF009278A0 /* ColoredHash.swift */; };
-		148937FF22B97FDF009278A0 /* GeoRenderer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 148937EA22B97FDF009278A0 /* GeoRenderer.swift */; };
 		1489380322B97FDF009278A0 /* PoiRenderer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 148937EE22B97FDF009278A0 /* PoiRenderer.swift */; };
 		1489380422B97FE0009278A0 /* MapViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 148937F022B97FDF009278A0 /* MapViewController.swift */; };
 		1489380522B97FE0009278A0 /* UIState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 148937F122B97FDF009278A0 /* UIState.swift */; };
@@ -150,7 +149,6 @@
 		148937E622B97FDF009278A0 /* EffectRenderer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = EffectRenderer.swift; sourceTree = "<group>"; };
 		148937E722B97FDF009278A0 /* RegionRenderer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RegionRenderer.swift; sourceTree = "<group>"; };
 		148937E922B97FDF009278A0 /* ColoredHash.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ColoredHash.swift; sourceTree = "<group>"; };
-		148937EA22B97FDF009278A0 /* GeoRenderer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = GeoRenderer.swift; sourceTree = "<group>"; };
 		148937EE22B97FDF009278A0 /* PoiRenderer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PoiRenderer.swift; sourceTree = "<group>"; };
 		148937F022B97FDF009278A0 /* MapViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MapViewController.swift; sourceTree = "<group>"; };
 		148937F122B97FDF009278A0 /* UIState.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UIState.swift; sourceTree = "<group>"; };
@@ -282,7 +280,6 @@
 		148937E322B97FDF009278A0 /* Rendering */ = {
 			isa = PBXGroup;
 			children = (
-				148937EA22B97FDF009278A0 /* GeoRenderer.swift */,
 				148937E722B97FDF009278A0 /* RegionRenderer.swift */,
 				14BD43392444AD50007A3D67 /* BorderRenderer.swift */,
 				148937EE22B97FDF009278A0 /* PoiRenderer.swift */,
@@ -728,7 +725,6 @@
 				14985FED22F0ED0C00F68A1F /* IndexedRenderPrimitive.swift in Sources */,
 				148937F622B97FDF009278A0 /* AppTypes.swift in Sources */,
 				1489380322B97FDF009278A0 /* PoiRenderer.swift in Sources */,
-				148937FF22B97FDF009278A0 /* GeoRenderer.swift in Sources */,
 				14B63F072461450F00A4A433 /* PoiShader.metal in Sources */,
 				146EA26A244AF14C009196BC /* RuntimeWorld.swift in Sources */,
 				148937FB22B97FDF009278A0 /* EffectRenderer.swift in Sources */,
