@@ -6,21 +6,18 @@
 //  Copyright © 2017 Wildbrain. All rights reserved.
 //
 
-import GLKit
-import OpenGLES
+import MetalKit
 
-class MapViewController: GLKViewController, GLKViewControllerDelegate {
+class MapViewController: UIViewController, MTKViewDelegate {
+	@IBOutlet weak var metalView: MTKView!
 	@IBOutlet var scrollView: UIScrollView!
 	@IBOutlet var placeName: UILabel!
 	@IBOutlet var labelView: LabelView!
 	
+	var renderers: MetalRenderer!
+	
 	// Presentation
-	var world: RuntimeWorld!
-	var regionRenderer: RegionRenderer!
-	var poiRenderer: PoiRenderer!
-	var effectRenderer: EffectRenderer!
-	var selectionRenderer: SelectionRenderer!
-	var borderRenderer: BorderRenderer!
+	var world: RuntimeWorld
 	var dummyView: UIView!
 	
 	// Navigation
@@ -30,12 +27,10 @@ class MapViewController: GLKViewController, GLKViewControllerDelegate {
 	var mapFrame = CGRect.zero
 	var lastRenderFrame: Int = Int.max
 	var needsRender: Bool = true { didSet {
-		if needsRender { self.isPaused = false }
+		if needsRender { metalView.isPaused = false }
 	}}
 	
 	// Rendering
-	var modelViewProjectionMatrix: GLKMatrix4 = GLKMatrix4Identity
-	var context: EAGLContext? = nil
 	var geometryStreamer: GeometryStreamer
 	
 	required init?(coder: NSCoder) {
@@ -64,19 +59,10 @@ class MapViewController: GLKViewController, GLKViewControllerDelegate {
 	override func viewDidLoad() {
 		super.viewDidLoad()
 		
-		delegate = self
-		
-		// OpenGL context setup
-		let view = self.view as! GLKView
-		if let newContext = EAGLContext(api: .openGLES2) {
-			self.context = newContext
-			view.context = newContext
-			view.drawableDepthFormat = .format24
-			EAGLContext.setCurrent(newContext)
-		} else {
-			print("Failed to create ES context")
-			exit(1)
-		}
+		let metalView = view as! MTKView
+		renderers = MetalRenderer(in: metalView, forWorld: world)
+		geometryStreamer.metalDevice = renderers.device
+		metalView.delegate = self
 		
 		// Scroll view setup
 		dummyView = UIView(frame: view.frame)
@@ -93,18 +79,9 @@ class MapViewController: GLKViewController, GLKViewControllerDelegate {
 		scrollView.zoomScale = zoomLimits.0
 		scrollView.maximumZoomScale = zoomLimits.1
 		
-		// Create renderers
-		regionRenderer = RegionRenderer()
-		poiRenderer = PoiRenderer(withVisibleContinents: world.availableContinents,
-															countries: world.availableCountries,
-															provinces: world.availableProvinces)
 		labelView.buildPoiPrimitives(withVisibleContinents: world.availableContinents,
 																 countries: world.availableCountries,
 																 provinces: world.availableProvinces)
-		poiRenderer.updateZoomThreshold(viewZoom: Float(scrollView!.zoomScale))
-		effectRenderer = EffectRenderer()
-		selectionRenderer = SelectionRenderer()
-		borderRenderer = BorderRenderer()
 		
 		// Prepare UI for rendering the map
 		AppDelegate.sharedUIState.cullWorldTree(focus: visibleLongLat(viewBounds: view.bounds))
@@ -113,15 +90,6 @@ class MapViewController: GLKViewController, GLKViewControllerDelegate {
 	
 	override func didReceiveMemoryWarning() {
 		super.didReceiveMemoryWarning()
-		
-		if self.isViewLoaded && (self.view.window != nil) {
-			self.view = nil
-			
-			if EAGLContext.current() === self.context {
-				EAGLContext.setCurrent(nil)
-			}
-			self.context = nil
-		}
 	}
 	
 	@objc func handleTap(sender: UITapGestureRecognizer) {
@@ -158,7 +126,7 @@ class MapViewController: GLKViewController, GLKViewControllerDelegate {
 				_ = processSelection(of: hitRegion, user: userState, ui: uiState)
 			} else {
 				uiState.clearSelection()
-				selectionRenderer.clear()
+				renderers.selectionRenderer.clear()
 			}
 			
 			uiState.cullWorldTree(focus: visibleLongLat(viewBounds: view.bounds))
@@ -172,7 +140,7 @@ class MapViewController: GLKViewController, GLKViewControllerDelegate {
 			return true
 		} else {
 			ui.selectRegion(hit)
-			selectionRenderer.select(regionHash: hit.geographyId.hashed)
+			renderers.selectionRenderer.select(regionHash: hit.geographyId.hashed)	// $ weird semantics to select in the renderer
 			return false
 		}
 	}
@@ -181,70 +149,55 @@ class MapViewController: GLKViewController, GLKViewControllerDelegate {
 		where T.SubType: GeoPlaceContainer {
 
 		user.openPlace(hit)
+		renderers.selectionRenderer.clear()
 		
 		if geometryStreamer.renderPrimitive(for: hit.geographyId.hashed) != nil {
-			effectRenderer.addOpeningEffect(for: hit.geographyId.hashed)
+			renderers.effectRenderer.addOpeningEffect(for: hit.geographyId.hashed)
 			geometryStreamer.evictPrimitive(for: hit.geographyId.hashed)
 		}
-		poiRenderer.updatePrimitives(for: hit, with: hit.children)
+
+		renderers.poiRenderer.updatePrimitives(for: hit, with: hit.children)
 		labelView.updatePrimitives(for: hit, with: hit.children)
 	}
 
-	// MARK: - GLKView and GLKViewController delegate methods
-	func glkViewControllerUpdate(_ controller: GLKViewController) {
-		modelViewProjectionMatrix = buildProjectionMatrix(viewSize: scrollView.bounds.size,
-																											mapSize: mapSpace.size,
-																											centeredOn: offset,
-																											zoomedTo: zoom)
+	func prepareFrame() {
+		renderers.updateProjection(viewSize: scrollView.bounds.size,
+																	 mapSize: mapSpace.size,
+																	 centeredOn: offset,
+																	 zoomedTo: zoom)
+		renderers.prepareFrame(forWorld: world)
 		
-		let visible = AppDelegate.sharedUIState.visibleRegionHashes
-		let borderedContinents = world.allContinents.filter { visible.contains($0.key) }	// All visible continents (even if visited)
-		effectRenderer.updatePrimitives()
-		selectionRenderer.updateStyle(zoomLevel: zoom)
-		borderRenderer.updateStyle(zoomLevel: zoom)
-		borderRenderer.prepareGeometry(visibleContinents: borderedContinents, visibleCountries: world.visibleCountries)
-		poiRenderer.updateStyle(zoomLevel: zoom)
-		poiRenderer.updateFades()
-		labelView.updateLabels(for: poiRenderer.activePoiHashes,
-													 inArea: visibleLongLat(viewBounds: view.bounds),
-													 atZoom: zoom)
+//		labelView.updateLabels(for: metalRenderer.poiRenderer.activePoiHashes,
+//													 inArea: visibleLongLat(viewBounds: view.bounds),
+//													 atZoom: zoom)
+		
 		geometryStreamer.updateLodLevel()
 		geometryStreamer.updateStreaming()
 		
-		idleIfStill(willRender: needsRender, frameCount: controller.framesDisplayed)
-	}
-	
-	override func glkView(_ view: GLKView, drawIn rect: CGRect) {
-		glClearColor(0.0, 0.1, 0.6, 1.0)
-		glClear(GLbitfield(GL_COLOR_BUFFER_BIT) | GLbitfield(GL_DEPTH_BUFFER_BIT))
-		
-		let available = AppDelegate.sharedUserState.availableSet
-		let visible = AppDelegate.sharedUIState.visibleRegionHashes
-		let renderSet = available.intersection(visible)
-		let borderedContinents = visible.intersection(world.allContinents.keys)	// All visible continents (even if visited)
-		let borderedCountries = Set(world.visibleCountries.keys)
-		
-		borderRenderer.renderContinentBorders(borderedContinents, inProjection: modelViewProjectionMatrix)
-		regionRenderer.renderWorld(visibleSet: renderSet, inProjection: modelViewProjectionMatrix)
-		borderRenderer.renderCountryBorders(borderedCountries, inProjection: modelViewProjectionMatrix)
-		poiRenderer.renderWorld(visibleSet: renderSet, inProjection: modelViewProjectionMatrix)
-		effectRenderer.renderWorld(inProjection: modelViewProjectionMatrix)
-		selectionRenderer.renderSelection(inProjection: modelViewProjectionMatrix)
-		labelView.renderLabels(projection: mapToView)
-		
-		needsRender = false
-//		DebugRenderer.shared.renderMarkers(inProjection: modelViewProjectionMatrix)
-	}
-	
-	func idleIfStill(willRender: Bool, frameCount: Int) {
-		needsRender = effectRenderer.animating ? true : willRender
-		needsRender = geometryStreamer.streaming ? true : willRender
-		if (needsRender) {
-			lastRenderFrame = frameCount
-		} else if frameCount - lastRenderFrame > 30 {
-			self.isPaused = true
+		needsRender = geometryStreamer.streaming ? true : needsRender
+
+		if renderers.shouldIdle(appUpdated: needsRender) {
+			metalView.isPaused = true
 		}
 	}
+	
+	func draw(in view: MTKView) {
+		guard let drawable = view.currentDrawable else { return }
+		
+		prepareFrame()
+		
+		renderers.render(forWorld: world, into: drawable)
+//		labelView.renderLabels(projection: mapToView)
+
+		needsRender = false
+	}
+	
+	func mtkView(_ view: MTKView, drawableSizeWillChange size: CGSize) {
+		renderers.updateProjection(viewSize: size,
+																	 mapSize: mapSpace.size,
+																	 centeredOn: offset,
+																	 zoomedTo: zoom)
+  }
 }
 
 extension MapViewController : UIScrollViewDelegate {
@@ -254,10 +207,7 @@ extension MapViewController : UIScrollViewDelegate {
 	
 	func scrollViewDidZoom(_ scrollView: UIScrollView) {
 		zoom = Float(scrollView.zoomScale)
-		if let renderer = poiRenderer {
-			renderer.updateZoomThreshold(viewZoom: zoom)
-		}
-
+		
 		geometryStreamer.zoomedTo(zoom)
 
 		AppDelegate.sharedUIState.cullWorldTree(focus: visibleLongLat(viewBounds: view.bounds))

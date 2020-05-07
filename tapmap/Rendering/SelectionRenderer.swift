@@ -6,47 +6,52 @@
 //  Copyright © 2019 Wildbrain. All rights reserved.
 //
 
-import OpenGLES
-import GLKit
+import Metal
+import simd
+
+struct SelectionUniforms {
+	let mvpMatrix: simd_float4x4
+	let width: simd_float1
+	let color: simd_float4
+}
 
 class SelectionRenderer {
-	let outlineProgram: GLuint
-	let outlineUniforms : (modelViewMatrix: GLint, color: GLint, width: GLint)
+	let device: MTLDevice
+	let pipeline: MTLRenderPipelineState
 	
 	var outlinePrimitive: OutlineRenderPrimitive?
 	var outlineWidth: Float
 	var lodLevel: Int
 	
-	init?() {
+	init(withDevice device: MTLDevice, pixelFormat: MTLPixelFormat) {
+		let shaderLib = device.makeDefaultLibrary()!
+		
+		let pipelineDescriptor = MTLRenderPipelineDescriptor()
+		pipelineDescriptor.vertexFunction = shaderLib.makeFunction(name: "selectionVertex")
+		pipelineDescriptor.fragmentFunction = shaderLib.makeFunction(name: "selectionFragment")
+		pipelineDescriptor.colorAttachments[0].pixelFormat = pixelFormat;
+		
+		do {
+			try pipeline = device.makeRenderPipelineState(descriptor: pipelineDescriptor)
+			self.device = device
+		} catch let error {
+			fatalError(error.localizedDescription)
+		}
+		
 		outlineWidth = 0.0
-		
-		outlineProgram = loadShaders(shaderName: "EdgeShader")
-		guard outlineProgram != 0 else {
-			print("Failed to load outline shaders")
-			return nil
-		}
-		
 		lodLevel = GeometryStreamer.shared.wantedLodLevel
-		outlineUniforms.modelViewMatrix = glGetUniformLocation(outlineProgram, "modelViewProjectionMatrix")
-		outlineUniforms.color = glGetUniformLocation(outlineProgram, "edgeColor")
-		outlineUniforms.width = glGetUniformLocation(outlineProgram, "edgeWidth")
-	}
-	
-	deinit {
-		if outlineProgram != 0 {
-			glDeleteProgram(outlineProgram)
-		}
 	}
 	
 	func select(regionHash: RegionHash) {
 		let streamer = GeometryStreamer.shared
 		guard let tessellation = streamer.tessellation(for: regionHash, atLod: streamer.actualLodLevel) else { return }
 		
-		let thinOutline = { (outline: [Vertex]) in generateClosedOutlineGeometry(outline: outline, innerExtent: 0.5, outerExtent: 0.5) }
+		let thinOutline = { (outline: [Vertex]) in generateClosedOutlineGeometry(outline: outline, innerExtent: 0.2, outerExtent: 1.0) }
 		let countourVertices = tessellation.contours.map({$0.vertices})
 		let outlineGeometry: RegionContours = countourVertices.map(thinOutline)
 		
 		outlinePrimitive = OutlineRenderPrimitive(contours: outlineGeometry,
+																							device: device,
 																							ownerHash: regionHash,
 																							debugName: "Selection contours")
 	}
@@ -64,27 +69,16 @@ class SelectionRenderer {
 		}
 	}
 	
-	func renderSelection(inProjection projection: GLKMatrix4) {
+	func renderSelection(inProjection projection: simd_float4x4, inEncoder encoder: MTLRenderCommandEncoder) {
 		guard let primitive = outlinePrimitive else { return }
-		glPushGroupMarkerEXT(0, "Render outlines")
-		glUseProgram(outlineProgram)
+		encoder.pushDebugGroup("Render outlines")
+		encoder.setRenderPipelineState(pipeline)
 		
-		var mutableProjection = projection // The 'let' argument is not safe to pass into withUnsafePointer. No copy, since copy-on-write.
-		withUnsafePointer(to: &mutableProjection, {
-			$0.withMemoryRebound(to: Float.self, capacity: 16, {
-				glUniformMatrix4fv(outlineUniforms.modelViewMatrix, 1, 0, $0)
-			})
-		})
+		var uniforms = SelectionUniforms(mvpMatrix: projection, width: outlineWidth, color: Color(r: 0.0, g: 0.0, b: 0.0, a: 1.0).vector)
+		encoder.setVertexBytes(&uniforms, length: MemoryLayout.stride(ofValue: uniforms), index: 1)
 		
-		let components : [GLfloat] = [0.0, 0.0, 0.0, 1.0]
-		glUniform4f(outlineUniforms.color,
-								GLfloat(components[0]),
-								GLfloat(components[1]),
-								GLfloat(components[2]),
-								GLfloat(components[3]))
-		glUniform1f(outlineUniforms.width, outlineWidth)
-		render(primitive: primitive)
+		render(primitive: primitive, into: encoder)
 	
-		glPopGroupMarkerEXT()
+		encoder.popDebugGroup()
 	}
 }

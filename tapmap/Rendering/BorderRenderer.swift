@@ -6,13 +6,20 @@
 //  Copyright © 2019 Wildbrain. All rights reserved.
 //
 
-import OpenGLES
-import GLKit
+import Metal
+import simd
+
+struct BorderUniforms {
+	let mvpMatrix: simd_float4x4
+	let width: simd_float1
+	var color: simd_float4
+}
 
 class BorderRenderer {
+	let device: MTLDevice
+	let pipeline: MTLRenderPipelineState
+	
 	var borderPrimitives: [Int : OutlineRenderPrimitive]
-	let borderProgram: GLuint
-	let borderUniforms : (modelViewMatrix: GLint, color: GLint, width: GLint)
 	var borderWidth: Float
 	var actualBorderLod: Int = 10
 	var wantedBorderLod: Int
@@ -20,29 +27,27 @@ class BorderRenderer {
 	let borderQueue: DispatchQueue
 	var pendingBorders: Set<Int> = []
 
-	init?() {
+	init(withDevice device: MTLDevice, pixelFormat: MTLPixelFormat) {
 		borderWidth = 0.0
 		
-		borderProgram = loadShaders(shaderName: "EdgeShader")
-		guard borderProgram != 0 else {
-			print("Failed to load outline shaders")
-			return nil
-		}
+		let shaderLib = device.makeDefaultLibrary()!
 		
-		borderUniforms.modelViewMatrix = glGetUniformLocation(borderProgram, "modelViewProjectionMatrix")
-		borderUniforms.color = glGetUniformLocation(borderProgram, "edgeColor")
-		borderUniforms.width = glGetUniformLocation(borderProgram, "edgeWidth")
+		let pipelineDescriptor = MTLRenderPipelineDescriptor()
+		pipelineDescriptor.vertexFunction = shaderLib.makeFunction(name: "borderVertex")
+		pipelineDescriptor.fragmentFunction = shaderLib.makeFunction(name: "borderFragment")
+		pipelineDescriptor.colorAttachments[0].pixelFormat = pixelFormat;
+				
+		do {
+			try pipeline = device.makeRenderPipelineState(descriptor: pipelineDescriptor)
+			self.device = device
+		} catch let error {
+			fatalError(error.localizedDescription)
+		}
 		
 		borderPrimitives = [:]
 		
 		borderQueue = DispatchQueue(label: "Border construction", qos: .userInitiated, attributes: .concurrent)
 		wantedBorderLod = GeometryStreamer.shared.wantedLodLevel
-	}
-	
-	deinit {
-		if borderProgram != 0 {
-			glDeleteProgram(borderProgram)
-		}
 	}
 	
 	func updateStyle(zoomLevel: Float) {
@@ -72,10 +77,10 @@ class BorderRenderer {
 						let countourVertices: [[Vertex]]
 						if visibleContinents[borderHash] != nil {
 							innerWidth = 0.1
-							outerWidth = 3.0
+							outerWidth = 1.0
 							countourVertices = [(tessellation.contours.first?.vertices ?? [])]
 						} else {
-							innerWidth = 1.0
+							innerWidth = 0.5
 							outerWidth = 0.1
 							countourVertices = tessellation.contours.map({$0.vertices})
 						}
@@ -83,9 +88,10 @@ class BorderRenderer {
 						let borderOutline = { (outline: [Vertex]) in generateClosedOutlineGeometry(outline: outline, innerExtent: innerWidth, outerExtent: outerWidth) }
 						let outlineGeometry: RegionContours = countourVertices.map(borderOutline)
 
-						// Create the render primitive and update book-keeping on the OpenGL/main thread
+						// Create the render primitive and update book-keeping on the main thread
 						DispatchQueue.main.async {
 							let outlinePrimitive = OutlineRenderPrimitive(contours: outlineGeometry,
+																														device: self.device,
 																														ownerHash: 0,
 																														debugName: "Border \(borderHash)@\(lodLevel)")
 							self.borderPrimitives[loddedBorderHash] = outlinePrimitive
@@ -101,61 +107,38 @@ class BorderRenderer {
 		}
 	}
 	
-	func renderContinentBorders(_ continents: Set<Int>, inProjection projection: GLKMatrix4) {
-		glPushGroupMarkerEXT(0, "Render continent borders")
-		glUseProgram(borderProgram)
-		
-		var mutableProjection = projection // The 'let' argument is not safe to pass into withUnsafePointer. No copy, since copy-on-write.
-		withUnsafePointer(to: &mutableProjection, {
-			$0.withMemoryRebound(to: Float.self, capacity: 16, {
-				glUniformMatrix4fv(borderUniforms.modelViewMatrix, 1, 0, $0)
-			})
-		})
-		
-		let components : [GLfloat] = [0.0, 0.5, 0.7, 1.0]
-		glUniform4f(borderUniforms.color,
-								GLfloat(components[0]),
-								GLfloat(components[1]),
-								GLfloat(components[2]),
-								GLfloat(components[3]))
-		glUniform1f(borderUniforms.width, borderWidth)
+	func renderContinentBorders(_ continents: Set<Int>, inProjection projection: simd_float4x4, inEncoder encoder: MTLRenderCommandEncoder) {
+		encoder.pushDebugGroup("Render continent borders")
+		encoder.setRenderPipelineState(pipeline)
 		
 		let continentOutlineLod = max(actualBorderLod, 0)	// $ Turn up the limit once border width is under control (set min/max outline width and ramp between )
 		let loddedBorderKeys = continents.map { borderHashLodKey($0, atLod: continentOutlineLod) }
+		
+		var uniforms = BorderUniforms(mvpMatrix: projection, width: borderWidth * 2.0, color: Color(r: 1.0, g: 0.5, b: 0.7, a: 1.0).vector)
+		encoder.setVertexBytes(&uniforms, length: MemoryLayout.stride(ofValue: uniforms), index: 1)
+		
 		for key in loddedBorderKeys {
 			guard let primitive = borderPrimitives[key] else { continue }
-			render(primitive: primitive)
+			render(primitive: primitive, into: encoder)
 		}
 		
-		glPopGroupMarkerEXT()
+		encoder.popDebugGroup()
 	}
 	
-	func renderCountryBorders(_ countries: Set<Int>, inProjection projection: GLKMatrix4) {
-		glPushGroupMarkerEXT(0, "Render country borders")
-		glUseProgram(borderProgram)
+	func renderCountryBorders(_ countries: Set<Int>, inProjection projection: simd_float4x4, inEncoder encoder: MTLRenderCommandEncoder) {
+		encoder.pushDebugGroup("Render country borders")
+		encoder.setRenderPipelineState(pipeline)
 		
-		var mutableProjection = projection // The 'let' argument is not safe to pass into withUnsafePointer. No copy, since copy-on-write.
-		withUnsafePointer(to: &mutableProjection, {
-			$0.withMemoryRebound(to: Float.self, capacity: 16, {
-				glUniformMatrix4fv(borderUniforms.modelViewMatrix, 1, 0, $0)
-			})
-		})
-		
-		let components : [GLfloat] = [1.0, 1.0, 1.0, 1.0]
-		glUniform4f(borderUniforms.color,
-								GLfloat(components[0]),
-								GLfloat(components[1]),
-								GLfloat(components[2]),
-								GLfloat(components[3]))
-		glUniform1f(borderUniforms.width, borderWidth)
+		var uniforms = BorderUniforms(mvpMatrix: projection, width: borderWidth, color: Color(r: 1.0, g: 1.0, b: 1.0, a: 1.0).vector)
+		encoder.setVertexBytes(&uniforms, length: MemoryLayout.stride(ofValue: uniforms), index: 1)
 		
 		let loddedBorderKeys = countries.map { borderHashLodKey($0, atLod: actualBorderLod) }
 		for key in loddedBorderKeys {
 			guard let primitive = borderPrimitives[key] else { continue }
-			render(primitive: primitive)
+			render(primitive: primitive, into: encoder)
 		}
 		
-		glPopGroupMarkerEXT()
+		encoder.popDebugGroup()
 	}
 	
 	func borderHashLodKey(_ regionHash: RegionHash, atLod lod: Int) -> Int {

@@ -8,7 +8,7 @@
 
 import Foundation
 import CoreGraphics.CGGeometry
-import GLKit
+import GLKit.GLKMatrix4
 
 // Map from screen space to map space
 func mapPoint(_ p: CGPoint, from view: CGRect, to subView: CGRect, space: CGRect) -> CGPoint {
@@ -30,7 +30,7 @@ func projectPoint(_ m: CGPoint, from view: CGRect, to subView: CGRect, space: CG
 								 y: y + subView.minY + view.minY)
 }
 
-func buildProjectionMatrix(viewSize: CGSize, mapSize: CGSize, centeredOn center: CGPoint, zoomedTo zoom: Float) -> GLKMatrix4 {
+func buildProjectionMatrix(viewSize: CGSize, mapSize: CGSize, centeredOn center: CGPoint, zoomedTo zoom: Float) -> simd_float4x4 {
 	let viewAspect = viewSize.height / viewSize.width
 	let fittedMapSize = CGSize(width: mapSize.width, height: mapSize.width * viewAspect)
 	let projectionMatrix = GLKMatrix4MakeOrtho(0.0, Float(fittedMapSize.width),
@@ -41,9 +41,9 @@ func buildProjectionMatrix(viewSize: CGSize, mapSize: CGSize, centeredOn center:
 	let lngOffset = Float(fittedMapSize.width / 2.0)
 	let latOffset = Float(fittedMapSize.height / 2.0)
 	
-	// Compute the model view matrix for the object rendered with GLKit
 	// (Z = -1.0 to position between the clipping planes)
-	var modelViewMatrix = GLKMatrix4Translate(GLKMatrix4Identity, 0.0, 0.0, -1.0)
+	var modelViewMatrix = GLKMatrix4Translate(GLKMatrix4Identity, 0.0, 0.0, -1.5)
+	
 	
 	// Matrix operations, applied in reverse order
 	// 3: Move to scaled UIScrollView content offset
@@ -53,7 +53,24 @@ func buildProjectionMatrix(viewSize: CGSize, mapSize: CGSize, centeredOn center:
 	// 1: Center the data
 	modelViewMatrix = GLKMatrix4Translate(modelViewMatrix, lngOffset, -latOffset, 0.0)
 	
-	return GLKMatrix4Multiply(projectionMatrix, modelViewMatrix)
+	let out = GLKMatrix4Multiply(projectionMatrix, modelViewMatrix)
+
+	return simd_float4x4(columns: (simd_float4(x: out.m00, y: out.m01, z: out.m02, w: out.m03),
+																 simd_float4(x: out.m10, y: out.m11, z: out.m12, w: out.m13),
+																 simd_float4(x: out.m20, y: out.m21, z: out.m22, w: out.m23),
+																 simd_float4(x: out.m30, y: out.m31, z: out.m32, w: out.m33)))
+}
+
+func buildScaleAboutPointMatrix(scale: Float, center: Vertex) -> simd_float4x4 {
+	var out = GLKMatrix4Identity;
+	out = GLKMatrix4Translate(out, center.x, center.y, 0.0)
+	out = GLKMatrix4Scale(out, scale, scale, 0.0)
+	out = GLKMatrix4Translate(out, -center.x, -center.y, 0.0)
+	
+	return simd_float4x4(columns: (simd_float4(x: out.m00, y: out.m01, z: out.m02, w: out.m03),
+																 simd_float4(x: out.m10, y: out.m11, z: out.m12, w: out.m13),
+																 simd_float4(x: out.m20, y: out.m21, z: out.m22, w: out.m23),
+																 simd_float4(x: out.m30, y: out.m31, z: out.m32, w: out.m33)))
 }
 
 func mapZoomLimits(viewSize: CGSize, mapSize: CGSize) -> (CGFloat, CGFloat) {

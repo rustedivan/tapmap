@@ -109,7 +109,6 @@ protocol GeoIdentifiable : Hashable {
 
 protocol GeoPlaceContainer {
 	var places : Set<GeoPlace> { get }
-	func poiRenderPlanes() -> [PoiPlane]
 }
 
 protocol GeoNode : GeoIdentifiable {

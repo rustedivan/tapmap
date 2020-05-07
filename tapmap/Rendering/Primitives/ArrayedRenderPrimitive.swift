@@ -6,64 +6,40 @@
 //  Copyright © 2019 Wildbrain. All rights reserved.
 //
 
-import OpenGLES
+import Metal
 
 class ArrayedRenderPrimitive {
 	let ownerHash: Int
 	
-	var vertexBuffer: GLuint = 0
-	let elementCount: GLsizei
+	let vertexBuffer: MTLBuffer
+	let elementCount: Int
 	
-	let color: (r: GLfloat, g: GLfloat, b: GLfloat, a: GLfloat)
+	let color: Color
 	let name: String
 	
-	init(vertices: [Vertex], color c: (r: Float, g: Float, b: Float, a: Float), ownerHash hash: Int, debugName: String) {
+	init(vertices: [Vertex], device: MTLDevice, color c: Color, ownerHash hash: Int, debugName: String) {
 		color = c
-		
+
 		ownerHash = hash
 		name = debugName
+		elementCount = vertices.count
 		
 		guard !vertices.isEmpty else {
-			elementCount = 0
-			return
+			fatalError("Do not create render primitive for empty meshes")
 		}
 		
-		glGenBuffers(1, &vertexBuffer)
-		glBindBuffer(GLenum(GL_ARRAY_BUFFER), vertexBuffer)
-		glBufferData(GLenum(GL_ARRAY_BUFFER),
-								 GLsizeiptr(MemoryLayout<Vertex>.stride * vertices.count),
-								 vertices,
-								 GLenum(GL_STATIC_DRAW))
+		let bufLen = MemoryLayout<Vertex>.stride * elementCount
+		guard let newBuffer = device.makeBuffer(length: bufLen, options: .storageModeShared) else {	// $ Figure out how to use .private
+			fatalError("Could not create vertex buffer for \(debugName)")
+		}
 		
-		glBindBuffer(GLenum(GL_ELEMENT_ARRAY_BUFFER), 0)
-		
-		elementCount = GLsizei(vertices.count)
-		
-		glLabelObjectEXT(GLenum(GL_BUFFER_OBJECT_EXT), vertexBuffer, 0, "\(debugName).vertices")
-	}
-	
-	deinit {
-		glDeleteBuffers(1, &vertexBuffer)
+		self.vertexBuffer = newBuffer
+		self.vertexBuffer.label = "\(debugName) vertex buffer"
+		self.vertexBuffer.contents().copyMemory(from: vertices, byteCount: bufLen)
 	}
 }
 
-func render(primitive: ArrayedRenderPrimitive) {
-	guard primitive.elementCount > 0 else {
-		return
-	}
-	
-	glEnableClientState(GLenum(GL_VERTEX_ARRAY))
-	glEnableVertexAttribArray(VertexAttribs.position.rawValue)
-	
-	glBindBuffer(GLenum(GL_ELEMENT_ARRAY_BUFFER), 0)
-	
-	glBindBuffer(GLenum(GL_ARRAY_BUFFER), primitive.vertexBuffer)
-	// Point out vertex positions
-	glVertexAttribPointer(VertexAttribs.position.rawValue, 2,
-												GLenum(GL_FLOAT), GLboolean(GL_FALSE),
-												GLsizei(MemoryLayout<Vertex>.stride), BUFFER_OFFSET(0))
-	
-	glDrawArrays(GLenum(GL_TRIANGLES),
-							 0,
-							 primitive.elementCount)
+func render(primitive: ArrayedRenderPrimitive, into encoder: MTLRenderCommandEncoder) {
+	encoder.setVertexBuffer(primitive.vertexBuffer, offset: 0, index: 0)
+	encoder.drawPrimitives(type: .triangle, vertexStart: 0, vertexCount: primitive.elementCount)
 }

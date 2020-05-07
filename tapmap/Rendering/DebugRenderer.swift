@@ -6,57 +6,44 @@
 //  Copyright © 2019 Wildbrain. All rights reserved.
 //
 
-import OpenGLES
-import GLKit
+import Metal
+import simd
+import CoreGraphics
+import UIKit.UIColor
 
 class DebugRenderPrimitive {
-	let drawMode: GLenum
-	var vertexBuffer: GLuint = 0
-	let elementCount: GLsizei
+	let drawMode: MTLPrimitiveType
+	let vertexBuffer: MTLBuffer
+	let elementCount: Int
 	
-	let color: (r: GLfloat, g: GLfloat, b: GLfloat, a: GLfloat)
+	let color: Color
 	let name: String
 	
-	init(mode: GLenum, vertices: [Vertex], color c: (r: Float, g: Float, b: Float, a: Float), debugName: String) {
+	init(mode: MTLPrimitiveType, vertices: [Vertex], device: MTLDevice, color c: Color, debugName: String) {
 		drawMode = mode
 		color = c
 		name = debugName
 		
+		elementCount = vertices.count
+		
 		guard !vertices.isEmpty else {
-			elementCount = 0
-			return
+			fatalError("Do not create render primitive for empty meshes")
 		}
 		
-		glGenBuffers(1, &vertexBuffer)
-		glBindBuffer(GLenum(GL_ARRAY_BUFFER), vertexBuffer)
-		glBufferData(GLenum(GL_ARRAY_BUFFER),
-								 GLsizeiptr(MemoryLayout<Vertex>.stride * vertices.count),
-								 vertices,
-								 GLenum(GL_STATIC_DRAW))
+		let bufLen = MemoryLayout<Vertex>.stride * elementCount
+		guard let newBuffer = device.makeBuffer(length: bufLen, options: .storageModeShared) else {
+			fatalError("Could not create vertex buffer for \(debugName)")
+		}
 		
-		glBindBuffer(GLenum(GL_ELEMENT_ARRAY_BUFFER), 0)
-		elementCount = GLsizei(vertices.count)
-		glLabelObjectEXT(GLenum(GL_BUFFER_OBJECT_EXT), vertexBuffer, 0, "Debug - \(debugName).vertices")
-	}
-	
-	deinit {
-		glDeleteBuffers(1, &vertexBuffer)
+		self.vertexBuffer = newBuffer
+		self.vertexBuffer.label = "Debug - \(debugName) vertex buffer"
+		self.vertexBuffer.contents().copyMemory(from: vertices, byteCount: bufLen)
 	}
 }
 
-func render(primitive: DebugRenderPrimitive) {
-	guard primitive.elementCount > 0 else {
-		return
-	}
-	
-	glBindBuffer(GLenum(GL_ARRAY_BUFFER), primitive.vertexBuffer)
-	glVertexAttribPointer(VertexAttribs.position.rawValue, 2,
-												GLenum(GL_FLOAT), GLboolean(GL_FALSE),
-												GLsizei(MemoryLayout<Vertex>.stride), BUFFER_OFFSET(0))
-	
-	glDrawArrays(primitive.drawMode,
-							 0,
-							 primitive.elementCount)
+func render(primitive: DebugRenderPrimitive, into encoder: MTLRenderCommandEncoder) {
+	encoder.setVertexBuffer(primitive.vertexBuffer, offset: 0, index: 0)
+	encoder.drawPrimitives(type: primitive.drawMode, vertexStart: 0, vertexCount: primitive.elementCount)
 }
 
 
@@ -64,43 +51,19 @@ protocol DebugMarker {
 	var renderPrimitive: DebugRenderPrimitive { get }
 }
 
-func makeDebugCursor(at p: Vertex, name: String) -> DebugRenderPrimitive {
-	let vertices: [Vertex] = [
-		Vertex(p.x, p.y),
-		Vertex(p.x - 3.0, p.y + 5.0),
-		Vertex(p.x + 3.0, p.y + 5.0)
-	]
-	return DebugRenderPrimitive(mode: GLenum(GL_TRIANGLES),
-															vertices: vertices,
-															color: (r: 1.0, g: 0.0, b: 1.0, a: 0.5),
-															debugName: name)
-}
-
-func makeDebugQuad(for box: Aabb, color: UIColor, name: String) -> DebugRenderPrimitive {
-	let vertices: [Vertex] = [
-		Vertex(box.minX, box.minY),
-		Vertex(box.maxX, box.minY),
-		Vertex(box.maxX, box.maxY),
-		Vertex(box.minX, box.maxY),
-	]
-	return DebugRenderPrimitive(mode: GLenum(GL_LINE_LOOP),
-															vertices: vertices,
-															color: color.tuple(),
-															debugName: name)
+struct DebugUniforms {
+	let mvpMatrix: simd_float4x4
+	var color: simd_float4
 }
 
 class DebugRenderer {
 	static private var _shared: DebugRenderer!
 	static var shared: DebugRenderer {
-		get {
-			if _shared == nil {
-				_shared = DebugRenderer()
-			}
-			return _shared
-		}
+		return _shared
 	}
-	let debugProgram: GLuint
-	let markerUniforms : (modelViewMatrix: GLint, color: GLint)
+
+	let device: MTLDevice
+	let pipeline: MTLRenderPipelineState
 	var primitives: [UUID: DebugRenderPrimitive]
 	var transientPrimitives: [DebugRenderPrimitive]
 	
@@ -142,56 +105,79 @@ class DebugRenderer {
 		transientPrimitives.append(newQuad)
 	}
 	
-	init?() {
-		debugProgram = loadShaders(shaderName: "DebugShader")
-		guard debugProgram != 0 else {
-			print("Failed to load debug shaders")
-			return nil
+	init(withDevice device: MTLDevice, pixelFormat: MTLPixelFormat) {
+		let shaderLib = device.makeDefaultLibrary()!
+		
+		let pipelineDescriptor = MTLRenderPipelineDescriptor()
+		pipelineDescriptor.vertexFunction = shaderLib.makeFunction(name: "mapVertex")
+		pipelineDescriptor.fragmentFunction = shaderLib.makeFunction(name: "mapFragment")
+		pipelineDescriptor.colorAttachments[0].pixelFormat = pixelFormat;
+		pipelineDescriptor.colorAttachments[0].isBlendingEnabled = true
+		pipelineDescriptor.colorAttachments[0].sourceRGBBlendFactor = .sourceAlpha
+		pipelineDescriptor.colorAttachments[0].sourceAlphaBlendFactor = .sourceAlpha
+		pipelineDescriptor.colorAttachments[0].destinationRGBBlendFactor = .oneMinusSourceAlpha
+		pipelineDescriptor.colorAttachments[0].destinationAlphaBlendFactor = .oneMinusSourceAlpha
+		
+		do {
+			try pipeline = device.makeRenderPipelineState(descriptor: pipelineDescriptor)
+			self.device = device
+		} catch let error {
+			fatalError(error.localizedDescription)
 		}
 		
-		markerUniforms.modelViewMatrix = glGetUniformLocation(debugProgram, "modelViewProjectionMatrix")
-		markerUniforms.color = glGetUniformLocation(debugProgram, "markerColor")
 		primitives = [:]
 		transientPrimitives = []
+		
+		DebugRenderer._shared = self
 	}
 	
-	func renderMarkers(inProjection projection: GLKMatrix4) {
-		glPushGroupMarkerEXT(0, "Render debug layer")
-		glUseProgram(debugProgram)
+	func renderMarkers(inProjection projection: simd_float4x4, inEncoder encoder: MTLRenderCommandEncoder) {
+		encoder.pushDebugGroup("Render debug layer")
+		encoder.setRenderPipelineState(pipeline)
 		
-		var mutableProjection = projection // The 'let' argument is not safe to pass into withUnsafePointer. No copy, since copy-on-write.
-		withUnsafePointer(to: &mutableProjection, {
-			$0.withMemoryRebound(to: Float.self, capacity: 16, {
-				glUniformMatrix4fv(markerUniforms.modelViewMatrix, 1, 0, $0)
-			})
-		})
+		var uniforms = DebugUniforms(mvpMatrix: projection,
+																 color: simd_float4())
 		
-		glEnable(GLenum(GL_BLEND))
-		glBlendFunc(GLenum(GL_SRC_ALPHA), GLenum(GL_ONE_MINUS_SRC_ALPHA))
 		
 		// Permanent markers
 		for primitive in primitives.values {
-			// Set color
-			glUniform4f(markerUniforms.color,
-									GLfloat(primitive.color.r),
-									GLfloat(primitive.color.g),
-									GLfloat(primitive.color.b),
-									GLfloat(primitive.color.a))
-			render(primitive: primitive)
+			uniforms.color = primitive.color.vector
+			render(primitive: primitive, into: encoder)
 		}
 		
 		// One-frame markers
 		for primitive in transientPrimitives {
-			// Set color
-			glUniform4f(markerUniforms.color,
-									GLfloat(primitive.color.r),
-									GLfloat(primitive.color.g),
-									GLfloat(primitive.color.b),
-									GLfloat(primitive.color.a))
-			render(primitive: primitive)
+			uniforms.color = primitive.color.vector
+			render(primitive: primitive, into: encoder)
 		}
 		transientPrimitives.removeAll()
-		
-		glDisable(GLenum(GL_BLEND))
+	}
+	
+	func makeDebugCursor(at p: Vertex, name: String) -> DebugRenderPrimitive {
+		let vertices: [Vertex] = [
+			Vertex(p.x, p.y),
+			Vertex(p.x - 3.0, p.y + 5.0),
+			Vertex(p.x + 3.0, p.y + 5.0)
+		]
+		return DebugRenderPrimitive(mode: .triangle,
+																vertices: vertices,
+																device: device,
+																color: Color(r: 1.0, g: 0.0, b: 1.0, a: 0.5),
+																debugName: name)
+	}
+
+	func makeDebugQuad(for box: Aabb, color: UIColor, name: String) -> DebugRenderPrimitive {
+		let vertices: [Vertex] = [
+			Vertex(box.minX, box.minY),
+			Vertex(box.maxX, box.minY),
+			Vertex(box.maxX, box.maxY),
+			Vertex(box.minX, box.maxY),
+			Vertex(box.minX, box.minY)	// Close the quad
+		]
+		return DebugRenderPrimitive(mode: .lineStrip,
+																vertices: vertices,
+																device: device,
+																color: color.tuple(),
+																debugName: name)
 	}
 }
