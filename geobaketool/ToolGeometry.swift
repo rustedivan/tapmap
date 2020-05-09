@@ -169,25 +169,11 @@ func tessellate(_ feature: ToolGeoFeature) -> GeoTessellation? {
 	midpoint.0 /= Double(regionVertices.count)
 	midpoint.1 /= Double(regionVertices.count)
 	
-	let indices = t.indices.map { UInt32($0) }
-	
-	var flattenedVertices: [Vertex] = []
-	for i in stride(from: 0, to: indices.count, by: 3) {
-		let i0 = indices[i + 0]
-		let i1 = indices[i + 1]
-		let i2 = indices[i + 2]
-		
-		// Expand the index-based vertices into straight arrays
-		let v0 = regionVertices[Int(i0)]
-		let v1 = regionVertices[Int(i1)]
-		let v2 = regionVertices[Int(i2)]
-		
-		flattenedVertices.append(contentsOf: [v0, v1, v2])
-	}
+	let indices = t.indices.map { UInt16($0) }
 	
 	let visualCenter = poleOfInaccessibility(feature.polygons)
 
-	return GeoTessellation(vertices: flattenedVertices, contours: feature.polygons.map { $0.exteriorRing }, aabb: aabb, visualCenter: visualCenter)
+	return GeoTessellation(vertices: regionVertices, indices: indices, contours: feature.polygons.map { $0.exteriorRing }, aabb: aabb, visualCenter: visualCenter)
 }
 
 // MARK: MapBox visual center algorithm

@@ -62,12 +62,12 @@ func tessellateGeometry(params: ArraySlice<String>) throws {
 		let continents = assembleGroups(parts: countries, type: .Continent, properties: [:])
 
 		// MARK: Tessellate geometry
-		let (tessContinents, tessCountries, tessRegions) = try tessellateLodLevel(continents: continents,
+		let (tessContinents, tessCountries, tessProvinces) = try tessellateLodLevel(continents: continents,
 																																							countries: countries,
 																																							regions: loadedProvinces)
 		
 		let archives = [
-			(tessRegions, "provinces", lodLevel),
+			(tessProvinces, "provinces", lodLevel),
 			(tessCountries, "countries", lodLevel),
 			(tessContinents, "continents", lodLevel)]
 		try _ = archives.map(archiveTessellations)

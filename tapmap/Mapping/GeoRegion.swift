@@ -96,6 +96,7 @@ struct Aabb : Equatable, Codable {
 
 struct GeoTessellation : Codable {
 	let vertices: [Vertex]
+	let indices: [UInt16]
 	let contours: [VertexRing]
 	let aabb: Aabb
 	let visualCenter: Vertex

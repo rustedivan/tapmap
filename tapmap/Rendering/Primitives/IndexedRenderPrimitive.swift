@@ -20,8 +20,8 @@ class IndexedRenderPrimitive<VertexType> {
 	
 	// Indexed draw mode
 	init(vertices: [VertexType],
+			 indices: [UInt16],
 			 device: MTLDevice,
-			 indices: [UInt32],
 			 color c: Color,
 			 ownerHash hash: Int, debugName: String) {
 		color = c
@@ -34,7 +34,7 @@ class IndexedRenderPrimitive<VertexType> {
 		}
 		
 		let vertexBufLen = MemoryLayout<VertexType>.stride * vertices.count
-		let indexBufLen = MemoryLayout<UInt32>.stride * indices.count
+		let indexBufLen = MemoryLayout<UInt16>.stride * indices.count
 		
 		guard let newVertBuffer = device.makeBuffer(length: vertexBufLen, options: .storageModeShared),
 					let	newIndexBuffer = device.makeBuffer(length: indexBufLen, options: .storageModeShared) else {
@@ -57,7 +57,7 @@ func render<T>(primitive: IndexedRenderPrimitive<T>, into encoder: MTLRenderComm
 	encoder.setVertexBuffer(primitive.vertexBuffer, offset: 0, index: 0)
 	encoder.drawIndexedPrimitives(type: .triangle,
 																indexCount: primitive.elementCount,
-																indexType: .uint32,
+																indexType: .uint16,
 																indexBuffer: primitive.indexBuffer,
 																indexBufferOffset: 0)
 }

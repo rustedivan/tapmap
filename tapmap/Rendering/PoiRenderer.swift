@@ -232,7 +232,7 @@ func bucketPlaceMarkers(places: Set<GeoPlace>) -> [Int: Set<GeoPlace>] {
 	return bins
 }
 
-func buildPlaceMarkers(places: Set<GeoPlace>) -> ([ScaleVertex], [UInt32]) {
+func buildPlaceMarkers(places: Set<GeoPlace>) -> ([ScaleVertex], [UInt16]) {
 	let vertices = places.reduce([]) { (accumulator: [ScaleVertex], place: GeoPlace) in
 		let size = 1.0 / Float(place.rank > 0 ? place.rank : 1)
 		let v0 = ScaleVertex(0.0, 0.0, normalX: -size, normalY: -size)
@@ -245,9 +245,9 @@ func buildPlaceMarkers(places: Set<GeoPlace>) -> ([ScaleVertex], [UInt32]) {
 		return accumulator + verts
 	}
 	
-	let quadRange = 0..<UInt32(places.count)
-	let indices = quadRange.reduce([]) { (accumulator: [UInt32], quadIndex: UInt32) in
-		let quadIndices: [UInt32] = [0, 2, 1, 0, 3, 2]	// Build two triangles from the four quad vertices
+	let quadRange = 0..<UInt16(places.count)
+	let indices = quadRange.reduce([]) { (accumulator: [UInt16], quadIndex: UInt16) in
+		let quadIndices: [UInt16] = [0, 2, 1, 0, 3, 2]	// Build two triangles from the four quad vertices
 		let vertexOffset = quadIndex * 4
 		let offsetIndices = quadIndices.map { $0 + vertexOffset }
 		return accumulator + offsetIndices
@@ -276,8 +276,8 @@ func makePoiPlaneFactory<T:GeoIdentifiable>(forArea: Bool, in container: T, inDe
 	return { (rank: Int, pois: Set<GeoPlace>) -> PoiPlane in
 		let (vertices, indices) = buildPlaceMarkers(places: pois)
 		let primitive = IndexedRenderPrimitive<ScaleVertex>(vertices: vertices,
-																												device: device,
 																												indices: indices,
+																												device: device,
 																												color: rank.hashColor.tuple(),
 																												ownerHash: container.geographyId.hashed,	// The hash of the owning region
 																												debugName: "\(container.name) - \(forArea ? "area" : "poi") plane @ \(rank)")

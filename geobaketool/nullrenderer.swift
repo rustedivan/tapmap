@@ -19,7 +19,7 @@ class ArrayedRenderPrimitive {
 class IndexedRenderPrimitive {
 	let ownerHash = 17
 	init() {}
-	init(vertices: [Vertex], indices: [UInt32], color c: (r: Float, g: Float, b: Float, a: Float), ownerHash hash: Int, debugName: String) {
+	init(vertices: [Vertex], indices: [UInt16], color c: (r: Float, g: Float, b: Float, a: Float), ownerHash hash: Int, debugName: String) {
 	}
 }
 
@@ -57,7 +57,7 @@ class GeometryStreamer {
 	static var shared: GeometryStreamer { get {
 		return GeometryStreamer()
 	}}
-	func tessellation(for: Int, atLod: Int) -> ArrayedRenderPrimitive? {
+	func tessellation(for: Int, atLod: Int) -> IndexedRenderPrimitive? {
 		return nil
 	}
 }

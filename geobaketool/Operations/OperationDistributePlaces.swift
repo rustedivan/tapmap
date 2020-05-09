@@ -42,7 +42,8 @@ class OperationDistributePlaces : Operation {
 			// Perform point-in-triangle tests
 			let belongingPlaces = candidatePlaces.filter {
 				triangleSoupHitTest(point: $0.location,
-														inVertices: regionTessellation.vertices)
+														inVertices: regionTessellation.vertices,
+														withIndices: regionTessellation.indices)
 			}
 			
 			var updatedFeature = region

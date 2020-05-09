@@ -31,21 +31,16 @@ class OperationTessellateRegions : Operation {
 		
 		let numFeatures = input.count
 		var doneFeatures = 0
-		let tessellationResult = input.values.compactMap { feature -> ToolGeoFeature? in
+		let tessellationResult = input.values.compactMap { (feature: ToolGeoFeature) -> ToolGeoFeature? in
 			if let tessellation = tessellate(feature) {
+				var out = feature
 				totalTris += tessellation.vertices.count
 				doneFeatures += 1
 				
 				let progress = Double(doneFeatures) / Double(numFeatures)
-				let shortName = feature.name.prefix(16)
-				report(progress, "\(totalTris) triangles @ \(shortName)", false)
-				return ToolGeoFeature(level: feature.level,
-															polygons: feature.polygons,
-															tessellations: [tessellation],	// $ Necessary to lens this?
-															places: nil,
-															children: nil,
-															stringProperties: feature.stringProperties,
-															valueProperties: feature.valueProperties)
+				report(progress, "\(totalTris) triangles @ \(out.name.prefix(16))", false)
+				out.tessellations = [tessellation]
+				return out
 			} else {
 				reportError(feature.name, "Tesselation failed")
 				return nil

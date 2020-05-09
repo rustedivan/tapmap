@@ -92,6 +92,8 @@ ROAD TO FINAL
 ## Splash screen until streamer goes still
 ## Evict LRU render primitive
 -- if memory used goes over high-water mark, evict 20% of the pool
+## Rewrite tessellator
+- replace with ear clipper to avoid the sliver polys
 
 # Content patches
 ## Move Gibraltar into Europe

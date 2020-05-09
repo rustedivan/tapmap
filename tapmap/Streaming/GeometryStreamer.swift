@@ -34,7 +34,7 @@ class GeometryStreamer {
 	var lodCacheMiss: Bool = true
 	var newChunkRequests: [RegionId] = []
 	var pendingChunks: Set<ChunkRequest> = []
-	var primitiveCache: [Int : ArrayedRenderPrimitive] = [:]
+	var primitiveCache: [Int : IndexedRenderPrimitive<Vertex>] = [:]
 	var geometryCache: [Int : GeoTessellation] = [:]
 	var regionIdLookup: [RegionHash : RegionId] = [:]	// To avoid dependency on RuntimeWorldl
 	var streaming: Bool { get {
@@ -98,7 +98,7 @@ class GeometryStreamer {
 		return loadedWorld
 	}
 	
-	func renderPrimitive(for regionHash: RegionHash) -> ArrayedRenderPrimitive? {
+	func renderPrimitive(for regionHash: RegionHash) -> IndexedRenderPrimitive<Vertex>? {
 		if primitiveHasWantedLod(for: regionHash) == false {
 			let needsNewChunk = streamMissingPrimitive(for: regionHash)
 			lodCacheMiss = needsNewChunk || lodCacheMiss
@@ -162,7 +162,7 @@ class GeometryStreamer {
 					// Create the render primitive and update book-keeping on the main thread
 					DispatchQueue.main.async {
 						let c = regionId.hashed.hashColor.tuple()
-						let primitive = ArrayedRenderPrimitive(vertices: tessellation.vertices, device: device, color: c, ownerHash: regionId.hashed, debugName: chunkName)
+						let primitive = IndexedRenderPrimitive<Vertex>(vertices: tessellation.vertices, indices: tessellation.indices, device: device, color: c, ownerHash: regionId.hashed, debugName: chunkName)
 						self.primitiveCache[runtimeLodKey] = primitive
 						self.geometryCache[runtimeLodKey] = tessellation
 						self.pendingChunks.remove(ChunkRequest(runtimeLodKey))

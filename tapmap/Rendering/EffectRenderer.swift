@@ -18,7 +18,7 @@ struct EffectUniforms {
 }
 
 struct RegionEffect {
-	let primitive: ArrayedRenderPrimitive
+	let primitive: IndexedRenderPrimitive<Vertex>
 	let center: Vertex
 	let startTime: Date
 	let duration: TimeInterval
