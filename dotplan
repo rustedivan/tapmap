@@ -57,6 +57,12 @@ ROAD TO FINAL
 -- build render primitive bookie with frame-count access markers
 -- the RPB can provide lists of primitives to nuke when under memory pressure
 
+# Architecture concerns
+- don't create streamed/backthread-generated resources from the renderer's completion handlers
+- add simple requests from the render thread
+- enqueue work from main to worker thread
+- add mutex for reading/writing to the work queue (multiple writers, single reader)
+
 # Creative brief
 ## Shading
 ## UX
@@ -69,7 +75,7 @@ ROAD TO FINAL
 ## Labelling scheme
 
 # Archive compression
-- Triangle indices to UInt16
+√ Triangle indices to UInt16
 - Vertices down to Float16
 
 # Runtime tweaking
