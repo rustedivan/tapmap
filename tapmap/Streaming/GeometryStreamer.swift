@@ -99,7 +99,11 @@ class GeometryStreamer {
 	}
 	
 	func renderPrimitive(for regionHash: RegionHash) -> IndexedRenderPrimitive<Vertex>? {
-		if primitiveHasWantedLod(for: regionHash) == false {
+		// $ Take write lock
+		let actualStreamHash = regionHashLodKey(regionHash, atLod: actualLodLevel)
+		let wantedStreamHash = regionHashLodKey(regionHash, atLod: wantedLodLevel)
+		
+		if primitiveCache[wantedStreamHash] == nil {
 			streamMissingPrimitive(for: regionHash)
 		}
 		
@@ -220,11 +224,6 @@ extension GeometryStreamer {
 		}
 		
 		wantedLodLevel = setToLevel
-	}
-	
-	func primitiveHasWantedLod(for regionHash: RegionHash) -> Bool {
-		let wantedStreamHash = regionHashLodKey(regionHash, atLod: wantedLodLevel)
-		return primitiveCache[wantedStreamHash] != nil
 	}
 }
 
