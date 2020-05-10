@@ -48,7 +48,9 @@ class MetalRenderer {
 																											mapSize: mapSize,
 																											centeredOn: offset,
 																											zoomedTo: zoom)
-
+	}
+	
+	func zoomedTo(_ zoom: Float) {
 		selectionRenderer.updateStyle(zoomLevel: zoom)
 		borderRenderer.updateStyle(zoomLevel: zoom)
 		poiRenderer.updateZoomThreshold(viewZoom: zoom)
