@@ -35,12 +35,18 @@ class RegionRenderer {
 		}
 	}
 	
-	func renderWorld(visibleSet: Set<Int>, inProjection projection: simd_float4x4, inEncoder encoder: MTLRenderCommandEncoder) {
+	func prepareGeometry(visibleSet: Set<RegionHash>) {
+		for regionHash in visibleSet {
+			_ = GeometryStreamer.shared.renderPrimitive(for: regionHash, streamIfMissing: true)
+		}
+	}
+	
+	func renderWorld(visibleSet: Set<RegionHash>, inProjection projection: simd_float4x4, inEncoder encoder: MTLRenderCommandEncoder) {
 		encoder.pushDebugGroup("Render world")
 		encoder.setRenderPipelineState(pipeline)
 
 		// Collect all streamed-in primitives for the currently visible set of non-visited regions
-		let renderPrimitives = visibleSet.compactMap { GeometryStreamer.shared.renderPrimitive(for: $0) }
+		let renderPrimitives = visibleSet.compactMap { GeometryStreamer.shared.renderPrimitive(for: $0, streamIfMissing: false) }
 		
 		var uniforms = MapUniforms(mvpMatrix: projection,
 															 color: simd_float4(),

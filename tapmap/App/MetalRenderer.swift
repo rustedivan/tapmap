@@ -58,10 +58,13 @@ class MetalRenderer {
 	}
 	
 	func prepareFrame(forWorld worldState: RuntimeWorld) {
+		let available = AppDelegate.sharedUserState.availableSet
 		let visible = AppDelegate.sharedUIState.visibleRegionHashes
+		let renderSet = available.intersection(visible)
 		let borderedContinents = worldState.allContinents.filter { visible.contains($0.key) }	// All visible continents (even if visited)
 
 		effectRenderer.updatePrimitives()
+		regionRenderer.prepareGeometry(visibleSet: renderSet)
 		borderRenderer.prepareGeometry(visibleContinents: borderedContinents, visibleCountries: worldState.visibleCountries)
 		poiRenderer.updateFades()
 	}

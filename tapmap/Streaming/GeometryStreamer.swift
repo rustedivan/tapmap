@@ -98,16 +98,17 @@ class GeometryStreamer {
 		return loadedWorld
 	}
 	
-	func renderPrimitive(for regionHash: RegionHash) -> IndexedRenderPrimitive<Vertex>? {
 		// $ Take write lock
+	func renderPrimitive(for regionHash: RegionHash, streamIfMissing: Bool = false) -> IndexedRenderPrimitive<Vertex>? {
 		let actualStreamHash = regionHashLodKey(regionHash, atLod: actualLodLevel)
 		let wantedStreamHash = regionHashLodKey(regionHash, atLod: wantedLodLevel)
 		
-		if primitiveCache[wantedStreamHash] == nil {
+		if let found = primitiveCache[wantedStreamHash] {
+			return found
+		} else if streamIfMissing {
 			streamMissingPrimitive(for: regionHash)
 			lodCacheMiss = true
 		}
-		
 		return primitiveCache[actualStreamHash]
 	}
 	

@@ -171,6 +171,7 @@ class MapViewController: UIViewController, MTKViewDelegate {
 //													 inArea: visibleLongLat(viewBounds: view.bounds),
 //													 atZoom: zoom)
 		
+		geometryStreamer.updateLodLevel()	// Must run after requests have been filed in renderers.prepareFrame, otherwise glitch when switching LOD level
 		geometryStreamer.updateStreaming()
 		
 		needsRender = geometryStreamer.streaming ? true : needsRender
@@ -189,8 +190,6 @@ class MapViewController: UIViewController, MTKViewDelegate {
 //		labelView.renderLabels(projection: mapToView)
 
 		needsRender = false
-		
-		geometryStreamer.updateLodLevel()
 	}
 	
 	func mtkView(_ view: MTKView, drawableSizeWillChange size: CGSize) {
