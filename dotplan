@@ -1,5 +1,19 @@
 ROAD TO FINAL
 
+# Rendering arch improvements
+- add ocean pass
+- drop everything except IndexedRenderPrimitive
+-- move the cursor stuff up from OutlineRenderPrim
+-- move color into it
+-- rename to renderPrimitive
+-- typealias the [scale]Vertex
+- renderer setup function (load shader, set pipeline)
+- parallel commannd encoding
+-- don't create streamed/backthread-generated resources from the renderer's completion handlers
+-- add simple requests from the render thread
+-- enqueue work from main to worker thread
+-- add mutex for reading/writing to the work queue (multiple writers, single reader)
+
 # Metal rewrite
 - target the Apple 1 GPU family (all the way back to iPhone 5S, iPad m3)
 
@@ -34,10 +48,6 @@ ROAD TO FINAL
 ## Modern rendering
 - memoryless attachments?
 
-## Other stuff
-- is it possible to drop all the custom zoom stuff in favour of MTKView's dirtyrects?
-- renderer setup function (load shader, set pipeline)
-
 ## LabelView's tag mechanism is incredibly expensive
 - together with projectPoint - move off main thread?
 
@@ -58,10 +68,8 @@ ROAD TO FINAL
 -- the RPB can provide lists of primitives to nuke when under memory pressure
 
 # Architecture concerns
-- don't create streamed/backthread-generated resources from the renderer's completion handlers
-- add simple requests from the render thread
-- enqueue work from main to worker thread
-- add mutex for reading/writing to the work queue (multiple writers, single reader)
+
+
 
 # Creative brief
 ## Shading
