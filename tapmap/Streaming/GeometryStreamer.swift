@@ -22,11 +22,6 @@ class GeometryStreamer {
 		}
 	}
 	
-	struct GeometryEntry {
-		let primitive: IndexedRenderPrimitive<Vertex>
-		let tessellation: GeoTessellation
-	}
-	
 	var metalDevice: MTLDevice?
 	
 	let fileData: Data	// fileData is memory-mapped so no need to attach a FileHandle here
@@ -39,7 +34,8 @@ class GeometryStreamer {
 	var lodCacheMiss: Bool = true
 	var frameChunkRequests: [RegionId] = []
 	var pendingChunks: Set<ChunkRequest> = []
-	var geometryCache: [Int : GeometryEntry] = [:]
+	var tessellationCache: [Int : GeoTessellation] = [:]
+	var primitiveCache: [Int : IndexedRenderPrimitive<Vertex>] = [:]
 	var regionIdLookup: [RegionHash : RegionId] = [:]	// To avoid dependency on RuntimeWorld
 	var streaming: Bool { get {
 		return !pendingChunks.isEmpty
@@ -108,13 +104,13 @@ class GeometryStreamer {
 		}
 		
 		let actualRegionHash = regionHashLodKey(regionHash, atLod: actualLodLevel)
-		return geometryCache[actualRegionHash]?.primitive
+		return primitiveCache[actualRegionHash]
 	}
 	
 	func tessellation(for regionHash: RegionHash, atLod lod: Int, streamIfMissing: Bool = false) -> GeoTessellation? {
 		let key = regionHashLodKey(regionHash, atLod: lod)
-		if let found = geometryCache[key] {
-			return found.tessellation
+		if let found = tessellationCache[key] {
+			return found
 		} else if streamIfMissing {
 			streamMissingPrimitive(for: regionHash)
 		}
@@ -124,7 +120,7 @@ class GeometryStreamer {
 	func evictPrimitive(for regionHash: RegionHash) {
 		for lod in 0 ..< chunkTable.lodCount {
 			let loddedRegionHash = regionHashLodKey(regionHash, atLod: lod)
-			geometryCache.removeValue(forKey: loddedRegionHash)
+			primitiveCache.removeValue(forKey: loddedRegionHash)
 		}
 	}
 	
@@ -148,6 +144,7 @@ class GeometryStreamer {
 		
 		let streamedLodLevel = wantedLodLevel
 		
+		// Start streaming failed requests from the current frame
 		for regionId in frameChunkRequests {
 			let chunkName = chunkLodName(regionId, atLod: streamedLodLevel)
 			let runtimeLodKey = regionHashLodKey(regionId.hashed, atLod: streamedLodLevel)
@@ -158,21 +155,38 @@ class GeometryStreamer {
 				if let tessellation = self.loadGeometry(chunkName) {
 					// Create the render primitive and update book-keeping on the main thread
 					DispatchQueue.main.async {
-						let c = regionId.hashed.hashColor.tuple()
-						let primitive = IndexedRenderPrimitive<Vertex>(vertices: tessellation.vertices, indices: tessellation.indices, device: device, color: c, ownerHash: regionId.hashed, debugName: chunkName)
-						self.geometryCache[runtimeLodKey] = GeometryEntry(primitive: primitive, tessellation: tessellation)
-						self.pendingChunks.remove(ChunkRequest(regionId, atLod: streamedLodLevel))
+						self.tessellationCache[runtimeLodKey] = tessellation
 					}
 				} else {
 					print("No geometry chunk available for \(chunkName)")
 				}
 			}
 		}
+		frameChunkRequests = []
+		
+		// Create primitives for finished requests
+		let finishedRequests = pendingChunks.filter { request in
+			let finishedRuntimeLodkey = regionHashLodKey(request.chunkId.hashed, atLod: request.lodLevel)	 // $ Convenience for this
+			return tessellationCache[finishedRuntimeLodkey] != nil
+		}
+		
+		for request in finishedRequests {
+			let freshRuntimeLodkey = regionHashLodKey(request.chunkId.hashed, atLod: request.lodLevel)	 // $ Convenience for this
+			let tessellation = tessellationCache[freshRuntimeLodkey]!
+			let c = request.chunkId.hashed.hashColor.tuple()
+			let primitive = IndexedRenderPrimitive<Vertex>(vertices: tessellation.vertices,
+																										 indices: tessellation.indices,
+																										 device: device,
+																										 color: c,
+																										 ownerHash: request.chunkId.hashed,
+																										 debugName: request.chunkId.key)
+			primitiveCache[freshRuntimeLodkey] = primitive
+		}
+		pendingChunks = pendingChunks.subtracting(finishedRequests)
 		
 		logPendingRequests()
 		logBlockingRequests()
 		
-		frameChunkRequests = []
 	}
 	
 	private func loadGeometry(_ name: String) -> GeoTessellation? {
@@ -205,15 +219,12 @@ extension GeometryStreamer {
 		default: setToLevel = 0
 		}
 		
-		if wantedLodLevel != setToLevel {
-			wantedLodLevel = setToLevel
-			lodCacheMiss = true
-		}
+		wantedLodLevel = setToLevel
 	}
 	
 	func primitiveHasWantedLod(for regionHash: RegionHash) -> Bool {
 		let wantedStreamHash = regionHashLodKey(regionHash, atLod: wantedLodLevel)
-		return geometryCache[wantedStreamHash] != nil
+		return primitiveCache[wantedStreamHash] != nil
 	}
 }
 
