@@ -130,6 +130,8 @@ class GeometryStreamer {
 	}
 	
 	private func streamMissingPrimitive(for regionHash: RegionHash) {
+		guard Thread.isMainThread else { fatalError("Stream requests must only be placed from the main thread")	}
+		
 		guard let regionId = regionIdLookup[regionHash] else {
 			print("RegionId lookup failed for hash \(regionHash)")
 			return
