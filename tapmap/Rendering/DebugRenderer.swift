@@ -31,13 +31,12 @@ class DebugRenderPrimitive {
 		}
 		
 		let bufLen = MemoryLayout<Vertex>.stride * elementCount
-		guard let newBuffer = device.makeBuffer(length: bufLen, options: .storageModeShared) else {
+		guard let newBuffer = device.makeBuffer(bytes: vertices, length: bufLen, options: .storageModeShared) else {
 			fatalError("Could not create vertex buffer for \(debugName)")
 		}
 		
 		self.vertexBuffer = newBuffer
 		self.vertexBuffer.label = "Debug - \(debugName) vertex buffer"
-		self.vertexBuffer.contents().copyMemory(from: vertices, byteCount: bufLen)
 	}
 }
 

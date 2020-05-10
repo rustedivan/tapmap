@@ -36,18 +36,16 @@ class IndexedRenderPrimitive<VertexType> {
 		let vertexBufLen = MemoryLayout<VertexType>.stride * vertices.count
 		let indexBufLen = MemoryLayout<UInt16>.stride * indices.count
 		
-		guard let newVertBuffer = device.makeBuffer(length: vertexBufLen, options: .storageModeShared),
-					let	newIndexBuffer = device.makeBuffer(length: indexBufLen, options: .storageModeShared) else {
+		guard let newVertBuffer = device.makeBuffer(bytes: vertices, length: vertexBufLen, options: .storageModeShared),
+					let	newIndexBuffer = device.makeBuffer(bytes: indices, length: indexBufLen, options: .storageModeShared) else {
 				fatalError("Could not create buffers for \(debugName)")
 		}
 		
 		self.vertexBuffer = newVertBuffer
 		self.vertexBuffer.label = "\(debugName) vertex buffer"
-		self.vertexBuffer.contents().copyMemory(from: vertices, byteCount: vertexBufLen)
 		
 		self.indexBuffer = newIndexBuffer
 		self.indexBuffer.label = "\(debugName) index buffer"
-		self.indexBuffer.contents().copyMemory(from: indices, byteCount: indexBufLen)
 		
 		elementCount = indices.count
 	}
