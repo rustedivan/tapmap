@@ -104,22 +104,21 @@ class GeometryStreamer {
 	
 	func renderPrimitive(for regionHash: RegionHash) -> IndexedRenderPrimitive<Vertex>? {
 		if primitiveHasWantedLod(for: regionHash) == false {
-			let needsNewChunk = streamMissingPrimitive(for: regionHash)
-			lodCacheMiss = needsNewChunk || lodCacheMiss
+			streamMissingPrimitive(for: regionHash)
 		}
 		
 		let actualRegionHash = regionHashLodKey(regionHash, atLod: actualLodLevel)
 		return geometryCache[actualRegionHash]?.primitive
 	}
 	
-	func streamMissingPrimitive(for regionHash: RegionHash) -> Bool {
-		// Only stream primitives that are actually opened
-		guard let regionId = regionIdLookup[regionHash] else {
-			print("RegionId lookup failed for hash \(regionHash)")
-			return false
+	func tessellation(for regionHash: RegionHash, atLod lod: Int, streamIfMissing: Bool = false) -> GeoTessellation? {
+		let key = regionHashLodKey(regionHash, atLod: lod)
+		if let found = geometryCache[key] {
+			return found.tessellation
+		} else if streamIfMissing {
+			streamMissingPrimitive(for: regionHash)
 		}
-		streamPrimitive(for: regionId)
-		return true
+		return nil
 	}
 	
 	func evictPrimitive(for regionHash: RegionHash) {
@@ -129,23 +128,17 @@ class GeometryStreamer {
 		}
 	}
 	
-	func tessellation(for regionHash: RegionHash, atLod lod: Int, streamIfMissing: Bool = false) -> GeoTessellation? {
-		let key = regionHashLodKey(regionHash, atLod: lod)
-		if let found = geometryCache[key] {
-			return found.tessellation
-		} else if streamIfMissing {
-			_ = streamMissingPrimitive(for: regionHash)
-		}
-		return nil
-	}
-	
-	func streamPrimitive(for regionId: RegionId) {
-		let runtimeLodKey = regionHashLodKey(regionId.hashed, atLod: wantedLodLevel)
-		if pendingChunks.contains(ChunkRequest(runtimeLodKey)) {
+	private func streamMissingPrimitive(for regionHash: RegionHash) {
+		guard let regionId = regionIdLookup[regionHash] else {
+			print("RegionId lookup failed for hash \(regionHash)")
 			return
 		}
 		
-		frameChunkRequests.append(regionId)
+		let runtimeLodKey = regionHashLodKey(regionId.hashed, atLod: wantedLodLevel)
+		if !pendingChunks.contains(ChunkRequest(runtimeLodKey)) {
+			frameChunkRequests.append(regionId)
+			lodCacheMiss = true
+		}
 	}
 	
 	func updateStreaming() {
@@ -154,6 +147,7 @@ class GeometryStreamer {
 			return
 		}
 		
+		// $ chunk request needs to be regionId + lod level, everything else is derivable from that
 		for regionId in frameChunkRequests {
 			let chunkName = chunkLodName(regionId, atLod: wantedLodLevel)
 			let runtimeLodKey = regionHashLodKey(regionId.hashed, atLod: wantedLodLevel)
