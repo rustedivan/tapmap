@@ -105,10 +105,10 @@ class GeometryStreamer {
 		
 		if primitiveCache[wantedStreamHash] == nil {
 			streamMissingPrimitive(for: regionHash)
+			lodCacheMiss = true
 		}
 		
-		let actualRegionHash = regionHashLodKey(regionHash, atLod: actualLodLevel)
-		return primitiveCache[actualRegionHash]
+		return primitiveCache[actualStreamHash]
 	}
 	
 	func tessellation(for regionHash: RegionHash, atLod lod: Int, streamIfMissing: Bool = false) -> GeoTessellation? {
@@ -136,7 +136,6 @@ class GeometryStreamer {
 		
 		if !pendingChunks.contains(ChunkRequest(regionId, atLod: wantedLodLevel)) {
 			frameChunkRequests.append(regionId)
-			lodCacheMiss = true
 		}
 	}
 	
@@ -166,6 +165,7 @@ class GeometryStreamer {
 				}
 			}
 		}
+		
 		frameChunkRequests = []
 		
 		// Create primitives for finished requests
@@ -190,7 +190,6 @@ class GeometryStreamer {
 		
 		logPendingRequests()
 		logBlockingRequests()
-		
 	}
 	
 	private func loadGeometry(_ name: String) -> GeoTessellation? {
