@@ -33,8 +33,7 @@ class GeometryStreamer {
 	var wantedLodLevel: Int
 	var actualLodLevel: Int = 10
 	var lodCacheMiss: Bool = true
-	var frameChunkRequests: [RegionId] = []							// Collects new requests for this frame
-	var pendingChunks: Set<ChunkRequest> = []						// Tracks outstanding stream requests
+	var pendingChunks: Set<ChunkRequest> = []										// Tracks outstanding stream requests
 	var deliveredChunks: [(ChunkRequest, GeoTessellation)] = []	// Chunks that finished streaming in this frame
 	
 	var tessellationCache: [Int : GeoTessellation] = [:]
@@ -139,7 +138,21 @@ class GeometryStreamer {
 		}
 		
 		if !pendingChunks.contains(ChunkRequest(regionId, atLod: wantedLodLevel)) {
-			frameChunkRequests.append(regionId)
+			let chunkName = chunkLodName(regionId, atLod: wantedLodLevel)
+			let request = ChunkRequest(regionId, atLod: wantedLodLevel)
+			pendingChunks.insert(request)
+			
+			streamQueue.async {
+				guard let tessellation = self.loadGeometry(chunkName) else {
+					print("No geometry chunk available for \(chunkName)")
+					return
+				}
+				
+				// Don't allow reads while publishing finished chunk
+				self.publishQueue.async(flags: .barrier) {
+					self.deliveredChunks.append((request, tessellation))
+				}
+			}
 		}
 	}
 	
@@ -148,28 +161,7 @@ class GeometryStreamer {
 			print("Cannot stream geometry before Metal setup")
 			return
 		}
-		
-		let streamedLodLevel = wantedLodLevel
-		
-		// Start streaming failed requests from the current frame
-		for regionId in frameChunkRequests {
-			let chunkName = chunkLodName(regionId, atLod: streamedLodLevel)
-			let request = ChunkRequest(regionId, atLod: streamedLodLevel)
-			pendingChunks.insert(request)
-			
-			streamQueue.async {
-				if let tessellation = self.loadGeometry(chunkName) {
-					self.publishQueue.async(flags: .barrier) {							// Don't allow reads while publishing finished chunk
-						self.deliveredChunks.append((request, tessellation))
-					}
-				} else {
-					print("No geometry chunk available for \(chunkName)")
-				}
-			}
-		}
-		
-		frameChunkRequests = []
-		
+				
 		// Create primitives for finished requests
 		publishQueue.sync {	// Don't build primitives while new tessellations are being published
 			for (request, chunk) in deliveredChunks {
