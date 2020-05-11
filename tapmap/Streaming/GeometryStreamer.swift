@@ -27,8 +27,8 @@ class GeometryStreamer {
 	let fileData: Data	// fileData is memory-mapped so no need to attach a FileHandle here
 	let fileHeader: WorldHeader
 	let chunkTable: ChunkTable
-	let streamQueue: DispatchQueue						// Async stream data from archive
-	var readTessellationLock: os_unfair_lock	// Read-write lock for accessing tessellation cache
+	let streamQueue: DispatchQueue	// Async stream data from archive
+	var publishQueue: DispatchQueue		// Deliver loaded chunks from worker thread
 	
 	var wantedLodLevel: Int
 	var actualLodLevel: Int = 10
@@ -72,7 +72,7 @@ class GeometryStreamer {
 		
 		streamQueue = DispatchQueue(label: "Geometry streaming", qos: .userInitiated, attributes: .concurrent)
 		print("  - empty streaming op-queue setup")
-		readTessellationLock = os_unfair_lock()
+		publishQueue = DispatchQueue(label: "Chunk delivery", qos: .userInitiated, attributes: .init())
 		
 		GeometryStreamer._shared = self
 		
@@ -157,12 +157,10 @@ class GeometryStreamer {
 			let request = ChunkRequest(regionId, atLod: streamedLodLevel)
 			pendingChunks.insert(request)
 			
-			streamQueue.async {																				// OK to load data concurrently...
+			streamQueue.async {
 				if let tessellation = self.loadGeometry(chunkName) {
-					DispatchQueue.main.sync {	// $ Idiotic
-						os_unfair_lock_lock(&self.readTessellationLock)				// But inserting must be done exclusively
+					self.publishQueue.async(flags: .barrier) {							// Don't allow reads while publishing finished chunk
 						self.deliveredChunks.append((request, tessellation))
-						os_unfair_lock_unlock(&self.readTessellationLock)			// $ Could this be barrier blocks now that loading doesn't block as bad?
 					}
 				} else {
 					print("No geometry chunk available for \(chunkName)")
@@ -173,7 +171,7 @@ class GeometryStreamer {
 		frameChunkRequests = []
 		
 		// Create primitives for finished requests
-		os_unfair_lock_lock(&readTessellationLock)	// Don't build primitives while new tessellations are being loaded
+		publishQueue.sync {	// Don't build primitives while new tessellations are being published
 			for (request, chunk) in deliveredChunks {
 				let runtimeLodKey = regionHashLodKey(request.chunkId.hashed, atLod: request.lodLevel)
 				
@@ -193,7 +191,7 @@ class GeometryStreamer {
 		
 			logPendingRequests()
 			logBlockingRequests()
-		os_unfair_lock_unlock(&readTessellationLock)	// $ Lock only in this fun
+		}
 	}
 	
 	private func loadGeometry(_ name: String) -> GeoTessellation? {
