@@ -106,9 +106,7 @@ class GeometryStreamer {
 		let actualStreamHash = regionHashLodKey(regionHash, atLod: actualLodLevel)
 		let wantedStreamHash = regionHashLodKey(regionHash, atLod: wantedLodLevel)
 		
-		if let found = primitiveCache[wantedStreamHash] {
-			return found
-		} else if streamIfMissing {
+		if primitiveCache[wantedStreamHash] == nil && streamIfMissing {
 			streamMissingPrimitive(for: regionHash)
 			lodCacheMiss = true
 		}
