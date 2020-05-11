@@ -23,7 +23,8 @@ class MetalRenderer {
 	var selectionRenderer: SelectionRenderer
 	var borderRenderer: BorderRenderer
 	var debugRenderer: DebugRenderer
-	
+	let encodingQueue = DispatchQueue(label: "Parallel command encoding", attributes: .concurrent)
+
 	init(in view: MTKView, forWorld world: RuntimeWorld) {
 		device = MTLCreateSystemDefaultDevice()
 		commandQueue = device.makeCommandQueue()!
@@ -70,13 +71,26 @@ class MetalRenderer {
 	}
 	
 	func render(forWorld worldState: RuntimeWorld, into drawable: CAMetalDrawable) {
-		let renderPassDescriptor = MTLRenderPassDescriptor()
-		renderPassDescriptor.colorAttachments[0].texture = drawable.texture
-		renderPassDescriptor.colorAttachments[0].loadAction = .clear
-		renderPassDescriptor.colorAttachments[0].clearColor = MTLClearColor(red: 0.0, green: 0.5, blue: 0.7, alpha: 1.0)
+		let clearPassDescriptor = MTLRenderPassDescriptor()
+		clearPassDescriptor.colorAttachments[0].texture = drawable.texture
+		clearPassDescriptor.colorAttachments[0].loadAction = .clear
+		clearPassDescriptor.colorAttachments[0].clearColor = MTLClearColor(red: 0.0, green: 0.5, blue: 0.7, alpha: 1.0)
+		let addPassDescriptor = clearPassDescriptor.copy() as! MTLRenderPassDescriptor
+		addPassDescriptor.colorAttachments[0].loadAction = .load
+				
+		// Create parallel command buffers and enqueue in order
+		guard let geographyBuffer = commandQueue.makeCommandBuffer() else { return }
+		guard let markerBuffer = commandQueue.makeCommandBuffer() else { return }
+		guard let overlayBuffer = commandQueue.makeCommandBuffer() else { return }
 		
-		guard let commandBuffer = commandQueue.makeCommandBuffer() else { return }
-		guard let commandEncoder = commandBuffer.makeRenderCommandEncoder(descriptor: renderPassDescriptor) else { return }
+		geographyBuffer.enqueue()
+		markerBuffer.enqueue()
+		overlayBuffer.enqueue()
+		
+		// Present after the last render pass
+		overlayBuffer.addScheduledHandler { buffer in
+			drawable.present()
+		}
 
 		let available = AppDelegate.sharedUserState.availableSet
 		let visible = AppDelegate.sharedUIState.visibleRegionHashes
@@ -84,18 +98,33 @@ class MetalRenderer {
 		let borderedContinents = visible.intersection(worldState.allContinents.keys)	// All visible continents (even if visited)
 		let borderedCountries = Set(worldState.visibleCountries.keys)
 		
-		borderRenderer.renderContinentBorders(borderedContinents, inProjection: modelViewProjectionMatrix, inEncoder: commandEncoder)
-		regionRenderer.renderWorld(visibleSet: renderSet, inProjection: modelViewProjectionMatrix, inEncoder: commandEncoder)
-		borderRenderer.renderCountryBorders(borderedCountries, inProjection: modelViewProjectionMatrix, inEncoder: commandEncoder)
-		poiRenderer.renderWorld(visibleSet: renderSet, inProjection: modelViewProjectionMatrix, inEncoder: commandEncoder)
-		effectRenderer.renderWorld(inProjection: modelViewProjectionMatrix, inEncoder: commandEncoder)
-		selectionRenderer.renderSelection(inProjection: modelViewProjectionMatrix, inEncoder: commandEncoder)
+		let mvpMatrix = modelViewProjectionMatrix
 		
-		//		DebugRenderer.shared.renderMarkers(inProjection: modelViewProjectionMatrix)
+		encodingQueue.async(execute: makeRenderPass(geographyBuffer, clearPassDescriptor) { (encoder) in
+			self.borderRenderer.renderContinentBorders(borderedContinents, inProjection: mvpMatrix, inEncoder: encoder)
+			self.regionRenderer.renderWorld(visibleSet: renderSet, inProjection: mvpMatrix, inEncoder: encoder)
+			self.borderRenderer.renderCountryBorders(borderedCountries, inProjection: mvpMatrix, inEncoder: encoder)
+		})
+
+		encodingQueue.async(execute: makeRenderPass(markerBuffer, addPassDescriptor) { (encoder) in
+			self.poiRenderer.renderWorld(visibleSet: renderSet, inProjection: mvpMatrix, inEncoder: encoder)
+		})
 		
-		commandEncoder.endEncoding()
-		commandBuffer.present(drawable)
-		commandBuffer.commit()
+		encodingQueue.async(execute: makeRenderPass(overlayBuffer, addPassDescriptor) { (encoder) in
+			self.effectRenderer.renderWorld(inProjection: mvpMatrix, inEncoder: encoder)
+			self.selectionRenderer.renderSelection(inProjection: mvpMatrix, inEncoder: encoder)
+			//		DebugRenderer.shared.renderMarkers(inProjection: modelViewProjectionMatrix)
+		})
+	}
+	
+	typealias MapRenderPass = () -> ()
+	func makeRenderPass(_ buffer: MTLCommandBuffer, _ renderPass: MTLRenderPassDescriptor, render: @escaping (MTLRenderCommandEncoder) -> ()) -> MapRenderPass {
+		return {
+			guard let encoder = buffer.makeRenderCommandEncoder(descriptor: renderPass) else { return }
+			render(encoder)
+			encoder.endEncoding()
+			buffer.commit()
+		}
 	}
 	
 	func shouldIdle(appUpdated: Bool) -> Bool {
