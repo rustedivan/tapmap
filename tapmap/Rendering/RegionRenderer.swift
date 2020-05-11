@@ -18,6 +18,7 @@ struct MapUniforms {
 class RegionRenderer {
 	let device: MTLDevice
 	let pipeline: MTLRenderPipelineState
+	var highlightedRegionHash: Int = 0
 	
 	init(withDevice device: MTLDevice, pixelFormat: MTLPixelFormat) {
 		let shaderLib = device.makeDefaultLibrary()!
@@ -35,10 +36,11 @@ class RegionRenderer {
 		}
 	}
 	
-	func prepareGeometry(visibleSet: Set<RegionHash>) {
+	func prepareFrame(visibleSet: Set<RegionHash>) {
 		for regionHash in visibleSet {
 			_ = GeometryStreamer.shared.renderPrimitive(for: regionHash, streamIfMissing: true)
 		}
+		highlightedRegionHash = AppDelegate.sharedUIState.selectedRegionHash
 	}
 	
 	func renderWorld(visibleSet: Set<RegionHash>, inProjection projection: simd_float4x4, inEncoder encoder: MTLRenderCommandEncoder) {
@@ -54,7 +56,7 @@ class RegionRenderer {
 		
 		for primitive in renderPrimitives {
 			uniforms.color = simd_float4(primitive.color.r, primitive.color.g, primitive.color.b, 1.0)
-			uniforms.highlighted = AppDelegate.sharedUIState.selected(primitive.ownerHash) ? 1 : 0
+			uniforms.highlighted = (primitive.ownerHash == highlightedRegionHash) ? 1 : 0
 			encoder.setVertexBytes(&uniforms, length: MemoryLayout.stride(ofValue: uniforms), index: 1)
 			render(primitive: primitive, into: encoder)
 		}

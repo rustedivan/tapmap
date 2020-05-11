@@ -9,8 +9,8 @@
 import Foundation
 
 class UIState {
-	private var selectedRegionHash: RegionHash = 0
 	private var worldQuadTree: WorldTree!								// For spatial lookups
+	var selectedRegionHash: RegionHash = 0
 	var visibleRegionHashes: Set<RegionHash> = Set()		// Cache of currently visible regions
 	
 	var delegate: UIStateDelegate!
@@ -46,10 +46,6 @@ class UIState {
 	
 	func selected<T:GeoIdentifiable>(_ object: T) -> Bool {
 		return selectedRegionHash == object.hashValue
-	}
-	
-	func selected(_ hashValue: Int) -> Bool {
-		return selectedRegionHash == hashValue
 	}
 	
 	func clearSelection() {

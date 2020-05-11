@@ -64,8 +64,8 @@ class MetalRenderer {
 		let borderedContinents = worldState.allContinents.filter { visible.contains($0.key) }	// All visible continents (even if visited)
 
 		effectRenderer.updatePrimitives()
-		regionRenderer.prepareGeometry(visibleSet: renderSet)
-		borderRenderer.prepareGeometry(visibleContinents: borderedContinents, visibleCountries: worldState.visibleCountries)
+		regionRenderer.prepareFrame(visibleSet: renderSet)
+		borderRenderer.prepareFrame(visibleContinents: borderedContinents, visibleCountries: worldState.visibleCountries)
 		poiRenderer.updateFades()
 	}
 	
