@@ -12,7 +12,7 @@ import MetalKit
 
 class MetalRenderer {
 	var device: MTLDevice!
-	var commandQueue: MTLCommandQueue! // $ Pass multiple into the renderers
+	var commandQueue: MTLCommandQueue
 	var latestFrame = Date()
 	var modelViewProjectionMatrix = simd_float4x4()
 
@@ -26,7 +26,7 @@ class MetalRenderer {
 	
 	init(in view: MTKView, forWorld world: RuntimeWorld) {
 		device = MTLCreateSystemDefaultDevice()
-		commandQueue = device.makeCommandQueue()
+		commandQueue = device.makeCommandQueue()!
 		view.device = device
 		view.colorPixelFormat = .bgra8Unorm
 		
