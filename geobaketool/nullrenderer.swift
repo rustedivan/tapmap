@@ -57,7 +57,7 @@ class GeometryStreamer {
 	static var shared: GeometryStreamer { get {
 		return GeometryStreamer()
 	}}
-	func tessellation(for: Int, atLod: Int) -> IndexedRenderPrimitive? {
+	func tessellation(for: Int, atLod: Int) -> GeoTessellation? {
 		return nil
 	}
 }
