@@ -70,7 +70,7 @@ class GeometryStreamer {
 		chunkTable.chunkData = fileData.subdata(in: fileHeader.dataOffset..<fileHeader.dataOffset + fileHeader.dataSize)
 		print("  - chunk data attached with \(ByteCountFormatter.string(fromByteCount: Int64(chunkTable.chunkData.count), countStyle: .memory))")
 		
-		streamQueue = DispatchQueue(label: "Geometry streaming", qos: .userInitiated, attributes: .init())
+		streamQueue = DispatchQueue(label: "Geometry streaming", qos: .userInitiated, attributes: .concurrent)
 		print("  - empty streaming op-queue setup")
 		readTessellationLock = os_unfair_lock()
 		
