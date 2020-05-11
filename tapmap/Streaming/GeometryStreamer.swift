@@ -27,13 +27,16 @@ class GeometryStreamer {
 	let fileData: Data	// fileData is memory-mapped so no need to attach a FileHandle here
 	let fileHeader: WorldHeader
 	let chunkTable: ChunkTable
-	let streamQueue: DispatchQueue
+	let streamQueue: DispatchQueue						// Async stream data from archive
+	var readTessellationLock: os_unfair_lock	// Read-write lock for accessing tessellation cache
 	
 	var wantedLodLevel: Int
 	var actualLodLevel: Int = 10
 	var lodCacheMiss: Bool = true
-	var frameChunkRequests: [RegionId] = []
-	var pendingChunks: Set<ChunkRequest> = []
+	var frameChunkRequests: [RegionId] = []							// Collects new requests for this frame
+	var pendingChunks: Set<ChunkRequest> = []						// Tracks outstanding stream requests
+	var deliveredChunks: [(ChunkRequest, GeoTessellation)] = []	// Chunks that finished streaming in this frame
+	
 	var tessellationCache: [Int : GeoTessellation] = [:]
 	var primitiveCache: [Int : IndexedRenderPrimitive<Vertex>] = [:]
 	var regionIdLookup: [RegionHash : RegionId] = [:]	// To avoid dependency on RuntimeWorld
@@ -67,8 +70,9 @@ class GeometryStreamer {
 		chunkTable.chunkData = fileData.subdata(in: fileHeader.dataOffset..<fileHeader.dataOffset + fileHeader.dataSize)
 		print("  - chunk data attached with \(ByteCountFormatter.string(fromByteCount: Int64(chunkTable.chunkData.count), countStyle: .memory))")
 		
-		streamQueue = DispatchQueue(label: "Geometry streaming", qos: .userInitiated, attributes: .concurrent)
+		streamQueue = DispatchQueue(label: "Geometry streaming", qos: .userInitiated, attributes: .init())
 		print("  - empty streaming op-queue setup")
+		readTessellationLock = os_unfair_lock()
 		
 		GeometryStreamer._shared = self
 		
@@ -98,7 +102,6 @@ class GeometryStreamer {
 		return loadedWorld
 	}
 	
-		// $ Take write lock
 	func renderPrimitive(for regionHash: RegionHash, streamIfMissing: Bool = false) -> IndexedRenderPrimitive<Vertex>? {
 		let actualStreamHash = regionHashLodKey(regionHash, atLod: actualLodLevel)
 		let wantedStreamHash = regionHashLodKey(regionHash, atLod: wantedLodLevel)
@@ -114,7 +117,9 @@ class GeometryStreamer {
 	
 	func tessellation(for regionHash: RegionHash, atLod lod: Int, streamIfMissing: Bool = false) -> GeoTessellation? {
 		let key = regionHashLodKey(regionHash, atLod: lod)
-		if let found = tessellationCache[key] {
+		let found = tessellationCache[key]
+		
+		if found != nil {
 			return found
 		} else if streamIfMissing {
 			streamMissingPrimitive(for: regionHash)
@@ -130,8 +135,6 @@ class GeometryStreamer {
 	}
 	
 	private func streamMissingPrimitive(for regionHash: RegionHash) {
-		guard Thread.isMainThread else { fatalError("Stream requests must only be placed from the main thread")	}
-		
 		guard let regionId = regionIdLookup[regionHash] else {
 			print("RegionId lookup failed for hash \(regionHash)")
 			return
@@ -153,15 +156,15 @@ class GeometryStreamer {
 		// Start streaming failed requests from the current frame
 		for regionId in frameChunkRequests {
 			let chunkName = chunkLodName(regionId, atLod: streamedLodLevel)
-			let runtimeLodKey = regionHashLodKey(regionId.hashed, atLod: streamedLodLevel)
+			let request = ChunkRequest(regionId, atLod: streamedLodLevel)
+			pendingChunks.insert(request)
 			
-			pendingChunks.insert(ChunkRequest(regionId, atLod: streamedLodLevel))
-			
-			streamQueue.async {
+			streamQueue.async {																				// OK to load data concurrently...
 				if let tessellation = self.loadGeometry(chunkName) {
-					// Create the render primitive and update book-keeping on the main thread
-					DispatchQueue.main.async {
-						self.tessellationCache[runtimeLodKey] = tessellation
+					DispatchQueue.main.sync {	// $ Idiotic
+						os_unfair_lock_lock(&self.readTessellationLock)				// But inserting must be done exclusively
+						self.deliveredChunks.append((request, tessellation))
+						os_unfair_lock_unlock(&self.readTessellationLock)			// $ Could this be barrier blocks now that loading doesn't block as bad?
 					}
 				} else {
 					print("No geometry chunk available for \(chunkName)")
@@ -172,27 +175,27 @@ class GeometryStreamer {
 		frameChunkRequests = []
 		
 		// Create primitives for finished requests
-		let finishedRequests = pendingChunks.filter { request in
-			let finishedRuntimeLodkey = regionHashLodKey(request.chunkId.hashed, atLod: request.lodLevel)	 // $ Convenience for this
-			return tessellationCache[finishedRuntimeLodkey] != nil
-		}
+		os_unfair_lock_lock(&readTessellationLock)	// Don't build primitives while new tessellations are being loaded
+			for (request, chunk) in deliveredChunks {
+				let runtimeLodKey = regionHashLodKey(request.chunkId.hashed, atLod: request.lodLevel)
+				
+				let primitive = IndexedRenderPrimitive<Vertex>(vertices: chunk.vertices,
+																											 indices: chunk.indices,
+																											 device: device,
+																											 color: runtimeLodKey.hashColor.tuple(),	// $ Embed color in tessellation
+																											 ownerHash: 0,
+																											 debugName: "Unnamed")	// $ Embed name in tessellation
+				tessellationCache[runtimeLodKey] = chunk
+				primitiveCache[runtimeLodKey] = primitive
+			}
+			
+			let finishedRequests = deliveredChunks.map { $0.0 }
+			pendingChunks = pendingChunks.subtracting(finishedRequests)
+			deliveredChunks = []
 		
-		for request in finishedRequests {
-			let freshRuntimeLodkey = regionHashLodKey(request.chunkId.hashed, atLod: request.lodLevel)	 // $ Convenience for this
-			let tessellation = tessellationCache[freshRuntimeLodkey]!
-			let c = request.chunkId.hashed.hashColor.tuple()
-			let primitive = IndexedRenderPrimitive<Vertex>(vertices: tessellation.vertices,
-																										 indices: tessellation.indices,
-																										 device: device,
-																										 color: c,
-																										 ownerHash: request.chunkId.hashed,
-																										 debugName: request.chunkId.key)
-			primitiveCache[freshRuntimeLodkey] = primitive
-		}
-		pendingChunks = pendingChunks.subtracting(finishedRequests)
-		
-		logPendingRequests()
-		logBlockingRequests()
+			logPendingRequests()
+			logBlockingRequests()
+		os_unfair_lock_unlock(&readTessellationLock)	// $ Lock only in this fun
 	}
 	
 	private func loadGeometry(_ name: String) -> GeoTessellation? {
