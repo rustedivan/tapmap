@@ -71,7 +71,7 @@ class GeometryStreamer {
 		
 		streamQueue = DispatchQueue(label: "Geometry streaming", qos: .userInitiated, attributes: .concurrent)
 		print("  - empty streaming op-queue setup")
-		publishQueue = DispatchQueue(label: "Chunk delivery", qos: .userInitiated, attributes: .init())
+		publishQueue = DispatchQueue(label: "Chunk delivery")
 		
 		GeometryStreamer._shared = self
 		

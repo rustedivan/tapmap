@@ -25,7 +25,9 @@ class BorderRenderer {
 	var wantedBorderLod: Int
 	
 	let borderQueue: DispatchQueue
+	let publishQueue: DispatchQueue
 	var pendingBorders: Set<Int> = []
+	var generatedBorders: [(Int, OutlineRenderPrimitive)] = []	// Border primitives that were generated this frame
 
 	init(withDevice device: MTLDevice, pixelFormat: MTLPixelFormat) {
 		borderWidth = 0.0
@@ -47,6 +49,7 @@ class BorderRenderer {
 		borderPrimitives = [:]
 		
 		borderQueue = DispatchQueue(label: "Border construction", qos: .userInitiated, attributes: .concurrent)
+		publishQueue = DispatchQueue(label: "Border delivery")
 		wantedBorderLod = GeometryStreamer.shared.wantedLodLevel
 	}
 	
@@ -68,38 +71,50 @@ class BorderRenderer {
 					continue
 				}
 				
+				// $guard let
 				if let tessellation = streamer.tessellation(for: borderHash, atLod: lodLevel, streamIfMissing: true) {
+					let innerWidth: Float
+					let outerWidth: Float
+					
+					let countourVertices: [[Vertex]]
+					if visibleContinents[borderHash] != nil {
+						innerWidth = 0.1
+						outerWidth = 1.0
+						countourVertices = [(tessellation.contours.first?.vertices ?? [])]
+					} else {
+						innerWidth = 0.5
+						outerWidth = 0.1
+						countourVertices = tessellation.contours.map({$0.vertices})
+					}
+					
+					let borderOutline = { (outline: [Vertex]) in generateClosedOutlineGeometry(outline: outline, innerExtent: innerWidth, outerExtent: outerWidth) }
+					let outlineGeometry: RegionContours = countourVertices.map(borderOutline)
+
+					// Create the render primitive and update book-keeping on the main thread
 					pendingBorders.insert(loddedBorderHash)
 					borderQueue.async {
-						let innerWidth: Float
-						let outerWidth: Float
-						
-						let countourVertices: [[Vertex]]
-						if visibleContinents[borderHash] != nil {
-							innerWidth = 0.1
-							outerWidth = 1.0
-							countourVertices = [(tessellation.contours.first?.vertices ?? [])]
-						} else {
-							innerWidth = 0.5
-							outerWidth = 0.1
-							countourVertices = tessellation.contours.map({$0.vertices})
-						}
-						
-						let borderOutline = { (outline: [Vertex]) in generateClosedOutlineGeometry(outline: outline, innerExtent: innerWidth, outerExtent: outerWidth) }
-						let outlineGeometry: RegionContours = countourVertices.map(borderOutline)
-
-						// Create the render primitive and update book-keeping on the main thread
-						DispatchQueue.main.async {
-							let outlinePrimitive = OutlineRenderPrimitive(contours: outlineGeometry,
-																														device: self.device,
-																														ownerHash: 0,
-																														debugName: "Border \(borderHash)@\(lodLevel)")
-							self.borderPrimitives[loddedBorderHash] = outlinePrimitive
-							self.pendingBorders.remove(loddedBorderHash)
+						let outlinePrimitive = OutlineRenderPrimitive(contours: outlineGeometry,
+																													device: self.device,
+																													ownerHash: 0,
+																													debugName: "Border \(borderHash)@\(lodLevel)")
+						// Don't allow reads while publishing finished primitive
+						self.publishQueue.async(flags: .barrier) {
+							self.generatedBorders.append((loddedBorderHash, outlinePrimitive))
 						}
 					}
 				}
 			}
+		}
+		
+		// Publish newly generated borders to the renderer
+		publishQueue.sync {
+			for (key, primitive) in generatedBorders {
+				self.borderPrimitives[key] = primitive
+				self.pendingBorders.remove(key)
+			}
+			let finishedBorders = generatedBorders.map { $0.0 }
+			pendingBorders = pendingBorders.subtracting(finishedBorders)
+			generatedBorders = []
 		}
 		
 		if !borderLodMiss && actualBorderLod != streamer.wantedLodLevel {
