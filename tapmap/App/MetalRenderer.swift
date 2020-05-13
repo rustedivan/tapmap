@@ -17,7 +17,7 @@ class MetalRenderer {
 	var modelViewProjectionMatrix = simd_float4x4()
 	var frameId = 0
 	let frameSemaphore: DispatchSemaphore
-
+	
 	// App renderers
 	var regionRenderer: RegionRenderer
 	var poiRenderer: PoiRenderer
@@ -26,7 +26,8 @@ class MetalRenderer {
 	var borderRenderer: BorderRenderer
 	var debugRenderer: DebugRenderer
 	let encodingQueue = DispatchQueue(label: "Parallel command encoding", attributes: .concurrent)
-
+	let renderPasses = DispatchGroup()
+	
 	init(in view: MTKView, forWorld world: RuntimeWorld) {
 		device = MTLCreateSystemDefaultDevice()
 		commandQueue = device.makeCommandQueue()!
@@ -63,8 +64,8 @@ class MetalRenderer {
 	}
 	
 	func prepareFrame(forWorld worldState: RuntimeWorld) {
-		frameSemaphore.wait()
 		frameId += 1
+		frameSemaphore.wait()
 		
 		let available = AppDelegate.sharedUserState.availableSet
 		let visible = AppDelegate.sharedUIState.visibleRegionHashes
@@ -81,9 +82,11 @@ class MetalRenderer {
 		let clearPassDescriptor = MTLRenderPassDescriptor()
 		clearPassDescriptor.colorAttachments[0].texture = drawable.texture
 		clearPassDescriptor.colorAttachments[0].loadAction = .clear
+		clearPassDescriptor.colorAttachments[0].storeAction = .dontCare
 		clearPassDescriptor.colorAttachments[0].clearColor = MTLClearColor(red: 0.0, green: 0.5, blue: 0.7, alpha: 1.0)
 		let addPassDescriptor = clearPassDescriptor.copy() as! MTLRenderPassDescriptor
 		addPassDescriptor.colorAttachments[0].loadAction = .load
+		addPassDescriptor.colorAttachments[0].storeAction = .dontCare
 				
 		// Create parallel command buffers and enqueue in order
 		guard let geographyBuffer = commandQueue.makeCommandBuffer() else { return }
@@ -97,35 +100,40 @@ class MetalRenderer {
 		overlayBuffer.label = "Overlay buffer"
 		overlayBuffer.enqueue()
 		
-		// Present after the last render pass
-		overlayBuffer.addCompletedHandler { buffer in
-			drawable.present()
-			self.frameSemaphore.signal()
-		}
-
+		// $ Mark buffers immutable
+		
 		let available = AppDelegate.sharedUserState.availableSet
 		let visible = AppDelegate.sharedUIState.visibleRegionHashes
-		let renderSet = available.intersection(visible)	// $ visible gets changed from main thread, while render thread is interested in renderSet...
+		let renderSet = available.intersection(visible)
 		let borderedContinents = visible.intersection(worldState.allContinents.keys)	// All visible continents (even if visited)
 		let borderedCountries = Set(worldState.visibleCountries.keys)
 		
 		let mvpMatrix = modelViewProjectionMatrix
 		
+		self.renderPasses.enter()
 		encodingQueue.async(execute: makeRenderPass(geographyBuffer, clearPassDescriptor) { (encoder) in
 			self.borderRenderer.renderContinentBorders(borderedContinents, inProjection: mvpMatrix, inEncoder: encoder)
 			self.regionRenderer.renderWorld(visibleSet: renderSet, inProjection: mvpMatrix, inEncoder: encoder)
 			self.borderRenderer.renderCountryBorders(borderedCountries, inProjection: mvpMatrix, inEncoder: encoder)
 		})
 
+		self.renderPasses.enter()
 		encodingQueue.async(execute: makeRenderPass(markerBuffer, addPassDescriptor) { (encoder) in
 			self.poiRenderer.renderWorld(inProjection: mvpMatrix, inEncoder: encoder)
 		})
 		
+		self.renderPasses.enter()
 		encodingQueue.async(execute: makeRenderPass(overlayBuffer, addPassDescriptor) { (encoder) in
 			self.effectRenderer.renderWorld(inProjection: mvpMatrix, inEncoder: encoder)
 			self.selectionRenderer.renderSelection(inProjection: mvpMatrix, inEncoder: encoder)
 			//		DebugRenderer.shared.renderMarkers(inProjection: modelViewProjectionMatrix)
 		})
+
+		renderPasses.wait()
+		frameSemaphore.signal()
+		drawable.present()
+		
+//		commandQueue.insertDebugCaptureBoundary()
 	}
 	
 	typealias MapRenderPass = () -> ()
@@ -136,6 +144,7 @@ class MetalRenderer {
 			render(encoder)
 			encoder.endEncoding()
 			buffer.commit()
+			self.renderPasses.leave()
 		}
 	}
 	
