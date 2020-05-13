@@ -15,6 +15,8 @@ class MetalRenderer {
 	var commandQueue: MTLCommandQueue
 	var latestFrame = Date()
 	var modelViewProjectionMatrix = simd_float4x4()
+	var frameId = 0
+	let frameSemaphore: DispatchSemaphore
 
 	// App renderers
 	var regionRenderer: RegionRenderer
@@ -42,6 +44,8 @@ class MetalRenderer {
 		
 		effectRenderer = EffectRenderer(withDevice: device, pixelFormat: view.colorPixelFormat)
 		debugRenderer = DebugRenderer(withDevice: device, pixelFormat: view.colorPixelFormat)
+		
+		frameSemaphore = DispatchSemaphore(value: 1)
 	}
 	
 	func updateProjection(viewSize: CGSize, mapSize: CGSize, centeredOn offset: CGPoint, zoomedTo zoom: Float) {
@@ -59,6 +63,9 @@ class MetalRenderer {
 	}
 	
 	func prepareFrame(forWorld worldState: RuntimeWorld) {
+		frameSemaphore.wait()
+		frameId += 1
+		
 		let available = AppDelegate.sharedUserState.availableSet
 		let visible = AppDelegate.sharedUIState.visibleRegionHashes
 		let renderSet = available.intersection(visible)
@@ -83,18 +90,22 @@ class MetalRenderer {
 		guard let markerBuffer = commandQueue.makeCommandBuffer() else { return }
 		guard let overlayBuffer = commandQueue.makeCommandBuffer() else { return }
 		
+		geographyBuffer.label = "Geography buffer"
 		geographyBuffer.enqueue()
+		markerBuffer.label = "Marker buffer"
 		markerBuffer.enqueue()
+		overlayBuffer.label = "Overlay buffer"
 		overlayBuffer.enqueue()
 		
 		// Present after the last render pass
-		overlayBuffer.addScheduledHandler { buffer in
+		overlayBuffer.addCompletedHandler { buffer in
 			drawable.present()
+			self.frameSemaphore.signal()
 		}
 
 		let available = AppDelegate.sharedUserState.availableSet
 		let visible = AppDelegate.sharedUIState.visibleRegionHashes
-		let renderSet = available.intersection(visible)
+		let renderSet = available.intersection(visible)	// $ visible gets changed from main thread, while render thread is interested in renderSet...
 		let borderedContinents = visible.intersection(worldState.allContinents.keys)	// All visible continents (even if visited)
 		let borderedCountries = Set(worldState.visibleCountries.keys)
 		
@@ -121,6 +132,7 @@ class MetalRenderer {
 	func makeRenderPass(_ buffer: MTLCommandBuffer, _ renderPass: MTLRenderPassDescriptor, render: @escaping (MTLRenderCommandEncoder) -> ()) -> MapRenderPass {
 		return {
 			guard let encoder = buffer.makeRenderCommandEncoder(descriptor: renderPass) else { return }
+			encoder.label = "\(buffer.label ?? "Unnamed") encoder @ \(self.frameId)"
 			render(encoder)
 			encoder.endEncoding()
 			buffer.commit()
