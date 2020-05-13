@@ -34,7 +34,7 @@ class GeometryStreamer {
 	var actualLodLevel: Int = 10
 	var lodCacheMiss: Bool = true
 	var pendingChunks: Set<ChunkRequest> = []										// Tracks outstanding stream requests
-	var deliveredChunks: [(ChunkRequest, GeoTessellation)] = []	// Chunks that finished streaming in this frame
+	var deliveredChunks: [(ChunkRequest, GeoTessellation, IndexedRenderPrimitive<Vertex>)] = []	// Chunks that finished streaming in this frame
 	
 	var tessellationCache: [Int : GeoTessellation] = [:]
 	var primitiveCache: [Int : IndexedRenderPrimitive<Vertex>] = [:]
@@ -69,7 +69,7 @@ class GeometryStreamer {
 		chunkTable.chunkData = fileData.subdata(in: fileHeader.dataOffset..<fileHeader.dataOffset + fileHeader.dataSize)
 		print("  - chunk data attached with \(ByteCountFormatter.string(fromByteCount: Int64(chunkTable.chunkData.count), countStyle: .memory))")
 		
-		streamQueue = DispatchQueue(label: "Geometry streaming", qos: .userInitiated, attributes: .concurrent)
+		streamQueue = DispatchQueue(label: "Geometry streaming", attributes: .concurrent)
 		print("  - empty streaming op-queue setup")
 		publishQueue = DispatchQueue(label: "Chunk delivery")
 		
@@ -150,30 +150,23 @@ class GeometryStreamer {
 				
 				// Don't allow reads while publishing finished chunk
 				self.publishQueue.async(flags: .barrier) {
-					self.deliveredChunks.append((request, tessellation))
+					let primitive = IndexedRenderPrimitive<Vertex>(vertices: tessellation.vertices,
+																												 indices: tessellation.indices,
+																												 device: self.metalDevice!,
+																												 color: regionId.hashed.hashColor.tuple(),	// $ Embed color in tessellation
+																												 ownerHash: 0,
+																												 debugName: "Unnamed")	// $ Embed name in tessellation
+					self.deliveredChunks.append((request, tessellation, primitive))
 				}
 			}
 		}
 	}
 	
 	func updateStreaming() {
-		guard let device = self.metalDevice else {
-			print("Cannot stream geometry before Metal setup")
-			return
-		}
-				
-		// Create primitives for finished requests
-		publishQueue.sync {	// Don't build primitives while new tessellations are being published
-			for (request, chunk) in deliveredChunks {
+		publishQueue.sync {
+			for (request, tessellation, primitive) in deliveredChunks {
 				let runtimeLodKey = regionHashLodKey(request.chunkId.hashed, atLod: request.lodLevel)
-				
-				let primitive = IndexedRenderPrimitive<Vertex>(vertices: chunk.vertices,
-																											 indices: chunk.indices,
-																											 device: device,
-																											 color: runtimeLodKey.hashColor.tuple(),	// $ Embed color in tessellation
-																											 ownerHash: 0,
-																											 debugName: "Unnamed")	// $ Embed name in tessellation
-				tessellationCache[runtimeLodKey] = chunk
+				tessellationCache[runtimeLodKey] = tessellation
 				primitiveCache[runtimeLodKey] = primitive
 			}
 			
