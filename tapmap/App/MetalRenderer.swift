@@ -74,7 +74,7 @@ class MetalRenderer {
 		effectRenderer.updatePrimitives()
 		regionRenderer.prepareFrame(visibleSet: renderSet)
 		borderRenderer.prepareFrame(visibleContinents: borderedContinents, visibleCountries: worldState.visibleCountries)
-		poiRenderer.updateFades()
+		poiRenderer.prepareFrame(visibleSet: renderSet)
 	}
 	
 	func render(forWorld worldState: RuntimeWorld, into drawable: CAMetalDrawable) {
@@ -118,7 +118,7 @@ class MetalRenderer {
 		})
 
 		encodingQueue.async(execute: makeRenderPass(markerBuffer, addPassDescriptor) { (encoder) in
-			self.poiRenderer.renderWorld(visibleSet: renderSet, inProjection: mvpMatrix, inEncoder: encoder)
+			self.poiRenderer.renderWorld(inProjection: mvpMatrix, inEncoder: encoder)
 		})
 		
 		encodingQueue.async(execute: makeRenderPass(overlayBuffer, addPassDescriptor) { (encoder) in

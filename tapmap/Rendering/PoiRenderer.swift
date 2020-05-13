@@ -9,10 +9,13 @@
 import Metal
 import simd
 
-struct PoiUniforms {
+fileprivate struct FrameUniforms {
 	let mvpMatrix: simd_float4x4
 	let rankThreshold: simd_float1
 	let poiBaseSize: simd_float1
+}
+
+fileprivate struct InstanceUniforms {
 	var progress: simd_float1
 }
 
@@ -49,6 +52,7 @@ struct PoiPlane: Hashable {
 */
 
 class PoiRenderer {
+	static let kMaxVisibleInstances = 256
 	enum Visibility {
 		static let FadeInDuration = 0.4
 		static let FadeOutDuration = 0.2
@@ -56,23 +60,25 @@ class PoiRenderer {
 		case fadeOut(startTime: Date)
 		case visible
 		
-		func alpha() -> Double {
+		func alpha() -> Float {
 			switch self {
 			case .fadeIn(let startTime):
 				let progress = Date().timeIntervalSince(startTime) / PoiRenderer.Visibility.FadeInDuration
-				return min(progress, 1.0)
+				return Float(min(progress, 1.0))
 			case .fadeOut(let startTime):
 				let progress = Date().timeIntervalSince(startTime) / PoiRenderer.Visibility.FadeOutDuration
-				return max(1.0 - progress, 0.0)
+				return Float(max(1.0 - progress, 0.0))
 			case .visible: return 1.0
 			}
 		}
 	}
 	var poiPlanePrimitives : [PoiPlane]
 	var poiVisibility: [Int : Visibility] = [:]
+	var visiblePlanes: [PoiPlane] = []
 	
 	let device: MTLDevice
 	let pipeline: MTLRenderPipelineState
+	let instanceUniforms: MTLBuffer
 	
 	var rankThreshold: Float = -1.0
 	var poiBaseSize: Float = 0.0
@@ -97,6 +103,7 @@ class PoiRenderer {
 		do {
 			try pipeline = device.makeRenderPipelineState(descriptor: pipelineDescriptor)
 			self.device = device
+			self.instanceUniforms = device.makeBuffer(length: PoiRenderer.kMaxVisibleInstances * MemoryLayout<InstanceUniforms>.stride, options: .storageModeShared)!
 		} catch let error {
 			fatalError(error.localizedDescription)
 		}
@@ -131,7 +138,7 @@ class PoiRenderer {
 		return sortPlacesIntoPoiPlanes(region.places, in: region, inDevice: device);
 	}
 	
-	func updateFades() {
+	func prepareFrame(visibleSet: Set<RegionHash>) {
 		let now = Date()
 		for (key, p) in poiVisibility {
 			switch(p) {
@@ -147,6 +154,14 @@ class PoiRenderer {
 			default: break
 			}
 		}
+		
+		visiblePlanes = poiPlanePrimitives.filter({ visibleSet.contains($0.ownerHash) })
+																			.filter({ poiVisibility[$0.hashValue] != nil })
+		var fades = Array<Float>(repeating: 0.0, count: PoiRenderer.kMaxVisibleInstances)
+		for (i, plane) in visiblePlanes.enumerated() {
+			fades[i] = poiVisibility[plane.hashValue]!.alpha()
+		}
+		instanceUniforms.contents().copyMemory(from: fades, byteCount: MemoryLayout<InstanceUniforms>.stride * fades.count)
 	}
 	
 	func updateZoomThreshold(viewZoom: Float) {
@@ -198,22 +213,22 @@ class PoiRenderer {
 		poiBaseSize += min(zoomLevel * 0.01, 0.1)	// Boost POI sizes a bit when zooming in
 	}
 	
-	func renderWorld(visibleSet: Set<Int>, inProjection projection: simd_float4x4, inEncoder encoder: MTLRenderCommandEncoder) {
+	func renderWorld(inProjection projection: simd_float4x4, inEncoder encoder: MTLRenderCommandEncoder) {
 		encoder.pushDebugGroup("Render POI plane")
 		encoder.setRenderPipelineState(pipeline)
 		
-		var uniforms = PoiUniforms(mvpMatrix: projection,
-															 rankThreshold: rankThreshold,
-															 poiBaseSize: poiBaseSize,
-															 progress: 0.0)
+		var frameUniforms = FrameUniforms(mvpMatrix: projection,
+																			 rankThreshold: rankThreshold,
+																			 poiBaseSize: poiBaseSize)
+		encoder.setVertexBytes(&frameUniforms, length: MemoryLayout<FrameUniforms>.stride, index: 1)
+		encoder.setVertexBuffer(instanceUniforms, offset: 0, index: 2)
 		
-		let visiblePrimitives = poiPlanePrimitives.filter({ visibleSet.contains($0.ownerHash) })
-																							.filter({ poiVisibility[$0.hashValue] != nil })
-		for poiPlane in visiblePrimitives {
-			let parameters = poiVisibility[poiPlane.hashValue]! // Ensured by visiblePoiPlanes()
-			uniforms.progress = Float(parameters.alpha())
-			encoder.setVertexBytes(&uniforms, length: MemoryLayout.stride(ofValue: uniforms), index: 1)
+		var instanceCursor = 0
+		for poiPlane in visiblePlanes {
+			encoder.setVertexBufferOffset(instanceCursor, index: 2)
 			render(primitive: poiPlane.primitive, into: encoder)
+			
+			instanceCursor += MemoryLayout<InstanceUniforms>.stride
 		}
 		encoder.popDebugGroup()
 	}

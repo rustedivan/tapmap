@@ -30,28 +30,6 @@ class OutlineRenderPrimitive {
 	}
 }
 
-extension GeoProvince {
-	func poiRenderPlanes() -> [PoiPlane] {
-		return []
-	}
-}
-
-extension GeoCountry {
-	func poiRenderPlanes() -> [PoiPlane] {
-		return []
-	}
-}
-
-extension GeoContinent {
-	func poiRenderPlanes() -> [PoiPlane] {
-		return []
-	}
-}
-
-struct PoiPlane {
-	
-}
-
 class GeometryStreamer {
 	let actualLodLevel = 0
 	static var shared: GeometryStreamer { get {
