@@ -280,6 +280,7 @@
 		148937E322B97FDF009278A0 /* Rendering */ = {
 			isa = PBXGroup;
 			children = (
+				14FCC068245ED44D006116E7 /* MetalRenderer.swift */,
 				148937E722B97FDF009278A0 /* RegionRenderer.swift */,
 				14BD43392444AD50007A3D67 /* BorderRenderer.swift */,
 				148937EE22B97FDF009278A0 /* PoiRenderer.swift */,
@@ -303,7 +304,6 @@
 				148937F322B97FDF009278A0 /* UserState.swift */,
 				148937F422B97FDF009278A0 /* Serialization.swift */,
 				146EA269244AF14C009196BC /* RuntimeWorld.swift */,
-				14FCC068245ED44D006116E7 /* MetalRenderer.swift */,
 			);
 			path = App;
 			sourceTree = "<group>";
