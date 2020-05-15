@@ -154,7 +154,7 @@ class GeometryStreamer {
 																												 indices: tessellation.indices,
 																												 device: self.metalDevice!,
 																												 color: regionId.hashed.hashColor.tuple(),	// $ Embed color in tessellation
-																												 ownerHash: 0,
+																												 ownerHash: regionHash,
 																												 debugName: "Unnamed")	// $ Embed name in tessellation
 					self.deliveredChunks.append((request, tessellation, primitive))
 				}

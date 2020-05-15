@@ -40,12 +40,12 @@ class UIState {
 	}
 
 	func selectRegion<T:GeoIdentifiable>(_ region: T) {
-		selectedRegionHash = region.hashValue
+		selectedRegionHash = region.geographyId.hashed
 		DebugRenderer.shared.moveSelection(region.aabb)
 	}
 	
 	func selected<T:GeoIdentifiable>(_ object: T) -> Bool {
-		return selectedRegionHash == object.hashValue
+		return selectedRegionHash == object.geographyId.hashed
 	}
 	
 	func clearSelection() {
