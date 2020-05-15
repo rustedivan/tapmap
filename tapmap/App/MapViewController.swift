@@ -140,7 +140,7 @@ class MapViewController: UIViewController, MTKViewDelegate {
 			return true
 		} else {
 			ui.selectRegion(hit)
-			renderers.selectionRenderer.select(regionHash: hit.geographyId.hashed)	// $ weird semantics to select in the renderer
+			renderers.selectionRenderer.updatePrimitive(selectedRegionHash: hit.geographyId.hashed)
 			return false
 		}
 	}

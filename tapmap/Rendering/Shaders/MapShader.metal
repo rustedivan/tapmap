@@ -37,7 +37,6 @@ vertex VertexOut mapVertex(const device Vertex* vertexArray [[ buffer(0) ]],
 	return outVertex;
 }
 
-// $ Color could be sent straight here
 fragment float4 mapFragment(VertexOut interpolated [[ stage_in ]]) {
 	return float4(interpolated.color);
 }

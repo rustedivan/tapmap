@@ -102,8 +102,6 @@ class MetalRenderer {
 		markerBuffer.label = "Marker buffer"
 		markerBuffer.enqueue()
 		
-		// $ Mark buffers immutable
-		
 		let mvpMatrix = modelViewProjectionMatrix
 		let bufferIndex = frameId % maxInflightFrames
 		
