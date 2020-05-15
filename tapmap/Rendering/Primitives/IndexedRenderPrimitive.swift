@@ -11,16 +11,17 @@ import Metal
 class IndexedRenderPrimitive<VertexType> {
 	let ownerHash: Int
 	
+	let drawMode: MTLPrimitiveType
 	let vertexBuffer: MTLBuffer
-	let elementCount: Int
+	let elementCounts: [Int]
 	let indexBuffer: MTLBuffer
 	
 	let color: Color
 	let name: String
 	
-	// Indexed draw mode
-	init(vertices: [VertexType],
-			 indices: [UInt16],
+	init(polygons: [[VertexType]],
+			 indices: [[UInt16]],
+			 drawMode mode: MTLPrimitiveType,
 			 device: MTLDevice,
 			 color c: Color,
 			 ownerHash hash: Int, debugName: String) {
@@ -28,16 +29,29 @@ class IndexedRenderPrimitive<VertexType> {
 		
 		ownerHash = hash
 		name = debugName
+		drawMode = mode
 		
 		guard !indices.isEmpty else {
 			fatalError("Do not create render primitive for empty meshes")
 		}
 		
-		let vertexBufLen = MemoryLayout<VertexType>.stride * vertices.count
-		let indexBufLen = MemoryLayout<UInt16>.stride * indices.count
+		// Concatenate all vertex rings into one buffer
+		var allVertices: [VertexType] = []
+		var allIndices: [UInt32] = []
+		var polyRanges: [Int] = []
+		for (p, i) in zip(polygons, indices) {
+			guard !p.isEmpty else { continue }
+			allVertices.append(contentsOf: p)
+			allIndices.append(contentsOf: i.map { UInt32($0) })
+			polyRanges.append(i.count)
+		}
+		elementCounts = polyRanges
 		
-		guard let newVertBuffer = device.makeBuffer(bytes: vertices, length: vertexBufLen, options: .storageModeShared),
-					let	newIndexBuffer = device.makeBuffer(bytes: indices, length: indexBufLen, options: .storageModeShared) else {
+		let vertexBufLen = MemoryLayout<VertexType>.stride * allVertices.count
+		let indexBufLen = MemoryLayout<UInt32>.stride * allIndices.count
+		
+		guard let newVertBuffer = device.makeBuffer(bytes: allVertices, length: vertexBufLen, options: .storageModeShared),
+					let	newIndexBuffer = device.makeBuffer(bytes: allIndices, length: indexBufLen, options: .storageModeShared) else {
 				fatalError("Could not create buffers for \(debugName)")
 		}
 		
@@ -46,16 +60,20 @@ class IndexedRenderPrimitive<VertexType> {
 		
 		self.indexBuffer = newIndexBuffer
 		self.indexBuffer.label = "\(debugName) index buffer"
-		
-		elementCount = indices.count
 	}
 }
 
+
 func render<T>(primitive: IndexedRenderPrimitive<T>, into encoder: MTLRenderCommandEncoder) {
 	encoder.setVertexBuffer(primitive.vertexBuffer, offset: 0, index: 0)
-	encoder.drawIndexedPrimitives(type: .triangle,
-																indexCount: primitive.elementCount,
-																indexType: .uint16,
-																indexBuffer: primitive.indexBuffer,
-																indexBufferOffset: 0)
+	
+	var cursor = 0
+	for range in primitive.elementCounts {
+		encoder.drawIndexedPrimitives(type: primitive.drawMode,
+																	indexCount: range,
+																	indexType: .uint32,
+																	indexBuffer: primitive.indexBuffer,
+																	indexBufferOffset: cursor)
+		cursor += range * MemoryLayout<UInt32>.stride
+	}
 }
