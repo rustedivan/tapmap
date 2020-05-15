@@ -53,6 +53,9 @@ class EffectRenderer {
 		pipelineDescriptor.colorAttachments[0].sourceAlphaBlendFactor = .sourceAlpha
 		pipelineDescriptor.colorAttachments[0].destinationRGBBlendFactor = .one
 		pipelineDescriptor.colorAttachments[0].destinationAlphaBlendFactor = .one
+		pipelineDescriptor.vertexBuffers[0].mutability = .immutable
+		pipelineDescriptor.vertexBuffers[1].mutability = .immutable
+		pipelineDescriptor.vertexBuffers[2].mutability = .immutable
 		
 		do {
 			try pipeline = device.makeRenderPipelineState(descriptor: pipelineDescriptor)

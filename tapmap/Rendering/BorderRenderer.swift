@@ -40,6 +40,7 @@ class BorderRenderer {
 		pipelineDescriptor.vertexFunction = shaderLib.makeFunction(name: "borderVertex")
 		pipelineDescriptor.fragmentFunction = shaderLib.makeFunction(name: "borderFragment")
 		pipelineDescriptor.colorAttachments[0].pixelFormat = pixelFormat;
+		pipelineDescriptor.vertexBuffers[0].mutability = .immutable
 				
 		do {
 			try pipeline = device.makeRenderPipelineState(descriptor: pipelineDescriptor)

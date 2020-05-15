@@ -99,6 +99,9 @@ class PoiRenderer {
 		pipelineDescriptor.colorAttachments[0].sourceAlphaBlendFactor = .sourceAlpha
 		pipelineDescriptor.colorAttachments[0].destinationRGBBlendFactor = .oneMinusSourceAlpha
 		pipelineDescriptor.colorAttachments[0].destinationAlphaBlendFactor = .oneMinusSourceAlpha
+		pipelineDescriptor.vertexBuffers[0].mutability = .immutable
+		pipelineDescriptor.vertexBuffers[1].mutability = .immutable
+		pipelineDescriptor.vertexBuffers[2].mutability = .immutable
 		
 		do {
 			try pipeline = device.makeRenderPipelineState(descriptor: pipelineDescriptor)

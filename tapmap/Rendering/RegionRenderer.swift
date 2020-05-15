@@ -31,6 +31,9 @@ class RegionRenderer {
 		pipelineDescriptor.vertexFunction = shaderLib.makeFunction(name: "mapVertex")
 		pipelineDescriptor.fragmentFunction = shaderLib.makeFunction(name: "mapFragment")
 		pipelineDescriptor.colorAttachments[0].pixelFormat = pixelFormat;
+		pipelineDescriptor.vertexBuffers[0].mutability = .immutable
+		pipelineDescriptor.vertexBuffers[1].mutability = .immutable
+		pipelineDescriptor.vertexBuffers[2].mutability = .immutable
 		
 		do {
 			try pipeline = device.makeRenderPipelineState(descriptor: pipelineDescriptor)

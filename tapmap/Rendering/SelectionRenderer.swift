@@ -30,6 +30,8 @@ class SelectionRenderer {
 		pipelineDescriptor.vertexFunction = shaderLib.makeFunction(name: "selectionVertex")
 		pipelineDescriptor.fragmentFunction = shaderLib.makeFunction(name: "selectionFragment")
 		pipelineDescriptor.colorAttachments[0].pixelFormat = pixelFormat;
+		pipelineDescriptor.vertexBuffers[0].mutability = .immutable
+		pipelineDescriptor.vertexBuffers[1].mutability = .immutable
 		
 		do {
 			try pipeline = device.makeRenderPipelineState(descriptor: pipelineDescriptor)
