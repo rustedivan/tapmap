@@ -84,11 +84,9 @@ class MetalRenderer {
 		let clearPassDescriptor = MTLRenderPassDescriptor()
 		clearPassDescriptor.colorAttachments[0].texture = drawable.texture
 		clearPassDescriptor.colorAttachments[0].loadAction = .clear
-		clearPassDescriptor.colorAttachments[0].storeAction = .dontCare
 		clearPassDescriptor.colorAttachments[0].clearColor = MTLClearColor(red: 0.0, green: 0.5, blue: 0.7, alpha: 1.0)
 		let addPassDescriptor = clearPassDescriptor.copy() as! MTLRenderPassDescriptor
 		addPassDescriptor.colorAttachments[0].loadAction = .load
-		addPassDescriptor.colorAttachments[0].storeAction = .dontCare
 				
 		// Create parallel command buffers and enqueue in order
 		guard let geographyBuffer = commandQueue.makeCommandBuffer() else { return }
@@ -126,8 +124,7 @@ class MetalRenderer {
 			self.poiRenderer.renderWorld(inProjection: mvpMatrix, inEncoder: encoder, bufferIndex: bufferIndex)
 		})
 		
-		
-		//		commandQueue.insertDebugCaptureBoundary()	// $ For GPU Frame capture
+//		commandQueue.insertDebugCaptureBoundary()	// $ For GPU Frame capture
 	}
 	
 	typealias MapRenderPass = () -> ()
