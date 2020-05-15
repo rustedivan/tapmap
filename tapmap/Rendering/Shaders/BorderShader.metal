@@ -9,7 +9,7 @@
 #include <metal_stdlib>
 using namespace metal;
 
-struct BorderUniforms {
+struct FrameUniforms {
 	float4x4 modelViewProjectionMatrix;
 	float scaleWidth;
 	float4 color;
@@ -26,13 +26,13 @@ struct VertexOut {
 };
 
 vertex VertexOut borderVertex(const device ScaleVertex* vertexArray [[ buffer(0) ]],
-															constant BorderUniforms *uniforms [[ buffer(1) ]],
+															constant FrameUniforms *frame [[ buffer(1) ]],
 															unsigned int vid [[ vertex_id ]]) {
 	ScaleVertex v = vertexArray[vid];
 	VertexOut outVertex = VertexOut();
-	float2 rib = v.normal * uniforms->scaleWidth;
-	outVertex.position = uniforms->modelViewProjectionMatrix * float4(v.position + rib, 0.0, 1.0);
-	outVertex.color = uniforms->color;
+	float2 rib = v.normal * frame->scaleWidth;
+	outVertex.position = frame->modelViewProjectionMatrix * float4(v.position + rib, 0.0, 1.0);
+	outVertex.color = frame->color;
 	return outVertex;
 }
 
