@@ -37,7 +37,7 @@ class MetalRenderer {
 		view.colorPixelFormat = .bgra8Unorm
 		
 		// Create renderers
-		regionRenderer = RegionRenderer(withDevice: device, pixelFormat: view.colorPixelFormat)
+		regionRenderer = RegionRenderer(withDevice: device, pixelFormat: view.colorPixelFormat, bufferCount: maxInflightFrames)
 		borderRenderer = BorderRenderer(withDevice: device, pixelFormat: view.colorPixelFormat)
 		selectionRenderer = SelectionRenderer(withDevice: device, pixelFormat: view.colorPixelFormat)
 		poiRenderer = PoiRenderer(withDevice: device, pixelFormat: view.colorPixelFormat, bufferCount: maxInflightFrames,
@@ -75,7 +75,7 @@ class MetalRenderer {
 
 		let bufferIndex = frameId % maxInflightFrames
 		effectRenderer.prepareFrame(bufferIndex: bufferIndex)
-		regionRenderer.prepareFrame(visibleSet: renderSet)
+		regionRenderer.prepareFrame(visibleSet: renderSet, bufferIndex: bufferIndex)
 		borderRenderer.prepareFrame(visibleContinents: borderedContinents, visibleCountries: worldState.visibleCountries)
 		poiRenderer.prepareFrame(visibleSet: renderSet, bufferIndex: bufferIndex)
 	}
@@ -104,11 +104,9 @@ class MetalRenderer {
 		
 		// $ Mark buffers immutable
 		
-		let available = AppDelegate.sharedUserState.availableSet
 		let visible = AppDelegate.sharedUIState.visibleRegionHashes
-		let renderSet = available.intersection(visible)
 		let borderedContinents = visible.intersection(worldState.allContinents.keys)	// All visible continents (even if visited)
-		let borderedCountries = Set(worldState.visibleCountries.keys)
+		let borderedCountries = Set(worldState.visibleCountries.keys)	// $ let borderrenderer build a renderlist
 		
 		let mvpMatrix = modelViewProjectionMatrix
 		let bufferIndex = frameId % maxInflightFrames
@@ -120,7 +118,7 @@ class MetalRenderer {
 		
 		encodingQueue.async(execute: makeRenderPass(geographyBuffer, clearPassDescriptor) { (encoder) in
 			self.borderRenderer.renderContinentBorders(borderedContinents, inProjection: mvpMatrix, inEncoder: encoder)
-			self.regionRenderer.renderWorld(visibleSet: renderSet, inProjection: mvpMatrix, inEncoder: encoder)
+			self.regionRenderer.renderWorld(inProjection: mvpMatrix, inEncoder: encoder, bufferIndex: bufferIndex)
 			self.borderRenderer.renderCountryBorders(borderedCountries, inProjection: mvpMatrix, inEncoder: encoder)
 		})
 

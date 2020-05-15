@@ -9,18 +9,22 @@
 import Metal
 import simd
 
-struct MapUniforms {
+fileprivate struct FrameUniforms {
 	let mvpMatrix: simd_float4x4
+}
+
+fileprivate struct InstanceUniforms {
 	var color: simd_float4
-	var highlighted: simd_int1
 }
 
 class RegionRenderer {
+	static let kMaxVisibleRegions = 5000
 	let device: MTLDevice
 	let pipeline: MTLRenderPipelineState
-	var highlightedRegionHash: Int = 0
+	let instanceUniforms: [MTLBuffer]
+	var renderList: [IndexedRenderPrimitive<Vertex>] = []
 	
-	init(withDevice device: MTLDevice, pixelFormat: MTLPixelFormat) {
+	init(withDevice device: MTLDevice, pixelFormat: MTLPixelFormat, bufferCount: Int) {
 		let shaderLib = device.makeDefaultLibrary()!
 		
 		let pipelineDescriptor = MTLRenderPipelineDescriptor()
@@ -31,34 +35,54 @@ class RegionRenderer {
 		do {
 			try pipeline = device.makeRenderPipelineState(descriptor: pipelineDescriptor)
 			self.device = device
+			self.instanceUniforms = (0..<bufferCount).map { _ in
+				return device.makeBuffer(length: RegionRenderer.kMaxVisibleRegions * MemoryLayout<InstanceUniforms>.stride, options: .storageModeShared)!
+			}
 		} catch let error {
 			fatalError(error.localizedDescription)
 		}
 	}
 	
-	func prepareFrame(visibleSet: Set<RegionHash>) {
-		for regionHash in visibleSet {
-			_ = GeometryStreamer.shared.renderPrimitive(for: regionHash, streamIfMissing: true)
+	func prepareFrame(visibleSet: Set<RegionHash>, bufferIndex: Int) {
+		// Collect all streamed-in primitives for the currently visible set of non-visited regions
+		// Store it locally until it's time to render, because geometryStreamer is allowed to change
+		// its list of available primitives at any time
+		renderList = visibleSet.compactMap { regionHash in
+			return GeometryStreamer.shared.renderPrimitive(for: regionHash, streamIfMissing: true)
 		}
-		highlightedRegionHash = AppDelegate.sharedUIState.selectedRegionHash
+		
+		let highlightedRegionHash = AppDelegate.sharedUIState.selectedRegionHash
+		var styles = Array<InstanceUniforms>()
+		styles.reserveCapacity(visibleSet.count)
+		for region in renderList {
+			var c = region.color.vector
+			if region.ownerHash == highlightedRegionHash {
+				c.x = max(c.x + 0.3, 1.0)
+				c.y = max(c.y + 0.3, 1.0)
+				c.z = max(c.z + 0.3, 1.0)
+			}
+			
+			let u = InstanceUniforms(color: c)	// $ Look up in style map
+			styles.append(u)
+		}
+		instanceUniforms[bufferIndex].contents().copyMemory(from: styles,
+																												byteCount: MemoryLayout<InstanceUniforms>.stride * styles.count)
 	}
 	
-	func renderWorld(visibleSet: Set<RegionHash>, inProjection projection: simd_float4x4, inEncoder encoder: MTLRenderCommandEncoder) {
+	func renderWorld(inProjection projection: simd_float4x4, inEncoder encoder: MTLRenderCommandEncoder, bufferIndex: Int) {
 		encoder.pushDebugGroup("Render world")
 		encoder.setRenderPipelineState(pipeline)
+		
+		var frameUniforms = FrameUniforms(mvpMatrix: projection)
+		encoder.setVertexBytes(&frameUniforms, length: MemoryLayout<FrameUniforms>.stride, index: 1)
+		encoder.setVertexBuffer(instanceUniforms[bufferIndex], offset: 0, index: 2)
 
-		// Collect all streamed-in primitives for the currently visible set of non-visited regions
-		let renderPrimitives = visibleSet.compactMap { GeometryStreamer.shared.renderPrimitive(for: $0, streamIfMissing: false) }
-		
-		var uniforms = MapUniforms(mvpMatrix: projection,
-															 color: simd_float4(),
-															 highlighted: simd_int1())
-		
-		for primitive in renderPrimitives {
-			uniforms.color = simd_float4(primitive.color.r, primitive.color.g, primitive.color.b, 1.0)
-			uniforms.highlighted = (primitive.ownerHash == highlightedRegionHash) ? 1 : 0
-			encoder.setVertexBytes(&uniforms, length: MemoryLayout.stride(ofValue: uniforms), index: 1)
+		var instanceCursor = 0
+		for primitive in renderList {
+			encoder.setVertexBufferOffset(instanceCursor, index: 2)
 			render(primitive: primitive, into: encoder)
+			
+			instanceCursor += MemoryLayout<InstanceUniforms>.stride
 		}
 		
 		encoder.popDebugGroup()

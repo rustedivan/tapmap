@@ -9,10 +9,12 @@
 #include <metal_stdlib>
 using namespace metal;
 
-struct MapUniforms {
+struct FrameUniforms {
 	float4x4 modelViewProjectionMatrix;
+};
+
+struct InstanceUniforms {
 	float4 color;
-	int highlighted;
 };
 
 struct Vertex {
@@ -25,16 +27,17 @@ struct VertexOut {
 };
 
 vertex VertexOut mapVertex(const device Vertex* vertexArray [[ buffer(0) ]],
-														constant MapUniforms *uniforms [[ buffer(1) ]],
-														unsigned int vid [[ vertex_id ]]) {
+													 constant FrameUniforms* frame [[ buffer(1) ]],
+													 const device InstanceUniforms* region [[ buffer(2) ]],
+													 unsigned int vid [[ vertex_id ]]) {
 	Vertex v = vertexArray[vid];
 	VertexOut outVertex = VertexOut();
-	// $ Use highlighted state
-	outVertex.position = uniforms->modelViewProjectionMatrix * float4(v.position, 0.0, 1.0);
-	outVertex.color = uniforms->color;
+	outVertex.position = frame->modelViewProjectionMatrix * float4(v.position, 0.0, 1.0);
+	outVertex.color = region->color;
 	return outVertex;
 }
 
+// $ Color could be sent straight here
 fragment float4 mapFragment(VertexOut interpolated [[ stage_in ]]) {
 	return float4(interpolated.color);
 }
