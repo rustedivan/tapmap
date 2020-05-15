@@ -75,26 +75,25 @@ class BorderRenderer {
 					return
 				}
 				
-				let innerWidth: Float
-				let outerWidth: Float
-				
-				let countourVertices: [[Vertex]]
-				if visibleContinents[borderHash] != nil {
-					innerWidth = 0.1
-					outerWidth = 1.0
-					countourVertices = [(tessellation.contours.first?.vertices ?? [])]
-				} else {
-					innerWidth = 0.5
-					outerWidth = 0.1
-					countourVertices = tessellation.contours.map({$0.vertices})
-				}
-				
-				let borderOutline = { (outline: [Vertex]) in generateClosedOutlineGeometry(outline: outline, innerExtent: innerWidth, outerExtent: outerWidth) }
-				let outlineGeometry: RegionContours = countourVertices.map(borderOutline)
-
 				// Create the render primitive and update book-keeping on the main thread
 				pendingBorders.insert(loddedBorderHash)
 				borderQueue.async {
+					let innerWidth: Float
+					let outerWidth: Float
+					
+					let countourVertices: [[Vertex]]
+					if visibleContinents[borderHash] != nil {
+						innerWidth = 0.1
+						outerWidth = 1.0
+						countourVertices = [(tessellation.contours.first?.vertices ?? [])]
+					} else {
+						innerWidth = 0.5
+						outerWidth = 0.1
+						countourVertices = tessellation.contours.map({$0.vertices})
+					}
+					
+					let borderOutline = { (outline: [Vertex]) in generateClosedOutlineGeometry(outline: outline, innerExtent: innerWidth, outerExtent: outerWidth) }
+					let outlineGeometry: RegionContours = countourVertices.map(borderOutline)
 					let outlinePrimitive = OutlineRenderPrimitive(contours: outlineGeometry,
 																												device: self.device,
 																												ownerHash: 0,
