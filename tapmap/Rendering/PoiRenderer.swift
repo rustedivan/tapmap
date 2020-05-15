@@ -74,7 +74,7 @@ class PoiRenderer {
 	}
 	var poiPlanePrimitives : [PoiPlane]
 	var poiVisibility: [Int : Visibility] = [:]
-	var visiblePlanes: [PoiPlane] = []
+	var renderList: [PoiPlane] = []
 	
 	let device: MTLDevice
 	let pipeline: MTLRenderPipelineState
@@ -157,11 +157,11 @@ class PoiRenderer {
 			}
 		}
 		
-		visiblePlanes = poiPlanePrimitives.filter({ visibleSet.contains($0.ownerHash) })
+		renderList = poiPlanePrimitives.filter({ visibleSet.contains($0.ownerHash) })
 																			.filter({ poiVisibility[$0.hashValue] != nil })
 		var fades = Array<InstanceUniforms>()
-		fades.reserveCapacity(visiblePlanes.count)
-		for plane in visiblePlanes {
+		fades.reserveCapacity(renderList.count)
+		for plane in renderList {
 			let u = InstanceUniforms(progress: poiVisibility[plane.hashValue]!.alpha())
 			fades.append(u)
 		}
@@ -229,7 +229,7 @@ class PoiRenderer {
 		encoder.setVertexBuffer(instanceUniforms[bufferIndex], offset: 0, index: 2)
 		
 		var instanceCursor = 0
-		for poiPlane in visiblePlanes {
+		for poiPlane in renderList {
 			encoder.setVertexBufferOffset(instanceCursor, index: 2)
 			render(primitive: poiPlane.primitive, into: encoder)
 			

@@ -20,6 +20,8 @@ class BorderRenderer {
 	let pipeline: MTLRenderPipelineState
 	
 	var borderPrimitives: [Int : OutlineRenderPrimitive]
+	var continentRenderList: [OutlineRenderPrimitive] = []
+	var countryRenderList: [OutlineRenderPrimitive] = []
 	var borderWidth: Float
 	var actualBorderLod: Int = 10
 	var wantedBorderLod: Int
@@ -120,36 +122,41 @@ class BorderRenderer {
 		if !borderLodMiss && actualBorderLod != streamer.wantedLodLevel {
 			actualBorderLod = streamer.wantedLodLevel
 		}
-	}
-	
-	func renderContinentBorders(_ continents: Set<Int>, inProjection projection: simd_float4x4, inEncoder encoder: MTLRenderCommandEncoder) {
-		encoder.pushDebugGroup("Render continent borders")
-		encoder.setRenderPipelineState(pipeline)
 		
 		let continentOutlineLod = max(actualBorderLod, 0)	// $ Turn up the limit once border width is under control (set min/max outline width and ramp between )
-		let loddedBorderKeys = continents.map { borderHashLodKey($0, atLod: continentOutlineLod) }
+		continentRenderList = visibleContinents.compactMap {
+			let loddedKey = borderHashLodKey($0.key, atLod: continentOutlineLod)
+			return borderPrimitives[loddedKey]
+		}
+		
+		countryRenderList = visibleCountries.compactMap {
+			let loddedKey = borderHashLodKey($0.key, atLod: actualBorderLod)
+			return borderPrimitives[loddedKey]
+		}
+	}
+	
+	func renderContinentBorders(inProjection projection: simd_float4x4, inEncoder encoder: MTLRenderCommandEncoder) {
+		encoder.pushDebugGroup("Render continent borders")
+		encoder.setRenderPipelineState(pipeline)
 		
 		var uniforms = FrameUniforms(mvpMatrix: projection, width: borderWidth * 2.0, color: Color(r: 1.0, g: 0.5, b: 0.7, a: 1.0).vector)
 		encoder.setVertexBytes(&uniforms, length: MemoryLayout.stride(ofValue: uniforms), index: 1)
 		
-		for key in loddedBorderKeys {
-			guard let primitive = borderPrimitives[key] else { continue }
+		for primitive in continentRenderList {
 			render(primitive: primitive, into: encoder)
 		}
 		
 		encoder.popDebugGroup()
 	}
 	
-	func renderCountryBorders(_ countries: Set<Int>, inProjection projection: simd_float4x4, inEncoder encoder: MTLRenderCommandEncoder) {
+	func renderCountryBorders(inProjection projection: simd_float4x4, inEncoder encoder: MTLRenderCommandEncoder) {
 		encoder.pushDebugGroup("Render country borders")
 		encoder.setRenderPipelineState(pipeline)
 		
 		var uniforms = FrameUniforms(mvpMatrix: projection, width: borderWidth, color: Color(r: 1.0, g: 1.0, b: 1.0, a: 1.0).vector)
 		encoder.setVertexBytes(&uniforms, length: MemoryLayout.stride(ofValue: uniforms), index: 1)
 		
-		let loddedBorderKeys = countries.map { borderHashLodKey($0, atLod: actualBorderLod) }
-		for key in loddedBorderKeys {
-			guard let primitive = borderPrimitives[key] else { continue }
+		for primitive in countryRenderList {
 			render(primitive: primitive, into: encoder)
 		}
 		

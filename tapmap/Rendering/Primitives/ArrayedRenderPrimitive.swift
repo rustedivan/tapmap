@@ -29,7 +29,7 @@ class ArrayedRenderPrimitive {
 		}
 		
 		let bufLen = MemoryLayout<Vertex>.stride * elementCount
-		guard let newBuffer = device.makeBuffer(length: bufLen, options: .storageModeShared) else {	// $ Figure out how to use .private
+		guard let newBuffer = device.makeBuffer(length: bufLen, options: .storageModeShared) else {
 			fatalError("Could not create vertex buffer for \(debugName)")
 		}
 		

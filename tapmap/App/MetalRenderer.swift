@@ -104,10 +104,6 @@ class MetalRenderer {
 		
 		// $ Mark buffers immutable
 		
-		let visible = AppDelegate.sharedUIState.visibleRegionHashes
-		let borderedContinents = visible.intersection(worldState.allContinents.keys)	// All visible continents (even if visited)
-		let borderedCountries = Set(worldState.visibleCountries.keys)	// $ let borderrenderer build a renderlist
-		
 		let mvpMatrix = modelViewProjectionMatrix
 		let bufferIndex = frameId % maxInflightFrames
 		
@@ -117,9 +113,9 @@ class MetalRenderer {
 		}
 		
 		encodingQueue.async(execute: makeRenderPass(geographyBuffer, clearPassDescriptor) { (encoder) in
-			self.borderRenderer.renderContinentBorders(borderedContinents, inProjection: mvpMatrix, inEncoder: encoder)
+			self.borderRenderer.renderContinentBorders(inProjection: mvpMatrix, inEncoder: encoder)
 			self.regionRenderer.renderWorld(inProjection: mvpMatrix, inEncoder: encoder, bufferIndex: bufferIndex)
-			self.borderRenderer.renderCountryBorders(borderedCountries, inProjection: mvpMatrix, inEncoder: encoder)
+			self.borderRenderer.renderCountryBorders(inProjection: mvpMatrix, inEncoder: encoder)
 		})
 
 		encodingQueue.async(execute: makeRenderPass(overlayBuffer, addPassDescriptor) { (encoder) in
