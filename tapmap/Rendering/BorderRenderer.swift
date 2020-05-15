@@ -54,7 +54,7 @@ class BorderRenderer {
 	}
 	
 	func updateStyle(zoomLevel: Float) {
-		borderWidth = 0.4 / zoomLevel
+		borderWidth = 1.0 / zoomLevel
 	}
 	
 	func prepareFrame(visibleContinents: GeoContinentMap, visibleCountries: GeoCountryMap) {
@@ -84,10 +84,10 @@ class BorderRenderer {
 					let countourVertices: [[Vertex]]
 					if visibleContinents[borderHash] != nil {
 						innerWidth = 0.1
-						outerWidth = 1.0
+						outerWidth = 0.5
 						countourVertices = [(tessellation.contours.first?.vertices ?? [])]
 					} else {
-						innerWidth = 0.5
+						innerWidth = 0.3
 						outerWidth = 0.1
 						countourVertices = tessellation.contours.map({$0.vertices})
 					}

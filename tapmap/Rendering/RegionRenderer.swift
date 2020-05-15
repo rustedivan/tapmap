@@ -57,9 +57,9 @@ class RegionRenderer {
 		for region in renderList {
 			var c = region.color.vector
 			if region.ownerHash == highlightedRegionHash {
-				c.x = max(c.x + 0.3, 1.0)
-				c.y = max(c.y + 0.3, 1.0)
-				c.z = max(c.z + 0.3, 1.0)
+				c.x = min(c.x - 0.3, 1.0)
+				c.y = min(c.y - 0.3, 1.0)
+				c.z = min(c.z - 0.3, 1.0)
 			}
 			
 			let u = InstanceUniforms(color: c)	// $ Look up in style map

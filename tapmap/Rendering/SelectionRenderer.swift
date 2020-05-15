@@ -46,7 +46,7 @@ class SelectionRenderer {
 		let streamer = GeometryStreamer.shared
 		guard let tessellation = streamer.tessellation(for: regionHash, atLod: streamer.actualLodLevel) else { return }
 		
-		let thinOutline = { (outline: [Vertex]) in generateClosedOutlineGeometry(outline: outline, innerExtent: 0.2, outerExtent: 1.0) }
+		let thinOutline = { (outline: [Vertex]) in generateClosedOutlineGeometry(outline: outline, innerExtent: 0.2, outerExtent: 0.5) }
 		let countourVertices = tessellation.contours.map({$0.vertices})
 		let outlineGeometry: RegionContours = countourVertices.map(thinOutline)
 		
@@ -61,7 +61,7 @@ class SelectionRenderer {
 	}
 	
 	func updateStyle(zoomLevel: Float) {
-		outlineWidth = 0.2 / zoomLevel
+		outlineWidth = 1.0 / zoomLevel
 		
 		if let selectionHash = outlinePrimitive?.ownerHash, lodLevel != GeometryStreamer.shared.actualLodLevel {
 			select(regionHash: selectionHash)

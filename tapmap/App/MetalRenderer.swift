@@ -97,10 +97,10 @@ class MetalRenderer {
 		
 		geographyBuffer.label = "Geography buffer"
 		geographyBuffer.enqueue()
-		markerBuffer.label = "Marker buffer"
-		markerBuffer.enqueue()
 		overlayBuffer.label = "Overlay buffer"
 		overlayBuffer.enqueue()
+		markerBuffer.label = "Marker buffer"
+		markerBuffer.enqueue()
 		
 		// $ Mark buffers immutable
 		
@@ -111,7 +111,7 @@ class MetalRenderer {
 		let mvpMatrix = modelViewProjectionMatrix
 		let bufferIndex = frameId % maxInflightFrames
 		
-		overlayBuffer.addCompletedHandler { buffer in
+		markerBuffer.addCompletedHandler { buffer in
 			drawable.present()
 			self.frameSemaphore.signal()
 		}
@@ -122,16 +122,17 @@ class MetalRenderer {
 			self.borderRenderer.renderCountryBorders(borderedCountries, inProjection: mvpMatrix, inEncoder: encoder)
 		})
 
-		encodingQueue.async(execute: makeRenderPass(markerBuffer, addPassDescriptor) { (encoder) in
-			self.poiRenderer.renderWorld(inProjection: mvpMatrix, inEncoder: encoder, bufferIndex: bufferIndex)
-		})
-		
 		encodingQueue.async(execute: makeRenderPass(overlayBuffer, addPassDescriptor) { (encoder) in
 			self.effectRenderer.renderWorld(inProjection: mvpMatrix, inEncoder: encoder, bufferIndex: bufferIndex)
 			self.selectionRenderer.renderSelection(inProjection: mvpMatrix, inEncoder: encoder)
 			//		DebugRenderer.shared.renderMarkers(inProjection: modelViewProjectionMatrix)
 		})
-
+		
+		encodingQueue.async(execute: makeRenderPass(markerBuffer, addPassDescriptor) { (encoder) in
+			self.poiRenderer.renderWorld(inProjection: mvpMatrix, inEncoder: encoder, bufferIndex: bufferIndex)
+		})
+		
+		
 		//		commandQueue.insertDebugCaptureBoundary()	// $ For GPU Frame capture
 	}
 	
