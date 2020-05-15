@@ -30,9 +30,9 @@ struct VertexOut {
 };
 
 vertex VertexOut poiVertex(const device ScaleVertex* vertexArray [[ buffer(0) ]],
-															constant FrameUniforms *frame [[ buffer(1) ]],
-															device InstanceUniforms *poi [[ buffer(2) ]],
-															unsigned int vid [[ vertex_id ]]) {
+													 constant FrameUniforms *frame [[ buffer(1) ]],
+													 const device InstanceUniforms *poi [[ buffer(2) ]],
+													 unsigned int vid [[ vertex_id ]]) {
 	ScaleVertex v = vertexArray[vid];
 	VertexOut outVertex = VertexOut();
 	float2 rib = v.normal * frame->baseSize;

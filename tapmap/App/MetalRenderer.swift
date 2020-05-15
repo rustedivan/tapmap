@@ -15,8 +15,12 @@ class MetalRenderer {
 	var commandQueue: MTLCommandQueue
 	var latestFrame = Date()
 	var modelViewProjectionMatrix = simd_float4x4()
+	
+	// Parallel rendering setup
+	let maxInflightFrames = 3
 	var frameId = 0
 	let frameSemaphore: DispatchSemaphore
+	let encodingQueue = DispatchQueue(label: "Parallel command encoding", attributes: .concurrent)
 	
 	// App renderers
 	var regionRenderer: RegionRenderer
@@ -25,8 +29,6 @@ class MetalRenderer {
 	var selectionRenderer: SelectionRenderer
 	var borderRenderer: BorderRenderer
 	var debugRenderer: DebugRenderer
-	let encodingQueue = DispatchQueue(label: "Parallel command encoding", attributes: .concurrent)
-	let renderPasses = DispatchGroup()
 	
 	init(in view: MTKView, forWorld world: RuntimeWorld) {
 		device = MTLCreateSystemDefaultDevice()
@@ -38,7 +40,7 @@ class MetalRenderer {
 		regionRenderer = RegionRenderer(withDevice: device, pixelFormat: view.colorPixelFormat)
 		borderRenderer = BorderRenderer(withDevice: device, pixelFormat: view.colorPixelFormat)
 		selectionRenderer = SelectionRenderer(withDevice: device, pixelFormat: view.colorPixelFormat)
-		poiRenderer = PoiRenderer(withDevice: device, pixelFormat: view.colorPixelFormat,
+		poiRenderer = PoiRenderer(withDevice: device, pixelFormat: view.colorPixelFormat, bufferCount: maxInflightFrames,
 															withVisibleContinents: world.availableContinents,
 															countries: world.availableCountries,
 															provinces: world.availableProvinces)
@@ -46,7 +48,7 @@ class MetalRenderer {
 		effectRenderer = EffectRenderer(withDevice: device, pixelFormat: view.colorPixelFormat)
 		debugRenderer = DebugRenderer(withDevice: device, pixelFormat: view.colorPixelFormat)
 		
-		frameSemaphore = DispatchSemaphore(value: 1)
+		frameSemaphore = DispatchSemaphore(value: maxInflightFrames)
 	}
 	
 	func updateProjection(viewSize: CGSize, mapSize: CGSize, centeredOn offset: CGPoint, zoomedTo zoom: Float) {
@@ -64,18 +66,18 @@ class MetalRenderer {
 	}
 	
 	func prepareFrame(forWorld worldState: RuntimeWorld) {
-		frameId += 1
 		frameSemaphore.wait()
-		
+		frameId += 1
 		let available = AppDelegate.sharedUserState.availableSet
 		let visible = AppDelegate.sharedUIState.visibleRegionHashes
 		let renderSet = available.intersection(visible)
 		let borderedContinents = worldState.allContinents.filter { visible.contains($0.key) }	// All visible continents (even if visited)
 
+		let bufferIndex = frameId % maxInflightFrames
 		effectRenderer.updatePrimitives()
 		regionRenderer.prepareFrame(visibleSet: renderSet)
 		borderRenderer.prepareFrame(visibleContinents: borderedContinents, visibleCountries: worldState.visibleCountries)
-		poiRenderer.prepareFrame(visibleSet: renderSet)
+		poiRenderer.prepareFrame(visibleSet: renderSet, frameIndex: bufferIndex)
 	}
 	
 	func render(forWorld worldState: RuntimeWorld, into drawable: CAMetalDrawable) {
@@ -109,31 +111,30 @@ class MetalRenderer {
 		let borderedCountries = Set(worldState.visibleCountries.keys)
 		
 		let mvpMatrix = modelViewProjectionMatrix
+		let bufferIndex = frameId % maxInflightFrames
 		
-		self.renderPasses.enter()
+		overlayBuffer.addCompletedHandler { buffer in
+			drawable.present()
+			self.frameSemaphore.signal()
+		}
+		
 		encodingQueue.async(execute: makeRenderPass(geographyBuffer, clearPassDescriptor) { (encoder) in
 			self.borderRenderer.renderContinentBorders(borderedContinents, inProjection: mvpMatrix, inEncoder: encoder)
 			self.regionRenderer.renderWorld(visibleSet: renderSet, inProjection: mvpMatrix, inEncoder: encoder)
 			self.borderRenderer.renderCountryBorders(borderedCountries, inProjection: mvpMatrix, inEncoder: encoder)
 		})
 
-		self.renderPasses.enter()
 		encodingQueue.async(execute: makeRenderPass(markerBuffer, addPassDescriptor) { (encoder) in
-			self.poiRenderer.renderWorld(inProjection: mvpMatrix, inEncoder: encoder)
+			self.poiRenderer.renderWorld(inProjection: mvpMatrix, inEncoder: encoder, bufferIndex: bufferIndex)
 		})
 		
-		self.renderPasses.enter()
 		encodingQueue.async(execute: makeRenderPass(overlayBuffer, addPassDescriptor) { (encoder) in
 			self.effectRenderer.renderWorld(inProjection: mvpMatrix, inEncoder: encoder)
 			self.selectionRenderer.renderSelection(inProjection: mvpMatrix, inEncoder: encoder)
 			//		DebugRenderer.shared.renderMarkers(inProjection: modelViewProjectionMatrix)
 		})
 
-		renderPasses.wait()
-		frameSemaphore.signal()
-		drawable.present()
-		
-//		commandQueue.insertDebugCaptureBoundary()
+		//		commandQueue.insertDebugCaptureBoundary()	// $ For GPU Frame capture
 	}
 	
 	typealias MapRenderPass = () -> ()
@@ -144,7 +145,6 @@ class MetalRenderer {
 			render(encoder)
 			encoder.endEncoding()
 			buffer.commit()
-			self.renderPasses.leave()
 		}
 	}
 	

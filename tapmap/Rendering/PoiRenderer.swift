@@ -78,12 +78,12 @@ class PoiRenderer {
 	
 	let device: MTLDevice
 	let pipeline: MTLRenderPipelineState
-	let instanceUniforms: MTLBuffer
+	let instanceUniforms: [MTLBuffer]
 	
 	var rankThreshold: Float = -1.0
 	var poiBaseSize: Float = 0.0
 	
-	init(withDevice device: MTLDevice, pixelFormat: MTLPixelFormat,
+	init(withDevice device: MTLDevice, pixelFormat: MTLPixelFormat, bufferCount: Int,
 				withVisibleContinents continents: GeoContinentMap,
 				countries: GeoCountryMap,
 				provinces: GeoProvinceMap) {
@@ -103,7 +103,9 @@ class PoiRenderer {
 		do {
 			try pipeline = device.makeRenderPipelineState(descriptor: pipelineDescriptor)
 			self.device = device
-			self.instanceUniforms = device.makeBuffer(length: PoiRenderer.kMaxVisibleInstances * MemoryLayout<InstanceUniforms>.stride, options: .storageModeShared)!
+			self.instanceUniforms = (0..<bufferCount).map { _ in
+				return device.makeBuffer(length: PoiRenderer.kMaxVisibleInstances * MemoryLayout<InstanceUniforms>.stride, options: .storageModeShared)!
+			}
 		} catch let error {
 			fatalError(error.localizedDescription)
 		}
@@ -138,7 +140,7 @@ class PoiRenderer {
 		return sortPlacesIntoPoiPlanes(region.places, in: region, inDevice: device);
 	}
 	
-	func prepareFrame(visibleSet: Set<RegionHash>) {
+	func prepareFrame(visibleSet: Set<RegionHash>, frameIndex: Int) {
 		let now = Date()
 		for (key, p) in poiVisibility {
 			switch(p) {
@@ -157,11 +159,12 @@ class PoiRenderer {
 		
 		visiblePlanes = poiPlanePrimitives.filter({ visibleSet.contains($0.ownerHash) })
 																			.filter({ poiVisibility[$0.hashValue] != nil })
-		var fades = Array<Float>(repeating: 0.0, count: PoiRenderer.kMaxVisibleInstances)
-		for (i, plane) in visiblePlanes.enumerated() {
-			fades[i] = poiVisibility[plane.hashValue]!.alpha()
+		var fades = Array<Float>()
+		fades.reserveCapacity(visiblePlanes.count)
+		for plane in visiblePlanes {
+			fades.append(poiVisibility[plane.hashValue]!.alpha())
 		}
-		instanceUniforms.contents().copyMemory(from: fades, byteCount: MemoryLayout<InstanceUniforms>.stride * fades.count)
+		instanceUniforms[frameIndex].contents().copyMemory(from: fades, byteCount: MemoryLayout<InstanceUniforms>.stride * fades.count)
 	}
 	
 	func updateZoomThreshold(viewZoom: Float) {
@@ -213,7 +216,7 @@ class PoiRenderer {
 		poiBaseSize += min(zoomLevel * 0.01, 0.1)	// Boost POI sizes a bit when zooming in
 	}
 	
-	func renderWorld(inProjection projection: simd_float4x4, inEncoder encoder: MTLRenderCommandEncoder) {
+	func renderWorld(inProjection projection: simd_float4x4, inEncoder encoder: MTLRenderCommandEncoder, bufferIndex: Int) {
 		encoder.pushDebugGroup("Render POI plane")
 		encoder.setRenderPipelineState(pipeline)
 		
@@ -221,7 +224,7 @@ class PoiRenderer {
 																			 rankThreshold: rankThreshold,
 																			 poiBaseSize: poiBaseSize)
 		encoder.setVertexBytes(&frameUniforms, length: MemoryLayout<FrameUniforms>.stride, index: 1)
-		encoder.setVertexBuffer(instanceUniforms, offset: 0, index: 2)
+		encoder.setVertexBuffer(instanceUniforms[bufferIndex], offset: 0, index: 2)
 		
 		var instanceCursor = 0
 		for poiPlane in visiblePlanes {
