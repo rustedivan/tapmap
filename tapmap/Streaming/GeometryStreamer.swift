@@ -11,6 +11,7 @@ import Dispatch
 import Metal
 
 class GeometryStreamer {
+	typealias StreamedPrimitive = IndexedRenderPrimitive<Vertex>
 	static private var _shared: GeometryStreamer!
 	static var shared: GeometryStreamer {
 		get {
@@ -34,10 +35,10 @@ class GeometryStreamer {
 	var actualLodLevel: Int = 10
 	var lodCacheMiss: Bool = true
 	var pendingChunks: Set<ChunkRequest> = []										// Tracks outstanding stream requests
-	var deliveredChunks: [(ChunkRequest, GeoTessellation, IndexedRenderPrimitive<Vertex>)] = []	// Chunks that finished streaming in this frame
+	var deliveredChunks: [(ChunkRequest, GeoTessellation, StreamedPrimitive)] = []	// Chunks that finished streaming in this frame
 	
 	var tessellationCache: [Int : GeoTessellation] = [:]
-	var primitiveCache: [Int : IndexedRenderPrimitive<Vertex>] = [:]
+	var primitiveCache: [Int : StreamedPrimitive] = [:]
 	var regionIdLookup: [RegionHash : RegionId] = [:]	// To avoid dependency on RuntimeWorld
 	var streaming: Bool { get {
 		return !pendingChunks.isEmpty
@@ -101,7 +102,7 @@ class GeometryStreamer {
 		return loadedWorld
 	}
 	
-	func renderPrimitive(for regionHash: RegionHash, streamIfMissing: Bool = false) -> IndexedRenderPrimitive<Vertex>? {
+	func renderPrimitive(for regionHash: RegionHash, streamIfMissing: Bool = false) -> StreamedPrimitive? {
 		let actualStreamHash = regionHashLodKey(regionHash, atLod: actualLodLevel)
 		let wantedStreamHash = regionHashLodKey(regionHash, atLod: wantedLodLevel)
 		
@@ -150,12 +151,13 @@ class GeometryStreamer {
 				
 				// Don't allow reads while publishing finished chunk
 				self.publishQueue.async(flags: .barrier) {
-					let primitive = IndexedRenderPrimitive<Vertex>(vertices: tessellation.vertices,
-																												 indices: tessellation.indices,
-																												 device: self.metalDevice!,
-																												 color: regionId.hashed.hashColor.tuple(),	// $ Embed color in tessellation
-																												 ownerHash: regionHash,
-																												 debugName: "Unnamed")	// $ Embed name in tessellation
+					let primitive = StreamedPrimitive(polygons: [tessellation.vertices],
+																					  indices: [tessellation.indices],
+																						drawMode: .triangle,
+																					  device: self.metalDevice!,
+																					  color: regionId.hashed.hashColor.tuple(),	// $ Embed color in tessellation
+																					  ownerHash: regionHash,
+																					  debugName: "Unnamed")	// $ Embed name in tessellation
 					self.deliveredChunks.append((request, tessellation, primitive))
 				}
 			}

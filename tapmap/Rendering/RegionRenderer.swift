@@ -18,11 +18,13 @@ fileprivate struct InstanceUniforms {
 }
 
 class RegionRenderer {
+	typealias RegionPrimitive = IndexedRenderPrimitive<Vertex>
+
 	static let kMaxVisibleRegions = 5000
 	let device: MTLDevice
 	let pipeline: MTLRenderPipelineState
 	let instanceUniforms: [MTLBuffer]
-	var renderList: [IndexedRenderPrimitive<Vertex>] = []
+	var renderList: [RegionPrimitive] = []
 	
 	init(withDevice device: MTLDevice, pixelFormat: MTLPixelFormat, bufferCount: Int) {
 		let shaderLib = device.makeDefaultLibrary()!

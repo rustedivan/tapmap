@@ -20,7 +20,8 @@ fileprivate struct InstanceUniforms {
 }
 
 struct PoiPlane: Hashable {
-	let primitive: IndexedRenderPrimitive<ScaleVertex>
+	typealias PoiPlanePrimitive = IndexedRenderPrimitive<ScaleVertex>
+	let primitive: PoiPlanePrimitive
 	let rank: Int
 	let representsArea: Bool
 	var ownerHash: Int { return primitive.ownerHash }
@@ -52,7 +53,7 @@ struct PoiPlane: Hashable {
 */
 
 class PoiRenderer {
-	static let kMaxVisibleInstances = 256
+	static let kMaxVisibleInstances = 1024
 	enum Visibility {
 		static let FadeInDuration = 0.4
 		static let FadeOutDuration = 0.2
@@ -299,12 +300,13 @@ typealias PoiFactory = (Int, Set<GeoPlace>) -> PoiPlane
 func makePoiPlaneFactory<T:GeoIdentifiable>(forArea: Bool, in container: T, inDevice device: MTLDevice) -> PoiFactory {
 	return { (rank: Int, pois: Set<GeoPlace>) -> PoiPlane in
 		let (vertices, indices) = buildPlaceMarkers(places: pois)
-		let primitive = IndexedRenderPrimitive<ScaleVertex>(vertices: vertices,
-																												indices: indices,
-																												device: device,
-																												color: rank.hashColor.tuple(),
-																												ownerHash: container.geographyId.hashed,	// The hash of the owning region
-																												debugName: "\(container.name) - \(forArea ? "area" : "poi") plane @ \(rank)")
+		let primitive = PoiPlane.PoiPlanePrimitive(polygons: [vertices],
+																							 indices: [indices],
+																							 drawMode: .triangle,
+																							 device: device,
+																							 color: rank.hashColor.tuple(),
+																							 ownerHash: container.geographyId.hashed,	// The hash of the owning region
+																							 debugName: "\(container.name) - \(forArea ? "area" : "poi") plane @ \(rank)")
 		let hashes = pois.map { $0.hashValue }
 		return PoiPlane(primitive: primitive, rank: rank, representsArea: forArea, poiHashes: hashes)
 	}
