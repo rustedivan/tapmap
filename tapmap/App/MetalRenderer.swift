@@ -45,7 +45,7 @@ class MetalRenderer {
 															countries: world.availableCountries,
 															provinces: world.availableProvinces)
 		
-		effectRenderer = EffectRenderer(withDevice: device, pixelFormat: view.colorPixelFormat)
+		effectRenderer = EffectRenderer(withDevice: device, pixelFormat: view.colorPixelFormat, bufferCount: maxInflightFrames)
 		debugRenderer = DebugRenderer(withDevice: device, pixelFormat: view.colorPixelFormat)
 		
 		frameSemaphore = DispatchSemaphore(value: maxInflightFrames)
@@ -74,10 +74,10 @@ class MetalRenderer {
 		let borderedContinents = worldState.allContinents.filter { visible.contains($0.key) }	// All visible continents (even if visited)
 
 		let bufferIndex = frameId % maxInflightFrames
-		effectRenderer.updatePrimitives()
+		effectRenderer.prepareFrame(bufferIndex: bufferIndex)
 		regionRenderer.prepareFrame(visibleSet: renderSet)
 		borderRenderer.prepareFrame(visibleContinents: borderedContinents, visibleCountries: worldState.visibleCountries)
-		poiRenderer.prepareFrame(visibleSet: renderSet, frameIndex: bufferIndex)
+		poiRenderer.prepareFrame(visibleSet: renderSet, bufferIndex: bufferIndex)
 	}
 	
 	func render(forWorld worldState: RuntimeWorld, into drawable: CAMetalDrawable) {
@@ -129,7 +129,7 @@ class MetalRenderer {
 		})
 		
 		encodingQueue.async(execute: makeRenderPass(overlayBuffer, addPassDescriptor) { (encoder) in
-			self.effectRenderer.renderWorld(inProjection: mvpMatrix, inEncoder: encoder)
+			self.effectRenderer.renderWorld(inProjection: mvpMatrix, inEncoder: encoder, bufferIndex: bufferIndex)
 			self.selectionRenderer.renderSelection(inProjection: mvpMatrix, inEncoder: encoder)
 			//		DebugRenderer.shared.renderMarkers(inProjection: modelViewProjectionMatrix)
 		})

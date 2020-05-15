@@ -140,7 +140,7 @@ class PoiRenderer {
 		return sortPlacesIntoPoiPlanes(region.places, in: region, inDevice: device);
 	}
 	
-	func prepareFrame(visibleSet: Set<RegionHash>, frameIndex: Int) {
+	func prepareFrame(visibleSet: Set<RegionHash>, bufferIndex: Int) {
 		let now = Date()
 		for (key, p) in poiVisibility {
 			switch(p) {
@@ -159,12 +159,14 @@ class PoiRenderer {
 		
 		visiblePlanes = poiPlanePrimitives.filter({ visibleSet.contains($0.ownerHash) })
 																			.filter({ poiVisibility[$0.hashValue] != nil })
-		var fades = Array<Float>()
+		var fades = Array<InstanceUniforms>()
 		fades.reserveCapacity(visiblePlanes.count)
 		for plane in visiblePlanes {
-			fades.append(poiVisibility[plane.hashValue]!.alpha())
+			let u = InstanceUniforms(progress: poiVisibility[plane.hashValue]!.alpha())
+			fades.append(u)
 		}
-		instanceUniforms[frameIndex].contents().copyMemory(from: fades, byteCount: MemoryLayout<InstanceUniforms>.stride * fades.count)
+		instanceUniforms[bufferIndex].contents().copyMemory(from: fades,
+																												byteCount: MemoryLayout<InstanceUniforms>.stride * fades.count)
 	}
 	
 	func updateZoomThreshold(viewZoom: Float) {
@@ -233,6 +235,7 @@ class PoiRenderer {
 			
 			instanceCursor += MemoryLayout<InstanceUniforms>.stride
 		}
+		
 		encoder.popDebugGroup()
 	}
 }

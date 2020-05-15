@@ -13,8 +13,11 @@ using namespace metal;
 #include <metal_stdlib>
 using namespace metal;
 
-struct EffectUniforms {
+struct FrameUniforms {
 	float4x4 modelViewProjectionMatrix;
+};
+
+struct InstanceUniforms {
 	float progress;
 	float4x4 scaleInPlaceMatrix;
 	float4 color;
@@ -30,12 +33,13 @@ struct VertexOut {
 };
 
 vertex VertexOut effectVertex(const device Vertex* vertexArray [[ buffer(0) ]],
-															constant EffectUniforms *uniforms [[ buffer(1) ]],
+															constant FrameUniforms* frame [[ buffer(1) ]],
+															const device InstanceUniforms* effect [[ buffer(2) ]],
 															unsigned int vid [[ vertex_id ]]) {
 	Vertex v = vertexArray[vid];
 	VertexOut outVertex = VertexOut();
-	outVertex.position = uniforms->modelViewProjectionMatrix * uniforms->scaleInPlaceMatrix * float4(v.position, 0.0, 1.0);
-	outVertex.color = uniforms->color * (1.0 - uniforms->progress);
+	outVertex.position = frame->modelViewProjectionMatrix * effect->scaleInPlaceMatrix * float4(v.position, 0.0, 1.0);
+	outVertex.color = effect->color * (1.0 - effect->progress);
 	return outVertex;
 }
 
