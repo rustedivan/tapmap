@@ -167,9 +167,9 @@ class MapViewController: UIViewController, MTKViewDelegate {
 																	 zoomedTo: zoom)
 		renderers.prepareFrame(forWorld: world)
 		
-//		labelView.updateLabels(for: metalRenderer.poiRenderer.activePoiHashes,
-//													 inArea: visibleLongLat(viewBounds: view.bounds),
-//													 atZoom: zoom)
+		labelView.updateLabels(for: renderers.poiRenderer.activePoiHashes,
+													 inArea: visibleLongLat(viewBounds: view.bounds),
+													 atZoom: zoom)
 		
 		geometryStreamer.updateLodLevel()	// Must run after requests have been filed in renderers.prepareFrame, otherwise glitch when switching LOD level
 		geometryStreamer.updateStreaming()
@@ -186,7 +186,7 @@ class MapViewController: UIViewController, MTKViewDelegate {
 		
 		guard let drawable = view.currentDrawable else { fatalError("No drawable") }
 		renderers.render(forWorld: world, into: drawable)
-//		labelView.renderLabels(projection: mapToView)
+		labelView.renderLabels(projection: mapToView)
 
 		needsRender = false
 	}
