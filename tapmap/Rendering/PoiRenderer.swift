@@ -79,6 +79,7 @@ class PoiRenderer {
 	var poiPlanePrimitives : [PoiPlane]
 	var poiVisibility: [Int : Visibility] = [:]
 	var renderLists: [RenderList] = []
+	var renderListSemaphore = DispatchSemaphore(value: 1)
 	
 	let device: MTLDevice
 	let pipeline: MTLRenderPipelineState
@@ -166,8 +167,13 @@ class PoiRenderer {
 		}
 		
 		let framePlanes = poiPlanePrimitives.filter { visibleSet.contains($0.ownerHash) }
-																			 .filter { poiVisibility[$0.hashValue] != nil }
-		renderLists[bufferIndex] = ContiguousArray(framePlanes.map { $0.primitive })
+																			  .filter { poiVisibility[$0.hashValue] != nil }
+		
+		let frameRenderList = ContiguousArray(framePlanes.map { $0.primitive })
+		renderListSemaphore.wait()
+			renderLists[bufferIndex] = frameRenderList
+		renderListSemaphore.signal()
+		
 		var fades = Array<InstanceUniforms>()
 		fades.reserveCapacity(framePlanes.count)
 		for plane in framePlanes {
@@ -237,8 +243,12 @@ class PoiRenderer {
 		encoder.setVertexBytes(&frameUniforms, length: MemoryLayout<FrameUniforms>.stride, index: 1)
 		encoder.setVertexBuffer(instanceUniforms[bufferIndex], offset: 0, index: 2)
 		
+		renderListSemaphore.wait()
+			let renderList = self.renderLists[bufferIndex]
+		renderListSemaphore.signal()
+		
 		var instanceCursor = 0
-		for primitive in renderLists[bufferIndex] {
+		for primitive in renderList {
 			encoder.setVertexBufferOffset(instanceCursor, index: 2)
 			render(primitive: primitive, into: encoder)
 			

@@ -40,7 +40,9 @@ class EffectRenderer {
 	let instanceUniforms: [MTLBuffer]
 	
 	var runningEffects : [RegionEffect]
+
 	var renderLists : [RenderList]
+	var renderListSemaphore = DispatchSemaphore(value: 1)
 	
 	var animating: Bool { get {
 		return !runningEffects.isEmpty
@@ -88,7 +90,11 @@ class EffectRenderer {
 			$0.startTime + $0.duration > Date()
 		}
 		
-		renderLists[bufferIndex] = ContiguousArray(runningEffects.map { $0.primitive })
+		let frameRenderList = ContiguousArray(runningEffects.map { $0.primitive })
+		renderListSemaphore.wait()
+			renderLists[bufferIndex] = frameRenderList
+		renderListSemaphore.signal()
+		
 		var fx = Array<InstanceUniforms>()
 		fx.reserveCapacity(runningEffects.count)
 		for effect in runningEffects {
@@ -113,8 +119,12 @@ class EffectRenderer {
 		encoder.setVertexBytes(&frameUniforms, length: MemoryLayout<FrameUniforms>.stride, index: 1)
 		encoder.setVertexBuffer(instanceUniforms[bufferIndex], offset: 0, index: 2)
 		
+		renderListSemaphore.wait()
+			let renderList = renderLists[bufferIndex]
+		renderListSemaphore.signal()
+		
 		var instanceCursor = 0
-		for primitive in renderLists[bufferIndex] {
+		for primitive in renderList {
 			encoder.setVertexBufferOffset(instanceCursor, index: 2)
 			render(primitive: primitive, into: encoder)
 			

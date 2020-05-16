@@ -26,6 +26,7 @@ class RegionRenderer {
 	let pipeline: MTLRenderPipelineState
 	let instanceUniforms: [MTLBuffer]
 	var renderLists: [RenderList] = []
+	var renderListSemaphore = DispatchSemaphore(value: 1)
 	
 	init(withDevice device: MTLDevice, pixelFormat: MTLPixelFormat, bufferCount: Int) {
 		let shaderLib = device.makeDefaultLibrary()!
@@ -42,7 +43,7 @@ class RegionRenderer {
 			try pipeline = device.makeRenderPipelineState(descriptor: pipelineDescriptor)
 			self.device = device
 			self.renderLists = (0..<bufferCount).map { _ in
-				return ContiguousArray()
+				return ContiguousArray()	// $ Replace all CA's with local RenderList
 			}
 			self.instanceUniforms = (0..<bufferCount).map { _ in
 				return device.makeBuffer(length: RegionRenderer.kMaxVisibleRegions * MemoryLayout<InstanceUniforms>.stride, options: .storageModeShared)!
@@ -56,9 +57,14 @@ class RegionRenderer {
 		// Collect all streamed-in primitives for the currently visible set of non-visited regions
 		// Store it locally until it's time to render, because geometryStreamer is allowed to change
 		// its list of available primitives at any time
-		renderLists[bufferIndex] = ContiguousArray(visibleSet.compactMap { regionHash in
-			return GeometryStreamer.shared.renderPrimitive(for: regionHash, streamIfMissing: true)
-		})
+		
+		let frameRenderList = ContiguousArray(visibleSet.compactMap { regionHash in
+														return GeometryStreamer.shared.renderPrimitive(for: regionHash, streamIfMissing: true)
+													})
+		
+		renderListSemaphore.wait()
+			renderLists[bufferIndex] = frameRenderList
+		renderListSemaphore.signal()
 		
 		let highlightedRegionHash = AppDelegate.sharedUIState.selectedRegionHash
 		var styles = Array<InstanceUniforms>()
@@ -86,8 +92,11 @@ class RegionRenderer {
 		encoder.setVertexBytes(&frameUniforms, length: MemoryLayout<FrameUniforms>.stride, index: 1)
 		encoder.setVertexBuffer(self.instanceUniforms[bufferIndex], offset: 0, index: 2)
 
+		renderListSemaphore.wait()
+			let renderList = self.renderLists[bufferIndex]
+		renderListSemaphore.signal()
 		var instanceCursor = 0
-		for primitive in self.renderLists[bufferIndex] {
+		for primitive in renderList {
 			encoder.setVertexBufferOffset(instanceCursor, index: 2)
 			render(primitive: primitive, into: encoder)
 			

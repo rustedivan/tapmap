@@ -20,6 +20,8 @@ class SelectionRenderer {
 	let pipeline: MTLRenderPipelineState
 	
 	var outlinePrimitive: OutlineRenderPrimitive?
+	var renderListSemaphore = DispatchSemaphore(value: 1)
+	
 	var outlineWidth: Float
 	var lodLevel: Int
 	
@@ -52,10 +54,13 @@ class SelectionRenderer {
 		let countourVertices = tessellation.contours.map({$0.vertices})
 		let outlineGeometry: RegionContours = countourVertices.map(thinOutline)
 		
-		outlinePrimitive = OutlineRenderPrimitive(contours: outlineGeometry,
+		let outline = OutlineRenderPrimitive(contours: outlineGeometry,
 																							device: device,
 																							ownerHash: selectedRegionHash,
 																							debugName: "Selection contours")
+		renderListSemaphore.wait()
+			outlinePrimitive = outline
+		renderListSemaphore.signal()
 	}
 	
 	func clear() {
@@ -72,7 +77,12 @@ class SelectionRenderer {
 	}
 	
 	func renderSelection(inProjection projection: simd_float4x4, inEncoder encoder: MTLRenderCommandEncoder) {
-		guard let primitive = outlinePrimitive else { return }
+		renderListSemaphore.wait()
+			let p = outlinePrimitive
+		renderListSemaphore.signal()
+		
+		guard let primitive = p else { return }
+		
 		encoder.pushDebugGroup("Render outlines")
 		encoder.setRenderPipelineState(pipeline)
 		

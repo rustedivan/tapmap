@@ -25,6 +25,8 @@ class BorderRenderer {
 	var borderPrimitives: [Int : OutlineRenderPrimitive]
 	var continentRenderLists: [RenderList] = []
 	var countryRenderLists: [RenderList] = []
+	var renderListSemaphore = DispatchSemaphore(value: 1)
+
 	var borderWidth: Float
 	var actualBorderLod: Int = 10
 	var wantedBorderLod: Int
@@ -130,15 +132,20 @@ class BorderRenderer {
 		}
 		
 		let continentOutlineLod = max(actualBorderLod, 0)	// $ Turn up the limit once border width is under control (set min/max outline width and ramp between )
-		continentRenderLists[bufferIndex] = ContiguousArray(visibleContinents.compactMap {
+		let frameContinentRenderList = RenderList(visibleContinents.compactMap {
 			let loddedKey = borderHashLodKey($0.key, atLod: continentOutlineLod)
 			return borderPrimitives[loddedKey]
 		})
 		
-		countryRenderLists[bufferIndex] = ContiguousArray(visibleCountries.compactMap {
+		let frameCountryRenderList = RenderList(visibleCountries.compactMap {
 			let loddedKey = borderHashLodKey($0.key, atLod: actualBorderLod)
 			return borderPrimitives[loddedKey]
 		})
+		
+		renderListSemaphore.wait()
+			continentRenderLists[bufferIndex] = frameContinentRenderList
+			countryRenderLists[bufferIndex] = frameCountryRenderList
+		renderListSemaphore.signal()
 	}
 	
 	func renderContinentBorders(inProjection projection: simd_float4x4, inEncoder encoder: MTLRenderCommandEncoder, bufferIndex: Int) {
@@ -148,7 +155,10 @@ class BorderRenderer {
 		var uniforms = FrameUniforms(mvpMatrix: projection, width: borderWidth * 2.0, color: Color(r: 1.0, g: 0.5, b: 0.7, a: 1.0).vector)
 		encoder.setVertexBytes(&uniforms, length: MemoryLayout.stride(ofValue: uniforms), index: 1)
 		
-		for primitive in continentRenderLists[bufferIndex] {
+		renderListSemaphore.wait()
+			let renderList = continentRenderLists[bufferIndex]
+		renderListSemaphore.signal()
+		for primitive in renderList {
 			render(primitive: primitive, into: encoder)
 		}
 		
@@ -162,7 +172,11 @@ class BorderRenderer {
 		var uniforms = FrameUniforms(mvpMatrix: projection, width: borderWidth, color: Color(r: 1.0, g: 1.0, b: 1.0, a: 1.0).vector)
 		encoder.setVertexBytes(&uniforms, length: MemoryLayout.stride(ofValue: uniforms), index: 1)
 		
-		for primitive in countryRenderLists[bufferIndex] {
+		renderListSemaphore.wait()
+			let renderList = countryRenderLists[bufferIndex]
+		renderListSemaphore.signal()
+		
+		for primitive in renderList {
 			render(primitive: primitive, into: encoder)
 		}
 		
