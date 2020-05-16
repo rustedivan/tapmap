@@ -53,6 +53,9 @@ struct PoiPlane: Hashable {
 */
 
 class PoiRenderer {
+	typealias PoiPrimitive = PoiPlane.PoiPlanePrimitive
+	typealias RenderList = ContiguousArray<PoiPrimitive>
+	
 	static let kMaxVisibleInstances = 1024
 	enum Visibility {
 		static let FadeInDuration = 0.4
@@ -75,7 +78,7 @@ class PoiRenderer {
 	}
 	var poiPlanePrimitives : [PoiPlane]
 	var poiVisibility: [Int : Visibility] = [:]
-	var renderList: [PoiPlane] = []
+	var renderLists: [RenderList] = []
 	
 	let device: MTLDevice
 	let pipeline: MTLRenderPipelineState
@@ -110,6 +113,7 @@ class PoiRenderer {
 			self.instanceUniforms = (0..<bufferCount).map { _ in
 				return device.makeBuffer(length: PoiRenderer.kMaxVisibleInstances * MemoryLayout<InstanceUniforms>.stride, options: .storageModeShared)!
 			}
+			self.renderLists = Array(repeating: ContiguousArray(), count: bufferCount)
 		} catch let error {
 			fatalError(error.localizedDescription)
 		}
@@ -161,11 +165,12 @@ class PoiRenderer {
 			}
 		}
 		
-		renderList = poiPlanePrimitives.filter({ visibleSet.contains($0.ownerHash) })
-																			.filter({ poiVisibility[$0.hashValue] != nil })
+		let framePlanes = poiPlanePrimitives.filter { visibleSet.contains($0.ownerHash) }
+																			 .filter { poiVisibility[$0.hashValue] != nil }
+		renderLists[bufferIndex] = ContiguousArray(framePlanes.map { $0.primitive })
 		var fades = Array<InstanceUniforms>()
-		fades.reserveCapacity(renderList.count)
-		for plane in renderList {
+		fades.reserveCapacity(framePlanes.count)
+		for plane in framePlanes {
 			let u = InstanceUniforms(progress: poiVisibility[plane.hashValue]!.alpha())
 			fades.append(u)
 		}
@@ -233,9 +238,9 @@ class PoiRenderer {
 		encoder.setVertexBuffer(instanceUniforms[bufferIndex], offset: 0, index: 2)
 		
 		var instanceCursor = 0
-		for poiPlane in renderList {
+		for primitive in renderLists[bufferIndex] {
 			encoder.setVertexBufferOffset(instanceCursor, index: 2)
-			render(primitive: poiPlane.primitive, into: encoder)
+			render(primitive: primitive, into: encoder)
 			
 			instanceCursor += MemoryLayout<InstanceUniforms>.stride
 		}
