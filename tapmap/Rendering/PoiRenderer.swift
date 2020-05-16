@@ -169,7 +169,7 @@ class PoiRenderer {
 		var poiScreenSize: Float = 2.0
 		poiScreenSize = 2.0 / (zoom)
 		poiScreenSize += min(zoom * 0.01, 0.1)	// Boost POI sizes a bit when zooming in
-		updateZoomThreshold(viewZoom: zoom)
+		let newRankThreshold = updateZoomThreshold(viewZoom: zoom)
 		
 		let framePlanes = poiPlanePrimitives.filter { visibleSet.contains($0.ownerHash) }
 																			  .filter { poiVisibility[$0.hashValue] != nil }
@@ -186,19 +186,17 @@ class PoiRenderer {
 			self.renderLists[bufferIndex] = frameRenderList
 			self.instanceUniforms[bufferIndex].contents().copyMemory(from: fades, byteCount: MemoryLayout<InstanceUniforms>.stride * fades.count)
 			self.poiBaseSize = poiScreenSize
+			self.rankThreshold = newRankThreshold
 		frameSwitchSemaphore.signal()
 	}
 	
-	func updateZoomThreshold(viewZoom: Float) {
+	func updateZoomThreshold(viewZoom: Float) -> Float{
 		if rankThreshold == viewZoom {
-			return
+			return rankThreshold
 		}
 		
-		let oldRankThreshold = rankThreshold
-		rankThreshold = viewZoom
-		
-		let previousPois = Set(poiPlanePrimitives.filter { cullPlaneToZoomRange(plane: $0, zoom: oldRankThreshold) })
-		let visiblePois = Set(poiPlanePrimitives.filter { cullPlaneToZoomRange(plane: $0, zoom: rankThreshold) })
+		let previousPois = Set(poiPlanePrimitives.filter { cullPlaneToZoomRange(plane: $0, zoom: rankThreshold) })
+		let visiblePois = Set(poiPlanePrimitives.filter { cullPlaneToZoomRange(plane: $0, zoom: viewZoom) })
 
 		let poisToHide = previousPois.subtracting(visiblePois)	// Culled this frame
 		let poisToShow = visiblePois.subtracting(previousPois) // Shown this frame
@@ -210,6 +208,8 @@ class PoiRenderer {
 		for p in poisToShow {
 			poiVisibility.updateValue(.fadeIn(startTime: Date()), forKey: p.hashValue)
 		}
+		
+		return viewZoom
 	}
 	
 	func cullPlaneToZoomRange(plane: PoiPlane, zoom: Float) -> Bool {
