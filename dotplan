@@ -22,10 +22,6 @@ ROAD TO FINAL
 -- build render primitive bookie with frame-count access markers
 -- the RPB can provide lists of primitives to nuke when under memory pressure
 
-# Architecture concerns
-
-
-
 # Creative brief
 ## Shading
 ## UX
