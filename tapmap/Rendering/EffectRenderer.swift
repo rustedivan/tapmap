@@ -32,12 +32,16 @@ struct RegionEffect {
 }
 
 class EffectRenderer {
+	typealias EffectPrimitive = RegionEffect.EffectPrimitive
+	typealias RenderList = ContiguousArray<EffectPrimitive>
 	static let kMaxSimultaneousEffects = 8
 	let device: MTLDevice
 	let pipeline: MTLRenderPipelineState
 	let instanceUniforms: [MTLBuffer]
 	
 	var runningEffects : [RegionEffect]
+	var renderLists : [RenderList]
+	
 	var animating: Bool { get {
 		return !runningEffects.isEmpty
 	}}
@@ -64,6 +68,7 @@ class EffectRenderer {
 			self.instanceUniforms = (0..<bufferCount).map { _ in
 				return device.makeBuffer(length: EffectRenderer.kMaxSimultaneousEffects * MemoryLayout<InstanceUniforms>.stride, options: .storageModeShared)!
 			}
+			self.renderLists = Array(repeating: ContiguousArray(), count: bufferCount)
 		} catch let error {
 			fatalError(error.localizedDescription)
 		}
@@ -83,6 +88,7 @@ class EffectRenderer {
 			$0.startTime + $0.duration > Date()
 		}
 		
+		renderLists[bufferIndex] = ContiguousArray(runningEffects.map { $0.primitive })
 		var fx = Array<InstanceUniforms>()
 		fx.reserveCapacity(runningEffects.count)
 		for effect in runningEffects {
@@ -108,9 +114,9 @@ class EffectRenderer {
 		encoder.setVertexBuffer(instanceUniforms[bufferIndex], offset: 0, index: 2)
 		
 		var instanceCursor = 0
-		for effect in runningEffects {
+		for primitive in renderLists[bufferIndex] {
 			encoder.setVertexBufferOffset(instanceCursor, index: 2)
-			render(primitive: effect.primitive, into: encoder)
+			render(primitive: primitive, into: encoder)
 			
 			instanceCursor += MemoryLayout<InstanceUniforms>.stride
 		}
