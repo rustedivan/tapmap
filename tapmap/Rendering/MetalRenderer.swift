@@ -15,6 +15,7 @@ class MetalRenderer {
 	var commandQueue: MTLCommandQueue
 	var latestFrame = Date()
 	var modelViewProjectionMatrix = simd_float4x4()
+	var zoomLevel: Float = 0.0
 	
 	// Parallel rendering setup
 	let maxInflightFrames = 3
@@ -58,13 +59,6 @@ class MetalRenderer {
 																											zoomedTo: zoom)
 	}
 	
-	func zoomedTo(_ zoom: Float) {
-		selectionRenderer.updateStyle(zoomLevel: zoom)
-		borderRenderer.updateStyle(zoomLevel: zoom)
-		poiRenderer.updateZoomThreshold(viewZoom: zoom)
-		poiRenderer.updateStyle(zoomLevel: zoom)
-	}
-	
 	func prepareFrame(forWorld worldState: RuntimeWorld) {
 		frameSemaphore.wait()
 		frameId += 1
@@ -76,8 +70,9 @@ class MetalRenderer {
 		let bufferIndex = frameId % maxInflightFrames
 		effectRenderer.prepareFrame(bufferIndex: bufferIndex)
 		regionRenderer.prepareFrame(visibleSet: renderSet, bufferIndex: bufferIndex)
-		borderRenderer.prepareFrame(visibleContinents: borderedContinents, visibleCountries: worldState.visibleCountries, bufferIndex: bufferIndex)
-		poiRenderer.prepareFrame(visibleSet: renderSet, bufferIndex: bufferIndex)
+		borderRenderer.prepareFrame(visibleContinents: borderedContinents, visibleCountries: worldState.visibleCountries, zoom: zoomLevel, bufferIndex: bufferIndex)
+		poiRenderer.prepareFrame(visibleSet: renderSet, zoom: zoomLevel, bufferIndex: bufferIndex)
+		selectionRenderer.prepareFrame(zoomLevel: zoomLevel)
 	}
 	
 	func render(forWorld worldState: RuntimeWorld, into drawable: CAMetalDrawable) {
