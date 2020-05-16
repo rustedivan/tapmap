@@ -11,6 +11,7 @@ import Dispatch
 import Metal
 
 class GeometryStreamer {
+	typealias StreamedPrimitive = RenderPrimitive
 	static private var _shared: GeometryStreamer!
 	static var shared: GeometryStreamer {
 		get {
@@ -27,16 +28,18 @@ class GeometryStreamer {
 	let fileData: Data	// fileData is memory-mapped so no need to attach a FileHandle here
 	let fileHeader: WorldHeader
 	let chunkTable: ChunkTable
-	let streamQueue: DispatchQueue
+	let streamQueue: DispatchQueue	// Async stream data from archive
+	var publishQueue: DispatchQueue		// Deliver loaded chunks from worker thread
 	
 	var wantedLodLevel: Int
 	var actualLodLevel: Int = 10
 	var lodCacheMiss: Bool = true
-	var newChunkRequests: [RegionId] = []
-	var pendingChunks: Set<ChunkRequest> = []
-	var primitiveCache: [Int : IndexedRenderPrimitive<Vertex>] = [:]
-	var geometryCache: [Int : GeoTessellation] = [:]
-	var regionIdLookup: [RegionHash : RegionId] = [:]	// To avoid dependency on RuntimeWorldl
+	var pendingChunks: Set<ChunkRequest> = []										// Tracks outstanding stream requests
+	var deliveredChunks: [(ChunkRequest, GeoTessellation, StreamedPrimitive)] = []	// Chunks that finished streaming in this frame
+	
+	var tessellationCache: [Int : GeoTessellation] = [:]
+	var primitiveCache: [Int : StreamedPrimitive] = [:]
+	var regionIdLookup: [RegionHash : RegionId] = [:]	// To avoid dependency on RuntimeWorld
 	var streaming: Bool { get {
 		return !pendingChunks.isEmpty
 	}}
@@ -67,8 +70,9 @@ class GeometryStreamer {
 		chunkTable.chunkData = fileData.subdata(in: fileHeader.dataOffset..<fileHeader.dataOffset + fileHeader.dataSize)
 		print("  - chunk data attached with \(ByteCountFormatter.string(fromByteCount: Int64(chunkTable.chunkData.count), countStyle: .memory))")
 		
-		streamQueue = DispatchQueue(label: "Geometry streaming", qos: .userInitiated, attributes: .concurrent)
+		streamQueue = DispatchQueue(label: "Geometry streaming", attributes: .concurrent)
 		print("  - empty streaming op-queue setup")
+		publishQueue = DispatchQueue(label: "Chunk delivery")
 		
 		GeometryStreamer._shared = self
 		
@@ -98,85 +102,83 @@ class GeometryStreamer {
 		return loadedWorld
 	}
 	
-	func renderPrimitive(for regionHash: RegionHash) -> IndexedRenderPrimitive<Vertex>? {
-		if primitiveHasWantedLod(for: regionHash) == false {
-			let needsNewChunk = streamMissingPrimitive(for: regionHash)
-			lodCacheMiss = needsNewChunk || lodCacheMiss
-		}
+	func renderPrimitive(for regionHash: RegionHash, streamIfMissing: Bool = false) -> StreamedPrimitive? {
+		let actualStreamHash = regionHashLodKey(regionHash, atLod: actualLodLevel)
+		let wantedStreamHash = regionHashLodKey(regionHash, atLod: wantedLodLevel)
 		
-		let actualRegionHash = regionHashLodKey(regionHash, atLod: actualLodLevel)
-		let renderPrimitive = primitiveCache[actualRegionHash]
-		return renderPrimitive
+		if primitiveCache[wantedStreamHash] == nil && streamIfMissing {
+			streamMissingPrimitive(for: regionHash)
+			lodCacheMiss = true
+		}
+		return primitiveCache[actualStreamHash]
 	}
 	
-	func streamMissingPrimitive(for regionHash: RegionHash) -> Bool {
-		// Only stream primitives that are actually opened
-		guard let regionId = regionIdLookup[regionHash] else {
-			print("RegionId lookup failed for hash \(regionHash)")
-			return false
+	func tessellation(for regionHash: RegionHash, atLod lod: Int, streamIfMissing: Bool = false) -> GeoTessellation? {
+		let key = regionHashLodKey(regionHash, atLod: lod)
+		let found = tessellationCache[key]
+		
+		if found != nil {
+			return found
+		} else if streamIfMissing {
+			streamMissingPrimitive(for: regionHash)
 		}
-		streamPrimitive(for: regionId)
-		return true
+		return nil
 	}
 	
 	func evictPrimitive(for regionHash: RegionHash) {
 		for lod in 0 ..< chunkTable.lodCount {
 			let loddedRegionHash = regionHashLodKey(regionHash, atLod: lod)
 			primitiveCache.removeValue(forKey: loddedRegionHash)
-			geometryCache.removeValue(forKey: loddedRegionHash)
 		}
 	}
 	
-	func tessellation(for regionHash: RegionHash, atLod lod: Int, streamIfMissing: Bool = false) -> GeoTessellation? {
-		let key = regionHashLodKey(regionHash, atLod: lod)
-		if let found = geometryCache[key] {
-			return found
-		} else if streamIfMissing {
-			_ = streamMissingPrimitive(for: regionHash)
-		}
-		return nil
-	}
-	
-	func streamPrimitive(for regionId: RegionId) {
-		let runtimeLodKey = regionHashLodKey(regionId.hashed, atLod: wantedLodLevel)
-		if pendingChunks.contains(ChunkRequest(runtimeLodKey)) {
+	private func streamMissingPrimitive(for regionHash: RegionHash) {
+		guard let regionId = regionIdLookup[regionHash] else {
+			print("RegionId lookup failed for hash \(regionHash)")
 			return
 		}
 		
-		newChunkRequests.append(regionId)
-	}
-	
-	func updateStreaming() {
-		guard let device = self.metalDevice else {
-			print("Cannot stream geometry before Metal setup")
-			return
-		}
-		
-		for regionId in newChunkRequests {
+		if !pendingChunks.contains(ChunkRequest(regionId, atLod: wantedLodLevel)) {
 			let chunkName = chunkLodName(regionId, atLod: wantedLodLevel)
-			let runtimeLodKey = regionHashLodKey(regionId.hashed, atLod: wantedLodLevel)
-			pendingChunks.insert(ChunkRequest(runtimeLodKey, name: regionId.key))
+			let request = ChunkRequest(regionId, atLod: wantedLodLevel)
+			pendingChunks.insert(request)
 			
 			streamQueue.async {
-				if let tessellation = self.loadGeometry(chunkName) {
-					// Create the render primitive and update book-keeping on the main thread
-					DispatchQueue.main.async {
-						let c = regionId.hashed.hashColor.tuple()
-						let primitive = IndexedRenderPrimitive<Vertex>(vertices: tessellation.vertices, indices: tessellation.indices, device: device, color: c, ownerHash: regionId.hashed, debugName: chunkName)
-						self.primitiveCache[runtimeLodKey] = primitive
-						self.geometryCache[runtimeLodKey] = tessellation
-						self.pendingChunks.remove(ChunkRequest(runtimeLodKey))
-					}
-				} else {
+				guard let tessellation = self.loadGeometry(chunkName) else {
 					print("No geometry chunk available for \(chunkName)")
+					return
+				}
+				
+				// Don't allow reads while publishing finished chunk
+				self.publishQueue.async(flags: .barrier) {
+					let primitive = StreamedPrimitive(polygons: [tessellation.vertices],
+																					  indices: [tessellation.indices],
+																						drawMode: .triangle,
+																					  device: self.metalDevice!,
+																					  color: regionId.hashed.hashColor.tuple(),	// $ Embed color in tessellation
+																					  ownerHash: regionHash,
+																					  debugName: "Unnamed")	// $ Embed name in tessellation
+					self.deliveredChunks.append((request, tessellation, primitive))
 				}
 			}
 		}
+	}
+	
+	func updateStreaming() {
+		publishQueue.sync {
+			for (request, tessellation, primitive) in deliveredChunks {
+				let runtimeLodKey = regionHashLodKey(request.chunkId.hashed, atLod: request.lodLevel)
+				tessellationCache[runtimeLodKey] = tessellation
+				primitiveCache[runtimeLodKey] = primitive
+			}
+			
+			let finishedRequests = deliveredChunks.map { $0.0 }
+			pendingChunks = pendingChunks.subtracting(finishedRequests)
+			deliveredChunks = []
 		
-		logPendingRequests()
-		logBlockingRequests()
-		
-		newChunkRequests = []
+			logPendingRequests()
+			logBlockingRequests()
+		}
 	}
 	
 	private func loadGeometry(_ name: String) -> GeoTessellation? {
@@ -209,47 +211,39 @@ extension GeometryStreamer {
 		default: setToLevel = 0
 		}
 		
-		if wantedLodLevel != setToLevel {
-			wantedLodLevel = setToLevel
-			lodCacheMiss = true
-		}
+		wantedLodLevel = setToLevel
 	}
-	
-	func primitiveHasWantedLod(for regionHash: RegionHash) -> Bool {
-		let wantedStreamHash = regionHashLodKey(regionHash, atLod: wantedLodLevel)
-		return primitiveCache[wantedStreamHash] != nil
-	}
-	
-	// For pulling chunks from the geometry archive
-	func chunkLodName(_ regionId: RegionId, atLod lod: Int) -> String {
-		return "\(regionId.key)-\(lod)"
-	}
-	
-	// For referencing region-lod geometry at runtime
-	func regionHashLodKey(_ regionHash: RegionHash, atLod lod: Int) -> RegionHash {
-		return "\(regionHash)-\(lod)".hashValue
-	}
+}
+
+// For pulling chunks from the geometry archive
+fileprivate func chunkLodName(_ regionId: RegionId, atLod lod: Int) -> String {
+	return "\(regionId.key)-\(lod)"
+}
+
+// For referencing region-lod geometry at runtime
+fileprivate func regionHashLodKey(_ regionHash: RegionHash, atLod lod: Int) -> RegionHash {
+	return "\(regionHash)-\(lod)".hashValue
 }
 
 // MARK: Introspection
 extension GeometryStreamer {
 	struct ChunkRequest: Hashable, Equatable {
-		let chunkHash: RegionHash
-		let name: String
+		let chunkId: RegionId
+		let lodLevel: Int
 		var frameCount: Int
 		
-		init(_ hash: RegionHash, name: String? = nil, frameCount: Int = 0) {
-			self.chunkHash = hash
+		init(_ regionId: RegionId, atLod lod: Int, frameCount: Int = 0) {
+			self.chunkId = regionId
+			self.lodLevel = lod
 			self.frameCount = frameCount
-			self.name = name ?? "unnamed request"
 		}
 		
 		func hash(into hasher: inout Hasher) {
-			hasher.combine(chunkHash)
+			hasher.combine(regionHashLodKey(chunkId.hashed, atLod: lodLevel))
 		}
 		
 		static func == (lhs: Self, rhs: Self) -> Bool {
-			return lhs.chunkHash == rhs.chunkHash
+			return regionHashLodKey(lhs.chunkId.hashed, atLod: lhs.lodLevel) == regionHashLodKey(rhs.chunkId.hashed, atLod: rhs.lodLevel)
 		}
 	}
 	
@@ -262,7 +256,7 @@ extension GeometryStreamer {
 	func logBlockingRequests() {
 		let blockingRequests = pendingChunks.filter { $0.frameCount > 30 }
 		if !blockingRequests.isEmpty {
-			print("Waiting for \(blockingRequests.map { $0.name }.joined(separator: ", "))")
+			print("Waiting for \(blockingRequests.map { $0.chunkId.key }.joined(separator: ", "))")
 		}
 	}
 }

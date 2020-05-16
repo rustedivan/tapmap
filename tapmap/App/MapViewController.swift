@@ -140,7 +140,7 @@ class MapViewController: UIViewController, MTKViewDelegate {
 			return true
 		} else {
 			ui.selectRegion(hit)
-			renderers.selectionRenderer.select(regionHash: hit.geographyId.hashed)	// $ weird semantics to select in the renderer
+			renderers.selectionRenderer.updatePrimitive(selectedRegionHash: hit.geographyId.hashed)
 			return false
 		}
 	}
@@ -171,7 +171,7 @@ class MapViewController: UIViewController, MTKViewDelegate {
 //													 inArea: visibleLongLat(viewBounds: view.bounds),
 //													 atZoom: zoom)
 		
-		geometryStreamer.updateLodLevel()
+		geometryStreamer.updateLodLevel()	// Must run after requests have been filed in renderers.prepareFrame, otherwise glitch when switching LOD level
 		geometryStreamer.updateStreaming()
 		
 		needsRender = geometryStreamer.streaming ? true : needsRender
@@ -182,10 +182,9 @@ class MapViewController: UIViewController, MTKViewDelegate {
 	}
 	
 	func draw(in view: MTKView) {
-		guard let drawable = view.currentDrawable else { return }
-		
 		prepareFrame()
 		
+		guard let drawable = view.currentDrawable else { fatalError("No drawable") }
 		renderers.render(forWorld: world, into: drawable)
 //		labelView.renderLabels(projection: mapToView)
 
@@ -209,6 +208,7 @@ extension MapViewController : UIScrollViewDelegate {
 		zoom = Float(scrollView.zoomScale)
 		
 		geometryStreamer.zoomedTo(zoom)
+		renderers.zoomLevel = zoom
 
 		AppDelegate.sharedUIState.cullWorldTree(focus: visibleLongLat(viewBounds: view.bounds))
 		needsRender = true

@@ -2,51 +2,6 @@ ROAD TO FINAL
 
 # Rendering arch improvements
 - add ocean pass
-- drop everything except IndexedRenderPrimitive
--- move the cursor stuff up from OutlineRenderPrim
--- move color into it
--- rename to renderPrimitive
--- typealias the [scale]Vertex
-- renderer setup function (load shader, set pipeline)
-- parallel commannd encoding
--- don't create streamed/backthread-generated resources from the renderer's completion handlers
--- add simple requests from the render thread
--- enqueue work from main to worker thread
--- add mutex for reading/writing to the work queue (multiple writers, single reader)
-
-# Metal rewrite
-- target the Apple 1 GPU family (all the way back to iPhone 5S, iPad m3)
-
-## Render passes
-- ocean pass (single texture, color x 2, time, zoom, [position + uv])
-- continent border pass (single texture, color, [position + miter + uv], border width)
-- geography pass (single texture, color, [position + uv], highlight, visited)
-- country border pass (color, [position + miter + uv], highlight, border width)
-- POI render pass (sprite atlas, [position + miter + uv], marker size)
-- effect render pass (color, progress, scaleInPlaceMatrix, [position])
-- selection render pass (color, [position + miter + uv], border width)
-- (label view pass)
-
-## Data formats
-- one uniform block per render pass, they're not going to stay
-	as uniform through the design phase
-- fixed-scale vertex format for borders, markers, selection and opening effect
-- polygon vertex format for geography
-
-## Render primitives
-- outline render primitive (Arrayed +
-- fixed-scale marker render primitive (Indexed + scale vertex) (Maybe just drop the indexed renderer?)
-- region render primitive (Arrayed - maybe cheaper as indexed?)
-- possibly boil this down to IndexedPrimitive with scalable/non-scalabe vertices?
-
-## Parallelism
-- break border, region and POI passes into separate command queues and encode in parallel
--- if needed, region CQ could be put into a parallel encoder itself, and run as separate jobs
--- argument buffers seems like a good fit for blasting out all the regions
---- could ICBs enable encoding all the regions in parallel? (No, only available in later GPU families)
-
-## Modern rendering
-- memoryless attachments?
 
 ## LabelView's tag mechanism is incredibly expensive
 - together with projectPoint - move off main thread?
@@ -66,10 +21,6 @@ ROAD TO FINAL
 - memory management
 -- build render primitive bookie with frame-count access markers
 -- the RPB can provide lists of primitives to nuke when under memory pressure
-
-# Architecture concerns
-
-
 
 # Creative brief
 ## Shading
@@ -118,6 +69,54 @@ ROAD TO FINAL
 ## Figure out how to handle Clipperton and friends (see "skipping..." in bake log)
 
 ----- ARCHIVE -----
+
+# Metal rewrite
+- drop everything except IndexedRenderPrimitive
+-- move the cursor stuff up from OutlineRenderPrim
+-- move color into it
+-- rename to renderPrimitive
+-- typealias the [scale]Vertex
+- renderer setup function (load shader, set pipeline)
+- parallel commannd encoding
+-- don't create streamed/backthread-generated resources from the renderer's completion handlers
+-- add simple requests from the render thread
+-- enqueue work from main to worker thread
+-- add mutex for reading/writing to the work queue (multiple writers, single reader)
+
+# Metal rewrite
+- target the Apple 1 GPU family (all the way back to iPhone 5S, iPad m3)
+
+## Render passes
+- ocean pass (single texture, color x 2, time, zoom, [position + uv])
+- continent border pass (single texture, color, [position + miter + uv], border width)
+- geography pass (single texture, color, [position + uv], highlight, visited)
+- country border pass (color, [position + miter + uv], highlight, border width)
+- POI render pass (sprite atlas, [position + miter + uv], marker size)
+- effect render pass (color, progress, scaleInPlaceMatrix, [position])
+- selection render pass (color, [position + miter + uv], border width)
+- (label view pass)
+
+## Data formats
+- one uniform block per render pass, they're not going to stay
+	as uniform through the design phase
+- fixed-scale vertex format for borders, markers, selection and opening effect
+- polygon vertex format for geography
+
+## Render primitives
+- outline render primitive (Arrayed +
+- fixed-scale marker render primitive (Indexed + scale vertex) (Maybe just drop the indexed renderer?)
+- region render primitive (Arrayed - maybe cheaper as indexed?)
+- possibly boil this down to IndexedPrimitive with scalable/non-scalabe vertices?
+
+## Parallelism
+- break border, region and POI passes into separate command queues and encode in parallel
+-- if needed, region CQ could be put into a parallel encoder itself, and run as separate jobs
+-- argument buffers seems like a good fit for blasting out all the regions
+--- could ICBs enable encoding all the regions in parallel? (No, only available in later GPU families)
+
+## Modern rendering
+- memoryless attachments?
+
 
 # Master branch pickups after merging
 √ make type for baked geometry hash

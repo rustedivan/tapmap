@@ -8,48 +8,11 @@
 
 import Foundation
 
-class ArrayedRenderPrimitive {
-	let ownerHash = 17
-	let vertices: [Vertex] = []
-	init() {}
-	init(vertices: [Vertex], color c: (r: Float, g: Float, b: Float, a: Float), ownerHash hash: Int, debugName: String) {
-	}
-}
-
-class IndexedRenderPrimitive {
+class RenderPrimitive {
 	let ownerHash = 17
 	init() {}
 	init(vertices: [Vertex], indices: [UInt16], color c: (r: Float, g: Float, b: Float, a: Float), ownerHash hash: Int, debugName: String) {
 	}
-}
-
-class OutlineRenderPrimitive {
-	let ownerHash = 17
-	init() {}
-	init(vertices: [Vertex], color c: (r: Float, g: Float, b: Float, a: Float), ownerHash hash: Int, debugName: String) {
-	}
-}
-
-extension GeoProvince {
-	func poiRenderPlanes() -> [PoiPlane] {
-		return []
-	}
-}
-
-extension GeoCountry {
-	func poiRenderPlanes() -> [PoiPlane] {
-		return []
-	}
-}
-
-extension GeoContinent {
-	func poiRenderPlanes() -> [PoiPlane] {
-		return []
-	}
-}
-
-struct PoiPlane {
-	
 }
 
 class GeometryStreamer {
@@ -57,7 +20,7 @@ class GeometryStreamer {
 	static var shared: GeometryStreamer { get {
 		return GeometryStreamer()
 	}}
-	func tessellation(for: Int, atLod: Int) -> IndexedRenderPrimitive? {
+	func tessellation(for: Int, atLod: Int) -> GeoTessellation? {
 		return nil
 	}
 }
