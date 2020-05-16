@@ -66,7 +66,6 @@
 		1489382122B9831C009278A0 /* OperationTessellateRegions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14C6659A22B97E660054D7F2 /* OperationTessellateRegions.swift */; };
 		1489382322B98456009278A0 /* ViewCalculations.swift in Sources */ = {isa = PBXBuildFile; fileRef = 148937E122B97FDF009278A0 /* ViewCalculations.swift */; };
 		14985FED22F0ED0C00F68A1F /* IndexedRenderPrimitive.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14985FEC22F0ED0C00F68A1F /* IndexedRenderPrimitive.swift */; };
-		14985FEF22F0ED4A00F68A1F /* OutlineRenderPrimitive.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14985FEE22F0ED4A00F68A1F /* OutlineRenderPrimitive.swift */; };
 		149B3FDD245EE8B1008A299E /* MapShader.metal in Sources */ = {isa = PBXBuildFile; fileRef = 149B3FDC245EE8B1008A299E /* MapShader.metal */; };
 		149CBDDD23CB230000A7AABB /* LabelView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 149CBDDC23CB230000A7AABB /* LabelView.swift */; };
 		14B63F052460BDFF00A4A433 /* BorderShader.metal in Sources */ = {isa = PBXBuildFile; fileRef = 14B63F042460BDFF00A4A433 /* BorderShader.metal */; };
@@ -155,7 +154,6 @@
 		148937F322B97FDF009278A0 /* UserState.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UserState.swift; sourceTree = "<group>"; };
 		148937F422B97FDF009278A0 /* Serialization.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Serialization.swift; sourceTree = "<group>"; };
 		14985FEC22F0ED0C00F68A1F /* IndexedRenderPrimitive.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IndexedRenderPrimitive.swift; sourceTree = "<group>"; };
-		14985FEE22F0ED4A00F68A1F /* OutlineRenderPrimitive.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OutlineRenderPrimitive.swift; sourceTree = "<group>"; };
 		14985FF522F0F35700F68A1F /* OutlineGeometry.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OutlineGeometry.swift; sourceTree = "<group>"; };
 		149B3FDC245EE8B1008A299E /* MapShader.metal */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.metal; path = MapShader.metal; sourceTree = "<group>"; };
 		149CBDDC23CB230000A7AABB /* LabelView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LabelView.swift; sourceTree = "<group>"; };
@@ -322,7 +320,6 @@
 			isa = PBXGroup;
 			children = (
 				14985FEC22F0ED0C00F68A1F /* IndexedRenderPrimitive.swift */,
-				14985FEE22F0ED4A00F68A1F /* OutlineRenderPrimitive.swift */,
 			);
 			path = Primitives;
 			sourceTree = "<group>";
@@ -696,7 +693,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				1416641B2463E2690006A2D4 /* EffectRenderer.metal in Sources */,
-				14985FEF22F0ED4A00F68A1F /* OutlineRenderPrimitive.swift in Sources */,
 				144B5D5A22D9E092001E2A85 /* SelectionRenderer.swift in Sources */,
 				14B63F052460BDFF00A4A433 /* BorderShader.metal in Sources */,
 				1489380622B97FE0009278A0 /* AppDelegate.swift in Sources */,
