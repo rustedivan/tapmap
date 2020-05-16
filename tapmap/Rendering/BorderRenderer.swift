@@ -16,12 +16,15 @@ fileprivate struct FrameUniforms {
 }
 
 class BorderRenderer {
+	typealias BorderPrimitive = OutlineRenderPrimitive
+	typealias RenderList = ContiguousArray<BorderPrimitive>
+	
 	let device: MTLDevice
 	let pipeline: MTLRenderPipelineState
 	
 	var borderPrimitives: [Int : OutlineRenderPrimitive]
-	var continentRenderList: [OutlineRenderPrimitive] = []
-	var countryRenderList: [OutlineRenderPrimitive] = []
+	var continentRenderLists: [RenderList] = []
+	var countryRenderLists: [RenderList] = []
 	var borderWidth: Float
 	var actualBorderLod: Int = 10
 	var wantedBorderLod: Int
@@ -31,7 +34,7 @@ class BorderRenderer {
 	var pendingBorders: Set<Int> = []
 	var generatedBorders: [(Int, OutlineRenderPrimitive)] = []	// Border primitives that were generated this frame
 
-	init(withDevice device: MTLDevice, pixelFormat: MTLPixelFormat) {
+	init(withDevice device: MTLDevice, pixelFormat: MTLPixelFormat, bufferCount: Int) {
 		borderWidth = 0.0
 		
 		let shaderLib = device.makeDefaultLibrary()!
@@ -45,6 +48,8 @@ class BorderRenderer {
 		do {
 			try pipeline = device.makeRenderPipelineState(descriptor: pipelineDescriptor)
 			self.device = device
+			self.continentRenderLists = Array(repeating: ContiguousArray(), count: bufferCount) // $ Better way to do it
+			self.countryRenderLists = Array(repeating: ContiguousArray(), count: bufferCount)
 		} catch let error {
 			fatalError(error.localizedDescription)
 		}
@@ -60,7 +65,7 @@ class BorderRenderer {
 		borderWidth = 1.0 / zoomLevel
 	}
 	
-	func prepareFrame(visibleContinents: GeoContinentMap, visibleCountries: GeoCountryMap) {
+	func prepareFrame(visibleContinents: GeoContinentMap, visibleCountries: GeoCountryMap, bufferIndex: Int) {
 		let streamer = GeometryStreamer.shared
 		let lodLevel = streamer.wantedLodLevel
 		var borderLodMiss = false
@@ -125,39 +130,39 @@ class BorderRenderer {
 		}
 		
 		let continentOutlineLod = max(actualBorderLod, 0)	// $ Turn up the limit once border width is under control (set min/max outline width and ramp between )
-		continentRenderList = visibleContinents.compactMap {
+		continentRenderLists[bufferIndex] = ContiguousArray(visibleContinents.compactMap {
 			let loddedKey = borderHashLodKey($0.key, atLod: continentOutlineLod)
 			return borderPrimitives[loddedKey]
-		}
+		})
 		
-		countryRenderList = visibleCountries.compactMap {
+		countryRenderLists[bufferIndex] = ContiguousArray(visibleCountries.compactMap {
 			let loddedKey = borderHashLodKey($0.key, atLod: actualBorderLod)
 			return borderPrimitives[loddedKey]
-		}
+		})
 	}
 	
-	func renderContinentBorders(inProjection projection: simd_float4x4, inEncoder encoder: MTLRenderCommandEncoder) {
+	func renderContinentBorders(inProjection projection: simd_float4x4, inEncoder encoder: MTLRenderCommandEncoder, bufferIndex: Int) {
 		encoder.pushDebugGroup("Render continent borders")
 		encoder.setRenderPipelineState(pipeline)
 		
 		var uniforms = FrameUniforms(mvpMatrix: projection, width: borderWidth * 2.0, color: Color(r: 1.0, g: 0.5, b: 0.7, a: 1.0).vector)
 		encoder.setVertexBytes(&uniforms, length: MemoryLayout.stride(ofValue: uniforms), index: 1)
 		
-		for primitive in continentRenderList {
+		for primitive in continentRenderLists[bufferIndex] {
 			render(primitive: primitive, into: encoder)
 		}
 		
 		encoder.popDebugGroup()
 	}
 	
-	func renderCountryBorders(inProjection projection: simd_float4x4, inEncoder encoder: MTLRenderCommandEncoder) {
+	func renderCountryBorders(inProjection projection: simd_float4x4, inEncoder encoder: MTLRenderCommandEncoder, bufferIndex: Int) {
 		encoder.pushDebugGroup("Render country borders")
 		encoder.setRenderPipelineState(pipeline)
 		
 		var uniforms = FrameUniforms(mvpMatrix: projection, width: borderWidth, color: Color(r: 1.0, g: 1.0, b: 1.0, a: 1.0).vector)
 		encoder.setVertexBytes(&uniforms, length: MemoryLayout.stride(ofValue: uniforms), index: 1)
 		
-		for primitive in countryRenderList {
+		for primitive in countryRenderLists[bufferIndex] {
 			render(primitive: primitive, into: encoder)
 		}
 		

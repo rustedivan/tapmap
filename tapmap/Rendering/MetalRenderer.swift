@@ -38,7 +38,7 @@ class MetalRenderer {
 		
 		// Create renderers
 		regionRenderer = RegionRenderer(withDevice: device, pixelFormat: view.colorPixelFormat, bufferCount: maxInflightFrames)
-		borderRenderer = BorderRenderer(withDevice: device, pixelFormat: view.colorPixelFormat)
+		borderRenderer = BorderRenderer(withDevice: device, pixelFormat: view.colorPixelFormat, bufferCount: maxInflightFrames)
 		selectionRenderer = SelectionRenderer(withDevice: device, pixelFormat: view.colorPixelFormat)
 		poiRenderer = PoiRenderer(withDevice: device, pixelFormat: view.colorPixelFormat, bufferCount: maxInflightFrames,
 															withVisibleContinents: world.availableContinents,
@@ -76,7 +76,7 @@ class MetalRenderer {
 		let bufferIndex = frameId % maxInflightFrames
 		effectRenderer.prepareFrame(bufferIndex: bufferIndex)
 		regionRenderer.prepareFrame(visibleSet: renderSet, bufferIndex: bufferIndex)
-		borderRenderer.prepareFrame(visibleContinents: borderedContinents, visibleCountries: worldState.visibleCountries)
+		borderRenderer.prepareFrame(visibleContinents: borderedContinents, visibleCountries: worldState.visibleCountries, bufferIndex: bufferIndex)
 		poiRenderer.prepareFrame(visibleSet: renderSet, bufferIndex: bufferIndex)
 	}
 	
@@ -104,9 +104,9 @@ class MetalRenderer {
 		let bufferIndex = frameId % maxInflightFrames
 		
 		let geographyPass = makeRenderPass(geographyBuffer, clearPassDescriptor) { (encoder) in
-			self.borderRenderer.renderContinentBorders(inProjection: mvpMatrix, inEncoder: encoder)
+			self.borderRenderer.renderContinentBorders(inProjection: mvpMatrix, inEncoder: encoder, bufferIndex: bufferIndex)
 			self.regionRenderer.renderWorld(inProjection: mvpMatrix, inEncoder: encoder, bufferIndex: bufferIndex)
-			self.borderRenderer.renderCountryBorders(inProjection: mvpMatrix, inEncoder: encoder)
+			self.borderRenderer.renderCountryBorders(inProjection: mvpMatrix, inEncoder: encoder, bufferIndex: bufferIndex)
 		}
 		
 		let overlayPass = makeRenderPass(overlayBuffer, addPassDescriptor) { (encoder) in
