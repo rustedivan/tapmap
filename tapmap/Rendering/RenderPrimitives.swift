@@ -1,5 +1,5 @@
 //
-//  IndexedRenderPrimitive.swift
+//  RenderPrimitives.swift
 //  tapmap
 //
 //  Created by Ivan Milles on 2019-07-30.
@@ -8,7 +8,7 @@
 
 import Metal
 
-class IndexedRenderPrimitive<VertexType> {
+class BaseRenderPrimitive<VertexType> {
 	let ownerHash: Int
 	
 	let drawMode: MTLPrimitiveType
@@ -63,8 +63,10 @@ class IndexedRenderPrimitive<VertexType> {
 	}
 }
 
+typealias RenderPrimitive = BaseRenderPrimitive<Vertex>
+typealias FixedScaleRenderPrimitive = BaseRenderPrimitive<ScaleVertex>
 
-func render<T>(primitive: IndexedRenderPrimitive<T>, into encoder: MTLRenderCommandEncoder) {
+func render<T>(primitive: BaseRenderPrimitive<T>, into encoder: MTLRenderCommandEncoder) {
 	encoder.setVertexBuffer(primitive.vertexBuffer, offset: 0, index: 0)
 	
 	var cursor = 0

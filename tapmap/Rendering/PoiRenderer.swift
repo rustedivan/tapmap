@@ -20,7 +20,7 @@ fileprivate struct InstanceUniforms {
 }
 
 struct PoiPlane: Hashable {
-	typealias PoiPlanePrimitive = IndexedRenderPrimitive<ScaleVertex>
+	typealias PoiPlanePrimitive = FixedScaleRenderPrimitive
 	let primitive: PoiPlanePrimitive
 	let rank: Int
 	let representsArea: Bool

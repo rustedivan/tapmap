@@ -8,7 +8,7 @@
 
 import Foundation
 
-class IndexedRenderPrimitive {
+class RenderPrimitive {
 	let ownerHash = 17
 	init() {}
 	init(vertices: [Vertex], indices: [UInt16], color c: (r: Float, g: Float, b: Float, a: Float), ownerHash hash: Int, debugName: String) {

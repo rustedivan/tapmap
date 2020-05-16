@@ -11,7 +11,7 @@ import Dispatch
 import Metal
 
 class GeometryStreamer {
-	typealias StreamedPrimitive = IndexedRenderPrimitive<Vertex>
+	typealias StreamedPrimitive = RenderPrimitive
 	static private var _shared: GeometryStreamer!
 	static var shared: GeometryStreamer {
 		get {

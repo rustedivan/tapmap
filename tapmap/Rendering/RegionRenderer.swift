@@ -18,7 +18,7 @@ fileprivate struct InstanceUniforms {
 }
 
 class RegionRenderer {
-	typealias RegionPrimitive = IndexedRenderPrimitive<Vertex>
+	typealias RegionPrimitive = RenderPrimitive
 	typealias RenderList = ContiguousArray<RegionPrimitive>
 
 	static let kMaxVisibleRegions = 5000

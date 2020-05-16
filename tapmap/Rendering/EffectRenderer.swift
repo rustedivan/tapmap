@@ -21,7 +21,7 @@ fileprivate struct InstanceUniforms {
 }
 
 struct RegionEffect {
-	typealias EffectPrimitive = IndexedRenderPrimitive<Vertex>
+	typealias EffectPrimitive = RenderPrimitive
 	let primitive: EffectPrimitive
 	let center: Vertex
 	let startTime: Date

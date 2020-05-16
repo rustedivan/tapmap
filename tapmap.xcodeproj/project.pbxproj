@@ -65,7 +65,7 @@
 		1489382022B9831C009278A0 /* OperationParseOSMJson.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14C665A322B97E670054D7F2 /* OperationParseOSMJson.swift */; };
 		1489382122B9831C009278A0 /* OperationTessellateRegions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14C6659A22B97E660054D7F2 /* OperationTessellateRegions.swift */; };
 		1489382322B98456009278A0 /* ViewCalculations.swift in Sources */ = {isa = PBXBuildFile; fileRef = 148937E122B97FDF009278A0 /* ViewCalculations.swift */; };
-		14985FED22F0ED0C00F68A1F /* IndexedRenderPrimitive.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14985FEC22F0ED0C00F68A1F /* IndexedRenderPrimitive.swift */; };
+		14985FED22F0ED0C00F68A1F /* RenderPrimitives.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14985FEC22F0ED0C00F68A1F /* RenderPrimitives.swift */; };
 		149B3FDD245EE8B1008A299E /* MapShader.metal in Sources */ = {isa = PBXBuildFile; fileRef = 149B3FDC245EE8B1008A299E /* MapShader.metal */; };
 		149CBDDD23CB230000A7AABB /* LabelView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 149CBDDC23CB230000A7AABB /* LabelView.swift */; };
 		14B63F052460BDFF00A4A433 /* BorderShader.metal in Sources */ = {isa = PBXBuildFile; fileRef = 14B63F042460BDFF00A4A433 /* BorderShader.metal */; };
@@ -153,7 +153,7 @@
 		148937F222B97FDF009278A0 /* AppDelegate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		148937F322B97FDF009278A0 /* UserState.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UserState.swift; sourceTree = "<group>"; };
 		148937F422B97FDF009278A0 /* Serialization.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Serialization.swift; sourceTree = "<group>"; };
-		14985FEC22F0ED0C00F68A1F /* IndexedRenderPrimitive.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IndexedRenderPrimitive.swift; sourceTree = "<group>"; };
+		14985FEC22F0ED0C00F68A1F /* RenderPrimitives.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RenderPrimitives.swift; sourceTree = "<group>"; };
 		14985FF522F0F35700F68A1F /* OutlineGeometry.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OutlineGeometry.swift; sourceTree = "<group>"; };
 		149B3FDC245EE8B1008A299E /* MapShader.metal */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.metal; path = MapShader.metal; sourceTree = "<group>"; };
 		149CBDDC23CB230000A7AABB /* LabelView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LabelView.swift; sourceTree = "<group>"; };
@@ -284,7 +284,7 @@
 				149CBDDC23CB230000A7AABB /* LabelView.swift */,
 				148937E622B97FDF009278A0 /* EffectRenderer.swift */,
 				1468830C23B4BC4100105E04 /* DebugRenderer.swift */,
-				14985FE922F0ECA000F68A1F /* Primitives */,
+				14985FEC22F0ED0C00F68A1F /* RenderPrimitives.swift */,
 				148937E922B97FDF009278A0 /* ColoredHash.swift */,
 				14985FE822F0EC7500F68A1F /* Shaders */,
 			);
@@ -314,14 +314,6 @@
 				1416641A2463E2690006A2D4 /* EffectRenderer.metal */,
 			);
 			path = Shaders;
-			sourceTree = "<group>";
-		};
-		14985FE922F0ECA000F68A1F /* Primitives */ = {
-			isa = PBXGroup;
-			children = (
-				14985FEC22F0ED0C00F68A1F /* IndexedRenderPrimitive.swift */,
-			);
-			path = Primitives;
 			sourceTree = "<group>";
 		};
 		14C6655222B97D890054D7F2 = {
@@ -714,7 +706,7 @@
 				147B819523DA043500942C9B /* WorldTree.swift in Sources */,
 				1468830D23B4BC4100105E04 /* DebugRenderer.swift in Sources */,
 				148937F522B97FDF009278A0 /* Geometry.swift in Sources */,
-				14985FED22F0ED0C00F68A1F /* IndexedRenderPrimitive.swift in Sources */,
+				14985FED22F0ED0C00F68A1F /* RenderPrimitives.swift in Sources */,
 				148937F622B97FDF009278A0 /* AppTypes.swift in Sources */,
 				1489380322B97FDF009278A0 /* PoiRenderer.swift in Sources */,
 				14B63F072461450F00A4A433 /* PoiShader.metal in Sources */,

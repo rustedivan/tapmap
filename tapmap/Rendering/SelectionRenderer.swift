@@ -16,7 +16,7 @@ fileprivate struct FrameUniforms {
 }
 
 class SelectionRenderer {
-	typealias SelectionPrimitive = IndexedRenderPrimitive<ScaleVertex>
+	typealias SelectionPrimitive = FixedScaleRenderPrimitive
 	typealias RenderList = ContiguousArray<SelectionPrimitive>
 	
 	let device: MTLDevice

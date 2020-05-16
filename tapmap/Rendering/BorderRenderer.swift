@@ -16,7 +16,7 @@ fileprivate struct FrameUniforms {
 }
 
 class BorderRenderer {
-	typealias BorderPrimitive = IndexedRenderPrimitive<ScaleVertex>
+	typealias BorderPrimitive = FixedScaleRenderPrimitive
 	typealias RenderList = ContiguousArray<BorderPrimitive>
 	
 	let device: MTLDevice
