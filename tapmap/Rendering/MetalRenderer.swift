@@ -103,26 +103,30 @@ class MetalRenderer {
 		let mvpMatrix = modelViewProjectionMatrix
 		let bufferIndex = frameId % maxInflightFrames
 		
+		let geographyPass = makeRenderPass(geographyBuffer, clearPassDescriptor) { (encoder) in
+			self.borderRenderer.renderContinentBorders(inProjection: mvpMatrix, inEncoder: encoder)
+			self.regionRenderer.renderWorld(inProjection: mvpMatrix, inEncoder: encoder, bufferIndex: bufferIndex)
+			self.borderRenderer.renderCountryBorders(inProjection: mvpMatrix, inEncoder: encoder)
+		}
+		
+		let overlayPass = makeRenderPass(overlayBuffer, addPassDescriptor) { (encoder) in
+			self.effectRenderer.renderWorld(inProjection: mvpMatrix, inEncoder: encoder, bufferIndex: bufferIndex)
+			self.selectionRenderer.renderSelection(inProjection: mvpMatrix, inEncoder: encoder)
+			//		DebugRenderer.shared.renderMarkers(inProjection: modelViewProjectionMatrix)
+		}
+		
+		let markerPass = makeRenderPass(markerBuffer, addPassDescriptor) { (encoder) in
+			self.poiRenderer.renderWorld(inProjection: mvpMatrix, inEncoder: encoder, bufferIndex: bufferIndex)
+		}
+		
 		markerBuffer.addCompletedHandler { buffer in
 			drawable.present()
 			self.frameSemaphore.signal()
 		}
 		
-		encodingQueue.async(execute: makeRenderPass(geographyBuffer, clearPassDescriptor) { (encoder) in
-			self.borderRenderer.renderContinentBorders(inProjection: mvpMatrix, inEncoder: encoder)
-			self.regionRenderer.renderWorld(inProjection: mvpMatrix, inEncoder: encoder, bufferIndex: bufferIndex)
-			self.borderRenderer.renderCountryBorders(inProjection: mvpMatrix, inEncoder: encoder)
-		})
-
-		encodingQueue.async(execute: makeRenderPass(overlayBuffer, addPassDescriptor) { (encoder) in
-			self.effectRenderer.renderWorld(inProjection: mvpMatrix, inEncoder: encoder, bufferIndex: bufferIndex)
-			self.selectionRenderer.renderSelection(inProjection: mvpMatrix, inEncoder: encoder)
-			//		DebugRenderer.shared.renderMarkers(inProjection: modelViewProjectionMatrix)
-		})
-		
-		encodingQueue.async(execute: makeRenderPass(markerBuffer, addPassDescriptor) { (encoder) in
-			self.poiRenderer.renderWorld(inProjection: mvpMatrix, inEncoder: encoder, bufferIndex: bufferIndex)
-		})
+		encodingQueue.async(execute: geographyPass)
+		encodingQueue.async(execute: overlayPass)
+		encodingQueue.async(execute: markerPass)
 		
 //		commandQueue.insertDebugCaptureBoundary()	// $ For GPU Frame capture
 	}
