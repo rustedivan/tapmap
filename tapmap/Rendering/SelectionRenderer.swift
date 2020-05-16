@@ -16,7 +16,7 @@ fileprivate struct FrameUniforms {
 }
 
 class SelectionRenderer {
-	typealias SelectionPrimitive = OutlineRenderPrimitive
+	typealias SelectionPrimitive = IndexedRenderPrimitive<ScaleVertex>
 	typealias RenderList = ContiguousArray<SelectionPrimitive>
 	
 	let device: MTLDevice
@@ -59,10 +59,22 @@ class SelectionRenderer {
 		let countourVertices = tessellation.contours.map({$0.vertices})
 		let outlineGeometry: RegionContours = countourVertices.map(thinOutline)
 		
-		outlinePrimitive = OutlineRenderPrimitive(contours: outlineGeometry,
-																							device: device,
-																							ownerHash: selectedRegionHash,
-																							debugName: "Selection contours")
+		var cursor = 0
+		var stackedIndices: [[UInt16]] = []
+		for outline in outlineGeometry {
+			let indices = 0..<UInt16(outline.count)
+			let stackedRing = indices.map { $0 + UInt16(cursor) }
+			stackedIndices.append(stackedRing)
+			cursor += outline.count
+		}
+		
+		outlinePrimitive = SelectionPrimitive(polygons: outlineGeometry,
+																					indices: stackedIndices,
+																					drawMode: .triangleStrip,
+																					device: device,
+																					color: Color(r: 0.0, g: 0.0, b: 0.0, a: 1.0),
+																					ownerHash: selectedRegionHash,
+																					debugName: "Selection contours")
 	}
 	
 	func clear() {

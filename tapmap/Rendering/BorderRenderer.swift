@@ -16,13 +16,13 @@ fileprivate struct FrameUniforms {
 }
 
 class BorderRenderer {
-	typealias BorderPrimitive = OutlineRenderPrimitive
+	typealias BorderPrimitive = IndexedRenderPrimitive<ScaleVertex>
 	typealias RenderList = ContiguousArray<BorderPrimitive>
 	
 	let device: MTLDevice
 	let pipeline: MTLRenderPipelineState
 	
-	var borderPrimitives: [Int : OutlineRenderPrimitive]
+	var borderPrimitives: [Int : BorderPrimitive]
 	var continentRenderLists: [RenderList] = []
 	var countryRenderLists: [RenderList] = []
 	var frameSelectSemaphore = DispatchSemaphore(value: 1)
@@ -34,7 +34,7 @@ class BorderRenderer {
 	let borderQueue: DispatchQueue
 	let publishQueue: DispatchQueue
 	var pendingBorders: Set<Int> = []
-	var generatedBorders: [(Int, OutlineRenderPrimitive)] = []	// Border primitives that were generated this frame
+	var generatedBorders: [(Int, BorderPrimitive)] = []	// Border primitives that were generated this frame
 
 	init(withDevice device: MTLDevice, pixelFormat: MTLPixelFormat, bufferCount: Int) {
 		borderWidth = 0.0
@@ -100,10 +100,24 @@ class BorderRenderer {
 					
 					let borderOutline = { (outline: [Vertex]) in generateClosedOutlineGeometry(outline: outline, innerExtent: innerWidth, outerExtent: outerWidth) }
 					let outlineGeometry: RegionContours = countourVertices.map(borderOutline)
-					let outlinePrimitive = OutlineRenderPrimitive(contours: outlineGeometry,
-																												device: self.device,
-																												ownerHash: 0,
-																												debugName: "Border \(borderHash)@\(lodLevel)")
+					
+					var cursor = 0
+					var stackedIndices: [[UInt16]] = []
+					for outline in outlineGeometry {
+						let indices = 0..<UInt16(outline.count)
+						let stackedRing = indices.map { $0 + UInt16(cursor) }
+						stackedIndices.append(stackedRing)
+						cursor += outline.count
+					}
+					
+					let outlinePrimitive = BorderPrimitive(polygons: outlineGeometry,
+																								 indices: stackedIndices,
+																								 drawMode: .triangleStrip,
+																								 device: self.device,
+																								 color: Color(r: 1.0, g: 1.0, b: 1.0, a: 1.0),
+																								 ownerHash: 0,
+																								 debugName: "Border \(borderHash)@\(lodLevel)")
+					
 					// Don't allow reads while publishing finished primitive
 					self.publishQueue.async(flags: .barrier) {
 						self.generatedBorders.append((loddedBorderHash, outlinePrimitive))
