@@ -9,17 +9,21 @@
 import Metal
 import simd
 
-struct SelectionUniforms {
+fileprivate struct FrameUniforms {
 	let mvpMatrix: simd_float4x4
 	let width: simd_float1
 	let color: simd_float4
 }
 
 class SelectionRenderer {
+	typealias SelectionPrimitive = OutlineRenderPrimitive
+	typealias RenderList = ContiguousArray<SelectionPrimitive>
+	
 	let device: MTLDevice
 	let pipeline: MTLRenderPipelineState
 	
-	var outlinePrimitive: OutlineRenderPrimitive?
+	var outlinePrimitive: SelectionPrimitive?
+	var renderList: RenderList
 	var frameSelectSemaphore = DispatchSemaphore(value: 1)
 	
 	var outlineWidth: Float
@@ -38,6 +42,7 @@ class SelectionRenderer {
 		do {
 			try pipeline = device.makeRenderPipelineState(descriptor: pipelineDescriptor)
 			self.device = device
+			self.renderList = RenderList()	// SelectionRenderer does not need to triple-buffer
 		} catch let error {
 			fatalError(error.localizedDescription)
 		}
@@ -54,42 +59,44 @@ class SelectionRenderer {
 		let countourVertices = tessellation.contours.map({$0.vertices})
 		let outlineGeometry: RegionContours = countourVertices.map(thinOutline)
 		
-		let outline = OutlineRenderPrimitive(contours: outlineGeometry,
+		outlinePrimitive = OutlineRenderPrimitive(contours: outlineGeometry,
 																							device: device,
 																							ownerHash: selectedRegionHash,
 																							debugName: "Selection contours")
-		frameSelectSemaphore.wait()
-			outlinePrimitive = outline
-		frameSelectSemaphore.signal()
 	}
 	
 	func clear() {
 		outlinePrimitive = nil
 	}
 	
-	func updateStyle(zoomLevel: Float) {
-		outlineWidth = 1.0 / zoomLevel
+	func prepareFrame(zoomLevel: Float) {
 		
 		if let selectionHash = outlinePrimitive?.ownerHash, lodLevel != GeometryStreamer.shared.actualLodLevel {
 			updatePrimitive(selectedRegionHash: selectionHash)
 			lodLevel = GeometryStreamer.shared.actualLodLevel
 		}
+		
+		frameSelectSemaphore.wait()
+			self.outlineWidth = 1.0 / zoomLevel
+			self.renderList = outlinePrimitive != nil ? [outlinePrimitive!] : []
+		frameSelectSemaphore.signal()
 	}
 	
 	func renderSelection(inProjection projection: simd_float4x4, inEncoder encoder: MTLRenderCommandEncoder) {
-		frameSelectSemaphore.wait()
-			let p = outlinePrimitive
-		frameSelectSemaphore.signal()
-		
-		guard let primitive = p else { return }
-		
+		guard !renderList.isEmpty else { return }
+	
 		encoder.pushDebugGroup("Render outlines")
 		encoder.setRenderPipelineState(pipeline)
+	
+		frameSelectSemaphore.wait()
+			var uniforms = FrameUniforms(mvpMatrix: projection, width: self.outlineWidth, color: Color(r: 0.0, g: 0.0, b: 0.0, a: 1.0).vector)
+		frameSelectSemaphore.signal()
 		
-		var uniforms = SelectionUniforms(mvpMatrix: projection, width: outlineWidth, color: Color(r: 0.0, g: 0.0, b: 0.0, a: 1.0).vector)
 		encoder.setVertexBytes(&uniforms, length: MemoryLayout.stride(ofValue: uniforms), index: 1)
 		
-		render(primitive: primitive, into: encoder)
+		for primitive in renderList {
+			render(primitive: primitive, into: encoder)
+		}
 	
 		encoder.popDebugGroup()
 	}
