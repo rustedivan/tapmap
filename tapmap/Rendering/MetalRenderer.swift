@@ -133,9 +133,10 @@ class MetalRenderer {
 	
 	typealias MapRenderPass = () -> ()
 	func makeRenderPass(_ buffer: MTLCommandBuffer, _ renderPass: MTLRenderPassDescriptor, render: @escaping (MTLRenderCommandEncoder) -> ()) -> MapRenderPass {
+		let passLabel = "\(buffer.label ?? "Unnamed") encoder @ \(frameId)"
 		return {
 			guard let encoder = buffer.makeRenderCommandEncoder(descriptor: renderPass) else { return }
-			encoder.label = "\(buffer.label ?? "Unnamed") encoder @ \(self.frameId)"
+			encoder.label = passLabel
 			render(encoder)
 			encoder.endEncoding()
 			buffer.commit()
