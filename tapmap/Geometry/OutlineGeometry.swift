@@ -59,11 +59,14 @@ func makeMiterRib(_ v0: Vertex, _ v1: Vertex, _ v2: Vertex, _ lIn: Float, _ lOut
 }
 
 func makeMiteredTriStrip(ribs: [Rib]) -> [ScaleVertex] {
-	return ribs.reduce([]) { (acc: [ScaleVertex], cur) in
+	var out = Array<ScaleVertex>()
+	out.reserveCapacity(ribs.count * 2)
+	out = ribs.flatMap { cur -> [ScaleVertex] in
 		let innerFatVertex = ScaleVertex(cur.p.x, cur.p.y, normalX: cur.miterIn.x, normalY: cur.miterIn.y)
 		let outerFatVertex = ScaleVertex(cur.p.x, cur.p.y, normalX: cur.miterOut.x, normalY: cur.miterOut.y)
-		return acc + [innerFatVertex, outerFatVertex]
+		return [innerFatVertex, outerFatVertex]
 	}
+	return out
 }
 
 func generateOutlineGeometry(outline: [Vertex]) -> [ScaleVertex] {
