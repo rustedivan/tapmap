@@ -42,9 +42,7 @@ class RegionRenderer {
 		do {
 			try pipeline = device.makeRenderPipelineState(descriptor: pipelineDescriptor)
 			self.device = device
-			self.renderLists = (0..<bufferCount).map { _ in
-				return ContiguousArray()	// $ Replace all CA's with local RenderList
-			}
+			self.renderLists = Array(repeating: RenderList(), count: bufferCount)
 			self.instanceUniforms = (0..<bufferCount).map { _ in
 				return device.makeBuffer(length: RegionRenderer.kMaxVisibleRegions * MemoryLayout<InstanceUniforms>.stride, options: .storageModeShared)!
 			}
@@ -54,7 +52,7 @@ class RegionRenderer {
 	}
 	
 	func prepareFrame(visibleSet: Set<RegionHash>, bufferIndex: Int) {
-		let frameRenderList = ContiguousArray(visibleSet.compactMap { regionHash in
+		let frameRenderList = RenderList(visibleSet.compactMap { regionHash in
 														return GeometryStreamer.shared.renderPrimitive(for: regionHash, streamIfMissing: true)
 													})
 		

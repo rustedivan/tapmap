@@ -111,10 +111,10 @@ class PoiRenderer {
 		do {
 			try pipeline = device.makeRenderPipelineState(descriptor: pipelineDescriptor)
 			self.device = device
+			self.renderLists = Array(repeating: RenderList(), count: bufferCount)
 			self.instanceUniforms = (0..<bufferCount).map { _ in
 				return device.makeBuffer(length: PoiRenderer.kMaxVisibleInstances * MemoryLayout<InstanceUniforms>.stride, options: .storageModeShared)!
 			}
-			self.renderLists = Array(repeating: ContiguousArray(), count: bufferCount)
 		} catch let error {
 			fatalError(error.localizedDescription)
 		}
@@ -181,7 +181,7 @@ class PoiRenderer {
 			fades.append(u)
 		}
 		
-		let frameRenderList = ContiguousArray(framePlanes.map { $0.primitive })
+		let frameRenderList = RenderList(framePlanes.map { $0.primitive })
 		frameSwitchSemaphore.wait()
 			self.renderLists[bufferIndex] = frameRenderList
 			self.instanceUniforms[bufferIndex].contents().copyMemory(from: fades, byteCount: MemoryLayout<InstanceUniforms>.stride * fades.count)

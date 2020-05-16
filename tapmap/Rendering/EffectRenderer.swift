@@ -67,10 +67,10 @@ class EffectRenderer {
 		do {
 			try pipeline = device.makeRenderPipelineState(descriptor: pipelineDescriptor)
 			self.device = device
+			self.renderLists = Array(repeating: RenderList(), count: bufferCount)
 			self.instanceUniforms = (0..<bufferCount).map { _ in
 				return device.makeBuffer(length: EffectRenderer.kMaxSimultaneousEffects * MemoryLayout<InstanceUniforms>.stride, options: .storageModeShared)!
 			}
-			self.renderLists = Array(repeating: ContiguousArray(), count: bufferCount)
 		} catch let error {
 			fatalError(error.localizedDescription)
 		}
@@ -90,7 +90,7 @@ class EffectRenderer {
 			$0.startTime + $0.duration > Date()
 		}
 		
-		let frameRenderList = ContiguousArray(runningEffects.map { $0.primitive })
+		let frameRenderList = RenderList(runningEffects.map { $0.primitive })
 		
 		var fx = Array<InstanceUniforms>()
 		fx.reserveCapacity(runningEffects.count)

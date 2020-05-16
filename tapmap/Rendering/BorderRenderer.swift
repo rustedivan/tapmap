@@ -50,8 +50,8 @@ class BorderRenderer {
 		do {
 			try pipeline = device.makeRenderPipelineState(descriptor: pipelineDescriptor)
 			self.device = device
-			self.continentRenderLists = Array(repeating: ContiguousArray(), count: bufferCount) // $ Better way to do it
-			self.countryRenderLists = Array(repeating: ContiguousArray(), count: bufferCount)
+			self.continentRenderLists = Array(repeating: RenderList(), count: bufferCount)
+			self.countryRenderLists = Array(repeating: RenderList(), count: bufferCount)
 		} catch let error {
 			fatalError(error.localizedDescription)
 		}
