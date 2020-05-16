@@ -42,7 +42,7 @@ class EffectRenderer {
 	var runningEffects : [RegionEffect]
 
 	var renderLists : [RenderList]
-	var renderListSemaphore = DispatchSemaphore(value: 1)
+	var frameSelectSemaphore = DispatchSemaphore(value: 1)
 	
 	var animating: Bool { get {
 		return !runningEffects.isEmpty
@@ -91,9 +91,6 @@ class EffectRenderer {
 		}
 		
 		let frameRenderList = ContiguousArray(runningEffects.map { $0.primitive })
-		renderListSemaphore.wait()
-			renderLists[bufferIndex] = frameRenderList
-		renderListSemaphore.signal()
 		
 		var fx = Array<InstanceUniforms>()
 		fx.reserveCapacity(runningEffects.count)
@@ -107,21 +104,25 @@ class EffectRenderer {
 															 color: effect.primitive.color.vector)
 			fx.append(u)
 		}
-		instanceUniforms[bufferIndex].contents().copyMemory(from: fx,
-																												byteCount: MemoryLayout<InstanceUniforms>.stride * fx.count)
+		
+		frameSelectSemaphore.wait()
+			renderLists[bufferIndex] = frameRenderList
+			instanceUniforms[bufferIndex].contents().copyMemory(from: fx, byteCount: MemoryLayout<InstanceUniforms>.stride * fx.count)
+		frameSelectSemaphore.signal()
 	}
 	
 	func renderWorld(inProjection projection: simd_float4x4, inEncoder encoder: MTLRenderCommandEncoder, bufferIndex: Int) {
 		encoder.pushDebugGroup("Render opening effect")
 		encoder.setRenderPipelineState(pipeline)
 		
-		var frameUniforms = FrameUniforms(mvpMatrix: projection)
-		encoder.setVertexBytes(&frameUniforms, length: MemoryLayout<FrameUniforms>.stride, index: 1)
-		encoder.setVertexBuffer(instanceUniforms[bufferIndex], offset: 0, index: 2)
-		
-		renderListSemaphore.wait()
+		frameSelectSemaphore.wait()
+			var frameUniforms = FrameUniforms(mvpMatrix: projection)
 			let renderList = renderLists[bufferIndex]
-		renderListSemaphore.signal()
+			let uniforms = instanceUniforms[bufferIndex]
+		frameSelectSemaphore.signal()
+		
+		encoder.setVertexBytes(&frameUniforms, length: MemoryLayout<FrameUniforms>.stride, index: 1)
+		encoder.setVertexBuffer(uniforms, offset: 0, index: 2)
 		
 		var instanceCursor = 0
 		for primitive in renderList {

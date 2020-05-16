@@ -79,7 +79,7 @@ class PoiRenderer {
 	var poiPlanePrimitives : [PoiPlane]
 	var poiVisibility: [Int : Visibility] = [:]
 	var renderLists: [RenderList] = []
-	var renderListSemaphore = DispatchSemaphore(value: 1)
+	var frameSwitchSemaphore = DispatchSemaphore(value: 1)
 	
 	let device: MTLDevice
 	let pipeline: MTLRenderPipelineState
@@ -149,7 +149,7 @@ class PoiRenderer {
 		return sortPlacesIntoPoiPlanes(region.places, in: region, inDevice: device);
 	}
 	
-	func prepareFrame(visibleSet: Set<RegionHash>, bufferIndex: Int) {
+	func prepareFrame(visibleSet: Set<RegionHash>, zoom: Float, bufferIndex: Int) {
 		let now = Date()
 		for (key, p) in poiVisibility {
 			switch(p) {
@@ -166,13 +166,13 @@ class PoiRenderer {
 			}
 		}
 		
+		var poiScreenSize: Float = 2.0
+		poiScreenSize = 2.0 / (zoom)
+		poiScreenSize += min(zoom * 0.01, 0.1)	// Boost POI sizes a bit when zooming in
+		updateZoomThreshold(viewZoom: zoom)
+		
 		let framePlanes = poiPlanePrimitives.filter { visibleSet.contains($0.ownerHash) }
 																			  .filter { poiVisibility[$0.hashValue] != nil }
-		
-		let frameRenderList = ContiguousArray(framePlanes.map { $0.primitive })
-		renderListSemaphore.wait()
-			renderLists[bufferIndex] = frameRenderList
-		renderListSemaphore.signal()
 		
 		var fades = Array<InstanceUniforms>()
 		fades.reserveCapacity(framePlanes.count)
@@ -180,8 +180,13 @@ class PoiRenderer {
 			let u = InstanceUniforms(progress: poiVisibility[plane.hashValue]!.alpha())
 			fades.append(u)
 		}
-		instanceUniforms[bufferIndex].contents().copyMemory(from: fades,
-																												byteCount: MemoryLayout<InstanceUniforms>.stride * fades.count)
+		
+		let frameRenderList = ContiguousArray(framePlanes.map { $0.primitive })
+		frameSwitchSemaphore.wait()
+			self.renderLists[bufferIndex] = frameRenderList
+			self.instanceUniforms[bufferIndex].contents().copyMemory(from: fades, byteCount: MemoryLayout<InstanceUniforms>.stride * fades.count)
+			self.poiBaseSize = poiScreenSize
+		frameSwitchSemaphore.signal()
 	}
 	
 	func updateZoomThreshold(viewZoom: Float) {
@@ -227,25 +232,20 @@ class PoiRenderer {
 		return minZoom <= zoom && zoom <= maxZoom
 	}
 	
-	func updateStyle(zoomLevel: Float) {
-		let poiScreenSize: Float = 2.0
-		poiBaseSize = poiScreenSize / (zoomLevel)
-		poiBaseSize += min(zoomLevel * 0.01, 0.1)	// Boost POI sizes a bit when zooming in
-	}
-	
 	func renderWorld(inProjection projection: simd_float4x4, inEncoder encoder: MTLRenderCommandEncoder, bufferIndex: Int) {
 		encoder.pushDebugGroup("Render POI plane")
 		encoder.setRenderPipelineState(pipeline)
 		
-		var frameUniforms = FrameUniforms(mvpMatrix: projection,
-																			 rankThreshold: rankThreshold,
-																			 poiBaseSize: poiBaseSize)
-		encoder.setVertexBytes(&frameUniforms, length: MemoryLayout<FrameUniforms>.stride, index: 1)
-		encoder.setVertexBuffer(instanceUniforms[bufferIndex], offset: 0, index: 2)
-		
-		renderListSemaphore.wait()
+		frameSwitchSemaphore.wait()
 			let renderList = self.renderLists[bufferIndex]
-		renderListSemaphore.signal()
+			var frameUniforms = FrameUniforms(mvpMatrix: projection,
+																				rankThreshold: self.rankThreshold,
+																				poiBaseSize: self.poiBaseSize)
+			let uniforms = self.instanceUniforms[bufferIndex]
+		frameSwitchSemaphore.signal()
+		
+		encoder.setVertexBytes(&frameUniforms, length: MemoryLayout<FrameUniforms>.stride, index: 1)
+		encoder.setVertexBuffer(uniforms, offset: 0, index: 2)
 		
 		var instanceCursor = 0
 		for primitive in renderList {

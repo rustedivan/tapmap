@@ -25,7 +25,7 @@ class BorderRenderer {
 	var borderPrimitives: [Int : OutlineRenderPrimitive]
 	var continentRenderLists: [RenderList] = []
 	var countryRenderLists: [RenderList] = []
-	var renderListSemaphore = DispatchSemaphore(value: 1)
+	var frameSelectSemaphore = DispatchSemaphore(value: 1)
 
 	var borderWidth: Float
 	var actualBorderLod: Int = 10
@@ -63,11 +63,7 @@ class BorderRenderer {
 		wantedBorderLod = GeometryStreamer.shared.wantedLodLevel
 	}
 	
-	func updateStyle(zoomLevel: Float) {
-		borderWidth = 1.0 / zoomLevel
-	}
-	
-	func prepareFrame(visibleContinents: GeoContinentMap, visibleCountries: GeoCountryMap, bufferIndex: Int) {
+	func prepareFrame(visibleContinents: GeoContinentMap, visibleCountries: GeoCountryMap, zoom: Float, bufferIndex: Int) {
 		let streamer = GeometryStreamer.shared
 		let lodLevel = streamer.wantedLodLevel
 		var borderLodMiss = false
@@ -142,22 +138,23 @@ class BorderRenderer {
 			return borderPrimitives[loddedKey]
 		})
 		
-		renderListSemaphore.wait()
-			continentRenderLists[bufferIndex] = frameContinentRenderList
-			countryRenderLists[bufferIndex] = frameCountryRenderList
-		renderListSemaphore.signal()
+		frameSelectSemaphore.wait()
+			self.borderWidth = 1.0 / zoom
+			self.continentRenderLists[bufferIndex] = frameContinentRenderList
+			self.countryRenderLists[bufferIndex] = frameCountryRenderList
+		frameSelectSemaphore.signal()
 	}
 	
 	func renderContinentBorders(inProjection projection: simd_float4x4, inEncoder encoder: MTLRenderCommandEncoder, bufferIndex: Int) {
 		encoder.pushDebugGroup("Render continent borders")
 		encoder.setRenderPipelineState(pipeline)
 		
-		var uniforms = FrameUniforms(mvpMatrix: projection, width: borderWidth * 2.0, color: Color(r: 1.0, g: 0.5, b: 0.7, a: 1.0).vector)
-		encoder.setVertexBytes(&uniforms, length: MemoryLayout.stride(ofValue: uniforms), index: 1)
-		
-		renderListSemaphore.wait()
+		frameSelectSemaphore.wait()
+			var frameUniforms = FrameUniforms(mvpMatrix: projection, width: self.borderWidth * 2.0, color: Color(r: 1.0, g: 0.5, b: 0.7, a: 1.0).vector)
 			let renderList = continentRenderLists[bufferIndex]
-		renderListSemaphore.signal()
+		frameSelectSemaphore.signal()
+		
+		encoder.setVertexBytes(&frameUniforms, length: MemoryLayout<FrameUniforms>.stride, index: 1)
 		for primitive in renderList {
 			render(primitive: primitive, into: encoder)
 		}
@@ -169,13 +166,12 @@ class BorderRenderer {
 		encoder.pushDebugGroup("Render country borders")
 		encoder.setRenderPipelineState(pipeline)
 		
-		var uniforms = FrameUniforms(mvpMatrix: projection, width: borderWidth, color: Color(r: 1.0, g: 1.0, b: 1.0, a: 1.0).vector)
-		encoder.setVertexBytes(&uniforms, length: MemoryLayout.stride(ofValue: uniforms), index: 1)
-		
-		renderListSemaphore.wait()
+		frameSelectSemaphore.wait()
+			var uniforms = FrameUniforms(mvpMatrix: projection, width: self.borderWidth, color: Color(r: 1.0, g: 1.0, b: 1.0, a: 1.0).vector)
 			let renderList = countryRenderLists[bufferIndex]
-		renderListSemaphore.signal()
+		frameSelectSemaphore.signal()
 		
+		encoder.setVertexBytes(&uniforms, length: MemoryLayout.stride(ofValue: uniforms), index: 1)
 		for primitive in renderList {
 			render(primitive: primitive, into: encoder)
 		}

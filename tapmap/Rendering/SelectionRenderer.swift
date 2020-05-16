@@ -20,7 +20,7 @@ class SelectionRenderer {
 	let pipeline: MTLRenderPipelineState
 	
 	var outlinePrimitive: OutlineRenderPrimitive?
-	var renderListSemaphore = DispatchSemaphore(value: 1)
+	var frameSelectSemaphore = DispatchSemaphore(value: 1)
 	
 	var outlineWidth: Float
 	var lodLevel: Int
@@ -58,9 +58,9 @@ class SelectionRenderer {
 																							device: device,
 																							ownerHash: selectedRegionHash,
 																							debugName: "Selection contours")
-		renderListSemaphore.wait()
+		frameSelectSemaphore.wait()
 			outlinePrimitive = outline
-		renderListSemaphore.signal()
+		frameSelectSemaphore.signal()
 	}
 	
 	func clear() {
@@ -77,9 +77,9 @@ class SelectionRenderer {
 	}
 	
 	func renderSelection(inProjection projection: simd_float4x4, inEncoder encoder: MTLRenderCommandEncoder) {
-		renderListSemaphore.wait()
+		frameSelectSemaphore.wait()
 			let p = outlinePrimitive
-		renderListSemaphore.signal()
+		frameSelectSemaphore.signal()
 		
 		guard let primitive = p else { return }
 		
