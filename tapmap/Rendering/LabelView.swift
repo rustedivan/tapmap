@@ -30,24 +30,33 @@ struct LabelMarker: Comparable {
 	}
 }
 
+class Label {
+	let view: UILabel
+	var ownerHash: RegionHash
+	
+	init() {
+		view = UILabel()
+		view.isHidden = true
+		view.frame = CGRect(x: 0.0, y: 0.0, width: 200.0, height: 30.0)
+		view.preferredMaxLayoutWidth = 200.0
+		view.lineBreakMode = .byWordWrapping
+		view.numberOfLines = 2
+		view.adjustsFontSizeToFitWidth = true
+		
+		ownerHash = 0
+	}
+}
+
 class LabelView: UIView {
 	static let s_maxLabels = 20
-	var poiPrimitives: [Int: LabelMarker] = [:]
-	var poiLabels: [UILabel] = []
+	var poiPrimitives: [Int : LabelMarker] = [:]
+	var poiLabels: [Label] = []
 	
 	override func awakeFromNib() {
 		for _ in 0 ..< LabelView.s_maxLabels {
-			let newLabel = UILabel()
-			newLabel.tag = 0
-			newLabel.isHidden = true
-			newLabel.frame = CGRect(x: 0.0, y: 0.0, width: 200.0, height: 30.0)
-			newLabel.preferredMaxLayoutWidth = 200.0
-			newLabel.lineBreakMode = .byWordWrapping
-			newLabel.numberOfLines = 2
-			newLabel.adjustsFontSizeToFitWidth = true
-			
+			let newLabel = Label()
 			poiLabels.append(newLabel)
-			addSubview(newLabel)
+			addSubview(newLabel.view)
 		}
 	}
 	
@@ -88,19 +97,17 @@ class LabelView: UIView {
 		let markersToShow = prioritizedMarkers.prefix(LabelView.s_maxLabels)
 		let hashesToShow = markersToShow.map { $0.ownerHash }
 		
-		// $ this tag mechanism eats ~30% of the CPU...
-		
 		// First free up any labels that no longer have active markers
 		_ = poiLabels
-			.filter({$0.tag != 0 && !hashesToShow.contains($0.tag)})
+			.filter({ $0.ownerHash != 0 && !hashesToShow.contains($0.ownerHash) })
 			.map(unbindLabel)
 		
 		// Bind new markers into free labels
 		for marker in markersToShow {
-			guard poiLabels.first(where: { $0.tag == marker.ownerHash }) == nil else { // $ hotspot
+			guard poiLabels.first(where: { $0.ownerHash == marker.ownerHash }) == nil else {
 				continue
 			}
-			guard let freeLabel = poiLabels.first(where: { $0.tag == 0 }) else {	// $ hotspot
+			guard let freeLabel = poiLabels.first(where: { $0.ownerHash == 0 }) else {
 				print("Marker \(marker.ownerHash) could not be bound to a free label")
 				continue
 			}
@@ -124,22 +131,22 @@ class LabelView: UIView {
 	
 	func renderLabels(projection project: (Vertex) -> CGPoint) {
 		for label in poiLabels {
-			guard let marker = poiPrimitives.values.first(where: { $0.ownerHash == label.tag }) else { // $ hotspot
+			guard let marker = poiPrimitives.values.first(where: { $0.ownerHash == label.ownerHash }) else { // $ hotspot
 				continue
 			}
 			
 			// Layout labels (region labels hang under the center, POI labels hang from their top-left)
 			let screenPos = project(marker.worldPos)
 			switch marker.kind {
-			case .Region: label.center = screenPos
-			default: label.frame.origin = screenPos
+			case .Region: label.view.center = screenPos
+			default: label.view.frame.origin = screenPos
 			}
 		}
 	}
 	
-	func bindLabel(_ label: UILabel, to marker: LabelMarker) {
-		label.tag = marker.ownerHash
-		label.isHidden = false
+	func bindLabel(_ label: Label, to marker: LabelMarker) {
+		label.ownerHash = marker.ownerHash
+		label.view.isHidden = false
 		
 		let alignment: NSTextAlignment
 		let textColor: UIColor
@@ -162,13 +169,13 @@ class LabelView: UIView {
 		switch marker.kind {
 		case .Region:
 			switch marker.rank {
-			case 0: label.font = .boldSystemFont(ofSize: 20.0)
-			case 1: label.font = .boldSystemFont(ofSize: 16.0)
-			default: label.font = .boldSystemFont(ofSize: 12.0)
+			case 0: label.view.font = .boldSystemFont(ofSize: 20.0)
+			case 1: label.view.font = .boldSystemFont(ofSize: 16.0)
+			default: label.view.font = .boldSystemFont(ofSize: 12.0)
 			}
-		case .Capital: label.font = .systemFont(ofSize: 13.0)
-		case .City: label.font = .systemFont(ofSize: 11.0)
-		case .Town: label.font = .systemFont(ofSize: 9.0)
+		case .Capital: label.view.font = .systemFont(ofSize: 13.0)
+		case .City: label.view.font = .systemFont(ofSize: 11.0)
+		case .Town: label.view.font = .systemFont(ofSize: 9.0)
 		}
 		 
 		let strokeAttribs: [NSAttributedString.Key: Any] =
@@ -176,12 +183,12 @@ class LabelView: UIView {
 			 .foregroundColor: textColor,
 			 .strokeWidth: strokeWidth]
 		
-		label.textAlignment = alignment
-		label.attributedText = NSAttributedString(string: marker.name, attributes: strokeAttribs)
+		label.view.textAlignment = alignment
+		label.view.attributedText = NSAttributedString(string: marker.name, attributes: strokeAttribs)
 	}
 	
-	func unbindLabel(_ label: UILabel) {
-		label.tag = 0
-		label.isHidden = true
+	func unbindLabel(_ label: Label) {
+		label.ownerHash = 0
+		label.view.isHidden = true
 	}
 }
