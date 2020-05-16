@@ -149,8 +149,6 @@ class GeometryStreamer {
 					return
 				}
 				
-				// Don't allow reads while publishing finished chunk
-				self.publishQueue.async(flags: .barrier) {
 					let primitive = StreamedPrimitive(polygons: [tessellation.vertices],
 																					  indices: [tessellation.indices],
 																						drawMode: .triangle,
@@ -158,6 +156,9 @@ class GeometryStreamer {
 																					  color: regionId.hashed.hashColor.tuple(),	// $ Embed color in tessellation
 																					  ownerHash: regionHash,
 																					  debugName: "Unnamed")	// $ Embed name in tessellation
+				
+				// Don't allow reads while publishing finished chunk
+				self.publishQueue.async(flags: .barrier) {
 					self.deliveredChunks.append((request, tessellation, primitive))
 				}
 			}
