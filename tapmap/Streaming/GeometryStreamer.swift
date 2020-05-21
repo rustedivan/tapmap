@@ -29,13 +29,13 @@ class GeometryStreamer {
 	let fileHeader: WorldHeader
 	let chunkTable: ChunkTable
 	let streamQueue: DispatchQueue	// Async stream data from archive
-	var publishQueue: DispatchQueue		// Deliver loaded chunks from worker thread
 	
 	var wantedLodLevel: Int
 	var actualLodLevel: Int = 10
 	var lodCacheMiss: Bool = true
 	var pendingChunks: Set<ChunkRequest> = []										// Tracks outstanding stream requests
 	var deliveredChunks: [(ChunkRequest, GeoTessellation, StreamedPrimitive)] = []	// Chunks that finished streaming in this frame
+	var chunkLock: os_unfair_lock = os_unfair_lock()
 	
 	var tessellationCache: [Int : GeoTessellation] = [:]
 	var primitiveCache: [Int : StreamedPrimitive] = [:]
@@ -70,9 +70,8 @@ class GeometryStreamer {
 		chunkTable.chunkData = fileData.subdata(in: fileHeader.dataOffset..<fileHeader.dataOffset + fileHeader.dataSize)
 		print("  - chunk data attached with \(ByteCountFormatter.string(fromByteCount: Int64(chunkTable.chunkData.count), countStyle: .memory))")
 		
-		streamQueue = DispatchQueue(label: "Geometry streaming", attributes: .concurrent)
+		streamQueue = DispatchQueue(label: "Geometry streaming", qos: .utility, attributes: .concurrent)
 		print("  - empty streaming op-queue setup")
-		publishQueue = DispatchQueue(label: "Chunk delivery")
 		
 		GeometryStreamer._shared = self
 		
@@ -149,24 +148,24 @@ class GeometryStreamer {
 					return
 				}
 				
-					let primitive = StreamedPrimitive(polygons: [tessellation.vertices],
-																					  indices: [tessellation.indices],
-																						drawMode: .triangle,
-																					  device: self.metalDevice!,
-																					  color: regionId.hashed.hashColor.tuple(),	// $ Embed color in tessellation
-																					  ownerHash: regionHash,
-																					  debugName: "Unnamed")	// $ Embed name in tessellation
+				let primitive = StreamedPrimitive(polygons: [tessellation.vertices],
+																					indices: [tessellation.indices],
+																					drawMode: .triangle,
+																					device: self.metalDevice!,
+																					color: regionId.hashed.hashColor.tuple(),	// $ Embed color in tessellation
+																					ownerHash: regionHash,
+																					debugName: "Unnamed")	// $ Embed name in tessellation
 				
 				// Don't allow reads while publishing finished chunk
-				self.publishQueue.async(flags: .barrier) {
+				os_unfair_lock_lock(&self.chunkLock)
 					self.deliveredChunks.append((request, tessellation, primitive))
-				}
+				os_unfair_lock_unlock(&self.chunkLock)
 			}
 		}
 	}
 	
 	func updateStreaming() {
-		publishQueue.sync {
+		if os_unfair_lock_trylock(&chunkLock) {
 			for (request, tessellation, primitive) in deliveredChunks {
 				let runtimeLodKey = regionHashLodKey(request.chunkId.hashed, atLod: request.lodLevel)
 				tessellationCache[runtimeLodKey] = tessellation
@@ -179,6 +178,7 @@ class GeometryStreamer {
 		
 			logPendingRequests()
 			logBlockingRequests()
+			os_unfair_lock_unlock(&chunkLock)
 		}
 	}
 	

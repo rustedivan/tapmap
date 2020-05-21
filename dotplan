@@ -1,12 +1,16 @@
 ROAD TO FINAL
 
-# Rendering arch improvements
-- add ocean pass
+# Hash key simplification
+- add chunkname to the streamed chunks
+- use lodHashKey as key in the chunktable
 
-## LabelView's tag mechanism is incredibly expensive
-- together with projectPoint - move off main thread?
+# Optimisation
+- building chunkname/LOD hashkeys is the most expensive part of the app now
+--build render primitive booke with frame-count access markers, use to nuke when under memory pressure
+- vertices down to Float16
 
 # Ocean rendering
+- add ocean pass in geography encoder
 - pale bathygraphic map
 - shifting blur waves
 √ ocean outlines
@@ -17,10 +21,6 @@ ROAD TO FINAL
 -- arc length determined by lat/lon distance
 ## Scale outline width on tap
 -- scale the outline width uniform with a progress variable
-
-- memory management
--- build render primitive bookie with frame-count access markers
--- the RPB can provide lists of primitives to nuke when under memory pressure
 
 # Creative brief
 ## Shading
@@ -33,14 +33,11 @@ ROAD TO FINAL
 ## Color scheme
 ## Labelling scheme
 
-# Archive compression
-√ Triangle indices to UInt16
-- Vertices down to Float16
-
 # Runtime tweaking
 - runtime setting: borders should ramp between min/max screenspace width, not fixed regardless of zoom
 - runtime setting: number of outlines to draw for each continent (Africa=2, Asia=5 and so on)
 - runtime setting: zoom limits
+- stylesheets for regions and colors
 
 # Persistence
 ## Store userstate to user defaults
@@ -50,6 +47,8 @@ ROAD TO FINAL
 # Rendering improvements
 ## Outline feathering
 -- can be done with an outline texture
+## Label layout
+-- layout into coordinate grid
 ## Texture UV's
 -- can draw full-screen quad behind map? as a clear-op?
 ## 60Hz updates
@@ -69,6 +68,9 @@ ROAD TO FINAL
 ## Figure out how to handle Clipperton and friends (see "skipping..." in bake log)
 
 ----- ARCHIVE -----
+
+## LabelView's tag mechanism is incredibly expensive
+- together with projectPoint - move off main thread?
 
 # Metal rewrite
 - drop everything except IndexedRenderPrimitive
