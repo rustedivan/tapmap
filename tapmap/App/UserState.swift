@@ -22,6 +22,14 @@ class UserState {
 						 .union(availableProvinces)
 	}
 	
+	init() {
+		let url = FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask).first!
+		if let profile = NSData(contentsOf: url) as Data? {
+			let persistedState = NSKeyedUnarchiver(forReadingWith: profile)
+			visitedPlaces = persistedState.decodeObject(forKey: "visited-places") as! [RegionHash : Bool]
+		}
+	}
+	
 	func buildWorldAvailability(withWorld world: RuntimeWorld) {
 		let allContinents = Set(world.allContinents.values)
 		let closedContinents = allContinents.filter { placeVisited($0) == false }
@@ -47,6 +55,7 @@ class UserState {
 	
 	func visitPlace<T:GeoIdentifiable>(_ p: T) {
 		visitedPlaces[p.geographyId.hashed] = true
+		persistToProfile()
 	}
 	
 	func openPlace<T:GeoNode>(_ p: T) {
@@ -62,14 +71,32 @@ class UserState {
 				availableProvinces.insert(newRegion.geographyId.hashed)
 			}
 		default:
-			break
+			return
 		}
 		
 		delegate.availabilityDidChange(availableSet: availableSet)
+		persistToProfile()
 	}
 	
-	func visitPlace(_ p: GeoProvince) {
-		visitedPlaces[p.geographyId.hashed] = true
+	func persistToProfile() {
+		var url = FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask).first!
+		
+		// Expect tapmap to run offline for long periods, so don't allow iOS to offload the savefile to iCloud
+		var dontOffloadUserstate = URLResourceValues()
+		dontOffloadUserstate.isExcludedFromBackup = true
+		try? url.setResourceValues(dontOffloadUserstate)
+		
+		let encoder = NSKeyedArchiver()
+		encoder.encode(10, forKey: "version")
+		encoder.encode(Date(), forKey: "archive-timestamp")
+		encoder.encode(visitedPlaces, forKey: "visited-places")
+		let chunk = encoder.encodedData
+		
+		do {
+			try chunk.write(to: url, options: .atomicWrite)
+		} catch (let error) {
+			print("Could not persist to profile at \(url): \(error.localizedDescription)")
+		}
 	}
 }
 
