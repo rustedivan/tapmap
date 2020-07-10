@@ -15,6 +15,11 @@ class UserState {
 	var availableProvinces: Set<RegionHash> = []
 	
 	var delegate: UserStateDelegate!
+	var persistentProfileUrl: URL {
+		FileManager.default
+			.urls(for: .applicationSupportDirectory, in: .userDomainMask).first!
+			.appendingPathComponent("visited-places.plist")
+	}
 	
 	var availableSet: Set<RegionHash> {
 		return Set<RegionHash>(availableContinents)
@@ -23,8 +28,7 @@ class UserState {
 	}
 	
 	init() {
-		let url = FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask).first!
-		if let profile = NSData(contentsOf: url) as Data? {
+		if let profile = NSData(contentsOf: persistentProfileUrl) as Data? {
 			let persistedState = NSKeyedUnarchiver(forReadingWith: profile)
 			visitedPlaces = persistedState.decodeObject(forKey: "visited-places") as! [RegionHash : Bool]
 		}
@@ -79,8 +83,7 @@ class UserState {
 	}
 	
 	func persistToProfile() {
-		var url = FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask).first!
-		
+		var url = persistentProfileUrl
 		// Expect tapmap to run offline for long periods, so don't allow iOS to offload the savefile to iCloud
 		var dontOffloadUserstate = URLResourceValues()
 		dontOffloadUserstate.isExcludedFromBackup = true
