@@ -10,6 +10,7 @@ import Foundation
 
 enum GeoReshapePipelineError : Error {
 	case noNodePath
+	case noMapshaperPath
 	case noMapshaperInstall
 	case missingShapeFile(level: String)
 	case noShapeFiles
@@ -44,17 +45,20 @@ func reshapeGeometry(params: ArraySlice<String>) throws {
 }
 
 func reshapeFile(input: URL, strength: Int, method: String, output: String) throws {
-	let nodeInstallPath = try findMapshaperInstall()
-	let nodePath = nodeInstallPath.appendingPathComponent("mapshaper").path
+	guard let nodePath = PipelineConfig.shared.configString("reshape.node") else {
+		throw GeoReshapePipelineError.noNodePath
+	}
+	
+	let mapshaperPath = try findMapshaperInstall()
 	let fileOutUrl = PipelineConfig.shared.sourceGeometryUrl
 		.appendingPathComponent("\(output)")
 
 	print("Reshaping \"\(input.lastPathComponent)\" with \(method) @ \(strength)%...")
 	let reshapeTask = Process()
-	reshapeTask.currentDirectoryURL = nodeInstallPath
+	reshapeTask.currentDirectoryURL = mapshaperPath
 	reshapeTask.launchPath = nodePath
 	reshapeTask.standardError = Pipe()
-	reshapeTask.arguments = [
+	reshapeTask.arguments = ["mapshaper",
 													 "-i", input.path,
 													 "-clean",
 													 "-simplify", method, "keep-shapes", "\(strength)%",
@@ -65,8 +69,8 @@ func reshapeFile(input: URL, strength: Int, method: String, output: String) thro
 }
 
 func findMapshaperInstall() throws -> URL {
-	guard let mapshaperPath = PipelineConfig.shared.configString("reshape.node") else {
-		throw GeoReshapePipelineError.noNodePath
+	guard let mapshaperPath = PipelineConfig.shared.configString("reshape.mapshaper") else {
+		throw GeoReshapePipelineError.noMapshaperPath
 	}
 	let mapShaper = URL(fileURLWithPath: mapshaperPath,
 											relativeTo: FileManager.default.homeDirectoryForCurrentUser)

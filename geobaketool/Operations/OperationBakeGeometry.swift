@@ -67,8 +67,8 @@ class OperationBakeGeometry : Operation {
 			try fileData.write(to: saveUrl, options: .atomicWrite)
 			let fileSize = Int64(fileData.count)
 			print("GeoWorld baked to \(ByteCountFormatter.string(fromByteCount: fileSize, countStyle: .file))")
-		} catch {
-			print("Saving failed")
+		} catch (let error) {
+			print("Saving failed: \(error.localizedDescription)")
 		}
 	
 		report(1.0, "Done.", true)
