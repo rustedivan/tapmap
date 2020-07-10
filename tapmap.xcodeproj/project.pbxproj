@@ -140,6 +140,7 @@
 		1468830C23B4BC4100105E04 /* DebugRenderer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DebugRenderer.swift; sourceTree = "<group>"; };
 		146EA269244AF14C009196BC /* RuntimeWorld.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RuntimeWorld.swift; sourceTree = "<group>"; };
 		147B819423DA043500942C9B /* WorldTree.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorldTree.swift; sourceTree = "<group>"; };
+		1484A6B024B8E5DF0049C0CF /* tapmap.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = tapmap.entitlements; sourceTree = "<group>"; };
 		148937DF22B97FDF009278A0 /* Geometry.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Geometry.swift; sourceTree = "<group>"; };
 		148937E022B97FDF009278A0 /* AppTypes.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AppTypes.swift; sourceTree = "<group>"; };
 		148937E122B97FDF009278A0 /* ViewCalculations.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ViewCalculations.swift; sourceTree = "<group>"; };
@@ -354,6 +355,7 @@
 				14C6656722B97D8A0054D7F2 /* LaunchScreen.storyboard */,
 				14C6656A22B97D8A0054D7F2 /* Info.plist */,
 				143A601E23DD954100BE554D /* world.geo */,
+				1484A6B024B8E5DF0049C0CF /* tapmap.entitlements */,
 			);
 			path = tapmap;
 			sourceTree = "<group>";
@@ -944,6 +946,8 @@
 			baseConfigurationReference = 766D4FF8C05C0073CE1CAAE8 /* Pods-tapmap.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_ENTITLEMENTS = tapmap/tapmap.entitlements;
+				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = Y4JDRD37Q9;
 				INFOPLIST_FILE = tapmap/Info.plist;
@@ -954,6 +958,7 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = se.wildbrain.tapmap;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
@@ -964,6 +969,8 @@
 			baseConfigurationReference = 971DAC5C780D7F3982D5CB30 /* Pods-tapmap.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_ENTITLEMENTS = tapmap/tapmap.entitlements;
+				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = Y4JDRD37Q9;
 				INFOPLIST_FILE = tapmap/Info.plist;
@@ -974,6 +981,7 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = se.wildbrain.tapmap;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};

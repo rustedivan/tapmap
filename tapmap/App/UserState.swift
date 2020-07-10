@@ -7,8 +7,10 @@
 //
 
 import Foundation
+import CloudKit
 
 class UserState {
+	static let visitedPlacesKey = "visited-places"
 	var visitedPlaces: [RegionHash : Bool] = [:]
 	var availableContinents: Set<RegionHash> = []
 	var availableCountries: Set<RegionHash> = []
@@ -16,9 +18,9 @@ class UserState {
 	
 	var delegate: UserStateDelegate!
 	var persistentProfileUrl: URL {
-		FileManager.default
-			.urls(for: .applicationSupportDirectory, in: .userDomainMask).first!
-			.appendingPathComponent("visited-places.plist")
+		try! FileManager.default
+			.url(for: .applicationSupportDirectory, in: .userDomainMask, appropriateFor: nil, create: true)
+			.appendingPathComponent("\(UserState.visitedPlacesKey).plist")
 	}
 	
 	var availableSet: Set<RegionHash> {
@@ -30,7 +32,7 @@ class UserState {
 	init() {
 		if let profile = NSData(contentsOf: persistentProfileUrl) as Data? {
 			let persistedState = NSKeyedUnarchiver(forReadingWith: profile)
-			visitedPlaces = persistedState.decodeObject(forKey: "visited-places") as! [RegionHash : Bool]
+			visitedPlaces = persistedState.decodeObject(forKey: UserState.visitedPlacesKey) as! [RegionHash : Bool]
 		}
 	}
 	
@@ -60,6 +62,7 @@ class UserState {
 	func visitPlace<T:GeoIdentifiable>(_ p: T) {
 		visitedPlaces[p.geographyId.hashed] = true
 		persistToProfile()
+		persistToCloud()
 	}
 	
 	func openPlace<T:GeoNode>(_ p: T) {
@@ -80,6 +83,7 @@ class UserState {
 		
 		delegate.availabilityDidChange(availableSet: availableSet)
 		persistToProfile()
+		persistToCloud()
 	}
 	
 	func persistToProfile() {
@@ -92,14 +96,35 @@ class UserState {
 		let encoder = NSKeyedArchiver()
 		encoder.encode(10, forKey: "version")
 		encoder.encode(Date(), forKey: "archive-timestamp")
-		encoder.encode(visitedPlaces, forKey: "visited-places")
+		encoder.encode(visitedPlaces, forKey: UserState.visitedPlacesKey)
 		let chunk = encoder.encodedData
 		
 		do {
-			try chunk.write(to: url, options: .atomicWrite)
+			try chunk.write(to: url, options: .atomic)
 		} catch (let error) {
 			print("Could not persist to profile at \(url): \(error.localizedDescription)")
 		}
+	}
+	
+	func persistToCloud() {
+		let storedPlaces = visitedPlaces.compactMap { (key, value) in (value ? String(key) : nil) }
+		NSUbiquitousKeyValueStore.default.set(storedPlaces, forKey: UserState.visitedPlacesKey)
+	}
+	
+	func mergeCloudVisits() {
+		guard let storedPlaces = NSUbiquitousKeyValueStore.default.array(forKey: UserState.visitedPlacesKey) else {
+			print("Stored profile wasn't an array")
+			return
+		}
+		
+		for newVisit in storedPlaces {
+			guard let visitString = newVisit as? String else { continue }
+			guard let visitKey = RegionHash(visitString) else { continue }
+			visitedPlaces[visitKey] = true
+		}
+		
+		persistToProfile()
+		persistToCloud()
 	}
 }
 
