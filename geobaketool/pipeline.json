@@ -6,7 +6,7 @@
 		"osmTownsUrl": "http://overpass-api.de/api/interpreter?data=[timeout:600][out:json];node(-85,-175,85,175)['place'='town'];out;"
 	},
 	"reshape": {
-		"node" : ".nvm/versions/node/v7.8.0/bin/",
+		"node" : "node_modules/mapshaper/bin/",
 		"method" : "visvalingam",
 		"lodlevels" : [30, 4, 1]
 	},

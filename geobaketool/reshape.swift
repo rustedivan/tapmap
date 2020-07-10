@@ -45,7 +45,7 @@ func reshapeGeometry(params: ArraySlice<String>) throws {
 
 func reshapeFile(input: URL, strength: Int, method: String, output: String) throws {
 	let nodeInstallPath = try findMapshaperInstall()
-	let nodePath = nodeInstallPath.appendingPathComponent("node").path
+	let nodePath = nodeInstallPath.appendingPathComponent("mapshaper").path
 	let fileOutUrl = PipelineConfig.shared.sourceGeometryUrl
 		.appendingPathComponent("\(output)")
 
@@ -54,7 +54,7 @@ func reshapeFile(input: URL, strength: Int, method: String, output: String) thro
 	reshapeTask.currentDirectoryURL = nodeInstallPath
 	reshapeTask.launchPath = nodePath
 	reshapeTask.standardError = Pipe()
-	reshapeTask.arguments = ["mapshaper",
+	reshapeTask.arguments = [
 													 "-i", input.path,
 													 "-clean",
 													 "-simplify", method, "keep-shapes", "\(strength)%",
