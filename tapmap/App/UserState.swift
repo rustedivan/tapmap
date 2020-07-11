@@ -110,22 +110,6 @@ class UserState {
 		let storedPlaces = visitedPlaces.compactMap { (key, value) in (value ? String(key) : nil) }
 		NSUbiquitousKeyValueStore.default.set(storedPlaces, forKey: UserState.visitedPlacesKey)
 	}
-	
-	func mergeCloudVisits() {
-		guard let storedPlaces = NSUbiquitousKeyValueStore.default.array(forKey: UserState.visitedPlacesKey) else {
-			print("Stored profile wasn't an array")
-			return
-		}
-		
-		for newVisit in storedPlaces {
-			guard let visitString = newVisit as? String else { continue }
-			guard let visitKey = RegionHash(visitString) else { continue }
-			visitedPlaces[visitKey] = true
-		}
-		
-		persistToProfile()
-		persistToCloud()
-	}
 }
 
 protocol UserStateDelegate {

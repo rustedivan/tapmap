@@ -54,6 +54,11 @@ class MapViewController: UIViewController, MTKViewDelegate {
 		uiState.buildQuadTree(withTree: worldTree)
 		
 		super.init(coder: coder)
+		
+		NotificationCenter.default.addObserver(forName: NSUbiquitousKeyValueStore.didChangeExternallyNotification,
+																					 object: NSUbiquitousKeyValueStore.default,
+																					 queue: nil,
+																					 using: takeCloudProfile)
 	}
 	
 	override func viewDidLoad() {
@@ -115,17 +120,22 @@ class MapViewController: UIViewController, MTKViewDelegate {
 				let hitContinent = world.availableContinents[hitHash]!
 				if processSelection(of: hitContinent, user: userState, ui: uiState) {
 					processVisit(of: hitContinent, user: userState, ui: uiState)
+					uiState.clearSelection()
+					renderers.selectionRenderer.clear()
 					renderers.effectRenderer.addOpeningEffect(for: hitContinent.geographyId.hashed)
 				}
 			} else if let hitHash = pickFromTessellations(p: tapPoint, candidates: candidateCountries) {
 				let hitCountry = world.availableCountries[hitHash]!
 				if processSelection(of: hitCountry, user: userState, ui: uiState) {
 					processVisit(of: hitCountry, user: userState, ui: uiState)
+					uiState.clearSelection()
+					renderers.selectionRenderer.clear()
 					renderers.effectRenderer.addOpeningEffect(for: hitCountry.geographyId.hashed)
 				}
 			} else if let hitHash = pickFromTessellations(p: tapPoint, candidates: candidateRegions) {
 				let hitRegion = world.availableProvinces[hitHash]!
 				_ = processSelection(of: hitRegion, user: userState, ui: uiState)
+				// $ Select + visit yo
 			} else {
 				uiState.clearSelection()
 				renderers.selectionRenderer.clear()
@@ -245,6 +255,50 @@ extension MapViewController : UIScrollViewDelegate {
 														 to: self.mapFrame,
 														 space: self.mapSpace)
 			return self.view.convert(mp, from: self.dummyView)
+		}
+	}
+}
+
+// MARK: iCloud
+extension MapViewController {
+	func takeCloudProfile(notification: Notification) {
+		guard let changedKeys = notification.userInfo?[NSUbiquitousKeyValueStoreChangedKeysKey] as? NSArray else {
+			print("Notification did not carry any changed keys.")
+			return
+		}
+		guard changedKeys.contains(UserState.visitedPlacesKey) else {
+			print("Notification did not carry visited places.")
+			return
+		}
+		guard let storedPlaces = NSUbiquitousKeyValueStore.default.array(forKey: UserState.visitedPlacesKey) else {
+			print("Stored profile wasn't an array.")
+			return
+		}
+
+		let cloudVisits = storedPlaces.compactMap { (k) -> RegionHash? in
+			if let keyString = k as? String {
+				return RegionHash(keyString)
+			} else {
+				return nil
+			}
+		}
+
+		let uiState = AppDelegate.sharedUIState
+		let userState = AppDelegate.sharedUserState
+		let newVisits = cloudVisits.filter { !(userState.visitedPlaces[$0] ?? false) }
+		print("New visits synched from iCloud: \(newVisits)")
+		
+		for hash in newVisits {
+			if let newContinent = world.allContinents[hash] {
+				userState.visitPlace(newContinent)
+				processVisit(of: newContinent, user: userState, ui: uiState)
+			} else if let newCountry = world.allCountries[hash] {
+				userState.visitPlace(newCountry)
+				processVisit(of: newCountry, user: userState, ui: uiState)
+			} else if let newProvince = world.allProvinces[hash] {
+				userState.visitPlace(newProvince)
+				// $ Process province visits
+			}
 		}
 	}
 }
