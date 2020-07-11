@@ -32,6 +32,8 @@
 		147B819523DA043500942C9B /* WorldTree.swift in Sources */ = {isa = PBXBuildFile; fileRef = 147B819423DA043500942C9B /* WorldTree.swift */; };
 		147B819623DA043500942C9B /* WorldTree.swift in Sources */ = {isa = PBXBuildFile; fileRef = 147B819423DA043500942C9B /* WorldTree.swift */; };
 		147B819723DA043500942C9B /* WorldTree.swift in Sources */ = {isa = PBXBuildFile; fileRef = 147B819423DA043500942C9B /* WorldTree.swift */; };
+		14869B3E24BA1183008E580F /* LocalProfile.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14869B3D24BA1183008E580F /* LocalProfile.swift */; };
+		14869B4024BA1191008E580F /* CloudProfile.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14869B3F24BA1191008E580F /* CloudProfile.swift */; };
 		148937F522B97FDF009278A0 /* Geometry.swift in Sources */ = {isa = PBXBuildFile; fileRef = 148937DF22B97FDF009278A0 /* Geometry.swift */; };
 		148937F622B97FDF009278A0 /* AppTypes.swift in Sources */ = {isa = PBXBuildFile; fileRef = 148937E022B97FDF009278A0 /* AppTypes.swift */; };
 		148937F722B97FDF009278A0 /* ViewCalculations.swift in Sources */ = {isa = PBXBuildFile; fileRef = 148937E122B97FDF009278A0 /* ViewCalculations.swift */; };
@@ -141,6 +143,8 @@
 		146EA269244AF14C009196BC /* RuntimeWorld.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RuntimeWorld.swift; sourceTree = "<group>"; };
 		147B819423DA043500942C9B /* WorldTree.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorldTree.swift; sourceTree = "<group>"; };
 		1484A6B024B8E5DF0049C0CF /* tapmap.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = tapmap.entitlements; sourceTree = "<group>"; };
+		14869B3D24BA1183008E580F /* LocalProfile.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocalProfile.swift; sourceTree = "<group>"; };
+		14869B3F24BA1191008E580F /* CloudProfile.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CloudProfile.swift; sourceTree = "<group>"; };
 		148937DF22B97FDF009278A0 /* Geometry.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Geometry.swift; sourceTree = "<group>"; };
 		148937E022B97FDF009278A0 /* AppTypes.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AppTypes.swift; sourceTree = "<group>"; };
 		148937E122B97FDF009278A0 /* ViewCalculations.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ViewCalculations.swift; sourceTree = "<group>"; };
@@ -262,6 +266,15 @@
 			path = Mapping;
 			sourceTree = "<group>";
 		};
+		14869B3C24BA1147008E580F /* Persistence */ = {
+			isa = PBXGroup;
+			children = (
+				14869B3D24BA1183008E580F /* LocalProfile.swift */,
+				14869B3F24BA1191008E580F /* CloudProfile.swift */,
+			);
+			path = Persistence;
+			sourceTree = "<group>";
+		};
 		148937DE22B97FDF009278A0 /* Geometry */ = {
 			isa = PBXGroup;
 			children = (
@@ -350,6 +363,7 @@
 				147B819323DA041800942C9B /* Mapping */,
 				148937E322B97FDF009278A0 /* Rendering */,
 				142A21ED23DC6189000DA4FA /* Streaming */,
+				14869B3C24BA1147008E580F /* Persistence */,
 				14C6656222B97D890054D7F2 /* Main.storyboard */,
 				14C6656522B97D8A0054D7F2 /* Assets.xcassets */,
 				14C6656722B97D8A0054D7F2 /* LaunchScreen.storyboard */,
@@ -687,6 +701,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				1416641B2463E2690006A2D4 /* EffectRenderer.metal in Sources */,
+				14869B3E24BA1183008E580F /* LocalProfile.swift in Sources */,
 				144B5D5A22D9E092001E2A85 /* SelectionRenderer.swift in Sources */,
 				14B63F052460BDFF00A4A433 /* BorderShader.metal in Sources */,
 				1489380622B97FE0009278A0 /* AppDelegate.swift in Sources */,
@@ -706,6 +721,7 @@
 				14F8918B22F0F3F7008CCCF3 /* OutlineGeometry.swift in Sources */,
 				14F481F42462875A00E4C001 /* SelectionShader.metal in Sources */,
 				147B819523DA043500942C9B /* WorldTree.swift in Sources */,
+				14869B4024BA1191008E580F /* CloudProfile.swift in Sources */,
 				1468830D23B4BC4100105E04 /* DebugRenderer.swift in Sources */,
 				148937F522B97FDF009278A0 /* Geometry.swift in Sources */,
 				14985FED22F0ED0C00F68A1F /* RenderPrimitives.swift in Sources */,

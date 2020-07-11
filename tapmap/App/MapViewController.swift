@@ -264,63 +264,21 @@ extension MapViewController : UIScrollViewDelegate {
 // MARK: iCloud
 extension MapViewController {
 	func takeCloudProfile(notification: Notification) {
-		guard let changedKeys = notification.userInfo?[NSUbiquitousKeyValueStoreChangedKeysKey] as? NSArray else {
-			print("Notification did not carry any changed keys.")
-			return
-		}
-		guard changedKeys.contains(UserState.visitedPlacesKey) else {
-			print("Notification did not carry visited places.")
-			return
-		}
-		guard let storedPlaces = NSUbiquitousKeyValueStore.default.array(forKey: UserState.visitedPlacesKey) else {
-			print("Stored profile wasn't an array.")
-			return
-		}
-
-		let cloudVisits = storedPlaces.compactMap { (k) -> RegionHash? in
-			if let keyString = k as? String {
-				return RegionHash(keyString)
-			} else {
-				return nil
-			}
-		}
-
-		let uiState = AppDelegate.sharedUIState
-		let userState = AppDelegate.sharedUserState
-		let newVisits = cloudVisits.filter { !(userState.visitedPlaces[$0] ?? false) }
-		let newContinentVisits = world.allContinents.filter { newVisits.contains($0.key) }.values
-		let newCountryVisits = world.allCountries.filter { newVisits.contains($0.key) }.values
-		let newProvinceVisits = world.allProvinces.filter { newVisits.contains($0.key) }.values
-		
-		if newVisits.isEmpty == false {
+		if let diff = mergeCloudProfile(notification: notification, world: world) {
+			let userState = AppDelegate.sharedUserState
+			let uiState = AppDelegate.sharedUIState
 			needsRender = true
-			print("New visits synched from iCloud: \(newVisits.count)")
-			print(" Continents: \(newContinentVisits.map { $0.name })")
-			print("  Countries: \(newCountryVisits.map { $0.name })")
-			print("  Provinces: \(newProvinceVisits.map { $0.name })")
-		} else {
-			print("iCloud synch had no unseen visits")
-			return
+			for newContinent in diff.continentVisits {
+				processVisit(of: newContinent, user: userState, ui: uiState)
+			}
+			for newCountry in diff.countryVisits {
+				processVisit(of: newCountry, user: userState, ui: uiState)
+			}
+			for _ in diff.provinceVisits {
+				// No-op
+			}
+			
+			uiState.cullWorldTree(focus: renderRect)
 		}
-		
-		for newContinent in newContinentVisits {
-			userState.visitPlace(newContinent)
-			processVisit(of: newContinent, user: userState, ui: uiState)
-		}
-		
-		for newCountry in newCountryVisits {
-			userState.visitPlace(newCountry)
-			processVisit(of: newCountry, user: userState, ui: uiState)
-		}
-		
-		for newProvince in newProvinceVisits {
-			userState.visitPlace(newProvince)
-		}
-		
-		uiState.cullWorldTree(focus: renderRect)
-		
-		// Save and publish merged data
-		userState.persistToProfile()
-		userState.persistToCloud()
 	}
 }

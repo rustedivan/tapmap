@@ -17,11 +17,6 @@ class UserState {
 	var availableProvinces: Set<RegionHash> = []
 	
 	var delegate: UserStateDelegate!
-	var persistentProfileUrl: URL {
-		try! FileManager.default
-			.url(for: .applicationSupportDirectory, in: .userDomainMask, appropriateFor: nil, create: true)
-			.appendingPathComponent("\(UserState.visitedPlacesKey).plist")
-	}
 	
 	var availableSet: Set<RegionHash> {
 		return Set<RegionHash>(availableContinents)
@@ -30,9 +25,8 @@ class UserState {
 	}
 	
 	init() {
-		if let profile = NSData(contentsOf: persistentProfileUrl) as Data? {
-			let persistedState = NSKeyedUnarchiver(forReadingWith: profile)
-			visitedPlaces = persistedState.decodeObject(forKey: UserState.visitedPlacesKey) as! [RegionHash : Bool]
+		if let storedVisits = loadVisitsFromDevice(key: UserState.visitedPlacesKey) {
+			visitedPlaces = storedVisits
 		}
 	}
 	
@@ -89,28 +83,11 @@ class UserState {
 	}
 	
 	func persistToProfile() {
-		var url = persistentProfileUrl
-		// Expect tapmap to run offline for long periods, so don't allow iOS to offload the savefile to iCloud
-		var dontOffloadUserstate = URLResourceValues()
-		dontOffloadUserstate.isExcludedFromBackup = true
-		try? url.setResourceValues(dontOffloadUserstate)
-		
-		let encoder = NSKeyedArchiver()
-		encoder.encode(10, forKey: "version")
-		encoder.encode(Date(), forKey: "archive-timestamp")
-		encoder.encode(visitedPlaces, forKey: UserState.visitedPlacesKey)
-		let chunk = encoder.encodedData
-		
-		do {
-			try chunk.write(to: url, options: .atomic)
-		} catch (let error) {
-			print("Could not persist to profile at \(url): \(error.localizedDescription)")
-		}
+		saveVisitsToDevice(visitedPlaces, as: UserState.visitedPlacesKey)
 	}
 	
 	func persistToCloud() {
-		let storedPlaces = visitedPlaces.compactMap { (key, value) in (value ? String(key) : nil) }
-		NSUbiquitousKeyValueStore.default.set(storedPlaces, forKey: UserState.visitedPlacesKey)
+		uploadVisitsToCloudKVS(visitedPlaces, as: UserState.visitedPlacesKey)
 	}
 }
 
