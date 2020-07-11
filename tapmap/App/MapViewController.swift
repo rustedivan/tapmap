@@ -29,6 +29,9 @@ class MapViewController: UIViewController, MTKViewDelegate {
 	var needsRender: Bool = true { didSet {
 		if needsRender { metalView.isPaused = false }
 	}}
+	var renderRect: Aabb {
+		return visibleLongLat(viewBounds: view.bounds)
+	}
 	
 	// Rendering
 	var geometryStreamer: GeometryStreamer
@@ -89,7 +92,7 @@ class MapViewController: UIViewController, MTKViewDelegate {
 																 provinces: world.availableProvinces)
 		
 		// Prepare UI for rendering the map
-		AppDelegate.sharedUIState.cullWorldTree(focus: visibleLongLat(viewBounds: view.bounds))
+		AppDelegate.sharedUIState.cullWorldTree(focus: renderRect)
 		needsRender = true
 	}
 	
@@ -135,13 +138,12 @@ class MapViewController: UIViewController, MTKViewDelegate {
 			} else if let hitHash = pickFromTessellations(p: tapPoint, candidates: candidateRegions) {
 				let hitRegion = world.availableProvinces[hitHash]!
 				_ = processSelection(of: hitRegion, user: userState, ui: uiState)
-				// $ Select + visit yo
 			} else {
 				uiState.clearSelection()
 				renderers.selectionRenderer.clear()
 			}
 			
-			uiState.cullWorldTree(focus: visibleLongLat(viewBounds: view.bounds))
+			uiState.cullWorldTree(focus: renderRect)
 		}
 	}
 	
@@ -179,7 +181,7 @@ class MapViewController: UIViewController, MTKViewDelegate {
 		renderers.prepareFrame(forWorld: world)
 		
 		labelView.updateLabels(for: renderers.poiRenderer.activePoiHashes,
-													 inArea: visibleLongLat(viewBounds: view.bounds),
+													 inArea: renderRect,
 													 atZoom: zoom)
 		
 		geometryStreamer.updateLodLevel()	// Must run after requests have been filed in renderers.prepareFrame, otherwise glitch when switching LOD level
@@ -221,13 +223,13 @@ extension MapViewController : UIScrollViewDelegate {
 		geometryStreamer.zoomedTo(zoom)
 		renderers.zoomLevel = zoom
 
-		AppDelegate.sharedUIState.cullWorldTree(focus: visibleLongLat(viewBounds: view.bounds))
+		AppDelegate.sharedUIState.cullWorldTree(focus: renderRect)
 		needsRender = true
 	}
 	
 	func scrollViewDidScroll(_ scrollView: UIScrollView) {
 		offset = scrollView.contentOffset
-		AppDelegate.sharedUIState.cullWorldTree(focus: visibleLongLat(viewBounds: view.bounds))
+		AppDelegate.sharedUIState.cullWorldTree(focus: renderRect)
 		needsRender = true
 	}
 	
@@ -315,7 +317,7 @@ extension MapViewController {
 			userState.visitPlace(newProvince)
 		}
 		
-		uiState.cullWorldTree(focus: visibleLongLat(viewBounds: view.bounds))	// $ Pull to comp prop
+		uiState.cullWorldTree(focus: renderRect)
 		
 		// Save and publish merged data
 		userState.persistToProfile()
