@@ -119,18 +119,18 @@ class MapViewController: UIViewController, MTKViewDelegate {
 			if let hitHash = pickFromTessellations(p: tapPoint, candidates: candidateContinents) {
 				let hitContinent = world.availableContinents[hitHash]!
 				if processSelection(of: hitContinent, user: userState, ui: uiState) {
-					processVisit(of: hitContinent, user: userState, ui: uiState)
 					uiState.clearSelection()
 					renderers.selectionRenderer.clear()
 					renderers.effectRenderer.addOpeningEffect(for: hitContinent.geographyId.hashed)
+					processVisit(of: hitContinent, user: userState, ui: uiState)
 				}
 			} else if let hitHash = pickFromTessellations(p: tapPoint, candidates: candidateCountries) {
 				let hitCountry = world.availableCountries[hitHash]!
 				if processSelection(of: hitCountry, user: userState, ui: uiState) {
-					processVisit(of: hitCountry, user: userState, ui: uiState)
 					uiState.clearSelection()
 					renderers.selectionRenderer.clear()
 					renderers.effectRenderer.addOpeningEffect(for: hitCountry.geographyId.hashed)
+					processVisit(of: hitCountry, user: userState, ui: uiState)
 				}
 			} else if let hitHash = pickFromTessellations(p: tapPoint, candidates: candidateRegions) {
 				let hitRegion = world.availableProvinces[hitHash]!
@@ -286,19 +286,39 @@ extension MapViewController {
 		let uiState = AppDelegate.sharedUIState
 		let userState = AppDelegate.sharedUserState
 		let newVisits = cloudVisits.filter { !(userState.visitedPlaces[$0] ?? false) }
-		print("New visits synched from iCloud: \(newVisits)")
+		let newContinentVisits = world.allContinents.filter { newVisits.contains($0.key) }.values
+		let newCountryVisits = world.allCountries.filter { newVisits.contains($0.key) }.values
+		let newProvinceVisits = world.allProvinces.filter { newVisits.contains($0.key) }.values
 		
-		for hash in newVisits {
-			if let newContinent = world.allContinents[hash] {
-				userState.visitPlace(newContinent)
-				processVisit(of: newContinent, user: userState, ui: uiState)
-			} else if let newCountry = world.allCountries[hash] {
-				userState.visitPlace(newCountry)
-				processVisit(of: newCountry, user: userState, ui: uiState)
-			} else if let newProvince = world.allProvinces[hash] {
-				userState.visitPlace(newProvince)
-				// $ Process province visits
-			}
+		if newVisits.isEmpty == false {
+			needsRender = true
+			print("New visits synched from iCloud: \(newVisits.count)")
+			print(" Continents: \(newContinentVisits.map { $0.name })")
+			print("  Countries: \(newCountryVisits.map { $0.name })")
+			print("  Provinces: \(newProvinceVisits.map { $0.name })")
+		} else {
+			print("iCloud synch had no unseen visits")
+			return
 		}
+		
+		for newContinent in newContinentVisits {
+			userState.visitPlace(newContinent)
+			processVisit(of: newContinent, user: userState, ui: uiState)
+		}
+		
+		for newCountry in newCountryVisits {
+			userState.visitPlace(newCountry)
+			processVisit(of: newCountry, user: userState, ui: uiState)
+		}
+		
+		for newProvince in newProvinceVisits {
+			userState.visitPlace(newProvince)
+		}
+		
+		uiState.cullWorldTree(focus: visibleLongLat(viewBounds: view.bounds))	// $ Pull to comp prop
+		
+		// Save and publish merged data
+		userState.persistToProfile()
+		userState.persistToCloud()
 	}
 }

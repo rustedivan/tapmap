@@ -68,11 +68,13 @@ class UserState {
 	func openPlace<T:GeoNode>(_ p: T) {
 		switch (p) {
 		case let continent as GeoContinent:
+			guard availableContinents.contains(continent.geographyId.hashed) else { return }
 			availableContinents.remove(continent.geographyId.hashed)
 			for newCountry in continent.children {
 				availableCountries.insert(newCountry.geographyId.hashed)
 			}
 		case let country as GeoCountry:
+			guard availableCountries.contains(country.geographyId.hashed) else { return }
 			availableCountries.remove(country.geographyId.hashed)
 			for newRegion in country.children {
 				availableProvinces.insert(newRegion.geographyId.hashed)
