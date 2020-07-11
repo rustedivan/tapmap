@@ -115,11 +115,13 @@ class MapViewController: UIViewController, MTKViewDelegate {
 				let hitContinent = world.availableContinents[hitHash]!
 				if processSelection(of: hitContinent, user: userState, ui: uiState) {
 					processVisit(of: hitContinent, user: userState, ui: uiState)
+					renderers.effectRenderer.addOpeningEffect(for: hitContinent.geographyId.hashed)
 				}
 			} else if let hitHash = pickFromTessellations(p: tapPoint, candidates: candidateCountries) {
 				let hitCountry = world.availableCountries[hitHash]!
 				if processSelection(of: hitCountry, user: userState, ui: uiState) {
 					processVisit(of: hitCountry, user: userState, ui: uiState)
+					renderers.effectRenderer.addOpeningEffect(for: hitCountry.geographyId.hashed)
 				}
 			} else if let hitHash = pickFromTessellations(p: tapPoint, candidates: candidateRegions) {
 				let hitRegion = world.availableProvinces[hitHash]!
@@ -152,7 +154,6 @@ class MapViewController: UIViewController, MTKViewDelegate {
 		renderers.selectionRenderer.clear()
 		
 		if geometryStreamer.renderPrimitive(for: hit.geographyId.hashed) != nil {
-			renderers.effectRenderer.addOpeningEffect(for: hit.geographyId.hashed)
 			geometryStreamer.evictPrimitive(for: hit.geographyId.hashed)
 		}
 
