@@ -29,6 +29,9 @@ class MapViewController: UIViewController, MTKViewDelegate {
 	var needsRender: Bool = true { didSet {
 		if needsRender { metalView.isPaused = false }
 	}}
+	var renderRect: Aabb {
+		return visibleLongLat(viewBounds: view.bounds)
+	}
 	
 	// Rendering
 	var geometryStreamer: GeometryStreamer
@@ -54,6 +57,11 @@ class MapViewController: UIViewController, MTKViewDelegate {
 		uiState.buildQuadTree(withTree: worldTree)
 		
 		super.init(coder: coder)
+		
+		NotificationCenter.default.addObserver(forName: NSUbiquitousKeyValueStore.didChangeExternallyNotification,
+																					 object: NSUbiquitousKeyValueStore.default,
+																					 queue: nil,
+																					 using: takeCloudProfile)
 	}
 	
 	override func viewDidLoad() {
@@ -84,7 +92,7 @@ class MapViewController: UIViewController, MTKViewDelegate {
 																 provinces: world.availableProvinces)
 		
 		// Prepare UI for rendering the map
-		AppDelegate.sharedUIState.cullWorldTree(focus: visibleLongLat(viewBounds: view.bounds))
+		AppDelegate.sharedUIState.cullWorldTree(focus: renderRect)
 		needsRender = true
 	}
 	
@@ -114,11 +122,17 @@ class MapViewController: UIViewController, MTKViewDelegate {
 			if let hitHash = pickFromTessellations(p: tapPoint, candidates: candidateContinents) {
 				let hitContinent = world.availableContinents[hitHash]!
 				if processSelection(of: hitContinent, user: userState, ui: uiState) {
+					uiState.clearSelection()
+					renderers.selectionRenderer.clear()
+					renderers.effectRenderer.addOpeningEffect(for: hitContinent.geographyId.hashed)
 					processVisit(of: hitContinent, user: userState, ui: uiState)
 				}
 			} else if let hitHash = pickFromTessellations(p: tapPoint, candidates: candidateCountries) {
 				let hitCountry = world.availableCountries[hitHash]!
 				if processSelection(of: hitCountry, user: userState, ui: uiState) {
+					uiState.clearSelection()
+					renderers.selectionRenderer.clear()
+					renderers.effectRenderer.addOpeningEffect(for: hitCountry.geographyId.hashed)
 					processVisit(of: hitCountry, user: userState, ui: uiState)
 				}
 			} else if let hitHash = pickFromTessellations(p: tapPoint, candidates: candidateRegions) {
@@ -129,7 +143,7 @@ class MapViewController: UIViewController, MTKViewDelegate {
 				renderers.selectionRenderer.clear()
 			}
 			
-			uiState.cullWorldTree(focus: visibleLongLat(viewBounds: view.bounds))
+			uiState.cullWorldTree(focus: renderRect)
 		}
 	}
 	
@@ -152,7 +166,6 @@ class MapViewController: UIViewController, MTKViewDelegate {
 		renderers.selectionRenderer.clear()
 		
 		if geometryStreamer.renderPrimitive(for: hit.geographyId.hashed) != nil {
-			renderers.effectRenderer.addOpeningEffect(for: hit.geographyId.hashed)
 			geometryStreamer.evictPrimitive(for: hit.geographyId.hashed)
 		}
 
@@ -168,7 +181,7 @@ class MapViewController: UIViewController, MTKViewDelegate {
 		renderers.prepareFrame(forWorld: world)
 		
 		labelView.updateLabels(for: renderers.poiRenderer.activePoiHashes,
-													 inArea: visibleLongLat(viewBounds: view.bounds),
+													 inArea: renderRect,
 													 atZoom: zoom)
 		
 		geometryStreamer.updateLodLevel()	// Must run after requests have been filed in renderers.prepareFrame, otherwise glitch when switching LOD level
@@ -210,13 +223,13 @@ extension MapViewController : UIScrollViewDelegate {
 		geometryStreamer.zoomedTo(zoom)
 		renderers.zoomLevel = zoom
 
-		AppDelegate.sharedUIState.cullWorldTree(focus: visibleLongLat(viewBounds: view.bounds))
+		AppDelegate.sharedUIState.cullWorldTree(focus: renderRect)
 		needsRender = true
 	}
 	
 	func scrollViewDidScroll(_ scrollView: UIScrollView) {
 		offset = scrollView.contentOffset
-		AppDelegate.sharedUIState.cullWorldTree(focus: visibleLongLat(viewBounds: view.bounds))
+		AppDelegate.sharedUIState.cullWorldTree(focus: renderRect)
 		needsRender = true
 	}
 	
@@ -244,6 +257,28 @@ extension MapViewController : UIScrollViewDelegate {
 														 to: self.mapFrame,
 														 space: self.mapSpace)
 			return self.view.convert(mp, from: self.dummyView)
+		}
+	}
+}
+
+// MARK: iCloud
+extension MapViewController {
+	func takeCloudProfile(notification: Notification) {
+		if let diff = mergeCloudProfile(notification: notification, world: world) {
+			let userState = AppDelegate.sharedUserState
+			let uiState = AppDelegate.sharedUIState
+			needsRender = true
+			for newContinent in diff.continentVisits {
+				processVisit(of: newContinent, user: userState, ui: uiState)
+			}
+			for newCountry in diff.countryVisits {
+				processVisit(of: newCountry, user: userState, ui: uiState)
+			}
+			for _ in diff.provinceVisits {
+				// No-op
+			}
+			
+			uiState.cullWorldTree(focus: renderRect)
 		}
 	}
 }

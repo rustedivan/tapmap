@@ -1,12 +1,21 @@
 ROAD TO FINAL
 
+# Persistence
+## Store userstate to Application Support
+### Save regularily
+## Knock out geoworld from userstate on startup
+### Animated on startup
+## Store userstate to iCloud
+### CKContainer
+### Don't animate updates from iCloud
+
 # Hash key simplification
 - add chunkname to the streamed chunks
 - use lodHashKey as key in the chunktable
 
 # Optimisation
 - building chunkname/LOD hashkeys is the most expensive part of the app now
---build render primitive booke with frame-count access markers, use to nuke when under memory pressure
+--build render primitive bookie with frame-count access markers, use to nuke when under memory pressure
 - vertices down to Float16
 
 # Ocean rendering
@@ -38,11 +47,6 @@ ROAD TO FINAL
 - runtime setting: number of outlines to draw for each continent (Africa=2, Asia=5 and so on)
 - runtime setting: zoom limits
 - stylesheets for regions and colors
-
-# Persistence
-## Store userstate to user defaults
-## Store userstate to iCloud
-## Knock out geoworld from userstate on startup
 
 # Rendering improvements
 ## Outline feathering

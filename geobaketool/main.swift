@@ -31,6 +31,8 @@ do {
 } catch GeoDownloadPipelineError.unpackFailed {
 	print("Could not unzip the downloaded geometry file archive.")
 } catch GeoReshapePipelineError.noNodePath {
+	print("No node path set in pipeline.config. Please set absolute path to node in \"reshape.node\".")
+} catch GeoReshapePipelineError.noMapshaperPath {
 	print("No mapshaper path set in pipeline.config. Please set user-relative path to mapshaper in \"reshape.mapshaper\".")
 } catch GeoReshapePipelineError.noMapshaperInstall {
 	print("No mapshaper install available on PATH. Please run 'npm install -g mapshaper'")
