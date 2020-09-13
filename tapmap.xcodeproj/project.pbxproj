@@ -178,7 +178,7 @@
 		14C6658D22B97E130054D7F2 /* geobaketoolTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = geobaketoolTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		14C6658F22B97E130054D7F2 /* geobaketoolTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = geobaketoolTests.swift; sourceTree = "<group>"; };
 		14C6659122B97E130054D7F2 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		14C6659522B97E570054D7F2 /* dotplan */ = {isa = PBXFileReference; lastKnownFileType = text; path = dotplan; sourceTree = "<group>"; };
+		14C6659522B97E570054D7F2 /* dotplan.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = dotplan.md; sourceTree = "<group>"; };
 		14C6659622B97E660054D7F2 /* reshape.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = reshape.swift; sourceTree = "<group>"; };
 		14C6659722B97E660054D7F2 /* bake.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = bake.swift; sourceTree = "<group>"; };
 		14C6659822B97E660054D7F2 /* nullrenderer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = nullrenderer.swift; sourceTree = "<group>"; };
@@ -333,7 +333,7 @@
 		14C6655222B97D890054D7F2 = {
 			isa = PBXGroup;
 			children = (
-				14C6659522B97E570054D7F2 /* dotplan */,
+				14C6659522B97E570054D7F2 /* dotplan.md */,
 				14C6655D22B97D890054D7F2 /* tapmap */,
 				14C6657222B97D8B0054D7F2 /* tapmapTests */,
 				14C6658322B97DF70054D7F2 /* geobaketool */,

@@ -1,13 +1,37 @@
 ROAD TO FINAL
 
-# Persistence
-## Store userstate to Application Support
-### Save regularily
-## Knock out geoworld from userstate on startup
-### Animated on startup
-## Store userstate to iCloud
-### CKContainer
-### Don't animate updates from iCloud
+# Rendering brief, step 1
+  Main design issue to solve: what are the actual visual states of regions?
+	The unclear design I've been working off so far is that a region can be
+	- unvisited/closed
+	- visited
+	- open, so the regions below are shown instead
+	This assumes that there is a difference between a visited region and an open
+	region. Why would there be, though? A user would never want to mark a country
+	as visited without moving on the the provinces below. So to clarify the visual
+	hierarchy:
+	
+	- Unvisited continents
+	- Visited continent renders unvisited countries
+	- Visited countries renders unvisited provinces
+	- Visited provinces
+	
+	The difference between a visited and unvisited continent is the country borders,
+	and the difference between a visited and unvisited country is the province borders.
+	Visited countries still render borders. Borders are rendered as an overlay, where
+	countries overwrite province borders.
+	
+  - Shader setup (HSV | border color)
+  - Ocean: 30-20-90 | none
+  - Unvisited continent: 0-0-100 | none
+  - Unvisited country: 230-0-98 | black
+  - Unvisited province: C-10-20 | white
+  - Visited province: C-100-50 | C-10-20
+  - C: continent key color
+
+  Country and province shaders blend in a topography relief map with a 50% linear burn.
+  
+  Selected regions re-render with a double-wide key-color border and bloom overlay.
 
 # Hash key simplification
 - add chunkname to the streamed chunks
@@ -72,6 +96,15 @@ ROAD TO FINAL
 ## Figure out how to handle Clipperton and friends (see "skipping..." in bake log)
 
 ----- ARCHIVE -----
+
+# Persistence
+- Store userstate to Application Support
+-- Save regularily
+- Knock out geoworld from userstate on startup
+-- Animated on startup
+- Store userstate to iCloud
+-- CKContainer
+-- Don't animate updates from iCloud
 
 ## LabelView's tag mechanism is incredibly expensive
 - together with projectPoint - move off main thread?
