@@ -11,7 +11,8 @@ using namespace metal;
 
 struct FrameUniforms {
 	float4x4 modelViewProjectionMatrix;
-	float scaleWidth;
+	float scaleWidthInner;
+	float scaleWidthOuter;
 	float4 color;
 };
 
@@ -30,7 +31,8 @@ vertex VertexOut borderVertex(const device ScaleVertex* vertexArray [[ buffer(0)
 															unsigned int vid [[ vertex_id ]]) {
 	ScaleVertex v = vertexArray[vid];
 	VertexOut outVertex = VertexOut();
-	float2 rib = v.normal * frame->scaleWidth;
+	float usedWidth = (frame->scaleWidthOuter * (vid % 2)) + (frame->scaleWidthInner * ((vid + 1) % 2));
+	float2 rib = v.normal * usedWidth;
 	outVertex.position = frame->modelViewProjectionMatrix * float4(v.position + rib, 0.0, 1.0);
 	outVertex.color = frame->color;
 	return outVertex;
