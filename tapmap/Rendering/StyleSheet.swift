@@ -8,13 +8,15 @@
 
 import Foundation
 
+import fixa
+
 class Stylesheet {
 	static let shared = Stylesheet()
 	
-	var continentBorderWidthInner: Float = 0.2
-	var continentBorderWidthOuter: Float = 1.0
-	var countryBorderWidthInner: Float = 0.3
-	var countryBorderWidthOuter: Float = 0.1
+	var continentBorderWidthInner = FixableFloat(AppFixables.continentBorderInner)
+	var continentBorderWidthOuter = FixableFloat(AppFixables.continentBorderOuter)
+	var countryBorderWidthInner = FixableFloat(AppFixables.countryBorderInner)
+	var countryBorderWidthOuter = FixableFloat(AppFixables.countryBorderOuter)
 	var provinceBorderWidthInner: Float = 0.3
 	var provinceBorderWidthOuter: Float = 0.1
 }

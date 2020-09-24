@@ -3,7 +3,7 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 50;
+	objectVersion = 52;
 	objects = {
 
 /* Begin PBXBuildFile section */
@@ -25,6 +25,7 @@
 		14532D9E23B5197600943ADC /* OutlineGeometry.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14985FF522F0F35700F68A1F /* OutlineGeometry.swift */; };
 		14532DA023B621A800943ADC /* QuadTree.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14532D9923B515BE00943ADC /* QuadTree.swift */; };
 		14553286250E3BE1002729F1 /* StyleSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14553285250E3BE1002729F1 /* StyleSheet.swift */; };
+		14553289250E9350002729F1 /* fixa in Frameworks */ = {isa = PBXBuildFile; productRef = 14553288250E9350002729F1 /* fixa */; };
 		145668FF23E0EA3C001EF91E /* Geometry.swift in Sources */ = {isa = PBXBuildFile; fileRef = 148937DF22B97FDF009278A0 /* Geometry.swift */; };
 		1456690023E0EA3D001EF91E /* Geometry.swift in Sources */ = {isa = PBXBuildFile; fileRef = 148937DF22B97FDF009278A0 /* Geometry.swift */; };
 		1468830D23B4BC4100105E04 /* DebugRenderer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1468830C23B4BC4100105E04 /* DebugRenderer.swift */; };
@@ -219,6 +220,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				14553289250E9350002729F1 /* fixa in Frameworks */,
 				42305820DDFD7F37DDEE8F12 /* Pods_tapmap.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -475,6 +477,9 @@
 			dependencies = (
 			);
 			name = tapmap;
+			packageProductDependencies = (
+				14553288250E9350002729F1 /* fixa */,
+			);
 			productName = tapmap;
 			productReference = 14C6655B22B97D890054D7F2 /* tapmap.app */;
 			productType = "com.apple.product-type.application";
@@ -567,6 +572,9 @@
 				Base,
 			);
 			mainGroup = 14C6655222B97D890054D7F2;
+			packageReferences = (
+				14553287250E9350002729F1 /* XCRemoteSwiftPackageReference "fixa" */,
+			);
 			productRefGroup = 14C6655C22B97D890054D7F2 /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
@@ -896,7 +904,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 12.2;
+				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
 				ONLY_ACTIVE_ARCH = YES;
@@ -951,7 +959,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 12.2;
+				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
 				SDKROOT = iphoneos;
@@ -971,7 +979,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = Y4JDRD37Q9;
 				INFOPLIST_FILE = tapmap/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 11.4;
+				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -994,7 +1002,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = Y4JDRD37Q9;
 				INFOPLIST_FILE = tapmap/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 11.4;
+				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -1168,6 +1176,25 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		14553287250E9350002729F1 /* XCRemoteSwiftPackageReference "fixa" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/rustedivan/fixa.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 0.1.1;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		14553288250E9350002729F1 /* fixa */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 14553287250E9350002729F1 /* XCRemoteSwiftPackageReference "fixa" */;
+			productName = fixa;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = 14C6655322B97D890054D7F2 /* Project object */;
 }

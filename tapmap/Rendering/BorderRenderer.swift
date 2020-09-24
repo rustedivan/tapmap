@@ -159,8 +159,8 @@ class BorderRenderer {
 		
 		frameSelectSemaphore.wait()
 			var frameUniforms = FrameUniforms(mvpMatrix: projection,
-																				widthInner: Stylesheet.shared.continentBorderWidthInner * borderScale,
-																				widthOuter: Stylesheet.shared.continentBorderWidthOuter * borderScale,
+																				widthInner: Stylesheet.shared.continentBorderWidthInner.value * borderScale,
+																				widthOuter: Stylesheet.shared.continentBorderWidthOuter.value * borderScale,
 																				color: Color(r: 1.0, g: 0.5, b: 0.7, a: 1.0).vector)
 			let renderList = continentRenderLists[bufferIndex]
 		frameSelectSemaphore.signal()
@@ -179,8 +179,8 @@ class BorderRenderer {
 		
 		frameSelectSemaphore.wait()
 			var uniforms = FrameUniforms(mvpMatrix: projection,
-																	 widthInner: Stylesheet.shared.countryBorderWidthInner * borderScale,
-																	 widthOuter: Stylesheet.shared.countryBorderWidthOuter * borderScale,
+																	 widthInner: Stylesheet.shared.countryBorderWidthInner.value * borderScale,
+																	 widthOuter: Stylesheet.shared.countryBorderWidthOuter.value * borderScale,
 																	 color: Color(r: 1.0, g: 1.0, b: 1.0, a: 1.0).vector)
 			let renderList = countryRenderLists[bufferIndex]
 		frameSelectSemaphore.signal()

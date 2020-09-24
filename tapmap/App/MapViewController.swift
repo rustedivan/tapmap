@@ -8,6 +8,8 @@
 
 import MetalKit
 
+import fixa
+
 class MapViewController: UIViewController, MTKViewDelegate {
 	@IBOutlet weak var metalView: MTKView!
 	@IBOutlet var scrollView: UIScrollView!
@@ -62,6 +64,10 @@ class MapViewController: UIViewController, MTKViewDelegate {
 																					 object: NSUbiquitousKeyValueStore.default,
 																					 queue: nil,
 																					 using: takeCloudProfile)
+		
+		NotificationCenter.default.addObserver(forName: FixaStream.DidUpdateValues, object: nil, queue: nil) { _ in
+			self.needsRender = true
+		}
 	}
 	
 	override func viewDidLoad() {
