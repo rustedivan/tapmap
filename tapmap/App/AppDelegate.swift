@@ -11,20 +11,27 @@ import UIKit
 import fixa
 
 struct AppFixables {
-	static let continentBorderInner = FixableSetup("Continent inside", config: .float(value: 0.1, min: 0.0, max: 2.0))
-	static let continentBorderOuter = FixableSetup("Continent outside", config: .float(value: 0.1, min: 0.0, max: 2.0))
-	static let countryBorderInner = FixableSetup("Country inside", config: .float(value: 0.1, min: 0.0, max: 2.0))
-	static let countryBorderOuter = FixableSetup("Country outside", config: .float(value: 0.1, min: 0.0, max: 2.0))
+	static let continentBorderInner = FixableId()
+	static let continentBorderOuter = FixableId()
+	static let countryBorderInner = FixableId()
+	static let countryBorderOuter = FixableId()
 }
+
+//FixableSetup("Continent inside", config: .float(value: 0.1, min: 0.0, max: 2.0))
+//FixableSetup("Continent outside", config: .float(value: 0.1, min: 0.0, max: 2.0))
+//FixableSetup("Country inside", config: .float(value: 0.1, min: 0.0, max: 2.0))
+//FixableSetup("Country outside", config: .float(value: 0.1, min: 0.0, max: 2.0))
+
 
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate {
 	var fixaStream = FixaStream(fixableSetups: [
-		FixableSetup("Borders", config: .divider()),
-		AppFixables.continentBorderInner,
-		AppFixables.continentBorderOuter,
-		AppFixables.countryBorderInner,
-		AppFixables.countryBorderOuter
+		FixableId() :											 .divider(display: FixableDisplay("Continents")),
+		AppFixables.continentBorderInner : .float(value: 0.1, min: 0.0, max: 2.0, display: FixableDisplay("Border inside")),
+		AppFixables.continentBorderOuter : .float(value: 0.1, min: 0.0, max: 2.0, display: FixableDisplay("Border outside")),
+		FixableId() : 										 .divider(display: FixableDisplay("Countries")),
+		AppFixables.countryBorderInner : 	 .float(value: 0.1, min: 0.0, max: 2.0, display: FixableDisplay("Border inside")),
+		AppFixables.countryBorderOuter : 	 .float(value: 0.1, min: 0.0, max: 2.0, display: FixableDisplay("Border inside"))
 	])
 	
 	var window: UIWindow?
