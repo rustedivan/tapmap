@@ -171,7 +171,7 @@ struct GeoWorld : GeoNode, Codable {
 	let name: String
 	var aabb : Aabb { return Aabb(loX: -180.0, loY: -85.0, hiX: 180.0, hiY: 85.0) }
 	let children: Set<GeoContinent>
-	let geographyId = RegionId(code: "UU00", "planet", "Earth")	// Use "Universe 0" as FIPS code
+	var geographyId = RegionId(code: "UU00", "planet", "Earth")	// Use "Universe 0" as FIPS code
 	
 	func hash(into hasher: inout Hasher) {
 		hasher.combine(geographyId.key)

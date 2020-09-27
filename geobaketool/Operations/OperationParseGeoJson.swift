@@ -160,7 +160,12 @@ class OperationParseGeoJson : Operation {
 
 	fileprivate func makeStar(around p: Vertex, radius: Float, points: Int) -> VertexRing {
 		let vertices = 0..<points * 2
-		let angles = vertices.map { (Double.pi / 2.0) + Double($0) * (2.0 * Double.pi / Double(points)) }
+		let angles = vertices.map { p -> Double in
+			let a0 = Double.pi / 2.0
+			let n = Double(points)
+			return Double(a0 + Double(p) * 2.0 * Double.pi / n)
+		}
+
 		let circle = angles.map { Vertex(cos($0), sin($0)) }
 		let star = circle.enumerated().map { (offset: Int, element: Vertex) -> Vertex in
 			let radius = (offset % 2 == 0) ? 1.0 : 0.6

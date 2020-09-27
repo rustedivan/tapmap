@@ -57,7 +57,7 @@ class UIState {
 // MARK: Debug rendering
 func debugRenderTree(_ tree: QuadTree<Int>, at focus: Aabb) {
 	debugQuadNode(tree.root, at: focus)
-	_ = DebugRenderer.shared.addTransientQuad(for: focus, alpha: 1.0, name: "Focus", color: .red)
+	DebugRenderer.shared.addTransientQuad(for: focus, alpha: 1.0, name: "Focus", color: .red)
 }
 
 func debugQuadNode(_ node: QuadNode<Int>, at focus: Aabb) {
@@ -66,7 +66,7 @@ func debugQuadNode(_ node: QuadNode<Int>, at focus: Aabb) {
 												focus.maxX <= bounds.minX ||
 												focus.minY >= bounds.maxY ||
 												focus.maxY <= bounds.minY)
-		_ = DebugRenderer.shared.addTransientQuad(for: bounds, alpha: highlight ? 1.0 : 0.2, name: "Node", color: highlight ? .white : values.hashColor)
+		DebugRenderer.shared.addTransientQuad(for: bounds, alpha: highlight ? 1.0 : 0.2, name: "Node", color: highlight ? .white : values.hashColor)
 		debugQuadNode(tl, at: focus)
 		debugQuadNode(tr, at: focus)
 		debugQuadNode(bl, at: focus)

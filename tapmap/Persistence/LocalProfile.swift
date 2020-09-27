@@ -21,7 +21,7 @@ func saveVisitsToDevice(_ hashes: [RegionHash : Bool], as key: String) {
 	dontOffloadUserstate.isExcludedFromBackup = true
 	try? url.setResourceValues(dontOffloadUserstate)
 	
-	let encoder = NSKeyedArchiver()
+	let encoder = NSKeyedArchiver(requiringSecureCoding: false)
 	encoder.encode(10, forKey: "version")
 	encoder.encode(Date(), forKey: "archive-timestamp")
 	encoder.encode(hashes, forKey: key)
@@ -36,9 +36,9 @@ func saveVisitsToDevice(_ hashes: [RegionHash : Bool], as key: String) {
 
 func loadVisitsFromDevice(key: String) -> [RegionHash : Bool]? {
 	if let profile = NSData(contentsOf: persistentProfileUrl) as Data? {
-		let persistedState = NSKeyedUnarchiver(forReadingWith: profile)
-		return persistedState.decodeObject(forKey: key) as? [RegionHash : Bool]
-	} else {
-		return nil
+		if let persistedState = try? NSKeyedUnarchiver(forReadingFrom: profile) {
+			return persistedState.decodeObject(forKey: key) as? [RegionHash : Bool]
+		}
 	}
+	return nil
 }
