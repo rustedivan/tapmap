@@ -26,18 +26,18 @@ struct AppFixables {
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate {
 	var fixaStream = FixaStream(fixableSetups: [
-		FixableId() :											 	.divider(display: FixableDisplay("Continents")),
-		AppFixables.continentBorderInner : 	.float(value: 0.1, min: 0.0, max: 2.0, display: FixableDisplay("Border inside")),
-		AppFixables.continentBorderOuter : 	.float(value: 0.1, min: 0.0, max: 2.0, display: FixableDisplay("Border outside")),
-		AppFixables.oceanColor:						 	.color(value: UIColor.blue.cgColor, display: FixableDisplay("Ocean")),
-		AppFixables.continentColor:				 	.color(value: UIColor.green.cgColor, display: FixableDisplay("Continent")),
-		FixableId() : 										 	.divider(display: FixableDisplay("Countries")),
-		AppFixables.countryBorderInner : 	 	.float(value: 0.1, min: 0.0, max: 2.0, display: FixableDisplay("Border inside")),
-		AppFixables.countryBorderOuter : 	 	.float(value: 0.1, min: 0.0, max: 2.0, display: FixableDisplay("Border inside")),
-		AppFixables.unvisitedCountryColor: 			 .color(value: UIColor.red.cgColor, display: FixableDisplay("Unvisited")),
-		AppFixables.unvisitedCountryBorderColor: .color(value: UIColor.yellow.cgColor, display: FixableDisplay("Unvisited border")),
-		AppFixables.visitedCountryColor:				 .color(value: UIColor.cyan.cgColor, display: FixableDisplay("Visited")),
-		AppFixables.visitedCountryBorderColor: 	 .color(value: UIColor.magenta.cgColor, display: FixableDisplay("Visited border")),
+		(FixableId(),											 				.divider(display: FixableDisplay("Continents"))),
+		(AppFixables.continentBorderInner, 				.float(value: 0.1, min: 0.0, max: 2.0, display: FixableDisplay("Border inside"))),
+		(AppFixables.continentBorderOuter, 				.float(value: 0.1, min: 0.0, max: 2.0, display: FixableDisplay("Border outside"))),
+		(AppFixables.oceanColor,						 			.color(value: UIColor.blue.cgColor, display: FixableDisplay("Ocean"))),
+		(AppFixables.continentColor,				 			.color(value: UIColor.green.cgColor, display: FixableDisplay("Continent"))),
+		(FixableId(), 										 				.divider(display: FixableDisplay("Countries"))),
+		(AppFixables.countryBorderInner, 	 				.float(value: 0.1, min: 0.0, max: 2.0, display: FixableDisplay("Border inside"))),
+		(AppFixables.countryBorderOuter, 	 				.float(value: 0.1, min: 0.0, max: 2.0, display: FixableDisplay("Border inside"))),
+		(AppFixables.unvisitedCountryColor, 			.color(value: UIColor.red.cgColor, display: FixableDisplay("Unvisited"))),
+		(AppFixables.unvisitedCountryBorderColor,	.color(value: UIColor.yellow.cgColor, display: FixableDisplay("Unvisited border"))),
+		(AppFixables.visitedCountryColor,					.color(value: UIColor.cyan.cgColor, display: FixableDisplay("Visited"))),
+		(AppFixables.visitedCountryBorderColor, 	.color(value: UIColor.magenta.cgColor, display: FixableDisplay("Visited border")))
 	])
 	
 	var window: UIWindow?
