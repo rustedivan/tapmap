@@ -65,11 +65,14 @@ class MetalRenderer {
 		let available = AppDelegate.sharedUserState.availableSet
 		let visible = AppDelegate.sharedUIState.visibleRegionHashes
 		let renderSet = available.intersection(visible)
+		let renderContinentSet = renderSet.filter { worldState.visibleContinents.keys.contains($0) }
+		let renderCountrySet = renderSet.filter { worldState.visibleCountries.keys.contains($0) }
+		let renderProvinceSet = renderSet.filter { worldState.visibleProvinces.keys.contains($0) }
 		let borderedContinents = worldState.allContinents.filter { visible.contains($0.key) }	// All visible continents (even if visited)
 
 		let bufferIndex = frameId % maxInflightFrames
 		effectRenderer.prepareFrame(bufferIndex: bufferIndex)
-		regionRenderer.prepareFrame(visibleSet: renderSet, bufferIndex: bufferIndex)
+		regionRenderer.prepareFrame(visibleContinentSet: renderContinentSet, visibleCountrySet: renderCountrySet, visibleProvinceSet: renderProvinceSet, bufferIndex: bufferIndex)
 		borderRenderer.prepareFrame(visibleContinents: borderedContinents, visibleCountries: worldState.visibleCountries, zoom: zoomLevel, bufferIndex: bufferIndex)
 		poiRenderer.prepareFrame(visibleSet: renderSet, zoom: zoomLevel, bufferIndex: bufferIndex)
 		selectionRenderer.prepareFrame(zoomLevel: zoomLevel)
