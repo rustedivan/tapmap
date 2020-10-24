@@ -30,7 +30,7 @@ ROAD TO FINAL
   - Shader setup (HSV | border color)
   - Ocean: 30-20-90 | none
   - Unvisited continent: 0-0-100 | none
-  - Unvisited country: 230-0-98 | black
+  - Unvisited country: C-70-17 | white*
   - Unvisited province: C-10-20 | white
   - Visited province: C-100-50 | C-10-20
   - C: continent key color
