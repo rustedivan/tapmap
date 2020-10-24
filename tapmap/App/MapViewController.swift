@@ -66,6 +66,7 @@ class MapViewController: UIViewController, MTKViewDelegate {
 																					 using: takeCloudProfile)
 		
 		NotificationCenter.default.addObserver(forName: FixaStream.DidUpdateValues, object: nil, queue: nil) { _ in
+			self.labelView.isHidden = !Stylesheet.shared.renderLabels.value;
 			self.needsRender = true
 		}
 	}

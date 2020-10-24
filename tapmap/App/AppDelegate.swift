@@ -11,6 +11,7 @@ import UIKit
 import fixa
 
 struct AppFixables {
+	static let renderLabels = FixableId("visible-labels")
 	static let continentBorderInner = FixableId("continent-border-inner")
 	static let continentBorderOuter = FixableId("continent-border-outer")
 	static let countryBorderInner = FixableId("country-border-inner")
@@ -25,6 +26,7 @@ struct AppFixables {
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate {
 	var fixaStream = FixaStream(fixableSetups: [
+		(AppFixables.renderLabels,		 						.bool(value: true, display: FixableDisplay("Show labels"))),
 		(FixableId("continent-header"),	 				.divider(display: FixableDisplay("Continents"))),
 		(AppFixables.continentBorderInner, 				.float(value: 0.1, min: 0.0, max: 2.0, display: FixableDisplay("Border inside"))),
 		(AppFixables.continentBorderOuter, 				.float(value: 0.1, min: 0.0, max: 2.0, display: FixableDisplay("Border outside"))),

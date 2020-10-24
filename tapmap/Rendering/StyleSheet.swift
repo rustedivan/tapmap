@@ -14,6 +14,9 @@ import simd
 class Stylesheet {
 	static let shared = Stylesheet()
 	
+	// Settings
+	var renderLabels = FixableBool(AppFixables.renderLabels, initial: true)
+	
 	// Border widths
 	var continentBorderWidthInner = FixableFloat(AppFixables.continentBorderInner, initial: 0.1)
 	var continentBorderWidthOuter = FixableFloat(AppFixables.continentBorderOuter, initial: 0.1)
