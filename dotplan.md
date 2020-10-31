@@ -47,10 +47,15 @@ ROAD TO FINAL
   - Key-color selection outline + bloom (static selection color and HSL-brightening of the base color)
   - Chromatic aberration (screen-space, independent of app logic, but animatable)
   
-  But OK then, in this case all I need is to pre-bake the colors into the BRPs, and find a clean way to update the color of provinces when they are visited. Fixa tweakability will be a bit worse since I'll need to find a way to re-tint all regions at runtime... Would it be possible to just make an enum list of all BRP uses and tag them? Might be useful in other cases as well and not that big a violation of principles. Semantic tagging of primitives sounds nice! Like, `continent, country, province, border, selection, marker`? I'm sure there are other places that could benefit from having that lookup burned into the primitives.
+  √ But OK then, in this case all I need is to pre-bake the colors into the BRPs, and find a clean way to update the color of provinces when they are visited. Fixa tweakability will be a bit worse since I'll need to find a way to re-tint all regions at runtime... Would it be possible to just make an enum list of all BRP uses and tag them? Might be useful in other cases as well and not that big a violation of principles. Semantic tagging of primitives sounds nice! Like, `continent, country, province, border, selection, marker`? I'm sure there are other places that could benefit from having that lookup burned into the primitives. Another solution would be to split the region renderer itself into three passes, one per region type. Only change needed would be to teach prepareFrame to append to its instance uniform buffer and render list, and then clear it at frame change...
   
-  Another solution would be to split the region renderer itself into three passes, one per region type. Only change needed would be to teach prepareFrame to append to its instance uniform buffer and render list, and then clear it at frame change...
+  The province colors should represent the their continents. I think this could be a cool way to achieve a faceted, sharp, consistent look that still sells the proximity between areas, and would look really nice for long overland trips.
   
+- Prerender an image with the continents' key colors.
+- Blur it heavily to get soft gradients where continents are close, and along coastlines
+- For each province (and optionally country, if needed), sample the blurred map at the pole of inaccessibility
+  
+  I did a quick test by just taking a continent-color map, blurring it in Pixelmator and taking a Voronoi filter to simulate countries. Looked good after one minute of work. This is the thing.
 
 # Hash key simplification
 - add chunkname to the streamed chunks
