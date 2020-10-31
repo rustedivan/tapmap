@@ -57,7 +57,23 @@ ROAD TO FINAL
   
   I did a quick test by just taking a continent-color map, blurring it in Pixelmator and taking a Voronoi filter to simulate countries. Looked good after one minute of work. This is the thing.
   
-  Since the blur map is pre-rendered art, I can overlay a NSWE gradient cross to get a feeling for the equator, directions, parts of the world... Can get very creative! 
+  Since the blur map is pre-rendered art, I can overlay a NSWE gradient cross to get a feeling for the equator, directions, parts of the world... Can get very creative!
+  
+  ## Province colors from pre-baked blur map
+  Again, stuck on architecture decision: where do I store the region colors? Three places, with drawbacks:
+  
+  1. In the baked tessellation (colors don't really belong in a tessellation, and should static colors be adjusted at runtime? [e.g. selected darkening, pulsing...])
+  2. In the render primitive (makes semantic sense, but then the color lookup must be made from GeometryStreamer on primitive creation)
+  3. In the renderer (flexible and nice, but then the colors must be passed to prepareFrame and do per-frame lookup... which doesn't serve any purpose)
+  
+  (3) is out immediately - the region _authored_ colors are not changing at runtime outside known visual effects, so this is over-generalization
+  (2) sure, ideally the render primitives should be assembled per-frame, referencing persistent GPU buffers, but that's an additional level of indirection that only serves code style)
+  (1) is also just a naming quirk - it wouldn't have been a complaint if GeoTessellation had been GeoMesh, and as with (3), this is about the authored content colors, not necessary the frame color
+  
+  So, (1) it is - looking up the blur map color at bake time and storing it into the GeoTessellation.
+  
+  
+
 
 # Hash key simplification
 - add chunkname to the streamed chunks
