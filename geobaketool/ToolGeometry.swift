@@ -173,7 +173,9 @@ func tessellate(_ feature: ToolGeoFeature) -> GeoTessellation? {
 	
 	let visualCenter = poleOfInaccessibility(feature.polygons)
 
-	return GeoTessellation(vertices: regionVertices, indices: indices, contours: feature.polygons.map { $0.exteriorRing }, aabb: aabb, visualCenter: visualCenter)
+	return GeoTessellation(vertices: regionVertices, indices: indices,
+												 contours: feature.polygons.map { $0.exteriorRing }, aabb: aabb, visualCenter: visualCenter,
+												 color: GeoColor(r: 1.0, g: 0.0, b: 1.0))
 }
 
 // MARK: MapBox visual center algorithm

@@ -25,7 +25,6 @@
 		14532D9E23B5197600943ADC /* OutlineGeometry.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14985FF522F0F35700F68A1F /* OutlineGeometry.swift */; };
 		14532DA023B621A800943ADC /* QuadTree.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14532D9923B515BE00943ADC /* QuadTree.swift */; };
 		14553286250E3BE1002729F1 /* StyleSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14553285250E3BE1002729F1 /* StyleSheet.swift */; };
-		14553289250E9350002729F1 /* fixa in Frameworks */ = {isa = PBXBuildFile; productRef = 14553288250E9350002729F1 /* fixa */; };
 		145668FF23E0EA3C001EF91E /* Geometry.swift in Sources */ = {isa = PBXBuildFile; fileRef = 148937DF22B97FDF009278A0 /* Geometry.swift */; };
 		1456690023E0EA3D001EF91E /* Geometry.swift in Sources */ = {isa = PBXBuildFile; fileRef = 148937DF22B97FDF009278A0 /* Geometry.swift */; };
 		1468830D23B4BC4100105E04 /* DebugRenderer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1468830C23B4BC4100105E04 /* DebugRenderer.swift */; };
@@ -34,6 +33,8 @@
 		147B819523DA043500942C9B /* WorldTree.swift in Sources */ = {isa = PBXBuildFile; fileRef = 147B819423DA043500942C9B /* WorldTree.swift */; };
 		147B819623DA043500942C9B /* WorldTree.swift in Sources */ = {isa = PBXBuildFile; fileRef = 147B819423DA043500942C9B /* WorldTree.swift */; };
 		147B819723DA043500942C9B /* WorldTree.swift in Sources */ = {isa = PBXBuildFile; fileRef = 147B819423DA043500942C9B /* WorldTree.swift */; };
+		1484C1DC254DB3F70043F44E /* fixa in Frameworks */ = {isa = PBXBuildFile; productRef = 14553288250E9350002729F1 /* fixa */; };
+		1484C1E2254DE21A0043F44E /* OperationTintRegions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1484C1E1254DE21A0043F44E /* OperationTintRegions.swift */; };
 		14869B3E24BA1183008E580F /* LocalProfile.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14869B3D24BA1183008E580F /* LocalProfile.swift */; };
 		14869B4024BA1191008E580F /* CloudProfile.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14869B3F24BA1191008E580F /* CloudProfile.swift */; };
 		148937F522B97FDF009278A0 /* Geometry.swift in Sources */ = {isa = PBXBuildFile; fileRef = 148937DF22B97FDF009278A0 /* Geometry.swift */; };
@@ -145,6 +146,7 @@
 		146EA269244AF14C009196BC /* RuntimeWorld.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RuntimeWorld.swift; sourceTree = "<group>"; };
 		147B819423DA043500942C9B /* WorldTree.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorldTree.swift; sourceTree = "<group>"; };
 		1484A6B024B8E5DF0049C0CF /* tapmap.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = tapmap.entitlements; sourceTree = "<group>"; };
+		1484C1E1254DE21A0043F44E /* OperationTintRegions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OperationTintRegions.swift; sourceTree = "<group>"; };
 		14869B3D24BA1183008E580F /* LocalProfile.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocalProfile.swift; sourceTree = "<group>"; };
 		14869B3F24BA1191008E580F /* CloudProfile.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CloudProfile.swift; sourceTree = "<group>"; };
 		148937DF22B97FDF009278A0 /* Geometry.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Geometry.swift; sourceTree = "<group>"; };
@@ -220,6 +222,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				1484C1DC254DB3F70043F44E /* fixa in Frameworks */,
 				D5186DD6430FEEF37E48CE23 /* Pods_tapmap.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -425,6 +428,7 @@
 				14C665A022B97E660054D7F2 /* OperationBakeGeometry.swift */,
 				14C665A222B97E670054D7F2 /* OperationDistributePlaces.swift */,
 				14BAA332240EF95000DC64B9 /* OperationFitLabels.swift */,
+				1484C1E1254DE21A0043F44E /* OperationTintRegions.swift */,
 				14C6659E22B97E660054D7F2 /* OperationFixupHierarchy.swift */,
 				14C665A422B97E670054D7F2 /* OperationParseGeoJson.swift */,
 				14C665A322B97E670054D7F2 /* OperationParseOSMJson.swift */,
@@ -784,6 +788,7 @@
 				14C665BF22B97E670054D7F2 /* OperationParseOSMJson.swift in Sources */,
 				14C665B522B97E670054D7F2 /* OperationFixupHierarchy.swift in Sources */,
 				142A21F023DC61A3000DA4FA /* ChunkTable.swift in Sources */,
+				1484C1E2254DE21A0043F44E /* OperationTintRegions.swift in Sources */,
 				14C665C922B97ED40054D7F2 /* JobHelpers.swift in Sources */,
 				1489380B22B98217009278A0 /* Serialization.swift in Sources */,
 				14BAA333240EF95000DC64B9 /* OperationFitLabels.swift in Sources */,

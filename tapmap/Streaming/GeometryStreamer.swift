@@ -152,7 +152,7 @@ class GeometryStreamer {
 																					indices: [tessellation.indices],
 																					drawMode: .triangle,
 																					device: self.metalDevice!,
-																					color: regionId.hashed.hashColor.tuple(),	// $ Embed color in tessellation
+																					color: Color(r: tessellation.color.r, g: tessellation.color.g, b: tessellation.color.b, a: 1.0),
 																					ownerHash: regionHash,
 																					debugName: "Unnamed")	// $ Embed name in tessellation
 				
