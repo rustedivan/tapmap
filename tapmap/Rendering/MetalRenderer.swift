@@ -65,11 +65,14 @@ class MetalRenderer {
 		let available = AppDelegate.sharedUserState.availableSet
 		let visible = AppDelegate.sharedUIState.visibleRegionHashes
 		let renderSet = available.intersection(visible)
+		let renderContinentSet = renderSet.filter { worldState.visibleContinents.keys.contains($0) }
+		let renderCountrySet = renderSet.filter { worldState.visibleCountries.keys.contains($0) }
+		let renderProvinceSet = renderSet.filter { worldState.visibleProvinces.keys.contains($0) }
 		let borderedContinents = worldState.allContinents.filter { visible.contains($0.key) }	// All visible continents (even if visited)
 
 		let bufferIndex = frameId % maxInflightFrames
 		effectRenderer.prepareFrame(bufferIndex: bufferIndex)
-		regionRenderer.prepareFrame(visibleSet: renderSet, bufferIndex: bufferIndex)
+		regionRenderer.prepareFrame(visibleContinentSet: renderContinentSet, visibleCountrySet: renderCountrySet, visibleProvinceSet: renderProvinceSet, bufferIndex: bufferIndex)
 		borderRenderer.prepareFrame(visibleContinents: borderedContinents, visibleCountries: worldState.visibleCountries, zoom: zoomLevel, bufferIndex: bufferIndex)
 		poiRenderer.prepareFrame(visibleSet: renderSet, zoom: zoomLevel, bufferIndex: bufferIndex)
 		selectionRenderer.prepareFrame(zoomLevel: zoomLevel)
@@ -79,7 +82,11 @@ class MetalRenderer {
 		let clearPassDescriptor = MTLRenderPassDescriptor()
 		clearPassDescriptor.colorAttachments[0].texture = drawable.texture
 		clearPassDescriptor.colorAttachments[0].loadAction = .clear
-		clearPassDescriptor.colorAttachments[0].clearColor = MTLClearColor(red: 0.0, green: 0.5, blue: 0.7, alpha: 1.0)
+		let clearColor = Stylesheet.shared.oceanColor.components
+		clearPassDescriptor.colorAttachments[0].clearColor = MTLClearColor(red: Double(clearColor.r),
+																																			 green: Double(clearColor.g),
+																																			 blue: Double(clearColor.b),
+																																			 alpha: Double(clearColor.a))
 		let addPassDescriptor = clearPassDescriptor.copy() as! MTLRenderPassDescriptor
 		addPassDescriptor.colorAttachments[0].loadAction = .load
 				

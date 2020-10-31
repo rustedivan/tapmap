@@ -8,6 +8,8 @@
 
 import MetalKit
 
+import fixa
+
 class MapViewController: UIViewController, MTKViewDelegate {
 	@IBOutlet weak var metalView: MTKView!
 	@IBOutlet var scrollView: UIScrollView!
@@ -62,6 +64,11 @@ class MapViewController: UIViewController, MTKViewDelegate {
 																					 object: NSUbiquitousKeyValueStore.default,
 																					 queue: nil,
 																					 using: takeCloudProfile)
+		
+		NotificationCenter.default.addObserver(forName: FixaStream.DidUpdateValues, object: nil, queue: nil) { _ in
+			self.labelView.isHidden = !Stylesheet.shared.renderLabels.value;
+			self.needsRender = true
+		}
 	}
 	
 	override func viewDidLoad() {
@@ -117,7 +124,7 @@ class MapViewController: UIViewController, MTKViewDelegate {
 			// Filter out sets of closed, visible regions that contain the tap
 			let candidateContinents = Set(world.visibleContinents.filter { boxContains($0.value.aabb, tapPoint) }.values)
 			let candidateCountries = Set(world.visibleCountries.filter { boxContains($0.value.aabb, tapPoint) }.values)
-			let candidateRegions = Set(world.visibleProvinces.filter { boxContains($0.value.aabb, tapPoint) }.values)
+			let candidateProvinces = Set(world.visibleProvinces.filter { boxContains($0.value.aabb, tapPoint) }.values)
 
 			if let hitHash = pickFromTessellations(p: tapPoint, candidates: candidateContinents) {
 				let hitContinent = world.availableContinents[hitHash]!
@@ -135,9 +142,9 @@ class MapViewController: UIViewController, MTKViewDelegate {
 					renderers.effectRenderer.addOpeningEffect(for: hitCountry.geographyId.hashed)
 					processVisit(of: hitCountry, user: userState, ui: uiState)
 				}
-			} else if let hitHash = pickFromTessellations(p: tapPoint, candidates: candidateRegions) {
-				let hitRegion = world.availableProvinces[hitHash]!
-				_ = processSelection(of: hitRegion, user: userState, ui: uiState)
+			} else if let hitHash = pickFromTessellations(p: tapPoint, candidates: candidateProvinces) {
+				let hitProvince = world.availableProvinces[hitHash]!
+				_ = processSelection(of: hitProvince, user: userState, ui: uiState)
 			} else {
 				uiState.clearSelection()
 				renderers.selectionRenderer.clear()

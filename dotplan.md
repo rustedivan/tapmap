@@ -1,13 +1,63 @@
 ROAD TO FINAL
 
-# Persistence
-## Store userstate to Application Support
-### Save regularily
-## Knock out geoworld from userstate on startup
-### Animated on startup
-## Store userstate to iCloud
-### CKContainer
-### Don't animate updates from iCloud
+# Rendering brief, step 1
+  Main design issue to solve: what are the actual visual states of regions?
+	The unclear design I've been working off so far is that a region can be
+	- unvisited/closed
+	- visited
+	- open, so the regions below are shown instead
+	This assumes that there is a difference between a visited region and an open
+	region. Why would there be, though? A user would never want to mark a country
+	as visited without moving on the the provinces below. So to clarify the visual
+	hierarchy:
+	
+	- Unvisited continents
+	- Visited continent renders unvisited countries
+	- Visited countries renders unvisited provinces
+	- Visited provinces
+	
+	The difference between a visited and unvisited continent is the country borders,
+	and the difference between a visited and unvisited country is the province borders.
+	Visited countries still render borders. Borders are rendered as an overlay, where
+	countries overwrite province borders.
+	
+	So, the color stylesheet needs ten colors (three levels, seven continent colors for provinces).
+	The renderer needs to copy out these style colors in prepareFrame to populate the instance uniforms (per frame, when selected).
+	
+	Additionally, selection border width and color.
+	
+	
+  - Shader setup (HSV | border color)
+  - Ocean: 30-20-90 | none
+  - Unvisited continent: 0-0-100 | none
+  - Unvisited country: C-70-17 | white*
+  - Unvisited province: C-10-20 | white
+  - Visited province: C-100-50 | C-10-20
+  - C: continent key color
+
+  Country and province shaders blend in a topography relief map with a 50% linear burn.
+  
+  Selected regions re-render with a double-wide key-color border and bloom overlay.
+  
+ # Rendering brief, step 2
+  There are some effects I want to spice up the presentation. I'm a little stuck at how to lookup the color for a region at runtime, since the base color isn't always static. Specifically, provinces have different colors when visited and unvisited. I can definitely route around that, and ~100 O(1) dictionary lookups per frame isn't going to make a difference, but it's _wrong_. To help guide the stylesheet lookup design, let's take a look at those extra effects.
+  
+  - Color key for visited provinces (need to know visit state for region). I could re-create the render primitive when the province is visited and reuse the buffer. No wait, BaseRenderPrimitive is a reference type so I can mutate the color at runtime!
+  - Province borders need the same visited/unvisited logic, but can HSL-darken the base color)
+  - Key-color selection outline + bloom (static selection color and HSL-brightening of the base color)
+  - Chromatic aberration (screen-space, independent of app logic, but animatable)
+  
+  √ But OK then, in this case all I need is to pre-bake the colors into the BRPs, and find a clean way to update the color of provinces when they are visited. Fixa tweakability will be a bit worse since I'll need to find a way to re-tint all regions at runtime... Would it be possible to just make an enum list of all BRP uses and tag them? Might be useful in other cases as well and not that big a violation of principles. Semantic tagging of primitives sounds nice! Like, `continent, country, province, border, selection, marker`? I'm sure there are other places that could benefit from having that lookup burned into the primitives. Another solution would be to split the region renderer itself into three passes, one per region type. Only change needed would be to teach prepareFrame to append to its instance uniform buffer and render list, and then clear it at frame change...
+  
+  The province colors should represent the their continents. I think this could be a cool way to achieve a faceted, sharp, consistent look that still sells the proximity between areas, and would look really nice for long overland trips.
+  
+- Prerender an image with the continents' key colors.
+- Blur it heavily to get soft gradients where continents are close, and along coastlines
+- For each province (and optionally country, if needed), sample the blurred map at the pole of inaccessibility
+  
+  I did a quick test by just taking a continent-color map, blurring it in Pixelmator and taking a Voronoi filter to simulate countries. Looked good after one minute of work. This is the thing.
+  
+  Since the blur map is pre-rendered art, I can overlay a NSWE gradient cross to get a feeling for the equator, directions, parts of the world... Can get very creative! 
 
 # Hash key simplification
 - add chunkname to the streamed chunks
@@ -72,6 +122,15 @@ ROAD TO FINAL
 ## Figure out how to handle Clipperton and friends (see "skipping..." in bake log)
 
 ----- ARCHIVE -----
+
+# Persistence
+- Store userstate to Application Support
+-- Save regularily
+- Knock out geoworld from userstate on startup
+-- Animated on startup
+- Store userstate to iCloud
+-- CKContainer
+-- Don't animate updates from iCloud
 
 ## LabelView's tag mechanism is incredibly expensive
 - together with projectPoint - move off main thread?

@@ -3,7 +3,7 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 50;
+	objectVersion = 52;
 	objects = {
 
 /* Begin PBXBuildFile section */
@@ -24,6 +24,8 @@
 		14532D9C23B5190F00943ADC /* QuadTreeTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14532D9B23B5190F00943ADC /* QuadTreeTests.swift */; };
 		14532D9E23B5197600943ADC /* OutlineGeometry.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14985FF522F0F35700F68A1F /* OutlineGeometry.swift */; };
 		14532DA023B621A800943ADC /* QuadTree.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14532D9923B515BE00943ADC /* QuadTree.swift */; };
+		14553286250E3BE1002729F1 /* StyleSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14553285250E3BE1002729F1 /* StyleSheet.swift */; };
+		14553289250E9350002729F1 /* fixa in Frameworks */ = {isa = PBXBuildFile; productRef = 14553288250E9350002729F1 /* fixa */; };
 		145668FF23E0EA3C001EF91E /* Geometry.swift in Sources */ = {isa = PBXBuildFile; fileRef = 148937DF22B97FDF009278A0 /* Geometry.swift */; };
 		1456690023E0EA3D001EF91E /* Geometry.swift in Sources */ = {isa = PBXBuildFile; fileRef = 148937DF22B97FDF009278A0 /* Geometry.swift */; };
 		1468830D23B4BC4100105E04 /* DebugRenderer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1468830C23B4BC4100105E04 /* DebugRenderer.swift */; };
@@ -138,6 +140,7 @@
 		144B5D5722D9E092001E2A85 /* SelectionRenderer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SelectionRenderer.swift; sourceTree = "<group>"; };
 		14532D9923B515BE00943ADC /* QuadTree.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QuadTree.swift; sourceTree = "<group>"; };
 		14532D9B23B5190F00943ADC /* QuadTreeTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QuadTreeTests.swift; sourceTree = "<group>"; };
+		14553285250E3BE1002729F1 /* StyleSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StyleSheet.swift; sourceTree = "<group>"; };
 		1468830C23B4BC4100105E04 /* DebugRenderer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DebugRenderer.swift; sourceTree = "<group>"; };
 		146EA269244AF14C009196BC /* RuntimeWorld.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RuntimeWorld.swift; sourceTree = "<group>"; };
 		147B819423DA043500942C9B /* WorldTree.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorldTree.swift; sourceTree = "<group>"; };
@@ -177,7 +180,7 @@
 		14C6658D22B97E130054D7F2 /* geobaketoolTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = geobaketoolTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		14C6658F22B97E130054D7F2 /* geobaketoolTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = geobaketoolTests.swift; sourceTree = "<group>"; };
 		14C6659122B97E130054D7F2 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		14C6659522B97E570054D7F2 /* dotplan */ = {isa = PBXFileReference; lastKnownFileType = text; path = dotplan; sourceTree = "<group>"; };
+		14C6659522B97E570054D7F2 /* dotplan.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = dotplan.md; sourceTree = "<group>"; };
 		14C6659622B97E660054D7F2 /* reshape.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = reshape.swift; sourceTree = "<group>"; };
 		14C6659722B97E660054D7F2 /* bake.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = bake.swift; sourceTree = "<group>"; };
 		14C6659822B97E660054D7F2 /* nullrenderer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = nullrenderer.swift; sourceTree = "<group>"; };
@@ -299,6 +302,7 @@
 				148937E622B97FDF009278A0 /* EffectRenderer.swift */,
 				1468830C23B4BC4100105E04 /* DebugRenderer.swift */,
 				14985FEC22F0ED0C00F68A1F /* RenderPrimitives.swift */,
+				14553285250E3BE1002729F1 /* StyleSheet.swift */,
 				148937E922B97FDF009278A0 /* ColoredHash.swift */,
 				14985FE822F0EC7500F68A1F /* Shaders */,
 			);
@@ -333,7 +337,7 @@
 		14C6655222B97D890054D7F2 = {
 			isa = PBXGroup;
 			children = (
-				14C6659522B97E570054D7F2 /* dotplan */,
+				14C6659522B97E570054D7F2 /* dotplan.md */,
 				14C6655D22B97D890054D7F2 /* tapmap */,
 				14C6657222B97D8B0054D7F2 /* tapmapTests */,
 				14C6658322B97DF70054D7F2 /* geobaketool */,
@@ -472,6 +476,9 @@
 			dependencies = (
 			);
 			name = tapmap;
+			packageProductDependencies = (
+				14553288250E9350002729F1 /* fixa */,
+			);
 			productName = tapmap;
 			productReference = 14C6655B22B97D890054D7F2 /* tapmap.app */;
 			productType = "com.apple.product-type.application";
@@ -564,6 +571,9 @@
 				Base,
 			);
 			mainGroup = 14C6655222B97D890054D7F2;
+			packageReferences = (
+				14553287250E9350002729F1 /* XCRemoteSwiftPackageReference "fixa" */,
+			);
 			productRefGroup = 14C6655C22B97D890054D7F2 /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
@@ -729,6 +739,7 @@
 				1489380322B97FDF009278A0 /* PoiRenderer.swift in Sources */,
 				14B63F072461450F00A4A433 /* PoiShader.metal in Sources */,
 				146EA26A244AF14C009196BC /* RuntimeWorld.swift in Sources */,
+				14553286250E3BE1002729F1 /* StyleSheet.swift in Sources */,
 				148937FB22B97FDF009278A0 /* EffectRenderer.swift in Sources */,
 				14BD433A2444AD50007A3D67 /* BorderRenderer.swift in Sources */,
 				1489380722B97FE0009278A0 /* UserState.swift in Sources */,
@@ -893,7 +904,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 12.2;
+				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
 				ONLY_ACTIVE_ARCH = YES;
@@ -949,7 +960,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 12.2;
+				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
 				SDKROOT = iphoneos;
@@ -969,7 +980,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = Y4JDRD37Q9;
 				INFOPLIST_FILE = tapmap/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -992,7 +1003,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = Y4JDRD37Q9;
 				INFOPLIST_FILE = tapmap/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -1170,6 +1181,25 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		14553287250E9350002729F1 /* XCRemoteSwiftPackageReference "fixa" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/rustedivan/fixa.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 0.1.1;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		14553288250E9350002729F1 /* fixa */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 14553287250E9350002729F1 /* XCRemoteSwiftPackageReference "fixa" */;
+			productName = fixa;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = 14C6655322B97D890054D7F2 /* Project object */;
 }

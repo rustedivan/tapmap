@@ -11,7 +11,8 @@ import simd
 
 fileprivate struct FrameUniforms {
 	let mvpMatrix: simd_float4x4
-	let width: simd_float1
+	let widthInner: simd_float1
+	let widthOuter: simd_float1
 	var color: simd_float4
 }
 
@@ -27,7 +28,7 @@ class BorderRenderer {
 	var countryRenderLists: [RenderList] = []
 	var frameSelectSemaphore = DispatchSemaphore(value: 1)
 
-	var borderWidth: Float
+	var borderScale: Float
 	var actualBorderLod: Int = 10
 	var wantedBorderLod: Int
 	
@@ -37,7 +38,7 @@ class BorderRenderer {
 	var generatedBorders: [(Int, BorderPrimitive)] = []	// Border primitives that were generated this frame
 
 	init(withDevice device: MTLDevice, pixelFormat: MTLPixelFormat, bufferCount: Int) {
-		borderWidth = 0.0
+		borderScale = 0.0
 		
 		let shaderLib = device.makeDefaultLibrary()!
 		
@@ -84,21 +85,14 @@ class BorderRenderer {
 				// Create the render primitive and update book-keeping on the main thread
 				pendingBorders.insert(loddedBorderHash)
 				borderQueue.async {
-					let innerWidth: Float
-					let outerWidth: Float
-					
 					let countourVertices: [[Vertex]]
 					if visibleContinents[borderHash] != nil {
-						innerWidth = 0.1
-						outerWidth = 0.5
 						countourVertices = [(tessellation.contours.first?.vertices ?? [])]
 					} else {
-						innerWidth = 0.3
-						outerWidth = 0.1
 						countourVertices = tessellation.contours.map({$0.vertices})
 					}
 					
-					let borderOutline = { (outline: [Vertex]) in generateClosedOutlineGeometry(outline: outline, innerExtent: innerWidth, outerExtent: outerWidth) }
+					let borderOutline = { (outline: [Vertex]) in generateClosedOutlineGeometry(outline: outline, innerExtent: 1.0, outerExtent: 1.0) }
 					let outlineGeometry: RegionContours = countourVertices.map(borderOutline)
 					
 					var cursor = 0
@@ -153,7 +147,7 @@ class BorderRenderer {
 		})
 		
 		frameSelectSemaphore.wait()
-			self.borderWidth = 1.0 / zoom
+			self.borderScale = 1.0 / zoom
 			self.continentRenderLists[bufferIndex] = frameContinentRenderList
 			self.countryRenderLists[bufferIndex] = frameCountryRenderList
 		frameSelectSemaphore.signal()
@@ -164,7 +158,10 @@ class BorderRenderer {
 		encoder.setRenderPipelineState(pipeline)
 		
 		frameSelectSemaphore.wait()
-			var frameUniforms = FrameUniforms(mvpMatrix: projection, width: self.borderWidth * 2.0, color: Color(r: 1.0, g: 0.5, b: 0.7, a: 1.0).vector)
+			var frameUniforms = FrameUniforms(mvpMatrix: projection,
+																				widthInner: Stylesheet.shared.continentBorderWidthInner.value * borderScale,
+																				widthOuter: Stylesheet.shared.continentBorderWidthOuter.value * borderScale,
+																				color: Color(r: 1.0, g: 0.5, b: 0.7, a: 1.0).vector)
 			let renderList = continentRenderLists[bufferIndex]
 		frameSelectSemaphore.signal()
 		
@@ -181,7 +178,10 @@ class BorderRenderer {
 		encoder.setRenderPipelineState(pipeline)
 		
 		frameSelectSemaphore.wait()
-			var uniforms = FrameUniforms(mvpMatrix: projection, width: self.borderWidth, color: Color(r: 1.0, g: 1.0, b: 1.0, a: 1.0).vector)
+			var uniforms = FrameUniforms(mvpMatrix: projection,
+																	 widthInner: Stylesheet.shared.countryBorderWidthInner.value * borderScale,
+																	 widthOuter: Stylesheet.shared.countryBorderWidthOuter.value * borderScale,
+																	 color: Color(r: 1.0, g: 1.0, b: 1.0, a: 1.0).vector)
 			let renderList = countryRenderLists[bufferIndex]
 		frameSelectSemaphore.signal()
 		
