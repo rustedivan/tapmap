@@ -56,6 +56,8 @@ ROAD TO FINAL
 - For each province (and optionally country, if needed), sample the blurred map at the pole of inaccessibility
   
   I did a quick test by just taking a continent-color map, blurring it in Pixelmator and taking a Voronoi filter to simulate countries. Looked good after one minute of work. This is the thing.
+  
+  Since the blur map is pre-rendered art, I can overlay a NSWE gradient cross to get a feeling for the equator, directions, parts of the world... Can get very creative! 
 
 # Hash key simplification
 - add chunkname to the streamed chunks
