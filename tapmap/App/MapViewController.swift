@@ -94,6 +94,7 @@ class MapViewController: UIViewController, MTKViewDelegate {
 		scrollView.zoomScale = zoomLimits.0
 		scrollView.maximumZoomScale = zoomLimits.1
 		
+		labelView.isHidden = !Stylesheet.shared.renderLabels.value
 		labelView.buildPoiPrimitives(withVisibleContinents: world.availableContinents,
 																 countries: world.availableCountries,
 																 provinces: world.availableProvinces)
