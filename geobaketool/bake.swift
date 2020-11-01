@@ -8,6 +8,7 @@
 
 import Foundation
 import SwiftyJSON
+import AppKit.NSImage
 
 enum GeoBakePipelineError : Error {
 	case tessellationMissing
@@ -102,10 +103,12 @@ func bakeGeometry() throws {
 	}
 	
 	// MARK: Get region colors from blur map
-	// - get region colors from blur map to tint the ToolGeoFeature's tessellations
-	let continentTintJob = OperationTintRegions(features: loddedContinents, reporter: reportLoad)
-	let countryTintJob = OperationTintRegions(features: loddedCountries, reporter: reportLoad)
-	let provinceTintJob = OperationTintRegions(features: loddedProvinces, reporter: reportLoad)
+	OperationTintRegions.storeNewColorMap()
+	let colorMap = OperationTintRegions.loadColorMap()
+	let bitmap = NSBitmapImageRep(data: colorMap.tiffRepresentation!)!
+	let continentTintJob = OperationTintRegions(features: loddedContinents, colorMap: bitmap, reporter: reportLoad)
+	let countryTintJob = OperationTintRegions(features: loddedCountries, colorMap: bitmap, reporter: reportLoad)
+	let provinceTintJob = OperationTintRegions(features: loddedProvinces, colorMap: bitmap, reporter: reportLoad)
 	
 	bakeQueue.addOperations([continentTintJob, countryTintJob, provinceTintJob],
 													waitUntilFinished: true)
