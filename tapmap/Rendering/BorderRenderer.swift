@@ -43,6 +43,7 @@ class BorderRenderer {
 		let shaderLib = device.makeDefaultLibrary()!
 		
 		let pipelineDescriptor = MTLRenderPipelineDescriptor()
+		pipelineDescriptor.sampleCount = 4
 		pipelineDescriptor.vertexFunction = shaderLib.makeFunction(name: "borderVertex")
 		pipelineDescriptor.fragmentFunction = shaderLib.makeFunction(name: "borderFragment")
 		pipelineDescriptor.colorAttachments[0].pixelFormat = pixelFormat;

@@ -96,6 +96,7 @@ class PoiRenderer {
 		let shaderLib = device.makeDefaultLibrary()!
 		
 		let pipelineDescriptor = MTLRenderPipelineDescriptor()
+		pipelineDescriptor.sampleCount = 4
 		pipelineDescriptor.vertexFunction = shaderLib.makeFunction(name: "poiVertex")
 		pipelineDescriptor.fragmentFunction = shaderLib.makeFunction(name: "poiFragment")
 		pipelineDescriptor.colorAttachments[0].pixelFormat = pixelFormat;

@@ -79,9 +79,10 @@ class MetalRenderer {
 	}
 	
 	func render(forWorld worldState: RuntimeWorld, into view: MTKView) {
-		guard let drawable = view.currentDrawable else { return }
-		guard let clearPassDescriptor = view.currentRenderPassDescriptor else { return }
+		guard let drawable = view.currentDrawable else { frameSemaphore.signal(); return }
+		guard let clearPassDescriptor = view.currentRenderPassDescriptor else { frameSemaphore.signal(); return }
 		clearPassDescriptor.colorAttachments[0].loadAction = .clear
+		clearPassDescriptor.colorAttachments[0].storeAction = .storeAndMultisampleResolve
 		let clearColor = Stylesheet.shared.oceanColor.components
 		clearPassDescriptor.colorAttachments[0].clearColor = MTLClearColor(red: Double(clearColor.r),
 																																			 green: Double(clearColor.g),

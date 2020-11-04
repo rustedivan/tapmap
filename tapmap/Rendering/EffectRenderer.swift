@@ -52,6 +52,7 @@ class EffectRenderer {
 		let shaderLib = device.makeDefaultLibrary()!
 		
 		let pipelineDescriptor = MTLRenderPipelineDescriptor()
+		pipelineDescriptor.sampleCount = 4
 		pipelineDescriptor.vertexFunction = shaderLib.makeFunction(name: "effectVertex")
 		pipelineDescriptor.fragmentFunction = shaderLib.makeFunction(name: "effectFragment")
 		pipelineDescriptor.colorAttachments[0].pixelFormat = pixelFormat;

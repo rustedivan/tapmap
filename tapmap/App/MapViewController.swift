@@ -75,6 +75,7 @@ class MapViewController: UIViewController, MTKViewDelegate {
 		super.viewDidLoad()
 		
 		let metalView = view as! MTKView
+		metalView.sampleCount = 4
 		renderers = MetalRenderer(in: metalView, forWorld: world)
 		geometryStreamer.metalDevice = renderers.device
 		metalView.delegate = self
