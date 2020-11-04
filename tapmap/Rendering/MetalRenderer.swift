@@ -80,17 +80,22 @@ class MetalRenderer {
 	
 	func render(forWorld worldState: RuntimeWorld, into view: MTKView) {
 		guard let drawable = view.currentDrawable else { frameSemaphore.signal(); return }
+		
+		// First pass clears to ocean color
 		guard let clearPassDescriptor = view.currentRenderPassDescriptor else { frameSemaphore.signal(); return }
+		let ocean = Stylesheet.shared.oceanColor.components
 		clearPassDescriptor.colorAttachments[0].loadAction = .clear
 		clearPassDescriptor.colorAttachments[0].storeAction = .storeAndMultisampleResolve
-		let clearColor = Stylesheet.shared.oceanColor.components
-		clearPassDescriptor.colorAttachments[0].clearColor = MTLClearColor(red: Double(clearColor.r),
-																																			 green: Double(clearColor.g),
-																																			 blue: Double(clearColor.b),
-																																			 alpha: Double(clearColor.a))
-		let addPassDescriptor = clearPassDescriptor.copy() as! MTLRenderPassDescriptor
+		clearPassDescriptor.colorAttachments[0].clearColor = MTLClearColor(red: Double(ocean.r), green: Double(ocean.g), blue: Double(ocean.b), alpha: Double(ocean.a))
+		// Middle pass loads from previous and passes to the next
+		guard let addPassDescriptor = view.currentRenderPassDescriptor else { frameSemaphore.signal(); return }
 		addPassDescriptor.colorAttachments[0].loadAction = .load
-				
+		addPassDescriptor.colorAttachments[0].storeAction = .storeAndMultisampleResolve
+		// Final pass does not need to store, only resolve
+		guard let endPassDescriptor = view.currentRenderPassDescriptor else { frameSemaphore.signal(); return }
+		endPassDescriptor.colorAttachments[0].loadAction = .load
+		endPassDescriptor.colorAttachments[0].storeAction = .multisampleResolve
+		
 		// Create parallel command buffers and enqueue in order
 		guard let geographyBuffer = commandQueue.makeCommandBuffer() else { return }
 		guard let markerBuffer = commandQueue.makeCommandBuffer() else { return }
@@ -118,7 +123,7 @@ class MetalRenderer {
 			//		DebugRenderer.shared.renderMarkers(inProjection: modelViewProjectionMatrix)
 		}
 		
-		let markerPass = makeRenderPass(markerBuffer, addPassDescriptor) { (encoder) in
+		let markerPass = makeRenderPass(markerBuffer, endPassDescriptor) { (encoder) in
 			self.poiRenderer.renderWorld(inProjection: mvpMatrix, inEncoder: encoder, bufferIndex: bufferIndex)
 		}
 		
