@@ -78,9 +78,9 @@ class MetalRenderer {
 		selectionRenderer.prepareFrame(zoomLevel: zoomLevel)
 	}
 	
-	func render(forWorld worldState: RuntimeWorld, into drawable: CAMetalDrawable) {
-		let clearPassDescriptor = MTLRenderPassDescriptor()
-		clearPassDescriptor.colorAttachments[0].texture = drawable.texture
+	func render(forWorld worldState: RuntimeWorld, into view: MTKView) {
+		guard let drawable = view.currentDrawable else { return }
+		guard let clearPassDescriptor = view.currentRenderPassDescriptor else { return }
 		clearPassDescriptor.colorAttachments[0].loadAction = .clear
 		let clearColor = Stylesheet.shared.oceanColor.components
 		clearPassDescriptor.colorAttachments[0].clearColor = MTLClearColor(red: Double(clearColor.r),

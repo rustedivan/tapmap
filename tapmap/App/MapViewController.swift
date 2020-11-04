@@ -205,8 +205,7 @@ class MapViewController: UIViewController, MTKViewDelegate {
 	func draw(in view: MTKView) {
 		prepareFrame()
 		
-		guard let drawable = view.currentDrawable else { fatalError("No drawable") }
-		renderers.render(forWorld: world, into: drawable)
+		renderers.render(forWorld: world, into: view)
 		labelView.renderLabels(projection: mapToView)
 
 		needsRender = false
