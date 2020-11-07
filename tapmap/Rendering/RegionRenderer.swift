@@ -71,30 +71,29 @@ class RegionRenderer {
 		styles.reserveCapacity(frameContinentRenderList.count +
 													 frameCountryRenderList.count +
 													 frameProvinceRenderList.count)
-		
+		let continentColor = Stylesheet.shared.continentColor.float4
+		let countryColor = Stylesheet.shared.countryColor.float4
 		// Style continents
 		for _ in frameContinentRenderList {
-			let c = Stylesheet.shared.continentColor.float4
-			let u = InstanceUniforms(color: c)
+			let u = InstanceUniforms(color: continentColor)
 			styles.append(u)
 		}
 		
 		// Style countries
 		for _ in frameCountryRenderList {
-			let c = Stylesheet.shared.countryColor.float4
-			let u = InstanceUniforms(color: c)
+			let u = InstanceUniforms(color: countryColor)
 			styles.append(u)
 		}
 		
 		// Style provinces
 		for province in frameProvinceRenderList {
-			let c = province.color.vector
+			let c = visitedSet.contains(province.ownerHash) ? province.color.vector : countryColor
 			let u = InstanceUniforms(color: c)
 			styles.append(u)
 		}
 		
 		frameSelectSemaphore.wait()
-		self.renderLists[bufferIndex] = (frameContinentRenderList + frameCountryRenderList + frameProvinceRenderList)
+			self.renderLists[bufferIndex] = (frameContinentRenderList + frameCountryRenderList + frameProvinceRenderList)
 			self.instanceUniforms[bufferIndex].contents().copyMemory(from: styles, byteCount: MemoryLayout<InstanceUniforms>.stride * styles.count)
 		frameSelectSemaphore.signal()
 	}
