@@ -28,11 +28,11 @@ ROAD TO FINAL
 	
 	
   - Shader setup (HSV | border color)
-  - Ocean: 30-20-90 | none
-  - Unvisited continent: 0-0-100 | none
-  - Unvisited country: C-70-17 | white*
-  - Unvisited province: C-10-20 | white
-  - Visited province: C-100-50 | C-10-20
+  - Ocean: 200-7-90 | none
+  - Unvisited continent: 0-0-97 | none			(bright white, no borders)
+  - Unvisited country: C-3-95 | white*			(tinted white, black borders)
+  - Unvisited province: C-70-17 | white			(tinted black, white borders)
+  - Visited province: C-100-50 | C-10-20		(bright hue, no borders)
   - C: continent key color
 
   Country and province shaders blend in a topography relief map with a 50% linear burn.

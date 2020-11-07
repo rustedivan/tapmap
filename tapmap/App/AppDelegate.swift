@@ -19,6 +19,7 @@ struct AppFixables {
 	static let oceanColor = FixableId("ocean-color")
 	static let continentColor = FixableId("continent-color")
 	static let countryColor = FixableId("country-color")
+	static let provinceColor = FixableId("province-color")
 	static let countryBorderColor = FixableId("country-border-color")
 	static let provinceBorderColor = FixableId("province-border-color")
 }
@@ -38,6 +39,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 		(AppFixables.countryColor,					 			.color(value: UIColor.red.cgColor, display: FixableDisplay("Fill color"))),
 		(AppFixables.countryBorderColor,					.color(value: UIColor.yellow.cgColor, display: FixableDisplay("Border color"))),
 		(FixableId("province-header"),	 				.divider(display: FixableDisplay("Provinces"))),
+		(AppFixables.provinceColor, 							.color(value: UIColor.magenta.cgColor, display: FixableDisplay("Province color"))),
 		(AppFixables.provinceBorderColor, 				.color(value: UIColor.magenta.cgColor, display: FixableDisplay("Border color")))
 	])
 	

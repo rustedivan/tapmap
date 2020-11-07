@@ -26,9 +26,10 @@ class Stylesheet {
 	var provinceBorderWidthOuter: Float = 0.1
 	
 	// Map colors
-	var oceanColor = FixableColor(AppFixables.oceanColor, initial: UIColor.blue.cgColor)
-	var continentColor = FixableColor(AppFixables.continentColor, initial: UIColor.green.cgColor)
-	var countryColor = FixableColor(AppFixables.countryColor, initial: UIColor.red.cgColor)
+	var oceanColor = FixableColor(AppFixables.oceanColor, initial: UIColor(hue: 0.55, saturation: 0.07, brightness: 0.90, alpha: 1.0).cgColor)
+	var continentColor = FixableColor(AppFixables.continentColor, initial: UIColor(hue: 0.00, saturation: 0.00, brightness: 0.97, alpha: 1.0).cgColor)
+	var countryColor = FixableColor(AppFixables.countryColor, initial: UIColor(hue: 0.00, saturation: 0.03, brightness: 0.95, alpha: 1.0).cgColor)
+	var provinceColor = FixableColor(AppFixables.provinceColor, initial: UIColor(hue: 0.90, saturation: 0.70, brightness: 0.17, alpha: 1.0).cgColor)
 	var countryBorderColor = FixableColor(AppFixables.countryBorderColor, initial: UIColor.yellow.cgColor)
 	var provinceBorderColor = FixableColor(AppFixables.provinceBorderColor, initial: UIColor.yellow.cgColor)
 }
