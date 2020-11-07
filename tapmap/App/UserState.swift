@@ -11,7 +11,7 @@ import CloudKit
 
 class UserState {
 	static let visitedPlacesKey = "visited-places"
-	var visitedPlaces: [RegionHash : Bool] = [:]
+	var visitedPlaces: Set<RegionHash> = []
 	var availableContinents: Set<RegionHash> = []
 	var availableCountries: Set<RegionHash> = []
 	var availableProvinces: Set<RegionHash> = []
@@ -50,11 +50,11 @@ class UserState {
 	}
 	
 	func placeVisited<T:GeoIdentifiable>(_ p: T) -> Bool {
-		return visitedPlaces[p.geographyId.hashed] ?? false
+		return visitedPlaces.contains(p.geographyId.hashed)
 	}
 	
 	func visitPlace<T:GeoIdentifiable>(_ p: T) {
-		visitedPlaces[p.geographyId.hashed] = true
+		visitedPlaces.insert(p.geographyId.hashed)
 		persistToProfile()
 		persistToCloud()
 	}

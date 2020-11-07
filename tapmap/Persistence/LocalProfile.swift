@@ -14,7 +14,7 @@ var persistentProfileUrl: URL {
 		.appendingPathComponent("\(UserState.visitedPlacesKey).plist")
 }
 
-func saveVisitsToDevice(_ hashes: [RegionHash : Bool], as key: String) {
+func saveVisitsToDevice(_ hashes: Set<RegionHash>, as key: String) {
 	var url = persistentProfileUrl
 	// Expect tapmap to run offline for long periods, so don't allow iOS to offload the savefile to iCloud
 	var dontOffloadUserstate = URLResourceValues()
@@ -34,10 +34,10 @@ func saveVisitsToDevice(_ hashes: [RegionHash : Bool], as key: String) {
 	}
 }
 
-func loadVisitsFromDevice(key: String) -> [RegionHash : Bool]? {
+func loadVisitsFromDevice(key: String) -> Set<RegionHash>? {
 	if let profile = NSData(contentsOf: persistentProfileUrl) as Data? {
 		if let persistedState = try? NSKeyedUnarchiver(forReadingFrom: profile) {
-			return persistedState.decodeObject(forKey: key) as? [RegionHash : Bool]
+			return persistedState.decodeObject(forKey: key) as? Set<RegionHash>
 		}
 	}
 	return nil

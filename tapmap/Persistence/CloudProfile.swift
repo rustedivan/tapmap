@@ -30,7 +30,7 @@ func mergeCloudProfile(notification: Notification, world: RuntimeWorld) -> UserS
 	}
 
 	let userState = AppDelegate.sharedUserState
-	let newVisits = cloudVisits.filter { !(userState.visitedPlaces[$0] ?? false) }
+	let newVisits = cloudVisits.filter { !userState.visitedPlaces.contains($0) }
 	let newContinentVisits = world.allContinents.filter { newVisits.contains($0.key) }.values
 	let newCountryVisits = world.allCountries.filter { newVisits.contains($0.key) }.values
 	let newProvinceVisits = world.allProvinces.filter { newVisits.contains($0.key) }.values
@@ -64,23 +64,15 @@ func mergeCloudProfile(notification: Notification, world: RuntimeWorld) -> UserS
 											 provinceVisits: Array(newProvinceVisits))
 }
 
-func uploadVisitsToCloudKVS(_ hashes: [RegionHash : Bool], as key: String) {
-	let stringKeys = hashes.compactMap { (key, value) in (value ? String(key) : nil) }
-	NSUbiquitousKeyValueStore.default.set(stringKeys, forKey: key)
+func uploadVisitsToCloudKVS(_ hashes: Set<RegionHash>, as key: String) {
+	let visitList = Array(hashes)
+	NSUbiquitousKeyValueStore.default.set(visitList, forKey: key)
 }
 
-func downloadVisitsFromCloudKVS(key: String) -> [RegionHash]? {
-	guard let storedPlaces = NSUbiquitousKeyValueStore.default.array(forKey: key) else {
+func downloadVisitsFromCloudKVS(key: String) -> Set<RegionHash>? {
+	if let visitList = NSUbiquitousKeyValueStore.default.array(forKey: key) as? [RegionHash] {
+		return Set<RegionHash>(visitList)
+	} else {
 		return nil
 	}
-
-	let cloudVisits = storedPlaces.compactMap { (k) -> RegionHash? in
-		if let keyString = k as? String {
-			return RegionHash(keyString)
-		} else {
-			return nil
-		}
-	}
-	
-	return cloudVisits
 }

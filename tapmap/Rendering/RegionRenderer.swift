@@ -52,7 +52,11 @@ class RegionRenderer {
 		}
 	}
 	
-	func prepareFrame(visibleContinentSet: Set<RegionHash>, visibleCountrySet: Set<RegionHash>, visibleProvinceSet: Set<RegionHash>, bufferIndex: Int) {
+	func prepareFrame(visibleContinentSet: Set<RegionHash>,
+										visibleCountrySet: Set<RegionHash>,
+										visibleProvinceSet: Set<RegionHash>,
+										visitedSet: Set<RegionHash>,
+										bufferIndex: Int) {
 		let frameContinentRenderList = RenderList(visibleContinentSet.compactMap { regionHash in
 																		return GeometryStreamer.shared.renderPrimitive(for: regionHash, streamIfMissing: true)
 																	 })
