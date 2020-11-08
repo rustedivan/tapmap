@@ -26,6 +26,7 @@ class BorderRenderer {
 	var borderPrimitives: [Int : BorderPrimitive]
 	var continentRenderLists: [RenderList] = []
 	var countryRenderLists: [RenderList] = []
+	var provinceRenderLists: [RenderList] = []
 	var frameSelectSemaphore = DispatchSemaphore(value: 1)
 
 	var borderScale: Float
@@ -54,6 +55,7 @@ class BorderRenderer {
 			self.device = device
 			self.continentRenderLists = Array(repeating: RenderList(), count: bufferCount)
 			self.countryRenderLists = Array(repeating: RenderList(), count: bufferCount)
+			self.provinceRenderLists = Array(repeating: RenderList(), count: bufferCount)
 		} catch let error {
 			fatalError(error.localizedDescription)
 		}
@@ -65,12 +67,12 @@ class BorderRenderer {
 		wantedBorderLod = GeometryStreamer.shared.wantedLodLevel
 	}
 	
-	func prepareFrame(visibleContinents: GeoContinentMap, visibleCountries: GeoCountryMap, zoom: Float, bufferIndex: Int) {
+	func prepareFrame(borderedContinents: GeoContinentMap, borderedCountries: GeoCountryMap, borderedProvinces: GeoProvinceMap, zoom: Float, bufferIndex: Int) {
 		let streamer = GeometryStreamer.shared
 		let lodLevel = streamer.wantedLodLevel
 		var borderLodMiss = false
 		
-		let updateSet: [Int] = Array(visibleContinents.keys) + Array(visibleCountries.keys)
+		let updateSet: [Int] = Array(borderedContinents.keys) + Array(borderedCountries.keys) + Array(borderedProvinces.keys)
 		for borderHash in updateSet {
 			let loddedBorderHash = borderHashLodKey(borderHash, atLod: lodLevel)
 			if borderPrimitives[loddedBorderHash] == nil {
@@ -87,7 +89,7 @@ class BorderRenderer {
 				pendingBorders.insert(loddedBorderHash)
 				borderQueue.async {
 					let countourVertices: [[Vertex]]
-					if visibleContinents[borderHash] != nil {
+					if borderedContinents[borderHash] != nil {
 						countourVertices = [(tessellation.contours.first?.vertices ?? [])]
 					} else {
 						countourVertices = tessellation.contours.map({$0.vertices})
@@ -137,12 +139,17 @@ class BorderRenderer {
 		}
 		
 		let continentOutlineLod = max(actualBorderLod, 0)	// $ Turn up the limit once border width is under control (set min/max outline width and ramp between )
-		let frameContinentRenderList = RenderList(visibleContinents.compactMap {
+		let frameContinentRenderList = RenderList(borderedContinents.compactMap {
 			let loddedKey = borderHashLodKey($0.key, atLod: continentOutlineLod)
 			return borderPrimitives[loddedKey]
 		})
 		
-		let frameCountryRenderList = RenderList(visibleCountries.compactMap {
+		let frameCountryRenderList = RenderList(borderedCountries.compactMap {
+			let loddedKey = borderHashLodKey($0.key, atLod: actualBorderLod)
+			return borderPrimitives[loddedKey]
+		})
+		
+		let frameProvinceRenderList = RenderList(borderedProvinces.compactMap {
 			let loddedKey = borderHashLodKey($0.key, atLod: actualBorderLod)
 			return borderPrimitives[loddedKey]
 		})
@@ -151,6 +158,7 @@ class BorderRenderer {
 			self.borderScale = 1.0 / zoom
 			self.continentRenderLists[bufferIndex] = frameContinentRenderList
 			self.countryRenderLists[bufferIndex] = frameCountryRenderList
+			self.provinceRenderLists[bufferIndex] = frameProvinceRenderList
 		frameSelectSemaphore.signal()
 	}
 	
@@ -182,8 +190,28 @@ class BorderRenderer {
 			var uniforms = FrameUniforms(mvpMatrix: projection,
 																	 widthInner: Stylesheet.shared.countryBorderWidthInner.value * borderScale,
 																	 widthOuter: Stylesheet.shared.countryBorderWidthOuter.value * borderScale,
-																	 color: Color(r: 1.0, g: 1.0, b: 1.0, a: 1.0).vector)
+																	 color: Stylesheet.shared.countryBorderColor.float4)
 			let renderList = countryRenderLists[bufferIndex]
+		frameSelectSemaphore.signal()
+		
+		encoder.setVertexBytes(&uniforms, length: MemoryLayout.stride(ofValue: uniforms), index: 1)
+		for primitive in renderList {
+			render(primitive: primitive, into: encoder)
+		}
+		
+		encoder.popDebugGroup()
+	}
+	
+	func renderProvinceBorders(inProjection projection: simd_float4x4, inEncoder encoder: MTLRenderCommandEncoder, bufferIndex: Int) {
+		encoder.pushDebugGroup("Render province borders")
+		encoder.setRenderPipelineState(pipeline)
+		
+		frameSelectSemaphore.wait()
+			var uniforms = FrameUniforms(mvpMatrix: projection,
+																	 widthInner: Stylesheet.shared.provinceBorderWidthInner.value * borderScale,
+																	 widthOuter: Stylesheet.shared.provinceBorderWidthOuter.value * borderScale,
+																	 color: Stylesheet.shared.provinceBorderColor.float4)
+			let renderList = provinceRenderLists[bufferIndex]
 		frameSelectSemaphore.signal()
 		
 		encoder.setVertexBytes(&uniforms, length: MemoryLayout.stride(ofValue: uniforms), index: 1)
