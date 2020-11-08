@@ -24,6 +24,7 @@ class MapViewController: UIViewController, MTKViewDelegate {
 	
 	// Navigation
 	var zoom: Float = 1.0
+	var zoomLimits: (Float, Float) = (1.0, 1.0)
 	var offset: CGPoint = .zero
 	let mapSpace = CGRect(x: -180.0, y: -80.0, width: 360.0, height: 160.0)
 	var mapFrame = CGRect.zero
@@ -90,10 +91,11 @@ class MapViewController: UIViewController, MTKViewDelegate {
 		let heightDiff = dummyView.bounds.height - (mapSpace.height / (mapSpace.width / dummyView.bounds.width))
 		mapFrame = dummyView.bounds.insetBy(dx: 0.0, dy: heightDiff / 2.0)
 		
-		let zoomLimits = mapZoomLimits(viewSize: view.frame.size, mapSize: mapSpace.size)
-		scrollView.minimumZoomScale = zoomLimits.0
-		scrollView.zoomScale = zoomLimits.0
-		scrollView.maximumZoomScale = zoomLimits.1
+		let limits = mapZoomLimits(viewSize: view.frame.size, mapSize: mapSpace.size)
+		scrollView.minimumZoomScale = limits.0
+		scrollView.zoomScale = limits.0
+		scrollView.maximumZoomScale = limits.1
+		zoomLimits = (Float(limits.0), Float(limits.1))
 		
 		labelView.isHidden = !Stylesheet.shared.renderLabels.value
 		labelView.buildPoiPrimitives(withVisibleContinents: world.availableContinents,
@@ -187,7 +189,8 @@ class MapViewController: UIViewController, MTKViewDelegate {
 																	 mapSize: mapSpace.size,
 																	 centeredOn: offset,
 																	 zoomedTo: zoom)
-		renderers.prepareFrame(forWorld: world)
+		let zoomRate = (zoom - zoomLimits.0) / (zoomLimits.1 - zoomLimits.0)	// How far down the zoom scale are we?
+		renderers.prepareFrame(forWorld: world, zoomRate: zoomRate)
 		
 		labelView.updateLabels(for: renderers.poiRenderer.activePoiHashes,
 													 inArea: renderRect,
@@ -227,7 +230,7 @@ extension MapViewController : UIScrollViewDelegate {
 	
 	func scrollViewDidZoom(_ scrollView: UIScrollView) {
 		zoom = Float(scrollView.zoomScale)
-		
+		print(zoom)
 		geometryStreamer.zoomedTo(zoom)
 		renderers.zoomLevel = zoom
 

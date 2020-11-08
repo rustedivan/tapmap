@@ -18,6 +18,7 @@ struct AppFixables {
 	static let countryBorderOuter = FixableId("country-border-outer")
 	static let provinceBorderInner = FixableId("province-border-inner")
 	static let provinceBorderOuter = FixableId("province-border-outer")
+	static let borderZoomBias = FixableId("border-zoom-bias")
 	static let oceanColor = FixableId("ocean-color")
 	static let continentColor = FixableId("continent-color")
 	static let countryColor = FixableId("country-color")
@@ -29,7 +30,9 @@ struct AppFixables {
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate {
 	var fixaStream = FixaStream(fixableSetups: [
+		(FixableId("general"),	 								.divider(display: FixableDisplay("General"))),
 		(AppFixables.renderLabels,		 						.bool(value: true, display: FixableDisplay("Show labels"))),
+		(AppFixables.borderZoomBias,		 					.float(value: 1.0, min: 1.0, max: 5.0, display: FixableDisplay("Border zoom bias"))),
 		(FixableId("continent-header"),	 				.divider(display: FixableDisplay("Continents"))),
 		(AppFixables.continentBorderInner, 				.float(value: 0.1, min: 0.0, max: 2.0, display: FixableDisplay("Border inside"))),
 		(AppFixables.continentBorderOuter, 				.float(value: 0.1, min: 0.0, max: 2.0, display: FixableDisplay("Border outside"))),
