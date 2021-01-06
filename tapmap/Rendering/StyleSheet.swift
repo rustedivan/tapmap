@@ -78,6 +78,7 @@ class Stylesheet {
 	// Calculated rendering colors from hue x brightness
 	var continentColors: [String : simd_float4] = [:]
 	var countryColors: [String : simd_float4] = [:]
+	var provinceColors: [String : simd_float4] = [:]
 	
 	init() {
 		NotificationCenter.default.addObserver(forName: FixaStream.DidUpdateValues, object: nil, queue: nil) { _ in
@@ -96,6 +97,11 @@ class Stylesheet {
 		return countryColors[continentName] ?? simd_float4([1.0, 0.0, 1.0, 1.0])
 	}
 	
+	func provinceColor(for regionHash: Int, in mapping: GeoContinentMap) -> simd_float4 {
+		let continentName = mapping[regionHash]!.name
+		return provinceColors[continentName] ?? simd_float4([1.0, 0.0, 1.0, 1.0])
+	}
+	
 	func recalculateTints() {
 		let tints = [
 			"Africa" : tintAfrica.value,
@@ -110,6 +116,7 @@ class Stylesheet {
 		for tint in tints {
 			continentColors[tint.key] = mixColor(tint.value, continentSaturation.value, continentBrightness.value)
 			countryColors[tint.key] = mixColor(tint.value, countrySaturation.value, countryBrightness.value)
+			provinceColors[tint.key] = mixColor(tint.value, provinceSaturation.value, provinceBrightness.value)
 		}
 	}
 	

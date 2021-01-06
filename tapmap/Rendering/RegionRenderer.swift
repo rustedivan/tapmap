@@ -73,7 +73,7 @@ class RegionRenderer {
 		styles.reserveCapacity(frameContinentRenderList.count +
 													 frameCountryRenderList.count +
 													 frameProvinceRenderList.count)
-		let provinceColor = Stylesheet.shared.provinceColor.float4
+		
 		// Style continents
 		for continent in frameContinentRenderList {
 			let u = InstanceUniforms(color: stylesheet.continentColor(for: continent.ownerHash, in: regionContinentMap))
@@ -89,7 +89,10 @@ class RegionRenderer {
 		// Style provinces
 		for province in frameProvinceRenderList {
 			let visited = visitedSet.contains(province.ownerHash)
-			let c = visited ? province.color.vector : provinceColor	// Visited provinces render in hue
+			
+			// Visited provinces render in authored color, unvisited in tinted country color
+			let c = visited ? province.color.vector
+											: stylesheet.provinceColor(for: province.ownerHash, in: regionContinentMap)
 			let u = InstanceUniforms(color: c)
 			styles.append(u)
 		}

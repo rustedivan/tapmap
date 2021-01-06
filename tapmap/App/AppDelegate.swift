@@ -29,6 +29,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 		(AppFixables.countryBorderOuter, 	 				.float(value: 0.1, min: 0.0, max: 2.0, display: FixableDisplay("Border inside"))),
 		(AppFixables.countryBorderColor,					.color(value: UIColor.yellow.cgColor, display: FixableDisplay("Border color"))),
 		(FixableId("province-header"),	 				.divider(display: FixableDisplay("Provinces"))),
+		(AppFixables.provinceSaturation,	 				.float(value: 0.70, min: 0.0, max: 1.0, display: FixableDisplay("Province saturation"))),
+		(AppFixables.provinceBrightness,	 				.float(value: 0.17, min: 0.0, max: 1.0, display: FixableDisplay("Province brightness"))),
 		(AppFixables.provinceBorderInner, 	 			.float(value: 0.1, min: 0.0, max: 2.0, display: FixableDisplay("Border inside"))),
 		(AppFixables.provinceBorderOuter, 	 			.float(value: 0.1, min: 0.0, max: 2.0, display: FixableDisplay("Border inside"))),
 		(AppFixables.provinceBorderColor, 				.color(value: UIColor.magenta.cgColor, display: FixableDisplay("Border color"))),
