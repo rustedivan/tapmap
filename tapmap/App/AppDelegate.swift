@@ -25,6 +25,13 @@ struct AppFixables {
 	static let provinceColor = FixableId("province-color")
 	static let countryBorderColor = FixableId("country-border-color")
 	static let provinceBorderColor = FixableId("province-border-color")
+	static let continentHueAfrica = FixableId("continent-hue-africa")
+	static let continentHueAntarctica = FixableId("continent-hue-antarctica")
+	static let continentHueAsia = FixableId("continent-hue-asia")
+	static let continentHueEurope = FixableId("continent-hue-europe")
+	static let continentHueNorthAmerica = FixableId("continent-hue-northamerica")
+	static let continentHueOceania = FixableId("continent-hue-oceania")
+	static let continentHueSouthAmerica = FixableId("continent-hue-southamerica")
 }
 
 @UIApplicationMain
@@ -38,6 +45,13 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 		(AppFixables.continentBorderOuter, 				.float(value: 0.1, min: 0.0, max: 2.0, display: FixableDisplay("Border outside"))),
 		(AppFixables.oceanColor,						 			.color(value: UIColor.blue.cgColor, display: FixableDisplay("Ocean"))),
 		(AppFixables.continentColor,				 			.color(value: UIColor.green.cgColor, display: FixableDisplay("Fill color"))),
+		(AppFixables.continentHueAfrica,		 			.color(value: UIColor.green.cgColor, display: FixableDisplay("Hue: Africa"))),
+		(AppFixables.continentHueAntarctica, 			.color(value: UIColor.green.cgColor, display: FixableDisplay("Hue: Antarctica"))),
+		(AppFixables.continentHueAsia,			 			.color(value: UIColor.green.cgColor, display: FixableDisplay("Hue: Asia"))),
+		(AppFixables.continentHueEurope,		 			.color(value: UIColor.green.cgColor, display: FixableDisplay("Hue: Europe"))),
+		(AppFixables.continentHueNorthAmerica,		.color(value: UIColor.green.cgColor, display: FixableDisplay("Hue: North America"))),
+		(AppFixables.continentHueOceania,					.color(value: UIColor.green.cgColor, display: FixableDisplay("Hue: Oceania"))),
+		(AppFixables.continentHueSouthAmerica,		.color(value: UIColor.green.cgColor, display: FixableDisplay("Hue: South America"))),
 		(FixableId("country-header"),		 				.divider(display: FixableDisplay("Countries"))),
 		(AppFixables.countryBorderInner, 	 				.float(value: 0.1, min: 0.0, max: 2.0, display: FixableDisplay("Border inside"))),
 		(AppFixables.countryBorderOuter, 	 				.float(value: 0.1, min: 0.0, max: 2.0, display: FixableDisplay("Border inside"))),
