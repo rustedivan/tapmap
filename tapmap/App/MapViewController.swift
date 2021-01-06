@@ -96,6 +96,7 @@ class MapViewController: UIViewController, MTKViewDelegate {
 		scrollView.zoomScale = limits.0
 		scrollView.maximumZoomScale = limits.1
 		zoomLimits = (Float(limits.0), Float(limits.1))
+		renderers.zoomLevel = Float(scrollView.zoomScale)
 		
 		labelView.isHidden = !Stylesheet.shared.renderLabels.value
 		labelView.buildPoiPrimitives(withVisibleContinents: world.availableContinents,
@@ -230,7 +231,6 @@ extension MapViewController : UIScrollViewDelegate {
 	
 	func scrollViewDidZoom(_ scrollView: UIScrollView) {
 		zoom = Float(scrollView.zoomScale)
-		print(zoom)
 		geometryStreamer.zoomedTo(zoom)
 		renderers.zoomLevel = zoom
 
