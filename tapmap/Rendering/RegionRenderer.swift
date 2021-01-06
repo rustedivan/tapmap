@@ -72,7 +72,6 @@ class RegionRenderer {
 		styles.reserveCapacity(frameContinentRenderList.count +
 													 frameCountryRenderList.count +
 													 frameProvinceRenderList.count)
-		let countryColor = Stylesheet.shared.countryColor.float4
 		let provinceColor = Stylesheet.shared.provinceColor.float4
 		// Style continents
 		for continent in frameContinentRenderList {
@@ -83,7 +82,9 @@ class RegionRenderer {
 		}
 		
 		// Style countries
-		for _ in frameCountryRenderList {
+		for country in frameCountryRenderList {
+			let continentName = regionContinentMap[country.ownerHash]!.name
+			let countryColor = Stylesheet.shared.countryColors[continentName] ?? simd_float4([1.0, 0.0, 1.0, 1.0])
 			let u = InstanceUniforms(color: countryColor)
 			styles.append(u)
 		}

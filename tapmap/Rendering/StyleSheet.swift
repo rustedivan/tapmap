@@ -35,6 +35,12 @@ class Stylesheet {
 	var provinceBorderColor = FixableColor(AppFixables.provinceBorderColor, initial: UIColor.yellow.cgColor)
 	
 	var continentBrightness = FixableFloat(AppFixables.continentBrightness, initial: 0.1)
+	var continentSaturation = FixableFloat(AppFixables.continentSaturation, initial: 0.1)
+	var countryBrightness = FixableFloat(AppFixables.countryBrightness, initial: 0.1)
+	var countrySaturation = FixableFloat(AppFixables.countrySaturation, initial: 0.1)
+	var provinceBrightness = FixableFloat(AppFixables.provinceBrightness, initial: 0.1)
+	var provinceSaturation = FixableFloat(AppFixables.provinceSaturation, initial: 0.1)
+	
 	var continentHueAfrica = FixableColor(AppFixables.continentHueAfrica, initial: UIColor.green.cgColor)
 	var continentHueAntarctica = FixableColor(AppFixables.continentHueAntarctica, initial: UIColor.green.cgColor)
 	var continentHueAsia = FixableColor(AppFixables.continentHueAsia, initial: UIColor.green.cgColor)
@@ -45,6 +51,7 @@ class Stylesheet {
 
 	// Calculated rendering colors from hue x brightness
 	var continentColors: [String : simd_float4] = [:]
+	var countryColors: [String : simd_float4] = [:]
 	
 	init() {
 		NotificationCenter.default.addObserver(forName: FixaStream.DidUpdateValues, object: nil, queue: nil) { _ in
@@ -54,20 +61,27 @@ class Stylesheet {
 	}
 	
 	func recalculateContinentColors() {
-		continentColors["Africa"] = mixColor(authored: UIColor(cgColor: continentHueAfrica.value), withBrightness: continentBrightness.value)
-		continentColors["Antarctica"] = mixColor(authored: UIColor(cgColor: continentHueAntarctica.value), withBrightness: continentBrightness.value)
-		continentColors["Asia"] = mixColor(authored: UIColor(cgColor: continentHueAsia.value), withBrightness: continentBrightness.value)
-		continentColors["Europe"] = mixColor(authored: UIColor(cgColor: continentHueEurope.value), withBrightness: continentBrightness.value)
-		continentColors["North America"] = mixColor(authored: UIColor(cgColor: continentHueNorthAmerica.value), withBrightness: continentBrightness.value)
-		continentColors["Oceania"] = mixColor(authored: UIColor(cgColor: continentHueOceania.value), withBrightness: continentBrightness.value)
-		continentColors["South America"] = mixColor(authored: UIColor(cgColor: continentHueSouthAmerica.value), withBrightness: continentBrightness.value)
+		let tints = [
+			"Africa" : continentHueAfrica.value,
+			"Antarctica" : continentHueAntarctica.value,
+			"Asia" : continentHueAsia.value,
+			"Europe" : continentHueEurope.value,
+			"North America" : continentHueNorthAmerica.value,
+			"Oceania" : continentHueOceania.value,
+			"South America" : continentHueSouthAmerica.value,
+		]
+		
+		for tint in tints {
+			continentColors[tint.key] = mixColor(tint.value, withSaturation: continentSaturation.value, withBrightness: continentBrightness.value)
+			countryColors[tint.key] = mixColor(tint.value, withSaturation: countrySaturation.value, withBrightness: countryBrightness.value)
+		}
 	}
 	
-	func mixColor(authored: UIColor, withBrightness b: Float) -> simd_float4 {
+	func mixColor(_ authored: CGColor, withSaturation s: Float, withBrightness b: Float) -> simd_float4 {
 		var h: CGFloat = 300.0
-		var s: CGFloat = 1.0
-		let v: CGFloat = CGFloat(b)
-		authored.getHue(&h, saturation: &s, brightness: nil, alpha: nil)
+		let s = CGFloat(s)
+		let v = CGFloat(b)
+		UIColor(cgColor: authored).getHue(&h, saturation: nil, brightness: nil, alpha: nil)
 		let out = UIColor(hue: h, saturation: s, brightness: v, alpha: 1.0)
 		return out.tuple().vector
 	}
