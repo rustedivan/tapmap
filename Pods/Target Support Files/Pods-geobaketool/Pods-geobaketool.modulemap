@@ -1,6 +1,0 @@
-module Pods_geobaketool {
-  umbrella header "Pods-geobaketool-umbrella.h"
-
-  export *
-  module * { export * }
-}

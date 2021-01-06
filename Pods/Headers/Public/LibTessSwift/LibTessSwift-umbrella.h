@@ -1,1 +1,0 @@
-../../../Target Support Files/LibTessSwift/LibTessSwift-umbrella.h
