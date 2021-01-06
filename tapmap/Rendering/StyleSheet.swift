@@ -34,7 +34,7 @@ class Stylesheet {
 	var countryBorderColor = FixableColor(AppFixables.countryBorderColor, initial: UIColor.yellow.cgColor)
 	var provinceBorderColor = FixableColor(AppFixables.provinceBorderColor, initial: UIColor.yellow.cgColor)
 	
-	var continentBrightness = Float(0.2)
+	var continentBrightness = FixableFloat(AppFixables.continentBrightness, initial: 0.1)
 	var continentHueAfrica = FixableColor(AppFixables.continentHueAfrica, initial: UIColor.green.cgColor)
 	var continentHueAntarctica = FixableColor(AppFixables.continentHueAntarctica, initial: UIColor.green.cgColor)
 	var continentHueAsia = FixableColor(AppFixables.continentHueAsia, initial: UIColor.green.cgColor)
@@ -54,13 +54,13 @@ class Stylesheet {
 	}
 	
 	func recalculateContinentColors() {
-		continentColors["Africa"] = mixColor(authored: UIColor(cgColor: continentHueAfrica.value), withBrightness: continentBrightness)
-		continentColors["Antarctica"] = mixColor(authored: UIColor(cgColor: continentHueAntarctica.value), withBrightness: continentBrightness)
-		continentColors["Asia"] = mixColor(authored: UIColor(cgColor: continentHueAsia.value), withBrightness: continentBrightness)
-		continentColors["Europe"] = mixColor(authored: UIColor(cgColor: continentHueEurope.value), withBrightness: continentBrightness)
-		continentColors["North America"] = mixColor(authored: UIColor(cgColor: continentHueNorthAmerica.value), withBrightness: continentBrightness)
-		continentColors["Oceania"] = mixColor(authored: UIColor(cgColor: continentHueOceania.value), withBrightness: continentBrightness)
-		continentColors["South America"] = mixColor(authored: UIColor(cgColor: continentHueSouthAmerica.value), withBrightness: continentBrightness)
+		continentColors["Africa"] = mixColor(authored: UIColor(cgColor: continentHueAfrica.value), withBrightness: continentBrightness.value)
+		continentColors["Antarctica"] = mixColor(authored: UIColor(cgColor: continentHueAntarctica.value), withBrightness: continentBrightness.value)
+		continentColors["Asia"] = mixColor(authored: UIColor(cgColor: continentHueAsia.value), withBrightness: continentBrightness.value)
+		continentColors["Europe"] = mixColor(authored: UIColor(cgColor: continentHueEurope.value), withBrightness: continentBrightness.value)
+		continentColors["North America"] = mixColor(authored: UIColor(cgColor: continentHueNorthAmerica.value), withBrightness: continentBrightness.value)
+		continentColors["Oceania"] = mixColor(authored: UIColor(cgColor: continentHueOceania.value), withBrightness: continentBrightness.value)
+		continentColors["South America"] = mixColor(authored: UIColor(cgColor: continentHueSouthAmerica.value), withBrightness: continentBrightness.value)
 	}
 	
 	func mixColor(authored: UIColor, withBrightness b: Float) -> simd_float4 {

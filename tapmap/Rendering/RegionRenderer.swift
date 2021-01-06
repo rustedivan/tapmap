@@ -56,6 +56,7 @@ class RegionRenderer {
 										visibleCountrySet: Set<RegionHash>,
 										visibleProvinceSet: Set<RegionHash>,
 										visitedSet: Set<RegionHash>,
+										regionContinentMap: GeoContinentMap,
 										bufferIndex: Int) {
 		let frameContinentRenderList = RenderList(visibleContinentSet.compactMap { regionHash in
 																		return GeometryStreamer.shared.renderPrimitive(for: regionHash, streamIfMissing: true)
@@ -71,11 +72,12 @@ class RegionRenderer {
 		styles.reserveCapacity(frameContinentRenderList.count +
 													 frameCountryRenderList.count +
 													 frameProvinceRenderList.count)
-		let continentColor = Stylesheet.shared.continentColor.float4
 		let countryColor = Stylesheet.shared.countryColor.float4
 		let provinceColor = Stylesheet.shared.provinceColor.float4
 		// Style continents
-		for _ in frameContinentRenderList {
+		for continent in frameContinentRenderList {
+			let continentName = regionContinentMap[continent.ownerHash]!.name
+			let continentColor = Stylesheet.shared.continentColors[continentName] ?? simd_float4([1.0, 0.0, 1.0, 1.0])
 			let u = InstanceUniforms(color: continentColor)
 			styles.append(u)
 		}

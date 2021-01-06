@@ -75,7 +75,7 @@ class MetalRenderer {
 		let borderZoom = zoomLevel / (1.0 - zoomRate + zoomRate * Stylesheet.shared.borderZoomBias.value)	// Borders become wider at closer zoom levels
 		let bufferIndex = frameId % maxInflightFrames
 		effectRenderer.prepareFrame(bufferIndex: bufferIndex)
-		regionRenderer.prepareFrame(visibleContinentSet: renderContinentSet, visibleCountrySet: renderCountrySet, visibleProvinceSet: renderProvinceSet, visitedSet: visited, bufferIndex: bufferIndex)
+		regionRenderer.prepareFrame(visibleContinentSet: renderContinentSet, visibleCountrySet: renderCountrySet, visibleProvinceSet: renderProvinceSet, visitedSet: visited, regionContinentMap: worldState.continentForRegion, bufferIndex: bufferIndex)
 		borderRenderer.prepareFrame(borderedContinents: borderedContinents, borderedCountries: borderedCountries, borderedProvinces: borderedProvinces, zoom: borderZoom, bufferIndex: bufferIndex)
 		poiRenderer.prepareFrame(visibleSet: renderSet, zoom: zoomLevel, bufferIndex: bufferIndex)
 		selectionRenderer.prepareFrame(zoomLevel: zoomLevel)

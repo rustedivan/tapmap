@@ -25,6 +25,7 @@ struct AppFixables {
 	static let provinceColor = FixableId("province-color")
 	static let countryBorderColor = FixableId("country-border-color")
 	static let provinceBorderColor = FixableId("province-border-color")
+	static let continentBrightness = FixableId("continent-brightness")
 	static let continentHueAfrica = FixableId("continent-hue-africa")
 	static let continentHueAntarctica = FixableId("continent-hue-antarctica")
 	static let continentHueAsia = FixableId("continent-hue-asia")
@@ -45,6 +46,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 		(AppFixables.continentBorderOuter, 				.float(value: 0.1, min: 0.0, max: 2.0, display: FixableDisplay("Border outside"))),
 		(AppFixables.oceanColor,						 			.color(value: UIColor.blue.cgColor, display: FixableDisplay("Ocean"))),
 		(AppFixables.continentColor,				 			.color(value: UIColor.green.cgColor, display: FixableDisplay("Fill color"))),
+		(AppFixables.continentBrightness,		 			.float(value: 0.1, min: 0.0, max: 1.0, display: FixableDisplay("Continent brightness"))),
 		(AppFixables.continentHueAfrica,		 			.color(value: UIColor.green.cgColor, display: FixableDisplay("Hue: Africa"))),
 		(AppFixables.continentHueAntarctica, 			.color(value: UIColor.green.cgColor, display: FixableDisplay("Hue: Antarctica"))),
 		(AppFixables.continentHueAsia,			 			.color(value: UIColor.green.cgColor, display: FixableDisplay("Hue: Asia"))),
