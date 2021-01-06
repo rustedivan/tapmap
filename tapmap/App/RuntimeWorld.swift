@@ -28,6 +28,9 @@ class RuntimeWorld {
 	var visibleCountries: GeoCountryMap = [:]
 	var visibleProvinces: GeoProvinceMap = [:]
 	
+	// Lookups and mappings
+	let continentForRegion: GeoContinentMap
+	
 	let geoWorld: GeoWorld
 	
 	init(withGeoWorld world: GeoWorld) {
@@ -41,6 +44,20 @@ class RuntimeWorld {
 		
 		let provinceList = countryList.flatMap { $0.children }
 		allProvinces = Dictionary(uniqueKeysWithValues: provinceList.map { ($0.geographyId.hashed, $0) })
+		
+		// Note which continent a region belongs to (including the continents themselves)
+		var regionHashToContinentMap: GeoContinentMap = [:]
+		for continent in continentList {
+			let countries = continent.children
+			let countryHashes = countries.map { $0.geographyId.hashed }
+			let provinces = countries.flatMap { $0.children }
+			let provinceHashes = provinces.map { $0.geographyId.hashed }
+			let allContinentHashes = [continent.geographyId.hashed] + countryHashes + provinceHashes
+			for h in allContinentHashes {
+				regionHashToContinentMap[h] = continent
+			}
+		}
+		continentForRegion = regionHashToContinentMap
 	}
 }
 
