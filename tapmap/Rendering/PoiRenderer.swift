@@ -169,7 +169,7 @@ class PoiRenderer {
 		
 		var poiScreenSize: Float = 2.0
 		poiScreenSize = 2.0 / (zoom)
-		poiScreenSize += min(zoom * 0.01, 0.1)	// Boost POI sizes a bit when zooming in
+		poiScreenSize += min(zoom * 0.01, 0.1)	// Boost POI sizes a bit when zooming in // $ Copy border zoom bias
 		let newRankThreshold = updateZoomThreshold(viewZoom: zoom)
 		
 		let framePlanes = poiPlanePrimitives.filter { visibleSet.contains($0.ownerHash) }

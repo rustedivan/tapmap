@@ -1,5 +1,47 @@
 ROAD TO FINAL
 
+# Rendering brief, step 2
+ There are some effects I want to spice up the presentation. I'm a little stuck at how to lookup the color for a region at runtime, since the base color isn't always static. Specifically, provinces have different colors when visited and unvisited. I can definitely route around that, and ~100 O(1) dictionary lookups per frame isn't going to make a difference, but it's _wrong_. To help guide the stylesheet lookup design, let's take a look at those extra effects.
+ 
+ - Color key for visited provinces (need to know visit state for region). I could re-create the render primitive when the province is visited and reuse the buffer. No wait, BaseRenderPrimitive is a reference type so I can mutate the color at runtime!
+ - Province borders need the same visited/unvisited logic, but can HSL-darken the base color)
+ - Key-color selection outline + bloom (static selection color and HSL-brightening of the base color)
+ - Chromatic aberration (screen-space, independent of app logic, but animatable)
+ 
+ √ But OK then, in this case all I need is to pre-bake the colors into the BRPs, and find a clean way to update the color of provinces when they are visited. Fixa tweakability will be a bit worse since I'll need to find a way to re-tint all regions at runtime... Would it be possible to just make an enum list of all BRP uses and tag them? Might be useful in other cases as well and not that big a violation of principles. Semantic tagging of primitives sounds nice! Like, `continent, country, province, border, selection, marker`? I'm sure there are other places that could benefit from having that lookup burned into the primitives. Another solution would be to split the region renderer itself into three passes, one per region type. Only change needed would be to teach prepareFrame to append to its instance uniform buffer and render list, and then clear it at frame change...
+ 
+ The province colors should represent the their continents. I think this could be a cool way to achieve a faceted, sharp, consistent look that still sells the proximity between areas, and would look really nice for long overland trips.
+ 
+- Prerender an image with the continents' key colors.
+- Blur it heavily to get soft gradients where continents are close, and along coastlines
+- For each province (and optionally country, if needed), sample the blurred map at the pole of inaccessibility
+ 
+ I did a quick test by just taking a continent-color map, blurring it in Pixelmator and taking a Voronoi filter to simulate countries. Looked good after one minute of work. This is the thing.
+ 
+ Since the blur map is pre-rendered art, I can overlay a NSWE gradient cross to get a feeling for the equator, directions, parts of the world... Can get very creative!
+ 
+ ## Province colors from pre-baked blur map
+ Again, stuck on architecture decision: where do I store the region colors? Three places, with drawbacks:
+ 
+ 1. In the baked tessellation (colors don't really belong in a tessellation, and should static colors be adjusted at runtime? [e.g. selected darkening, pulsing...])
+ 2. In the render primitive (makes semantic sense, but then the color lookup must be made from GeometryStreamer on primitive creation)
+ 3. In the renderer (flexible and nice, but then the colors must be passed to prepareFrame and do per-frame lookup... which doesn't serve any purpose)
+ 
+ (3) is out immediately - the region _authored_ colors are not changing at runtime outside known visual effects, so this is over-generalization
+ (2) sure, ideally the render primitives should be assembled per-frame, referencing persistent GPU buffers, but that's an additional level of indirection that only serves code style)
+ (1) is also just a naming quirk - it wouldn't have been a complaint if GeoTessellation had been GeoMesh, and as with (3), this is about the authored content colors, not necessary the frame color
+ 
+ So, (1) it is - looking up the blur map color at bake time and storing it into the GeoTessellation.
+ 
+ ## Polish
+ - author continent hue and build HSB tuples from from Stylesheet for all regions to get the tinted black/white
+ 
+
+
+# Marketing
+Find public land travels and make maps from it. LWR/D/U
+
+
 # Rendering brief, step 1
   Main design issue to solve: what are the actual visual states of regions?
 	The unclear design I've been working off so far is that a region can be
@@ -38,41 +80,6 @@ ROAD TO FINAL
   Country and province shaders blend in a topography relief map with a 50% linear burn.
   
   Selected regions re-render with a double-wide key-color border and bloom overlay.
-  
- # Rendering brief, step 2
-  There are some effects I want to spice up the presentation. I'm a little stuck at how to lookup the color for a region at runtime, since the base color isn't always static. Specifically, provinces have different colors when visited and unvisited. I can definitely route around that, and ~100 O(1) dictionary lookups per frame isn't going to make a difference, but it's _wrong_. To help guide the stylesheet lookup design, let's take a look at those extra effects.
-  
-  - Color key for visited provinces (need to know visit state for region). I could re-create the render primitive when the province is visited and reuse the buffer. No wait, BaseRenderPrimitive is a reference type so I can mutate the color at runtime!
-  - Province borders need the same visited/unvisited logic, but can HSL-darken the base color)
-  - Key-color selection outline + bloom (static selection color and HSL-brightening of the base color)
-  - Chromatic aberration (screen-space, independent of app logic, but animatable)
-  
-  √ But OK then, in this case all I need is to pre-bake the colors into the BRPs, and find a clean way to update the color of provinces when they are visited. Fixa tweakability will be a bit worse since I'll need to find a way to re-tint all regions at runtime... Would it be possible to just make an enum list of all BRP uses and tag them? Might be useful in other cases as well and not that big a violation of principles. Semantic tagging of primitives sounds nice! Like, `continent, country, province, border, selection, marker`? I'm sure there are other places that could benefit from having that lookup burned into the primitives. Another solution would be to split the region renderer itself into three passes, one per region type. Only change needed would be to teach prepareFrame to append to its instance uniform buffer and render list, and then clear it at frame change...
-  
-  The province colors should represent the their continents. I think this could be a cool way to achieve a faceted, sharp, consistent look that still sells the proximity between areas, and would look really nice for long overland trips.
-  
-- Prerender an image with the continents' key colors.
-- Blur it heavily to get soft gradients where continents are close, and along coastlines
-- For each province (and optionally country, if needed), sample the blurred map at the pole of inaccessibility
-  
-  I did a quick test by just taking a continent-color map, blurring it in Pixelmator and taking a Voronoi filter to simulate countries. Looked good after one minute of work. This is the thing.
-  
-  Since the blur map is pre-rendered art, I can overlay a NSWE gradient cross to get a feeling for the equator, directions, parts of the world... Can get very creative!
-  
-  ## Province colors from pre-baked blur map
-  Again, stuck on architecture decision: where do I store the region colors? Three places, with drawbacks:
-  
-  1. In the baked tessellation (colors don't really belong in a tessellation, and should static colors be adjusted at runtime? [e.g. selected darkening, pulsing...])
-  2. In the render primitive (makes semantic sense, but then the color lookup must be made from GeometryStreamer on primitive creation)
-  3. In the renderer (flexible and nice, but then the colors must be passed to prepareFrame and do per-frame lookup... which doesn't serve any purpose)
-  
-  (3) is out immediately - the region _authored_ colors are not changing at runtime outside known visual effects, so this is over-generalization
-  (2) sure, ideally the render primitives should be assembled per-frame, referencing persistent GPU buffers, but that's an additional level of indirection that only serves code style)
-  (1) is also just a naming quirk - it wouldn't have been a complaint if GeoTessellation had been GeoMesh, and as with (3), this is about the authored content colors, not necessary the frame color
-  
-  So, (1) it is - looking up the blur map color at bake time and storing it into the GeoTessellation.
-  
-  
 
 
 # Hash key simplification
