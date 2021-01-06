@@ -68,6 +68,7 @@ class RegionRenderer {
 																		return GeometryStreamer.shared.renderPrimitive(for: regionHash, streamIfMissing: true)
 																	 })
 		
+		let stylesheet = Stylesheet.shared
 		var styles = Array<InstanceUniforms>()
 		styles.reserveCapacity(frameContinentRenderList.count +
 													 frameCountryRenderList.count +
@@ -75,17 +76,13 @@ class RegionRenderer {
 		let provinceColor = Stylesheet.shared.provinceColor.float4
 		// Style continents
 		for continent in frameContinentRenderList {
-			let continentName = regionContinentMap[continent.ownerHash]!.name
-			let continentColor = Stylesheet.shared.continentColors[continentName] ?? simd_float4([1.0, 0.0, 1.0, 1.0])
-			let u = InstanceUniforms(color: continentColor)
+			let u = InstanceUniforms(color: stylesheet.continentColor(for: continent.ownerHash, in: regionContinentMap))
 			styles.append(u)
 		}
 		
 		// Style countries
 		for country in frameCountryRenderList {
-			let continentName = regionContinentMap[country.ownerHash]!.name
-			let countryColor = Stylesheet.shared.countryColors[continentName] ?? simd_float4([1.0, 0.0, 1.0, 1.0])
-			let u = InstanceUniforms(color: countryColor)
+			let u = InstanceUniforms(color: stylesheet.countryColor(for: country.ownerHash, in: regionContinentMap))
 			styles.append(u)
 		}
 		
