@@ -55,25 +55,25 @@ class Stylesheet {
 	
 	// Map colors
 	var oceanColor = FixableColor(AppFixables.oceanColor, initial: UIColor(hue: 0.55, saturation: 0.07, brightness: 0.90, alpha: 1.0).cgColor)
-	var countryBorderColor = FixableColor(AppFixables.countryBorderColor, initial: UIColor.yellow.cgColor)
-	var provinceBorderColor = FixableColor(AppFixables.provinceBorderColor, initial: UIColor.yellow.cgColor)
+	var countryBorderColor = FixableColor(AppFixables.countryBorderColor, initial: UIColor(hue: 0.55, saturation: 0.00, brightness: 0.50, alpha: 1.0).cgColor)
+	var provinceBorderColor = FixableColor(AppFixables.provinceBorderColor, initial: UIColor(hue: 0.55, saturation: 0.00, brightness: 0.50, alpha: 1.0).cgColor)
 	
 	// Tint controls
-	var continentBrightness = FixableFloat(AppFixables.continentBrightness, initial: 0.1)
-	var continentSaturation = FixableFloat(AppFixables.continentSaturation, initial: 0.1)
-	var countryBrightness = FixableFloat(AppFixables.countryBrightness, initial: 0.1)
-	var countrySaturation = FixableFloat(AppFixables.countrySaturation, initial: 0.1)
-	var provinceBrightness = FixableFloat(AppFixables.provinceBrightness, initial: 0.1)
-	var provinceSaturation = FixableFloat(AppFixables.provinceSaturation, initial: 0.1)
+	var continentBrightness = FixableFloat(AppFixables.continentBrightness, initial: 0.97)
+	var continentSaturation = FixableFloat(AppFixables.continentSaturation, initial: 0.02)
+	var countryBrightness = FixableFloat(AppFixables.countryBrightness, initial: 0.95)
+	var countrySaturation = FixableFloat(AppFixables.countrySaturation, initial: 0.03)
+	var provinceBrightness = FixableFloat(AppFixables.provinceBrightness, initial: 0.15)
+	var provinceSaturation = FixableFloat(AppFixables.provinceSaturation, initial: 0.30)
 	
 	// Continent tints
-	var tintAfrica = FixableColor(AppFixables.tintAfrica, initial: UIColor.green.cgColor)
-	var tintAntarctica = FixableColor(AppFixables.tintAntarctica, initial: UIColor.green.cgColor)
-	var tintAsia = FixableColor(AppFixables.tintAsia, initial: UIColor.green.cgColor)
-	var tintEuropa = FixableColor(AppFixables.tintEurope, initial: UIColor.green.cgColor)
-	var tintNorthAmerica = FixableColor(AppFixables.tintNorthAmerica, initial: UIColor.green.cgColor)
-	var tintEurope = FixableColor(AppFixables.tintOceania, initial: UIColor.green.cgColor)
-	var tintSouthAmerica = FixableColor(AppFixables.tintSouthAmerica, initial: UIColor.green.cgColor)
+	var tintAfrica = FixableColor(AppFixables.tintAfrica, initial: 							UIColor(hue: 0.11, saturation: 1.00, brightness: 1.00, alpha: 1.0).cgColor)
+	var tintAntarctica = FixableColor(AppFixables.tintAntarctica, initial: 			UIColor(hue: 0.55, saturation: 1.00, brightness: 1.00, alpha: 1.0).cgColor)
+	var tintAsia = FixableColor(AppFixables.tintAsia, initial: 									UIColor(hue: 0.83, saturation: 1.00, brightness: 1.00, alpha: 1.0).cgColor)
+	var tintEuropa = FixableColor(AppFixables.tintEurope, initial: 							UIColor(hue: 0.26, saturation: 1.00, brightness: 1.00, alpha: 1.0).cgColor)
+	var tintNorthAmerica = FixableColor(AppFixables.tintNorthAmerica, initial: 	UIColor(hue: 0.00, saturation: 1.00, brightness: 1.00, alpha: 1.0).cgColor)
+	var tintEurope = FixableColor(AppFixables.tintOceania, initial: 						UIColor(hue: 0.15, saturation: 1.00, brightness: 1.00, alpha: 1.0).cgColor)
+	var tintSouthAmerica = FixableColor(AppFixables.tintSouthAmerica, initial: 	UIColor(hue: 0.77, saturation: 1.00, brightness: 1.00, alpha: 1.0).cgColor)
 
 	// Calculated rendering colors from hue x brightness
 	var continentColors: [String : simd_float4] = [:]
