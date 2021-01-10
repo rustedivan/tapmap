@@ -84,61 +84,35 @@ class MetalRenderer {
 	func render(forWorld worldState: RuntimeWorld, into view: MTKView) {
 		guard let drawable = view.currentDrawable else { frameSemaphore.signal(); return }
 		
-		// First pass clears to ocean color
-		guard let clearPassDescriptor = view.currentRenderPassDescriptor else { frameSemaphore.signal(); return }
+		guard let passDescriptor = view.currentRenderPassDescriptor else { frameSemaphore.signal(); return }
 		let ocean = Stylesheet.shared.oceanColor.components
-		clearPassDescriptor.colorAttachments[0].loadAction = .clear
-		clearPassDescriptor.colorAttachments[0].storeAction = .storeAndMultisampleResolve
-		clearPassDescriptor.colorAttachments[0].clearColor = MTLClearColor(red: Double(ocean.r), green: Double(ocean.g), blue: Double(ocean.b), alpha: Double(ocean.a))
-		// Middle pass loads from previous and passes to the next
-		guard let addPassDescriptor = view.currentRenderPassDescriptor else { frameSemaphore.signal(); return }
-		addPassDescriptor.colorAttachments[0].loadAction = .load
-		addPassDescriptor.colorAttachments[0].storeAction = .storeAndMultisampleResolve
-		// Final pass does not need to store, only resolve
-		guard let endPassDescriptor = view.currentRenderPassDescriptor else { frameSemaphore.signal(); return }
-		endPassDescriptor.colorAttachments[0].loadAction = .load
-		endPassDescriptor.colorAttachments[0].storeAction = .multisampleResolve
+		passDescriptor.colorAttachments[0].loadAction = .clear
+		passDescriptor.colorAttachments[0].storeAction = .multisampleResolve
+		passDescriptor.colorAttachments[0].clearColor = MTLClearColor(red: Double(ocean.r), green: Double(ocean.g), blue: Double(ocean.b), alpha: Double(ocean.a))
 		
-		// Create parallel command buffers and enqueue in order
-		guard let geographyBuffer = commandQueue.makeCommandBuffer() else { return }
-		guard let markerBuffer = commandQueue.makeCommandBuffer() else { return }
-		guard let overlayBuffer = commandQueue.makeCommandBuffer() else { return }
-		
-		geographyBuffer.label = "Geography buffer"
-		geographyBuffer.enqueue()
-		overlayBuffer.label = "Overlay buffer"
-		overlayBuffer.enqueue()
-		markerBuffer.label = "Marker buffer"
-		markerBuffer.enqueue()
-		
+		guard let commandBuffer = commandQueue.makeCommandBuffer() else { return }
+		commandBuffer.label = "Geography buffer"
+		commandBuffer.addCompletedHandler { buffer in
+			drawable.present()						// Render
+			self.frameSemaphore.signal()	// Make this in-flight frame available
+		}
+
 		let mvpMatrix = modelViewProjectionMatrix
 		let bufferIndex = frameId % maxInflightFrames
 		
-		let geographyPass = makeRenderPass(geographyBuffer, clearPassDescriptor) { (encoder) in
-			// self.borderRenderer.renderContinentBorders(inProjection: mvpMatrix, inEncoder: encoder, bufferIndex: bufferIndex)
-			self.regionRenderer.renderWorld(inProjection: mvpMatrix, inEncoder: encoder, bufferIndex: bufferIndex)
-			self.borderRenderer.renderCountryBorders(inProjection: mvpMatrix, inEncoder: encoder, bufferIndex: bufferIndex)
-			self.borderRenderer.renderProvinceBorders(inProjection: mvpMatrix, inEncoder: encoder, bufferIndex: bufferIndex)
-		}
+		guard let encoder = commandBuffer.makeRenderCommandEncoder(descriptor: passDescriptor) else { return }
+		encoder.label = "Main render pass encoder @ \(frameId)"
 		
-		let overlayPass = makeRenderPass(overlayBuffer, addPassDescriptor) { (encoder) in
-			self.effectRenderer.renderWorld(inProjection: mvpMatrix, inEncoder: encoder, bufferIndex: bufferIndex)
-			self.selectionRenderer.renderSelection(inProjection: mvpMatrix, inEncoder: encoder)
-			//		DebugRenderer.shared.renderMarkers(inProjection: modelViewProjectionMatrix)
-		}
+		// self.borderRenderer.renderContinentBorders(inProjection: mvpMatrix, inEncoder: encoder, bufferIndex: bufferIndex)
+		self.regionRenderer.renderWorld(inProjection: mvpMatrix, inEncoder: encoder, bufferIndex: bufferIndex)
+		self.borderRenderer.renderCountryBorders(inProjection: mvpMatrix, inEncoder: encoder, bufferIndex: bufferIndex)
+		self.borderRenderer.renderProvinceBorders(inProjection: mvpMatrix, inEncoder: encoder, bufferIndex: bufferIndex)
+		self.effectRenderer.renderWorld(inProjection: mvpMatrix, inEncoder: encoder, bufferIndex: bufferIndex)
+		self.selectionRenderer.renderSelection(inProjection: mvpMatrix, inEncoder: encoder)
+		self.poiRenderer.renderWorld(inProjection: mvpMatrix, inEncoder: encoder, bufferIndex: bufferIndex)
 		
-		let markerPass = makeRenderPass(markerBuffer, endPassDescriptor) { (encoder) in
-			self.poiRenderer.renderWorld(inProjection: mvpMatrix, inEncoder: encoder, bufferIndex: bufferIndex)
-		}
-		
-		markerBuffer.addCompletedHandler { buffer in
-			drawable.present()
-			self.frameSemaphore.signal()
-		}
-		
-		encodingQueue.async(execute: geographyPass)
-		encodingQueue.async(execute: overlayPass)
-		encodingQueue.async(execute: markerPass)
+		encoder.endEncoding()
+		commandBuffer.commit()
 		
 //		commandQueue.insertDebugCaptureBoundary()	// $ For GPU Frame capture
 	}
