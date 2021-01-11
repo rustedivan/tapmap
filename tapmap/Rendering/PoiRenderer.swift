@@ -7,6 +7,7 @@
 //
 
 import Metal
+import MetalKit
 import simd
 
 fileprivate struct FrameUniforms {
@@ -84,6 +85,7 @@ class PoiRenderer {
 	let device: MTLDevice
 	let pipeline: MTLRenderPipelineState
 	let instanceUniforms: [MTLBuffer]
+	let markerAtlas: MTLTexture
 	
 	var rankThreshold: Float = -1.0
 	var poiBaseSize: Float = 0.0
@@ -125,6 +127,8 @@ class PoiRenderer {
 		let visibleProvincePoiPlanes = provinces.values.flatMap { sortPlacesIntoPoiPlanes($0.places, in: $0, inDevice: device) }
 		
 		poiPlanePrimitives = visibleContinentPoiPlanes + visibleCountryPoiPlanes + visibleProvincePoiPlanes
+		
+		markerAtlas = loadMarkerAtlas("MarkerAtlas", inDevice: device)
 	}
 	
 	var activePoiHashes: Set<Int> {
@@ -235,6 +239,7 @@ class PoiRenderer {
 	func renderWorld(inProjection projection: simd_float4x4, inEncoder encoder: MTLRenderCommandEncoder, bufferIndex: Int) {
 		encoder.pushDebugGroup("Render POI plane")
 		encoder.setRenderPipelineState(pipeline)
+		encoder.setFragmentTexture(markerAtlas, index: 0)
 		
 		frameSwitchSemaphore.wait()
 			let renderList = self.renderLists[bufferIndex]
@@ -257,6 +262,19 @@ class PoiRenderer {
 		
 		encoder.popDebugGroup()
 	}
+}
+
+// MARK: Texture management
+func loadMarkerAtlas(_ name: String, inDevice device: MTLDevice) -> MTLTexture {
+	let loader = MTKTextureLoader(device: device)
+	let path = Bundle.main.url(forResource: "atlas", withExtension: "pvr")!
+	guard let atlas = try? loader.newTexture(URL: path, options: .none) else {
+		fatalError("Could not load marker atlas")
+	}
+	
+	print("Loaded marker atlas with \(atlas.mipmapLevelCount) mip levels")
+	
+	return atlas
 }
 
 // MARK: Generating POI planes

@@ -26,6 +26,7 @@ struct ScaleVertex {
 
 struct VertexOut {
 	float4 position [[position]];
+	float2 uv;
 	float4 color;
 };
 
@@ -38,10 +39,14 @@ vertex VertexOut poiVertex(const device ScaleVertex* vertexArray [[ buffer(0) ]]
 	float2 rib = v.normal * frame->baseSize;
 	outVertex.position = frame->modelViewProjectionMatrix * float4(v.position + rib, 0.0, 1.0);
 	outVertex.color = float4(1.0, 1.0, 1.0, poi->progress);
+	outVertex.uv = float2((v.normal.x > 0.0) * 0.25, (v.normal.y < 0.0) * 1.00);
 	return outVertex;
 }
 
-fragment float4 poiFragment(VertexOut interpolated [[ stage_in ]]) {
-	return float4(interpolated.color);
+fragment float4 poiFragment(VertexOut interpolated [[ stage_in ]], texture2d<float> markerAtlas [[texture(0)]]) {
+	constexpr sampler markers(coord::normalized, address::clamp_to_zero, filter::linear, mip_filter::linear);
+	float4 color = markerAtlas.sample(markers, interpolated.uv);
+	color.a *= interpolated.color.a;
+	return float4(color);
 }
 

@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		1407688C25AD0CCE00DABCFE /* atlas.pvr in Resources */ = {isa = PBXBuildFile; fileRef = 1407688B25AD0CC000DABCFE /* atlas.pvr */; };
 		140835BC22B98F89004697FB /* pipeline.json in CopyFiles */ = {isa = PBXBuildFile; fileRef = 140835BB22B98F76004697FB /* pipeline.json */; };
 		140B990622E57D5700C912A4 /* EdgeGenerationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 140B990522E57D5700C912A4 /* EdgeGenerationTests.swift */; };
 		1416641B2463E2690006A2D4 /* EffectRenderer.metal in Sources */ = {isa = PBXBuildFile; fileRef = 1416641A2463E2690006A2D4 /* EffectRenderer.metal */; };
@@ -130,6 +131,7 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		1407688B25AD0CC000DABCFE /* atlas.pvr */ = {isa = PBXFileReference; lastKnownFileType = file; path = atlas.pvr; sourceTree = "<group>"; };
 		140835BB22B98F76004697FB /* pipeline.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = pipeline.json; sourceTree = "<group>"; };
 		140B990522E57D5700C912A4 /* EdgeGenerationTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EdgeGenerationTests.swift; sourceTree = "<group>"; };
 		1416641A2463E2690006A2D4 /* EffectRenderer.metal */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.metal; path = EffectRenderer.metal; sourceTree = "<group>"; };
@@ -238,6 +240,14 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		1407688A25AD0CAD00DABCFE /* Assets */ = {
+			isa = PBXGroup;
+			children = (
+				1407688B25AD0CC000DABCFE /* atlas.pvr */,
+			);
+			path = Assets;
+			sourceTree = "<group>";
+		};
 		142A21ED23DC6189000DA4FA /* Streaming */ = {
 			isa = PBXGroup;
 			children = (
@@ -359,6 +369,7 @@
 				14C6656A22B97D8A0054D7F2 /* Info.plist */,
 				143A601E23DD954100BE554D /* world.geo */,
 				1484A6B024B8E5DF0049C0CF /* tapmap.entitlements */,
+				1407688A25AD0CAD00DABCFE /* Assets */,
 			);
 			path = tapmap;
 			sourceTree = "<group>";
@@ -557,6 +568,7 @@
 				14C6656622B97D8A0054D7F2 /* Assets.xcassets in Resources */,
 				14C6656422B97D890054D7F2 /* Main.storyboard in Resources */,
 				143A601F23DD954900BE554D /* world.geo in Resources */,
+				1407688C25AD0CCE00DABCFE /* atlas.pvr in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
