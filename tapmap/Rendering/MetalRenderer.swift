@@ -59,76 +59,60 @@ class MetalRenderer {
 																											zoomedTo: zoom)
 	}
 	
-	func prepareFrame(forWorld worldState: RuntimeWorld) {
+	func prepareFrame(forWorld worldState: RuntimeWorld, zoomRate: Float) {
 		frameSemaphore.wait()
 		frameId += 1
 		let available = AppDelegate.sharedUserState.availableSet
 		let visible = AppDelegate.sharedUIState.visibleRegionHashes
+		let visited = AppDelegate.sharedUserState.visitedPlaces
 		let renderSet = available.intersection(visible)
 		let renderContinentSet = renderSet.filter { worldState.visibleContinents.keys.contains($0) }
 		let renderCountrySet = renderSet.filter { worldState.visibleCountries.keys.contains($0) }
 		let renderProvinceSet = renderSet.filter { worldState.visibleProvinces.keys.contains($0) }
 		let borderedContinents = worldState.allContinents.filter { visible.contains($0.key) }	// All visible continents (even if visited)
-
+		let borderedCountries = worldState.visibleCountries
+		let borderedProvinces = worldState.visibleProvinces.filter { !visited.contains($0.key) }	// Visited provinces have no borders
+		let borderZoom = zoomLevel / (1.0 - zoomRate + zoomRate * Stylesheet.shared.borderZoomBias.value)	// Borders become wider at closer zoom levels
 		let bufferIndex = frameId % maxInflightFrames
 		effectRenderer.prepareFrame(bufferIndex: bufferIndex)
-		regionRenderer.prepareFrame(visibleContinentSet: renderContinentSet, visibleCountrySet: renderCountrySet, visibleProvinceSet: renderProvinceSet, bufferIndex: bufferIndex)
-		borderRenderer.prepareFrame(visibleContinents: borderedContinents, visibleCountries: worldState.visibleCountries, zoom: zoomLevel, bufferIndex: bufferIndex)
+		regionRenderer.prepareFrame(visibleContinentSet: renderContinentSet, visibleCountrySet: renderCountrySet, visibleProvinceSet: renderProvinceSet, visitedSet: visited, regionContinentMap: worldState.continentForRegion, bufferIndex: bufferIndex)
+		borderRenderer.prepareFrame(borderedContinents: borderedContinents, borderedCountries: borderedCountries, borderedProvinces: borderedProvinces, zoom: borderZoom, bufferIndex: bufferIndex)
 		poiRenderer.prepareFrame(visibleSet: renderSet, zoom: zoomLevel, bufferIndex: bufferIndex)
 		selectionRenderer.prepareFrame(zoomLevel: zoomLevel)
 	}
 	
-	func render(forWorld worldState: RuntimeWorld, into drawable: CAMetalDrawable) {
-		let clearPassDescriptor = MTLRenderPassDescriptor()
-		clearPassDescriptor.colorAttachments[0].texture = drawable.texture
-		clearPassDescriptor.colorAttachments[0].loadAction = .clear
-		let clearColor = Stylesheet.shared.oceanColor.components
-		clearPassDescriptor.colorAttachments[0].clearColor = MTLClearColor(red: Double(clearColor.r),
-																																			 green: Double(clearColor.g),
-																																			 blue: Double(clearColor.b),
-																																			 alpha: Double(clearColor.a))
-		let addPassDescriptor = clearPassDescriptor.copy() as! MTLRenderPassDescriptor
-		addPassDescriptor.colorAttachments[0].loadAction = .load
-				
-		// Create parallel command buffers and enqueue in order
-		guard let geographyBuffer = commandQueue.makeCommandBuffer() else { return }
-		guard let markerBuffer = commandQueue.makeCommandBuffer() else { return }
-		guard let overlayBuffer = commandQueue.makeCommandBuffer() else { return }
+	func render(forWorld worldState: RuntimeWorld, into view: MTKView) {
+		guard let drawable = view.currentDrawable else { frameSemaphore.signal(); return }
 		
-		geographyBuffer.label = "Geography buffer"
-		geographyBuffer.enqueue()
-		overlayBuffer.label = "Overlay buffer"
-		overlayBuffer.enqueue()
-		markerBuffer.label = "Marker buffer"
-		markerBuffer.enqueue()
+		guard let passDescriptor = view.currentRenderPassDescriptor else { frameSemaphore.signal(); return }
+		let ocean = Stylesheet.shared.oceanColor.components
+		passDescriptor.colorAttachments[0].loadAction = .clear
+		passDescriptor.colorAttachments[0].storeAction = .multisampleResolve
+		passDescriptor.colorAttachments[0].clearColor = MTLClearColor(red: Double(ocean.r), green: Double(ocean.g), blue: Double(ocean.b), alpha: Double(ocean.a))
 		
+		guard let commandBuffer = commandQueue.makeCommandBuffer() else { return }
+		commandBuffer.label = "Geography buffer"
+		commandBuffer.addCompletedHandler { buffer in
+			drawable.present()						// Render
+			self.frameSemaphore.signal()	// Make this in-flight frame available
+		}
+
 		let mvpMatrix = modelViewProjectionMatrix
 		let bufferIndex = frameId % maxInflightFrames
 		
-		let geographyPass = makeRenderPass(geographyBuffer, clearPassDescriptor) { (encoder) in
-			self.borderRenderer.renderContinentBorders(inProjection: mvpMatrix, inEncoder: encoder, bufferIndex: bufferIndex)
-			self.regionRenderer.renderWorld(inProjection: mvpMatrix, inEncoder: encoder, bufferIndex: bufferIndex)
-			self.borderRenderer.renderCountryBorders(inProjection: mvpMatrix, inEncoder: encoder, bufferIndex: bufferIndex)
-		}
+		guard let encoder = commandBuffer.makeRenderCommandEncoder(descriptor: passDescriptor) else { return }
+		encoder.label = "Main render pass encoder @ \(frameId)"
 		
-		let overlayPass = makeRenderPass(overlayBuffer, addPassDescriptor) { (encoder) in
-			self.effectRenderer.renderWorld(inProjection: mvpMatrix, inEncoder: encoder, bufferIndex: bufferIndex)
-			self.selectionRenderer.renderSelection(inProjection: mvpMatrix, inEncoder: encoder)
-			//		DebugRenderer.shared.renderMarkers(inProjection: modelViewProjectionMatrix)
-		}
+		// self.borderRenderer.renderContinentBorders(inProjection: mvpMatrix, inEncoder: encoder, bufferIndex: bufferIndex)
+		self.regionRenderer.renderWorld(inProjection: mvpMatrix, inEncoder: encoder, bufferIndex: bufferIndex)
+		self.borderRenderer.renderCountryBorders(inProjection: mvpMatrix, inEncoder: encoder, bufferIndex: bufferIndex)
+		self.borderRenderer.renderProvinceBorders(inProjection: mvpMatrix, inEncoder: encoder, bufferIndex: bufferIndex)
+		self.effectRenderer.renderWorld(inProjection: mvpMatrix, inEncoder: encoder, bufferIndex: bufferIndex)
+		self.selectionRenderer.renderSelection(inProjection: mvpMatrix, inEncoder: encoder)
+		self.poiRenderer.renderWorld(inProjection: mvpMatrix, inEncoder: encoder, bufferIndex: bufferIndex)
 		
-		let markerPass = makeRenderPass(markerBuffer, addPassDescriptor) { (encoder) in
-			self.poiRenderer.renderWorld(inProjection: mvpMatrix, inEncoder: encoder, bufferIndex: bufferIndex)
-		}
-		
-		markerBuffer.addCompletedHandler { buffer in
-			drawable.present()
-			self.frameSemaphore.signal()
-		}
-		
-		encodingQueue.async(execute: geographyPass)
-		encodingQueue.async(execute: overlayPass)
-		encodingQueue.async(execute: markerPass)
+		encoder.endEncoding()
+		commandBuffer.commit()
 		
 //		commandQueue.insertDebugCaptureBoundary()	// $ For GPU Frame capture
 	}

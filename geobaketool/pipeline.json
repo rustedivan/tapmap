@@ -14,5 +14,6 @@
 	"input-countries": "reshaped-countries",
 	"input-provinces": "reshaped-provinces",
 	"input-cities": "osm-cities",
+	"input-colormap": "Development/tapmap/blurmap.png",
 	"output": "Development/tapmap/tapmap/Raw/world.geo"
 }

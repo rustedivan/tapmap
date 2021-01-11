@@ -108,6 +108,7 @@ class DebugRenderer {
 		let shaderLib = device.makeDefaultLibrary()!
 		
 		let pipelineDescriptor = MTLRenderPipelineDescriptor()
+		pipelineDescriptor.sampleCount = 4
 		pipelineDescriptor.vertexFunction = shaderLib.makeFunction(name: "mapVertex")
 		pipelineDescriptor.fragmentFunction = shaderLib.makeFunction(name: "mapFragment")
 		pipelineDescriptor.colorAttachments[0].pixelFormat = pixelFormat;

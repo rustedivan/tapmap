@@ -10,35 +10,38 @@ import UIKit
 
 import fixa
 
-struct AppFixables {
-	static let renderLabels = FixableId("visible-labels")
-	static let continentBorderInner = FixableId("continent-border-inner")
-	static let continentBorderOuter = FixableId("continent-border-outer")
-	static let countryBorderInner = FixableId("country-border-inner")
-	static let countryBorderOuter = FixableId("country-border-outer")
-	static let oceanColor = FixableId("ocean-color")
-	static let continentColor = FixableId("continent-color")
-	static let countryColor = FixableId("country-color")
-	static let countryBorderColor = FixableId("country-border-color")
-	static let provinceBorderColor = FixableId("province-border-color")
-}
-
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate {
 	var fixaStream = FixaStream(fixableSetups: [
+		(FixableId("general"),	 								.divider(display: FixableDisplay("General"))),
 		(AppFixables.renderLabels,		 						.bool(value: true, display: FixableDisplay("Show labels"))),
+		(AppFixables.borderZoomBias,		 					.float(value: 1.0, min: 1.0, max: 5.0, display: FixableDisplay("Border zoom bias"))),
 		(FixableId("continent-header"),	 				.divider(display: FixableDisplay("Continents"))),
 		(AppFixables.continentBorderInner, 				.float(value: 0.1, min: 0.0, max: 2.0, display: FixableDisplay("Border inside"))),
 		(AppFixables.continentBorderOuter, 				.float(value: 0.1, min: 0.0, max: 2.0, display: FixableDisplay("Border outside"))),
 		(AppFixables.oceanColor,						 			.color(value: UIColor.blue.cgColor, display: FixableDisplay("Ocean"))),
-		(AppFixables.continentColor,				 			.color(value: UIColor.green.cgColor, display: FixableDisplay("Fill color"))),
+		(AppFixables.continentSaturation,		 			.float(value: 0.03, min: 0.0, max: 1.0, display: FixableDisplay("Continent saturation"))),
+		(AppFixables.continentBrightness,		 			.float(value: 0.97, min: 0.0, max: 1.0, display: FixableDisplay("Continent brightness"))),
 		(FixableId("country-header"),		 				.divider(display: FixableDisplay("Countries"))),
+		(AppFixables.countrySaturation,		 				.float(value: 0.03, min: 0.0, max: 1.0, display: FixableDisplay("Country saturation"))),
+		(AppFixables.countryBrightness,		 				.float(value: 0.9, min: 0.0, max: 1.0, display: FixableDisplay("Country brightness"))),
 		(AppFixables.countryBorderInner, 	 				.float(value: 0.1, min: 0.0, max: 2.0, display: FixableDisplay("Border inside"))),
 		(AppFixables.countryBorderOuter, 	 				.float(value: 0.1, min: 0.0, max: 2.0, display: FixableDisplay("Border inside"))),
-		(AppFixables.countryColor,					 			.color(value: UIColor.red.cgColor, display: FixableDisplay("Fill color"))),
 		(AppFixables.countryBorderColor,					.color(value: UIColor.yellow.cgColor, display: FixableDisplay("Border color"))),
 		(FixableId("province-header"),	 				.divider(display: FixableDisplay("Provinces"))),
-		(AppFixables.provinceBorderColor, 				.color(value: UIColor.magenta.cgColor, display: FixableDisplay("Border color")))
+		(AppFixables.provinceSaturation,	 				.float(value: 0.70, min: 0.0, max: 1.0, display: FixableDisplay("Province saturation"))),
+		(AppFixables.provinceBrightness,	 				.float(value: 0.17, min: 0.0, max: 1.0, display: FixableDisplay("Province brightness"))),
+		(AppFixables.provinceBorderInner, 	 			.float(value: 0.1, min: 0.0, max: 2.0, display: FixableDisplay("Border inside"))),
+		(AppFixables.provinceBorderOuter, 	 			.float(value: 0.1, min: 0.0, max: 2.0, display: FixableDisplay("Border inside"))),
+		(AppFixables.provinceBorderColor, 				.color(value: UIColor.magenta.cgColor, display: FixableDisplay("Border color"))),
+		(FixableId("tint-header"),							.divider(display: FixableDisplay("Tints"))),
+		(AppFixables.tintAfrica,		 							.color(value: UIColor.green.cgColor, display: FixableDisplay("Hue: Africa"))),
+		(AppFixables.tintAntarctica, 							.color(value: UIColor.green.cgColor, display: FixableDisplay("Hue: Antarctica"))),
+		(AppFixables.tintAsia,			 							.color(value: UIColor.green.cgColor, display: FixableDisplay("Hue: Asia"))),
+		(AppFixables.tintEurope,		 							.color(value: UIColor.green.cgColor, display: FixableDisplay("Hue: Europe"))),
+		(AppFixables.tintNorthAmerica,						.color(value: UIColor.green.cgColor, display: FixableDisplay("Hue: North America"))),
+		(AppFixables.tintOceania,									.color(value: UIColor.green.cgColor, display: FixableDisplay("Hue: Oceania"))),
+		(AppFixables.tintSouthAmerica,						.color(value: UIColor.green.cgColor, display: FixableDisplay("Hue: South America")))
 	])
 	
 	var window: UIWindow?

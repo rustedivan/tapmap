@@ -50,15 +50,6 @@ struct GeoColor : Codable {
 	let r, g, b: Float
 }
 
-struct GeoColors : Codable {
-	static func randomGreen() -> GeoColor {
-		let r = 0.0 + Float(arc4random_uniform(50)) / 100.0
-		let g = 0.5 + Float(arc4random_uniform(50)) / 100.0
-		let b = 0.0 + Float(arc4random_uniform(50)) / 100.0
-		return GeoColor(r: r, g: g, b: b)
-	}
-}
-
 struct Triangle {
 	let i: (Int, Int, Int)
 }
@@ -100,6 +91,7 @@ struct GeoTessellation : Codable {
 	let contours: [VertexRing]
 	let aabb: Aabb
 	let visualCenter: Vertex
+	let color: GeoColor
 }
 
 protocol GeoIdentifiable : Hashable {

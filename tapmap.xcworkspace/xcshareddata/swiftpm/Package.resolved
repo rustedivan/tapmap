@@ -9,6 +9,33 @@
           "revision": "4fc527d0a5586a4c4def5a7750640927fb9fa428",
           "version": "0.3.2"
         }
+      },
+      {
+        "package": "LibTessSwift",
+        "repositoryURL": "https://github.com/LuizZak/LibTessSwift",
+        "state": {
+          "branch": null,
+          "revision": "da48d3f8e66a614df22d5b2fab2f04576130f46e",
+          "version": "0.8.2"
+        }
+      },
+      {
+        "package": "MiniLexer",
+        "repositoryURL": "https://github.com/LuizZak/MiniLexer.git",
+        "state": {
+          "branch": null,
+          "revision": "4da97d6f92d79402cd3cf35d6438ec723554ae7c",
+          "version": "0.9.5"
+        }
+      },
+      {
+        "package": "SwiftyJSON",
+        "repositoryURL": "https://github.com/SwiftyJSON/SwiftyJSON",
+        "state": {
+          "branch": null,
+          "revision": "2b6054efa051565954e1d2b9da831680026cd768",
+          "version": "5.0.0"
+        }
       }
     ]
   },

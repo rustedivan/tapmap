@@ -1,1 +1,0 @@
-../../../LibTessSwift/LibTessSwift/libtess2/sweep.h

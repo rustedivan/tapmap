@@ -8,6 +8,7 @@
 
 import Foundation
 import SwiftyJSON
+import AppKit.NSImage
 
 enum GeoBakePipelineError : Error {
 	case tessellationMissing
@@ -101,13 +102,27 @@ func bakeGeometry() throws {
 		loddedProvinces = addLodLevels(to: loddedProvinces, from: lodProvinces)
 	}
 	
+	// MARK: Get region colors from blur map
+	OperationTintRegions.storeNewColorMap()
+	let colorMap = OperationTintRegions.loadColorMap()
+	let bitmap = NSBitmapImageRep(data: colorMap.tiffRepresentation!)!
+	let continentTintJob = OperationTintRegions(features: loddedContinents, colorMap: bitmap, reporter: reportLoad)
+	let countryTintJob = OperationTintRegions(features: loddedCountries, colorMap: bitmap, reporter: reportLoad)
+	let provinceTintJob = OperationTintRegions(features: loddedProvinces, colorMap: bitmap, reporter: reportLoad)
+	
+	bakeQueue.addOperations([continentTintJob, countryTintJob, provinceTintJob],
+													waitUntilFinished: true)
+	let tintedContinents = continentTintJob.output
+	let tintedCountries = countryTintJob.output
+	let tintedProvinces = provinceTintJob.output
+	
 	// Filter on pipeline settings before baking into file
 	let continentFilter = PipelineConfig.shared.configArray("bake.continents")
 	let countriesFilter = PipelineConfig.shared.configArray("bake.countries")
 	let provincesFilter = PipelineConfig.shared.configArray("bake.provinces")
-	let filteredContinents = loddedContinents.filter { continentFilter?.contains($0.value.name) ?? true }
-	let filteredCountries = loddedCountries.filter { countriesFilter?.contains($0.value.name) ?? true }
-	let filteredProvinces = loddedProvinces.filter { provincesFilter?.contains($0.value.name) ?? true }
+	let filteredContinents = tintedContinents.filter { continentFilter?.contains($0.value.name) ?? true }
+	let filteredCountries = tintedCountries.filter { countriesFilter?.contains($0.value.name) ?? true }
+	let filteredProvinces = tintedProvinces.filter { provincesFilter?.contains($0.value.name) ?? true }
 	
 	let fixupJob = OperationFixupHierarchy(continentCollection: filteredContinents,
 																				 countryCollection: filteredCountries,

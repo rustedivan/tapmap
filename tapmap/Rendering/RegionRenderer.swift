@@ -32,6 +32,7 @@ class RegionRenderer {
 		let shaderLib = device.makeDefaultLibrary()!
 		
 		let pipelineDescriptor = MTLRenderPipelineDescriptor()
+		pipelineDescriptor.sampleCount = 4
 		pipelineDescriptor.vertexFunction = shaderLib.makeFunction(name: "mapVertex")
 		pipelineDescriptor.fragmentFunction = shaderLib.makeFunction(name: "mapFragment")
 		pipelineDescriptor.colorAttachments[0].pixelFormat = pixelFormat;
@@ -51,7 +52,12 @@ class RegionRenderer {
 		}
 	}
 	
-	func prepareFrame(visibleContinentSet: Set<RegionHash>, visibleCountrySet: Set<RegionHash>, visibleProvinceSet: Set<RegionHash>, bufferIndex: Int) {
+	func prepareFrame(visibleContinentSet: Set<RegionHash>,
+										visibleCountrySet: Set<RegionHash>,
+										visibleProvinceSet: Set<RegionHash>,
+										visitedSet: Set<RegionHash>,
+										regionContinentMap: GeoContinentMap,
+										bufferIndex: Int) {
 		let frameContinentRenderList = RenderList(visibleContinentSet.compactMap { regionHash in
 																		return GeometryStreamer.shared.renderPrimitive(for: regionHash, streamIfMissing: true)
 																	 })
@@ -62,34 +68,37 @@ class RegionRenderer {
 																		return GeometryStreamer.shared.renderPrimitive(for: regionHash, streamIfMissing: true)
 																	 })
 		
+		let stylesheet = Stylesheet.shared
 		var styles = Array<InstanceUniforms>()
 		styles.reserveCapacity(frameContinentRenderList.count +
 													 frameCountryRenderList.count +
 													 frameProvinceRenderList.count)
 		
 		// Style continents
-		for _ in frameContinentRenderList {
-			let c = Stylesheet.shared.continentColor.float4
-			let u = InstanceUniforms(color: c)
+		for continent in frameContinentRenderList {
+			let u = InstanceUniforms(color: stylesheet.continentColor(for: continent.ownerHash, in: regionContinentMap))
 			styles.append(u)
 		}
 		
 		// Style countries
-		for _ in frameCountryRenderList {
-			let c = Stylesheet.shared.countryColor.float4
-			let u = InstanceUniforms(color: c)
+		for country in frameCountryRenderList {
+			let u = InstanceUniforms(color: stylesheet.countryColor(for: country.ownerHash, in: regionContinentMap))
 			styles.append(u)
 		}
 		
 		// Style provinces
 		for province in frameProvinceRenderList {
-			let c = province.color.vector
+			let visited = visitedSet.contains(province.ownerHash)
+			
+			// Visited provinces render in authored color, unvisited in tinted country color
+			let c = visited ? province.color.vector
+											: stylesheet.provinceColor(for: province.ownerHash, in: regionContinentMap)
 			let u = InstanceUniforms(color: c)
 			styles.append(u)
 		}
 		
 		frameSelectSemaphore.wait()
-		self.renderLists[bufferIndex] = (frameContinentRenderList + frameCountryRenderList + frameProvinceRenderList)
+			self.renderLists[bufferIndex] = (frameContinentRenderList + frameCountryRenderList + frameProvinceRenderList)
 			self.instanceUniforms[bufferIndex].contents().copyMemory(from: styles, byteCount: MemoryLayout<InstanceUniforms>.stride * styles.count)
 		frameSelectSemaphore.signal()
 	}

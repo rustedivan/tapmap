@@ -103,6 +103,13 @@ class PipelineConfig {
 		guard let file = PipelineConfig.shared.reshapedCitiesFilename else { return nil }
 		return applicationSupportUrl.appendingPathComponent(file)
 	}
+	var inputColorMapPath : URL? {
+		guard let setting = configString("input-colormap") else { return nil }
+		return URL(fileURLWithPath: setting, relativeTo: FileManager.default.homeDirectoryForCurrentUser)
+	}
+	var storedColorMapPath : URL? {
+		return applicationSupportUrl.appendingPathComponent("source-colormap.png")
+	}
 	
 	var outputFilePath : URL? {
 		guard let setting = configString("output") else { return nil }
