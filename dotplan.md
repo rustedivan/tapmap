@@ -3,8 +3,8 @@ ROAD TO FINAL
 # Rendering brief, step 2
  There are some effects I want to spice up the presentation. I'm a little stuck at how to lookup the color for a region at runtime, since the base color isn't always static. Specifically, provinces have different colors when visited and unvisited. I can definitely route around that, and ~100 O(1) dictionary lookups per frame isn't going to make a difference, but it's _wrong_. To help guide the stylesheet lookup design, let's take a look at those extra effects.
  
- - Color key for visited provinces (need to know visit state for region). I could re-create the render primitive when the province is visited and reuse the buffer. No wait, BaseRenderPrimitive is a reference type so I can mutate the color at runtime!
- - Province borders need the same visited/unvisited logic, but can HSL-darken the base color)
+ √ Color key for visited provinces (need to know visit state for region). I could re-create the render primitive when the province is visited and reuse the buffer. No wait, BaseRenderPrimitive is a reference type so I can mutate the color at runtime!
+ √ Province borders need the same visited/unvisited logic, but can HSL-darken the base color)
  - Key-color selection outline + bloom (static selection color and HSL-brightening of the base color)
  - Chromatic aberration (screen-space, independent of app logic, but animatable)
  
@@ -34,7 +34,7 @@ ROAD TO FINAL
  So, (1) it is - looking up the blur map color at bake time and storing it into the GeoTessellation.
  
  ## Polish
- - author continent hue and build HSB tuples from from Stylesheet for all regions to get the tinted black/white
+ √ author continent hue and build HSB tuples from from Stylesheet for all regions to get the tinted black/white
  
 
 
