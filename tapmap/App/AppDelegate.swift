@@ -15,8 +15,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 	var fixaStream = FixaStream(fixableSetups: [
 		(FixableId("general"),	 								.divider(display: FixableDisplay("General"))),
 		(AppFixables.renderLabels,		 						.bool(value: true, display: FixableDisplay("Show labels"))),
-		(AppFixables.borderZoomBias,		 					.float(value: 1.0, min: 1.0, max: 5.0, display: FixableDisplay("Border zoom bias"))),
-		(AppFixables.poiZoomBias,		 							.float(value: 1.0, min: 1.0, max: 5.0, display: FixableDisplay("Marker zoom bias"))),
+		(AppFixables.borderZoomBias,		 					.float(value: 1.5, min: 1.0, max: 5.0, display: FixableDisplay("Border zoom bias"))),
+		(AppFixables.poiZoomBias,		 							.float(value: 2.0, min: 1.0, max: 5.0, display: FixableDisplay("Marker zoom bias"))),
 		(FixableId("continent-header"),	 				.divider(display: FixableDisplay("Continents"))),
 		(AppFixables.continentBorderInner, 				.float(value: 0.1, min: 0.0, max: 2.0, display: FixableDisplay("Border inside"))),
 		(AppFixables.continentBorderOuter, 				.float(value: 0.1, min: 0.0, max: 2.0, display: FixableDisplay("Border outside"))),

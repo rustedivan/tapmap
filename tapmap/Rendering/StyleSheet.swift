@@ -52,8 +52,8 @@ class Stylesheet {
 	var countryBorderWidthOuter = FixableFloat(AppFixables.countryBorderOuter, initial: 0.1)
 	var provinceBorderWidthInner = FixableFloat(AppFixables.provinceBorderInner, initial: 0.1)
 	var provinceBorderWidthOuter = FixableFloat(AppFixables.provinceBorderOuter, initial: 0.1)
-	var borderZoomBias = FixableFloat(AppFixables.borderZoomBias, initial: 1.0)
-	var poiZoomBias = FixableFloat(AppFixables.poiZoomBias, initial: 1.0)
+	var borderZoomBias = FixableFloat(AppFixables.borderZoomBias, initial: 1.5)
+	var poiZoomBias = FixableFloat(AppFixables.poiZoomBias, initial: 2.0)
 	
 	// Map colors
 	var oceanColor = FixableColor(AppFixables.oceanColor, initial: UIColor(hue: 0.55, saturation: 0.07, brightness: 0.90, alpha: 1.0).cgColor)
