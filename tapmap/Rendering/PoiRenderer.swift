@@ -150,7 +150,7 @@ class PoiRenderer {
 		return sortPlacesIntoPoiPlanes(region.places, in: region, inDevice: device);
 	}
 	
-	func prepareFrame(visibleSet: Set<RegionHash>, zoom: Float, bufferIndex: Int) {
+	func prepareFrame(visibleSet: Set<RegionHash>, zoom: Float, zoomRate: Float, bufferIndex: Int) {
 		let now = Date()
 		for (key, p) in poiVisibility {
 			switch(p) {
@@ -167,9 +167,8 @@ class PoiRenderer {
 			}
 		}
 		
-		var poiScreenSize: Float = 2.0
-		poiScreenSize = 2.0 / (zoom)
-		poiScreenSize += min(zoom * 0.01, 0.1)	// Boost POI sizes a bit when zooming in // $ Copy border zoom bias
+		let poiZoom = zoom / (1.0 - zoomRate + zoomRate * Stylesheet.shared.poiZoomBias.value)	// POIs become larger at closer zoom levels
+		let poiScreenSize: Float = 2.0 / poiZoom
 		let newRankThreshold = updateZoomThreshold(viewZoom: zoom)
 		
 		let framePlanes = poiPlanePrimitives.filter { visibleSet.contains($0.ownerHash) }
