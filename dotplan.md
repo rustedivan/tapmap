@@ -1,5 +1,18 @@
 ROAD TO FINAL
 
+# POI styling
+POI styling needs better markers, and support for selecting different marker sprites. It looks pretty straight-forward - every rank has its own POI plane, so the marker index can be an instance uniform.
+Label layout, however, looks to be a right week-long beast. I've done some research of how MapBox and friends to do it, and here are some requirements and insights.
+
+**Label collision detection:** on scroll or zoom, labels need to be laid out by collision detection. Fixable margins around fitted label boxes. As a first step, layout all labels where they want to be.
+**Label anchoring:** Maps seem to have a convention where labels are offset diagonally from their anchor points: NE, SE, NW, SW in that order. The offset in pixels would be a good Fixable.
+**Label prioritisation:** Insert labels into the view in rank order. Weaker ranks are inserted later.
+**Layout annealing:** When inserting, check for collisions. Incoming labels must move if colliding. If no free space can be found by selecting another anchor, restart from the first anchor point, and ask colliding labels to move to a "worse" anchor. Don't recurse. If a solution can't be found, drop the label.
+**Label polish:** Areas should print in small-caps, without a marker. POI labels should come in two weights with differing size, weight and brightness. Give multiline labels negative line height.
+
+Depending on how fast this layout step runs, it can be done on each zoom frame. Otherwise, put it on a backthread, and animate to the produced frame when it's done.
+- refactoring: break out other backthread jobs to their own files
+
 # Rendering brief, step 2
  There are some effects I want to spice up the presentation. I'm a little stuck at how to lookup the color for a region at runtime, since the base color isn't always static. Specifically, provinces have different colors when visited and unvisited. I can definitely route around that, and ~100 O(1) dictionary lookups per frame isn't going to make a difference, but it's _wrong_. To help guide the stylesheet lookup design, let's take a look at those extra effects.
  
@@ -13,7 +26,7 @@ ROAD TO FINAL
  The province colors should represent the their continents. I think this could be a cool way to achieve a faceted, sharp, consistent look that still sells the proximity between areas, and would look really nice for long overland trips.
  
 - Prerender an image with the continents' key colors.
-- Blur it heavily to get soft gradients where continents are close, and along coastlines
+- Blur it heavily to get soft gradients where continents are close, and along coastlines (maybe even bring dark blue into the continent coastlines?)
 - For each province (and optionally country, if needed), sample the blurred map at the pole of inaccessibility
  
  I did a quick test by just taking a continent-color map, blurring it in Pixelmator and taking a Voronoi filter to simulate countries. Looked good after one minute of work. This is the thing.
