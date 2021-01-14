@@ -41,7 +41,7 @@ class Label {
 		view.preferredMaxLayoutWidth = 200.0
 		view.lineBreakMode = .byWordWrapping
 		view.numberOfLines = 2
-		view.adjustsFontSizeToFitWidth = true
+//		view.adjustsFontSizeToFitWidth = true
 		
 		ownerHash = 0
 	}
@@ -89,21 +89,53 @@ class LabelView: UIView {
 	}
 	
 	func updateLabels(for activePoiHashes: Set<Int>, inArea focus: Aabb, atZoom zoom: Float) {
-		// Pick out the top-ten markers for display
+		// √ Create a QuadTree<LabelHash> (yes, per frame - we're only doing insertions, and there is nothing to learn from the previous layout frame)
+		// $ Copy label frame size into marker when binding
+		// $ Reject labels that collide with a higher-prio label and keep selecting until pool is full
+		// $ Teach poiPrimitives how to cycle down through anchor points
+		// $ Teach poiPrimitives how to give their aabb based on anchor point, margins and radial offset (insert aabb on the primitive when binding the label)
+		// $ Sort the poiPrimitives by priority
+		// $ For each primitive
+		//	$ query the qtree for the incoming label - intersect the results against the label aabb
+		//  $ if no collision, insert the label into the tree
+		//  $ if collision, try the other orientations
+		// ------- it might be that this is enough; stop here and evaluate, because the next step may be O(n2) ------
+		// ------- well actually, if a label can't fit in any of its four direction, the density in this region is probably too high; spend time on rebinding to another marker instead ------
+		// ------- also, this layout should be done in prepareFrame so we only bind labels that will actually fit somewhere ------
+		// ------- skip the prefix slicing, just pull labels until the pool is full ------
+		//  $ if no other orientation works, take the list of NE collisions
+		//		$ get the aabb of their next anchor, and see if all of them can be moved out of the way
+		//		$ if so, remove them from the qtree and insert them in their new places
+		//		$ if not, take the list of SE collisions and try agaig
+		//  $ if a label cannot be inserted, unbind it and take another label in the next frame
+		
+		// Pick out the top markers for display
 		let activeMarkers = poiPrimitives.values.filter { activePoiHashes.contains($0.ownerHash) }
 		let visibleMarkers = activeMarkers.filter { boxContains(focus, $0.worldPos) }
 		let unlimitedMarkers = visibleMarkers.filter { zoomFilter($0, zoom) }
 		let prioritizedMarkers = unlimitedMarkers.sorted(by: <)
-		let markersToShow = prioritizedMarkers.prefix(LabelView.s_maxLabels)
-		let hashesToShow = markersToShow.map { $0.ownerHash }
+		let hashesToShow = prioritizedMarkers.map { $0.ownerHash }
 		
 		// First free up any labels that no longer have active markers
 		_ = poiLabels
 			.filter({ $0.ownerHash != 0 && !hashesToShow.contains($0.ownerHash) })
 			.map(unbindLabel)
 		
+		// Collision detection structure for current view
+		let labelQuadTree = QuadTree<Int>(minX: focus.minX, minY: focus.minY, maxX: focus.maxX, maxY: focus.maxY, maxDepth: 9)
+		// $ for every markersToShow
+		//  $ take the label size by name/font from the marker
+		//  $ calculate AABB offset from NE anchor
+		// 	$ query qtree for intersections with AABB, and do proper intersection.
+		//	$ if any intersection, skip the marker
+		//	$ if no intersection, bind the marker to any free label
+		//	$ if no free label can be found, exit
+		
+		// $ step 2
+		// $ if any intersection, change anchor, recalc AABB, and try again
+		
 		// Bind new markers into free labels
-		for marker in markersToShow {
+		for marker in prioritizedMarkers {
 			guard poiLabels.first(where: { $0.ownerHash == marker.ownerHash }) == nil else {
 				continue
 			}
@@ -131,7 +163,7 @@ class LabelView: UIView {
 	
 	func renderLabels(projection project: (Vertex) -> CGPoint) {
 		for label in poiLabels {
-			guard let marker = poiPrimitives.values.first(where: { $0.ownerHash == label.ownerHash }) else { // $ hotspot
+			guard let marker = poiPrimitives.values.first(where: { $0.ownerHash == label.ownerHash }) else {
 				continue
 			}
 			
@@ -139,7 +171,7 @@ class LabelView: UIView {
 			let screenPos = project(marker.worldPos)
 			switch marker.kind {
 			case .Region: label.view.center = screenPos
-			default: label.view.frame.origin = screenPos
+			default: label.view.frame.origin = screenPos	// $ Use NE origin instead
 			}
 		}
 	}
