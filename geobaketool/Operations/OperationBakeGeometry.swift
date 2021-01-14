@@ -138,7 +138,7 @@ class OperationBakeGeometry : Operation {
 	}
 	
 	func buildTree(from bakedWorld: GeoWorld) -> WorldTree {
-		var worldQuadTree = QuadTree<RegionBounds>(minX: -180.0, minY: -90.0, maxX: 181.0, maxY: 90.0, maxDepth: 6)
+		var worldQuadTree = QuadTree<RegionBounds>(minX: -180.0, minY: -90.0, maxX: 181.0, maxY: 90.0, maxDepth: 9)
 		
 		for continent in bakedWorld.children {
 			for country in continent.children {
