@@ -195,7 +195,8 @@ class MapViewController: UIViewController, MTKViewDelegate {
 		
 		labelView.updateLabels(for: renderers.poiRenderer.activePoiHashes,
 													 inArea: renderRect,
-													 atZoom: zoom)
+													 atZoom: zoom,
+													 projection: mapToView)
 		
 		geometryStreamer.updateLodLevel()	// Must run after requests have been filed in renderers.prepareFrame, otherwise glitch when switching LOD level
 		geometryStreamer.updateStreaming()
@@ -211,7 +212,7 @@ class MapViewController: UIViewController, MTKViewDelegate {
 		prepareFrame()
 		
 		renderers.render(forWorld: world, into: view)
-		labelView.renderLabels(projection: mapToView)
+		labelView.renderLabels()
 
 		needsRender = false
 	}

@@ -88,7 +88,7 @@ class LabelView: UIView {
 		poiPrimitives.merge(hashedPrimitives, uniquingKeysWith: { (l, r) in print("Replacing"); return l })
 	}
 	
-	func updateLabels(for activePoiHashes: Set<Int>, inArea focus: Aabb, atZoom zoom: Float) {
+	func updateLabels(for activePoiHashes: Set<Int>, inArea focus: Aabb, atZoom zoom: Float, projection project: (Vertex) -> CGPoint) {
 		// √ Create a QuadTree<LabelHash> (yes, per frame - we're only doing insertions, and there is nothing to learn from the previous layout frame)
 		// $ Copy label frame size into marker when binding
 		// $ Reject labels that collide with a higher-prio label and keep selecting until pool is full
@@ -161,18 +161,9 @@ class LabelView: UIView {
 		}
 	}
 	
-	func renderLabels(projection project: (Vertex) -> CGPoint) {
-		for label in poiLabels {
-			guard let marker = poiPrimitives.values.first(where: { $0.ownerHash == label.ownerHash }) else {
-				continue
-			}
-			
-			// Layout labels (region labels hang under the center, POI labels hang from their top-left)
-			let screenPos = project(marker.worldPos)
-			switch marker.kind {
-			case .Region: label.view.center = screenPos
-			default: label.view.frame.origin = screenPos	// $ Use NE origin instead
-			}
+	func renderLabels() {
+		// $ Suppress immediate layout, layout after the frame is done
+	}
 		}
 	}
 	
