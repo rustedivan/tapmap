@@ -29,6 +29,13 @@ func boxContains(_ aabb: Aabb, _ p: Vertex) -> Bool {
 					aabb.minY < p.y && p.y < aabb.maxY)
 }
 
+func boxIntersects(_ a: Aabb, _ b: Aabb) -> Bool {
+	return !( a.minX >= b.maxX ||
+						a.maxX <= b.minX ||
+						a.minY >= b.maxY ||
+						a.maxY <= b.minY)
+}
+
 func pickFromTessellations<T:GeoIdentifiable>(p: Vertex, candidates: Set<T>) -> RegionHash? {
 	let streamer = GeometryStreamer.shared
 	for candidate in candidates {

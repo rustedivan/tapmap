@@ -60,14 +60,6 @@ indirect enum QuadNode<T: Hashable & Codable>: Codable {
 						a.maxX <  b.maxX && a.maxY <  b.maxY)
 	}
 	
-	func intersects(search a: Aabb) -> Bool {
-		let b = bounds
-		return !( a.minX >= b.maxX ||
-							a.maxX <= b.minX ||
-							a.minY >= b.maxY ||
-							a.maxY <= b.minY)
-	}
-	
 	func subnodes() -> (tl: QuadNode, tr: QuadNode, bl: QuadNode, br: QuadNode) {
 		let b = bounds
 		let tlOut = QuadNode.Empty(bounds: Aabb(loX: b.minX, loY: b.midpoint.y, hiX: b.midpoint.x, hiY: b.maxY))
@@ -181,7 +173,7 @@ func quadQuery<T:Hashable>(search: Aabb, in node: QuadNode<T>) -> Set<T> {
 	case .Empty:
 		return Set<T>()
 	case let .Node(_, values, tl, tr, bl, br):
-		if node.intersects(search: search) {
+		if boxIntersects(node.bounds, search) {
 			var subtreeValues = Set<T>(values)
 			subtreeValues.formUnion(quadQuery(search: search, in: tl))
 			subtreeValues.formUnion(quadQuery(search: search, in: tr))
