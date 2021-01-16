@@ -8,6 +8,15 @@
 
 import UIKit
 
+struct LayoutedLabel: Codable, Hashable {
+	let markerHash: Int
+	let aabb: Aabb
+	
+	func hash(into hasher: inout Hasher) {
+		hasher.combine(markerHash)
+	}
+}
+
 struct LabelMarker: Comparable {
 	let name: String
 	let ownerHash: Int
@@ -90,7 +99,7 @@ class LabelView: UIView {
 	
 	func updateLabels(for activePoiHashes: Set<Int>, inArea focus: Aabb, atZoom zoom: Float, projection project: (Vertex) -> CGPoint) {
 		// √ Create a QuadTree<LabelHash> (yes, per frame - we're only doing insertions, and there is nothing to learn from the previous layout frame)
-		// $ Copy label frame size into marker when binding
+		// x Copy label frame size into marker when binding
 		// $ Reject labels that collide with a higher-prio label and keep selecting until pool is full
 		// $ Teach poiPrimitives how to cycle down through anchor points
 		// $ Teach poiPrimitives how to give their aabb based on anchor point, margins and radial offset (insert aabb on the primitive when binding the label)
@@ -114,15 +123,40 @@ class LabelView: UIView {
 		let visibleMarkers = activeMarkers.filter { boxContains(focus, $0.worldPos) }
 		let unlimitedMarkers = visibleMarkers.filter { zoomFilter($0, zoom) }
 		let prioritizedMarkers = unlimitedMarkers.sorted(by: <)
-		let hashesToShow = prioritizedMarkers.map { $0.ownerHash }
+
+		// Collision detection structure for current view
+		let screen = UIScreen.main.bounds // $ Fix
+		var labelQuadTree = QuadTree<LayoutedLabel>(minX: Float(screen.minX), minY: Float(screen.minY), maxX: Float(screen.maxX), maxY: Float(screen.maxY), maxDepth: 9)
 		
-		// First free up any labels that no longer have active markers
+		// $ Do the layout (marker ID + anchor selection)
+		
+		var layoutedMarkers: [Int: LayoutedLabel] = [:]
+		for marker in prioritizedMarkers {
+			let origin = project(marker.worldPos)
+			let size = labelSize(forMarker: marker)
+			let rect = Aabb(loX: Float(origin.x), loY: Float(origin.y), hiX: Float(origin.x + size.width), hiY: Float(origin.y + size.height))
+			
+			let closeLabels = labelQuadTree.query(search: rect)
+			let overlap = closeLabels.first { boxIntersects($0.aabb, rect) }
+			if overlap != nil { continue }
+				
+			let layoutNode = LayoutedLabel(markerHash: marker.ownerHash, aabb: rect)
+			labelQuadTree.insert(value: layoutNode, region: rect, warnOutside: false)
+			layoutedMarkers[layoutNode.markerHash] = layoutNode	// $ Does LayoutNode need to include its markerHash?
+			if layoutedMarkers.count > LabelView.s_maxLabels {
+				break
+			}
+		}
+		
+		// Free up any labels whose markers are no longer on screen
 		_ = poiLabels
-			.filter({ $0.ownerHash != 0 && !hashesToShow.contains($0.ownerHash) })
+			.filter({ $0.ownerHash != 0 && layoutedMarkers[$0.ownerHash] == nil })
 			.map(unbindLabel)
 		
-		// Collision detection structure for current view
-		let labelQuadTree = QuadTree<Int>(minX: focus.minX, minY: focus.minY, maxX: focus.maxX, maxY: focus.maxY, maxDepth: 9)
+		// # Bind markers without a label to a free label, break when no free label can be found
+		
+		// # Now we have a list of markers and labels - project them into place
+		
 		// $ for every markersToShow
 		//  $ take the label size by name/font from the marker
 		//  $ calculate AABB offset from NE anchor
@@ -135,16 +169,20 @@ class LabelView: UIView {
 		// $ if any intersection, change anchor, recalc AABB, and try again
 		
 		// Bind new markers into free labels
-		for marker in prioritizedMarkers {
-			guard poiLabels.first(where: { $0.ownerHash == marker.ownerHash }) == nil else {
-				continue
-			}
-			guard let freeLabel = poiLabels.first(where: { $0.ownerHash == 0 }) else {
-				print("Marker \(marker.ownerHash) could not be bound to a free label")
-				continue
-			}
+		for markerHash in layoutedMarkers.keys {
+			guard poiLabels.first(where: { $0.ownerHash == markerHash }) == nil else { continue }	// $ Checks that the label is bound to a marker, unnecessary
+			guard let freeLabel = poiLabels.first(where: { $0.ownerHash == 0 }) else { break }		// $ Finds a free label
 			
-			bindLabel(freeLabel, to: marker)
+			bindLabel(freeLabel, to: poiPrimitives[markerHash]!)
+		}
+		
+		for label in poiLabels {
+			guard label.ownerHash != 0 else { continue }
+			let labelRect = layoutedMarkers[label.ownerHash]!.aabb	// $ Shitty layout
+			label.view.frame = CGRect(x: CGFloat(labelRect.minX),
+																y: CGFloat(labelRect.minY),
+																width: CGFloat(labelRect.maxX - labelRect.minX),
+																height: CGFloat(labelRect.maxY - labelRect.minY))
 		}
 	}
 	
@@ -164,7 +202,26 @@ class LabelView: UIView {
 	func renderLabels() {
 		// $ Suppress immediate layout, layout after the frame is done
 	}
+	
+	func labelSize(forMarker marker: LabelMarker) -> CGSize {
+		let font: UIFont
+		switch marker.kind {
+			case .Region:
+				switch marker.rank {
+				case 0: font = .boldSystemFont(ofSize: 20.0)	// $ Move to stylesheet
+				case 1: font = .boldSystemFont(ofSize: 16.0)
+				default: font = .boldSystemFont(ofSize: 12.0)
+				}
+			case .Capital: font = .systemFont(ofSize: 13.0)
+			case .City: font = .systemFont(ofSize: 11.0)
+			case .Town: font = .systemFont(ofSize: 9.0)
 		}
+		
+		let rect = (marker.name as NSString).boundingRect(with: CGSize(width: 200.0, height: 30.0),
+																											options: .usesLineFragmentOrigin,
+																											attributes: [.font: font],
+																											context: nil)
+		return rect.size
 	}
 	
 	func bindLabel(_ label: Label, to marker: LabelMarker) {
@@ -192,7 +249,7 @@ class LabelView: UIView {
 		switch marker.kind {
 		case .Region:
 			switch marker.rank {
-			case 0: label.view.font = .boldSystemFont(ofSize: 20.0)
+			case 0: label.view.font = .boldSystemFont(ofSize: 20.0)	// $ Move to stylesheet
 			case 1: label.view.font = .boldSystemFont(ofSize: 16.0)
 			default: label.view.font = .boldSystemFont(ofSize: 12.0)
 			}
@@ -208,6 +265,7 @@ class LabelView: UIView {
 		
 		label.view.textAlignment = alignment
 		label.view.attributedText = NSAttributedString(string: marker.name, attributes: strokeAttribs)
+//		label.view.backgroundColor = UIColor(red: 0.0, green: 0.5, blue: 1.0, alpha: 0.4)
 	}
 	
 	func unbindLabel(_ label: Label) {
