@@ -15,10 +15,11 @@ class Label {
 	init() {
 		view = UILabel()
 		view.isHidden = true
-		view.frame = CGRect(x: 0.0, y: 0.0, width: 200.0, height: 30.0)
-		view.preferredMaxLayoutWidth = 200.0
+		view.frame = CGRect(x: 0.0, y: 0.0, width: 100.0, height: 30.0)
+		view.preferredMaxLayoutWidth = 100.0
 		view.lineBreakMode = .byWordWrapping
 		view.numberOfLines = 2
+		// $ Autotighten
 		
 		ownerHash = 0
 	}
@@ -77,12 +78,17 @@ class LabelView: UIView {
 		bindLabelsToNewMarkers(layout: layout)
 		
 		for label in poiLabels {
-			guard let labelRect = layout[label.ownerHash]?.aabb else { continue }
+			guard let placement = layout[label.ownerHash] else { continue }
+			let labelRect = placement.aabb
 			label.view.frame = CGRect(x: CGFloat(labelRect.minX),
 																y: CGFloat(labelRect.minY),
 																width: CGFloat(labelRect.maxX - labelRect.minX),
 																height: CGFloat(labelRect.maxY - labelRect.minY))
-			// $ Align text with anchor direction
+			switch placement.anchor {
+				case .NE, .SE: label.view.textAlignment = .left
+				case .NW, .SW: label.view.textAlignment = .right
+				case .Center: label.view.textAlignment = .center
+			}
 		}
 	}
 	

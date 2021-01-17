@@ -29,7 +29,7 @@ enum LayoutAnchor {
 }
 
 func placeLabel(width: Float, height: Float, at screenPos: CGPoint, anchor: LayoutAnchor) -> Aabb {
-	let radialDistance: Float = 5.0 // $ Radial distance from Stylesheet
+	let radialDistance: Float = 2.0
 	let markerPos = Vertex(Float(screenPos.x), Float(screenPos.y))
 	let lowerLeft: Vertex
 	switch anchor {
@@ -124,18 +124,25 @@ class LabelLayoutEngine {
 		var layout: [Int : LabelPlacement] = [:]
 		
 		for marker in workingSet {
-			let anchor = LayoutAnchor.Center
+			var anchor: LayoutAnchor? = (marker.kind == .Region ? .Center : .NE)	// Choose starting layout anchor
 			let origin = project(marker.worldPos)
 			let size = labelSize(forMarker: marker)
-			let aabb = placeLabel(width: size.w, height: size.h, at: origin, anchor: anchor)
 			
-			let closeLabels = labelQuadTree.query(search: aabb)
-			if closeLabels.allSatisfy({ boxIntersects($0.aabb, aabb) == false })
-			{
-				let layoutNode = LabelPlacement(markerHash: marker.ownerHash, aabb: aabb, anchor: anchor)
-				labelQuadTree.insert(value: layoutNode, region: aabb, warnOutside: false)
-				layout[layoutNode.markerHash] = layoutNode
-			}
+			repeat {
+				let aabb = placeLabel(width: size.w, height: size.h, at: origin, anchor: anchor!)
+				
+				let closeLabels = labelQuadTree.query(search: aabb)
+				let canPlaceLabel = closeLabels.allSatisfy { boxIntersects($0.aabb, aabb) == false }
+				if canPlaceLabel
+				{
+					let layoutNode = LabelPlacement(markerHash: marker.ownerHash, aabb: aabb, anchor: anchor!)
+					labelQuadTree.insert(value: layoutNode, region: aabb, warnOutside: false)
+					layout[layoutNode.markerHash] = layoutNode
+					break
+				} else {
+					anchor = anchor?.next
+				}
+			} while anchor != nil
 			
 			if layout.count >= maxLabels {
 				break
