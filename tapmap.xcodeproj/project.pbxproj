@@ -76,6 +76,7 @@
 		14985FED22F0ED0C00F68A1F /* RenderPrimitives.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14985FEC22F0ED0C00F68A1F /* RenderPrimitives.swift */; };
 		149B3FDD245EE8B1008A299E /* MapShader.metal in Sources */ = {isa = PBXBuildFile; fileRef = 149B3FDC245EE8B1008A299E /* MapShader.metal */; };
 		149CBDDD23CB230000A7AABB /* LabelView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 149CBDDC23CB230000A7AABB /* LabelView.swift */; };
+		149EEA6D25B39D9D00B19285 /* LabelLayout.swift in Sources */ = {isa = PBXBuildFile; fileRef = 149EEA6C25B39D9D00B19285 /* LabelLayout.swift */; };
 		14B63F052460BDFF00A4A433 /* BorderShader.metal in Sources */ = {isa = PBXBuildFile; fileRef = 14B63F042460BDFF00A4A433 /* BorderShader.metal */; };
 		14B63F072461450F00A4A433 /* PoiShader.metal in Sources */ = {isa = PBXBuildFile; fileRef = 14B63F062461450F00A4A433 /* PoiShader.metal */; };
 		14BAA333240EF95000DC64B9 /* OperationFitLabels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14BAA332240EF95000DC64B9 /* OperationFitLabels.swift */; };
@@ -166,6 +167,7 @@
 		14985FF522F0F35700F68A1F /* OutlineGeometry.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OutlineGeometry.swift; sourceTree = "<group>"; };
 		149B3FDC245EE8B1008A299E /* MapShader.metal */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.metal; path = MapShader.metal; sourceTree = "<group>"; };
 		149CBDDC23CB230000A7AABB /* LabelView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LabelView.swift; sourceTree = "<group>"; };
+		149EEA6C25B39D9D00B19285 /* LabelLayout.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LabelLayout.swift; sourceTree = "<group>"; };
 		14B63F042460BDFF00A4A433 /* BorderShader.metal */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.metal; path = BorderShader.metal; sourceTree = "<group>"; };
 		14B63F062461450F00A4A433 /* PoiShader.metal */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.metal; path = PoiShader.metal; sourceTree = "<group>"; };
 		14BAA332240EF95000DC64B9 /* OperationFitLabels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OperationFitLabels.swift; sourceTree = "<group>"; };
@@ -296,6 +298,7 @@
 				148937EE22B97FDF009278A0 /* PoiRenderer.swift */,
 				144B5D5722D9E092001E2A85 /* SelectionRenderer.swift */,
 				149CBDDC23CB230000A7AABB /* LabelView.swift */,
+				149EEA6C25B39D9D00B19285 /* LabelLayout.swift */,
 				148937E622B97FDF009278A0 /* EffectRenderer.swift */,
 				1468830C23B4BC4100105E04 /* DebugRenderer.swift */,
 				14985FEC22F0ED0C00F68A1F /* RenderPrimitives.swift */,
@@ -605,6 +608,7 @@
 				14FCC069245ED44D006116E7 /* MetalRenderer.swift in Sources */,
 				148937FC22B97FDF009278A0 /* RegionRenderer.swift in Sources */,
 				149CBDDD23CB230000A7AABB /* LabelView.swift in Sources */,
+				149EEA6D25B39D9D00B19285 /* LabelLayout.swift in Sources */,
 				1489380422B97FE0009278A0 /* MapViewController.swift in Sources */,
 				148937F822B97FDF009278A0 /* GeoRegion.swift in Sources */,
 				14532D9A23B515BE00943ADC /* QuadTree.swift in Sources */,
