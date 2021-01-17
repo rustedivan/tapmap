@@ -158,7 +158,7 @@ class LabelLayoutEngine {
 		}
 		
 		let font = marker.font
-		let size = (marker.name as NSString).boundingRect(with: CGSize(width: 200.0, height: 30.0),
+		let size = (marker.name as NSString).boundingRect(with: CGSize(width: 120.0, height: 60.0),
 																											options: .usesLineFragmentOrigin,
 																											attributes: [.font: font],
 																											context: nil)

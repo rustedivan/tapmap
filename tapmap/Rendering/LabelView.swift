@@ -26,7 +26,7 @@ class Label {
 }
 
 class LabelView: UIView {
-	static let s_maxLabels = 20
+	static let s_maxLabels = 50
 	var poiPrimitives: [Int : LabelMarker] = [:]
 	var poiLabels: [Label] = []
 	var layoutEngine = LabelLayoutEngine(maxLabels: s_maxLabels)
@@ -105,10 +105,6 @@ class LabelView: UIView {
 		}
 	}
 	
-	func renderLabels() {
-		// $ Suppress immediate layout, layout after the frame is done
-	}
-	
 	func bindLabelsToNewMarkers(layout: [Int : LabelPlacement]) {
 		// Free up any labels whose markers are no longer on screen
 		_ = poiLabels
@@ -134,7 +130,6 @@ class LabelView: UIView {
 		label.ownerHash = marker.ownerHash
 		label.view.isHidden = false
 		
-		let alignment: NSTextAlignment
 		let textColor: UIColor
 		let strokeColor: UIColor
 		let strokeWidth: CGFloat
@@ -144,23 +139,20 @@ class LabelView: UIView {
 			textColor = .darkGray
 			strokeColor = .white
 			strokeWidth = -2.0
-			alignment = .center
 		default:
 			textColor = .white
 			strokeColor = .darkGray
 			strokeWidth = -4.0
-			alignment = .left
 		}
 		
-		label.view.font = marker.font
-		 
-		let strokeAttribs: [NSAttributedString.Key: Any] =
-			[.strokeColor: strokeColor,
-			 .foregroundColor: textColor,
-			 .strokeWidth: strokeWidth]
+		let attribs: [NSAttributedString.Key: Any] = [
+			.font: marker.font,
+			.strokeColor: strokeColor,
+			.foregroundColor: textColor,
+			.strokeWidth: strokeWidth
+		]
 		
-		label.view.textAlignment = alignment
-		label.view.attributedText = NSAttributedString(string: marker.name, attributes: strokeAttribs)
+		label.view.attributedText = NSAttributedString(string: marker.name, attributes: attribs)
 	}
 	
 	func unbindLabel(_ label: Label) {

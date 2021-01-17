@@ -210,10 +210,7 @@ class MapViewController: UIViewController, MTKViewDelegate {
 	
 	func draw(in view: MTKView) {
 		prepareFrame()
-		
 		renderers.render(forWorld: world, into: view)
-		labelView.renderLabels()
-
 		needsRender = false
 	}
 	
