@@ -15,6 +15,7 @@ enum LayoutAnchor {
 	case SE
 	case NW
 	case SW
+	case Center
 	
 	var next: LayoutAnchor? {
 		switch self {
@@ -22,13 +23,26 @@ enum LayoutAnchor {
 			case .SE: return .NW
 			case .NW: return .SW
 			case .SW: return nil
+			case .Center: return nil
 		}
 	}
 }
 
-fileprivate func layout(width: Float, height: Float, at worldPos: Vertex, anchor: LayoutAnchor) -> Aabb {
-	// $ Radial distance from Stylesheet
-	return Aabb()
+func placeLabel(width: Float, height: Float, at screenPos: CGPoint, anchor: LayoutAnchor) -> Aabb {
+	let radialDistance: Float = 5.0 // $ Radial distance from Stylesheet
+	let markerPos = Vertex(Float(screenPos.x), Float(screenPos.y))
+	let lowerLeft: Vertex
+	switch anchor {
+		case .NE: lowerLeft = markerPos + Vertex(+radialDistance, -radialDistance) + Vertex(0.0, -height)
+		case .SE: lowerLeft = markerPos + Vertex(+radialDistance, +radialDistance) + Vertex(0.0, 0.0)
+		case .NW: lowerLeft = markerPos + Vertex(-radialDistance, -radialDistance) + Vertex(-width, -height)
+		case .SW: lowerLeft = markerPos + Vertex(-radialDistance, +radialDistance) + Vertex(-width, 0.0)
+		case .Center: lowerLeft = markerPos + Vertex(-width / 2.0, -height / 2.0)
+	}
+
+
+	return Aabb(loX: lowerLeft.x, loY: lowerLeft.y,
+							hiX: lowerLeft.x + width, hiY: lowerLeft.y + height)
 }
 
 struct LabelMarker: Comparable {
@@ -88,7 +102,7 @@ struct LabelPlacement: Codable, Hashable {
 
 class LabelLayoutEngine {
 	let maxLabels: Int
-	var labelSizeCache: [Int : CGSize] = [:]
+	var labelSizeCache: [Int : (w: Float, h: Float)] = [:]
 	
 	init(maxLabels: Int) {
 		self.maxLabels = maxLabels
@@ -110,15 +124,15 @@ class LabelLayoutEngine {
 		var layout: [Int : LabelPlacement] = [:]
 		
 		for marker in workingSet {
+			let anchor = LayoutAnchor.Center
 			let origin = project(marker.worldPos)
 			let size = labelSize(forMarker: marker)
-			let aabb = Aabb(loX: Float(origin.x), loY: Float(origin.y),
-											hiX: Float(origin.x + size.width), hiY: Float(origin.y + size.height))
+			let aabb = placeLabel(width: size.w, height: size.h, at: origin, anchor: anchor)
 			
 			let closeLabels = labelQuadTree.query(search: aabb)
 			if closeLabels.allSatisfy({ boxIntersects($0.aabb, aabb) == false })
 			{
-				let layoutNode = LabelPlacement(markerHash: marker.ownerHash, aabb: aabb, anchor: LayoutAnchor.NE)
+				let layoutNode = LabelPlacement(markerHash: marker.ownerHash, aabb: aabb, anchor: anchor)
 				labelQuadTree.insert(value: layoutNode, region: aabb, warnOutside: false)
 				layout[layoutNode.markerHash] = layoutNode
 			}
@@ -131,7 +145,7 @@ class LabelLayoutEngine {
 		return layout
 	}
 	
-	func labelSize(forMarker marker: LabelMarker) -> CGSize {
+	func labelSize(forMarker marker: LabelMarker) -> (w: Float, h: Float) {
 		if let cachedSize = labelSizeCache[marker.ownerHash] {
 			return cachedSize
 		}
@@ -142,7 +156,8 @@ class LabelLayoutEngine {
 																											attributes: [.font: font],
 																											context: nil)
 																											.size
-		labelSizeCache[marker.ownerHash] = size
-		return size
+		let wh = (w: Float(size.width), h: Float(size.height))
+		labelSizeCache[marker.ownerHash] = wh
+		return wh
 	}
 }
