@@ -46,6 +46,20 @@ struct LabelMarker: Comparable {
 		rank = poi.rank
 	}
 	
+	var font: UIFont {
+		switch kind {
+			case .Region:
+				switch rank {
+				case 0: return .boldSystemFont(ofSize: 20.0)	// $ Move to stylesheet
+				case 1: return .boldSystemFont(ofSize: 16.0)
+				default: return .boldSystemFont(ofSize: 12.0)
+				}
+			case .Capital: return .systemFont(ofSize: 13.0)
+			case .City: return .systemFont(ofSize: 11.0)
+			case .Town: return .systemFont(ofSize: 9.0)
+		}
+	}
+	
 	static func < (lhs: LabelMarker, rhs: LabelMarker) -> Bool {
 		let lhsScore = lhs.rank - (lhs.kind == .Region ? 1 : 0)	// Value regions one step higher
 		let rhsScore = rhs.rank - (rhs.kind == .Region ? 1 : 0)
@@ -122,19 +136,7 @@ class LabelLayoutEngine {
 			return cachedSize
 		}
 		
-		let font: UIFont
-		switch marker.kind {
-			case .Region:
-				switch marker.rank {
-				case 0: font = .boldSystemFont(ofSize: 20.0)	// $ Move to stylesheet
-				case 1: font = .boldSystemFont(ofSize: 16.0)
-				default: font = .boldSystemFont(ofSize: 12.0)
-				}
-			case .Capital: font = .systemFont(ofSize: 13.0)
-			case .City: font = .systemFont(ofSize: 11.0)
-			case .Town: font = .systemFont(ofSize: 9.0)
-		}
-		
+		let font = marker.font
 		let size = (marker.name as NSString).boundingRect(with: CGSize(width: 200.0, height: 30.0),
 																											options: .usesLineFragmentOrigin,
 																											attributes: [.font: font],

@@ -146,17 +146,7 @@ class LabelView: UIView {
 			alignment = .left
 		}
 		
-		switch marker.kind {
-		case .Region:
-			switch marker.rank {
-			case 0: label.view.font = .boldSystemFont(ofSize: 20.0)	// $ Move to stylesheet
-			case 1: label.view.font = .boldSystemFont(ofSize: 16.0)
-			default: label.view.font = .boldSystemFont(ofSize: 12.0)
-			}
-		case .Capital: label.view.font = .systemFont(ofSize: 13.0)
-		case .City: label.view.font = .systemFont(ofSize: 11.0)
-		case .Town: label.view.font = .systemFont(ofSize: 9.0)
-		}
+		label.view.font = marker.font
 		 
 		let strokeAttribs: [NSAttributedString.Key: Any] =
 			[.strokeColor: strokeColor,
