@@ -89,14 +89,22 @@ struct QuadTree<T: Hashable & Codable>: Codable {
 		self.maxDepth = maxDepth
 	}
 	
-	mutating func insert(value: T, region: Aabb, warnOutside: Bool = false) {
-		guard root.contains(region: region) else {
-			if warnOutside {
+	mutating func insert(value: T, region: Aabb, clipToBounds: Bool = false) {
+		var newRegion = region
+		if root.contains(region: region) == false {
+			if clipToBounds {
+				let l = max(newRegion.minX, root.bounds.minX)
+				let r = min(newRegion.maxX, root.bounds.maxX)
+				let t = max(newRegion.minY, root.bounds.minY)
+				let b = min(newRegion.maxY, root.bounds.maxY)
+				newRegion = Aabb(loX: l, loY: t, hiX: r, hiY: b)
+			} else {
 				print("Value \(value) lies outside quadtree bounds: \(region)")
+				return
 			}
-			return
 		}
-		(root, _) = quadInsert(value, region: region, into: root, depth: 1, maxDepth: maxDepth)
+		
+		(root, _) = quadInsert(value, region: newRegion, into: root, depth: 1, maxDepth: maxDepth)
 	}
 	
 	mutating func remove(hashValue: Int) {
