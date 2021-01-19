@@ -60,17 +60,21 @@ struct LabelMarker: Comparable {
 		rank = poi.rank
 	}
 	
+	var displayText: NSString {
+		return ((kind == .Region) ? name.uppercased() : name) as NSString
+	}
+	
 	var font: UIFont {
 		switch kind {
 			case .Region:
 				switch rank {
-				case 0: return .boldSystemFont(ofSize: 20.0)	// $ Move to stylesheet
-				case 1: return .boldSystemFont(ofSize: 16.0)
-				default: return .boldSystemFont(ofSize: 12.0)
+					case 0: return UIFont(name: "HelveticaNeue-Bold", size: 20.0)!	// $ Move to stylesheet
+					case 1: return UIFont(name: "HelveticaNeue-Bold", size: 16.0)!
+					default: return UIFont(name: "HelveticaNeue-Bold", size: 12.0)!
 				}
-			case .Capital: return .systemFont(ofSize: 13.0)
-			case .City: return .systemFont(ofSize: 11.0)
-			case .Town: return .systemFont(ofSize: 9.0)
+			case .Capital: return UIFont(name: "HelveticaNeue-Bold", size: 14.0)!
+			case .City: return UIFont(name: "HelveticaNeue-Bold", size: 12.0)!
+			case .Town: return UIFont(name: "HelveticaNeue-Bold", size: 10.0)!
 		}
 	}
 	
@@ -110,7 +114,7 @@ class LabelLayoutEngine {
 	
 	func layoutLabels(visibleMarkers: [LabelMarker],
 										projection project: (Vertex) -> CGPoint) -> [Int : LabelPlacement] {
-		let prioritizedMarkers = visibleMarkers.sorted(by: <)
+		let prioritizedMarkers = visibleMarkers.sorted(by: <)	// $ Prioritize by age too, so we don't get flickering. Older labels should not get nixed by newer
 		let workingSet = prioritizedMarkers.prefix(maxLabels * 2)	// Take enough markers to give each label two candidates
 		
 		// Collision detection structure for screen-space layout
@@ -119,10 +123,10 @@ class LabelLayoutEngine {
 																								 minY: Float(screen.minY),
 																								 maxX: Float(screen.maxX),
 																								 maxY: Float(screen.maxY),
-																								 maxDepth: 9)
+																								 maxDepth: 6)
 		
 		var layout: [Int : LabelPlacement] = [:]
-		
+		let margin: Float = 3.0 // $ Stylesheet
 		for marker in workingSet {
 			var anchor: LayoutAnchor? = (marker.kind == .Region ? .Center : .NE)	// Choose starting layout anchor
 			let origin = project(marker.worldPos)
@@ -130,14 +134,15 @@ class LabelLayoutEngine {
 			
 			repeat {
 				let aabb = placeLabel(width: size.w, height: size.h, at: origin, anchor: anchor!)
+				let paddedAabb = Aabb(loX: aabb.minX - margin, loY: aabb.minY - margin, hiX: aabb.maxX + margin, hiY: aabb.maxY + margin)
 				
-				let closeLabels = labelQuadTree.query(search: aabb)
-				let canPlaceLabel = closeLabels.allSatisfy { boxIntersects($0.aabb, aabb) == false }
+				let closeLabels = labelQuadTree.query(search: paddedAabb)
+				let canPlaceLabel = closeLabels.allSatisfy { boxIntersects($0.aabb, paddedAabb) == false }
 				if canPlaceLabel
 				{
-					let layoutNode = LabelPlacement(markerHash: marker.ownerHash, aabb: aabb, anchor: anchor!)
-					labelQuadTree.insert(value: layoutNode, region: aabb, warnOutside: false)
+					let layoutNode = LabelPlacement(markerHash: marker.ownerHash, aabb: aabb, anchor: anchor!)	// Use the unpadded aabb for the actual label
 					layout[layoutNode.markerHash] = layoutNode
+					labelQuadTree.insert(value: layoutNode, region: paddedAabb, clipToBounds: true)							// Use the padded aabb for collision detection
 					break
 				} else {
 					anchor = anchor?.next
@@ -158,12 +163,12 @@ class LabelLayoutEngine {
 		}
 		
 		let font = marker.font
-		let size = (marker.name as NSString).boundingRect(with: CGSize(width: 120.0, height: 60.0),
+		let size = marker.displayText.boundingRect(with: CGSize(width: 120.0, height: 120.0),
 																											options: .usesLineFragmentOrigin,
 																											attributes: [.font: font],
 																											context: nil)
 																											.size
-		let wh = (w: Float(size.width), h: Float(size.height))
+		let wh = (w: Float(ceil(size.width)), h: Float(ceil(size.height)))
 		labelSizeCache[marker.ownerHash] = wh
 		return wh
 	}

@@ -19,7 +19,7 @@ class Label {
 		view.preferredMaxLayoutWidth = 100.0
 		view.lineBreakMode = .byWordWrapping
 		view.numberOfLines = 2
-		// $ Autotighten
+		view.allowsDefaultTighteningForTruncation = true
 		
 		ownerHash = 0
 	}
@@ -136,23 +136,34 @@ class LabelView: UIView {
 		
 		switch marker.kind {
 		case .Region:
-			textColor = .darkGray
+			textColor = .darkGray	// $ Stylesheet
 			strokeColor = .white
 			strokeWidth = -2.0
 		default:
-			textColor = .white
+			textColor = .lightGray // $ Stylesheet
 			strokeColor = .darkGray
 			strokeWidth = -4.0
 		}
+		
+		let labelLineSpacing: CGFloat = 2.0
+		let font = marker.font
+		let paragraphStyle = NSMutableParagraphStyle()
+		let lineHeight = font.pointSize - font.ascender + font.capHeight
+		let offset = font.capHeight - font.ascender
+		paragraphStyle.minimumLineHeight = lineHeight
+		paragraphStyle.maximumLineHeight = lineHeight + labelLineSpacing
 		
 		let attribs: [NSAttributedString.Key: Any] = [
 			.font: marker.font,
 			.strokeColor: strokeColor,
 			.foregroundColor: textColor,
-			.strokeWidth: strokeWidth
+			.strokeWidth: strokeWidth,
+			.paragraphStyle: paragraphStyle,
+			.baselineOffset: offset
 		]
 		
-		label.view.attributedText = NSAttributedString(string: marker.name, attributes: attribs)
+		let text = marker.displayText as String
+		label.view.attributedText = NSAttributedString(string: text, attributes: attribs)
 	}
 	
 	func unbindLabel(_ label: Label) {
