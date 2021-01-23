@@ -81,7 +81,11 @@ struct LabelMarker: Comparable {
 	static func < (lhs: LabelMarker, rhs: LabelMarker) -> Bool {
 		let lhsScore = lhs.rank - (lhs.kind == .Region ? 1 : 0)	// Value regions one step higher
 		let rhsScore = rhs.rank - (rhs.kind == .Region ? 1 : 0)
-		return lhsScore <= rhsScore
+		
+		let lVal = (lhsScore, lhs.ownerHash)
+		let rVal = (rhsScore, rhs.ownerHash)
+		
+		return lVal < rVal
 	}
 }
 
@@ -106,18 +110,22 @@ struct LabelPlacement: Codable, Hashable {
 
 class LabelLayoutEngine {
 	let maxLabels: Int
-	var labelSizeCache: [Int : (w: Float, h: Float)] = [:]
+	var labelSizeCache: [Int : (w: Float, h: Float)] = [:]	// $ Limit size of this
 	
 	init(maxLabels: Int) {
 		self.maxLabels = maxLabels
+		// Collision detection structure for screen-space layout
 	}
 	
-	func layoutLabels(visibleMarkers: [LabelMarker],
+	// $ Re-implement zoom culling as a 3D box sweeping through point cloud
+	
+	func layoutLabels(labeledMarkers: [LabelMarker],
+										unlabeledMarkers: [LabelMarker],
 										projection project: (Vertex) -> CGPoint) -> [Int : LabelPlacement] {
-		let prioritizedMarkers = visibleMarkers.sorted(by: <)	// $ Prioritize by age too, so we don't get flickering. Older labels should not get nixed by newer
+		let newCandidates = unlabeledMarkers.sorted(by: <)
+		let prioritizedMarkers = labeledMarkers + newCandidates
 		let workingSet = prioritizedMarkers.prefix(maxLabels * 2)	// Take enough markers to give each label two candidates
 		
-		// Collision detection structure for screen-space layout
 		let screen = UIScreen.main.bounds
 		var labelQuadTree = QuadTree<LabelPlacement>(minX: Float(screen.minX),
 																								 minY: Float(screen.minY),
@@ -125,8 +133,8 @@ class LabelLayoutEngine {
 																								 maxY: Float(screen.maxY),
 																								 maxDepth: 6)
 		
-		var layout: [Int : LabelPlacement] = [:]
 		let margin: Float = 3.0 // $ Stylesheet
+		var layout: [Int : LabelPlacement] = [:]
 		for marker in workingSet {
 			var anchor: LayoutAnchor? = (marker.kind == .Region ? .Center : .NE)	// Choose starting layout anchor
 			let origin = project(marker.worldPos)
@@ -141,8 +149,8 @@ class LabelLayoutEngine {
 				if canPlaceLabel
 				{
 					let layoutNode = LabelPlacement(markerHash: marker.ownerHash, aabb: aabb, anchor: anchor!)	// Use the unpadded aabb for the actual label
-					layout[layoutNode.markerHash] = layoutNode
 					labelQuadTree.insert(value: layoutNode, region: paddedAabb, clipToBounds: true)							// Use the padded aabb for collision detection
+					layout[marker.ownerHash] = layoutNode
 					break
 				} else {
 					anchor = anchor?.next
