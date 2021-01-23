@@ -30,6 +30,7 @@ class LabelView: UIView {
 	var poiPrimitives: [Int : LabelMarker] = [:]
 	var poiLabels: [Label] = []
 	var layoutEngine = LabelLayoutEngine(maxLabels: s_maxLabels)
+	var labelAges: [Int : Double] = [:]	// $ Typealias the marker hash
 	
 	override func awakeFromNib() {
 		for _ in 0 ..< LabelView.s_maxLabels {
@@ -68,17 +69,46 @@ class LabelView: UIView {
 	}
 	
 	func updateLabels(for activePoiHashes: Set<Int>, inArea focus: Aabb, atZoom zoom: Float, projection project: (Vertex) -> CGPoint) {
-		// Pick out the top markers for display
 		let activeMarkers = poiPrimitives.values.filter { activePoiHashes.contains($0.ownerHash) }
 		let visibleMarkers = activeMarkers.filter { zoomFilter($0, zoom) && boxContains(focus, $0.worldPos) }
+		let visibleMarkerHashes = Set<Int>(visibleMarkers.map { $0.ownerHash })
 		
-		// Layout up to s_maxLabels
-		let layout = layoutEngine.layoutLabels(visibleMarkers: visibleMarkers, projection: project)
 		
-		bindLabelsToNewMarkers(layout: layout)
+		let freeLabels = poiLabels.filter { $0.ownerHash == 0 || visibleMarkerHashes.contains($0.ownerHash)  == false}
+		freeLabels.forEach { unbindLabel($0) }
 		
+		// Find new/unbound markers
+		let boundLabelsHashes = Set<Int>(poiLabels
+																.filter { $0.ownerHash != 0 }
+																.map { $0.ownerHash })
+		let boundMarkers = visibleMarkers
+			.filter { boundLabelsHashes.contains($0.ownerHash) == true }
+			.sorted { (lhs, rhs) -> Bool in
+				labelAges[lhs.ownerHash]! < labelAges[rhs.ownerHash]!	// Older labels layouted before newer
+			}
+		let unboundMarkers = visibleMarkers
+			.filter { boundLabelsHashes.contains($0.ownerHash) == false }
+			.sorted(by: <)
+		
+		let markersToLayout = boundMarkers + unboundMarkers
+		
+		let layout = layoutEngine.layoutLabels(markers: markersToLayout,
+																					 projection: project)
+		let layoutContent = Set<Int>(layout.keys)
+		let newLayoutEntries = unboundMarkers.filter { layoutContent.contains($0.ownerHash) }
+
+		bindMarkers(newLayoutEntries, to: freeLabels)
+
+		// Move all labels into place
 		for label in poiLabels {
-			guard let placement = layout[label.ownerHash] else { continue }
+			guard let placement = layout[label.ownerHash] else {
+				// Labes that could not be laid out should be unbound
+				print("Warning: label for \(label.view.text) got knocked out of the layout.")
+				if label.view.isHidden == false {
+					unbindLabel(label)
+				}
+				continue
+			}
 			let labelRect = placement.aabb
 			label.view.frame = CGRect(x: CGFloat(labelRect.minX),
 																y: CGFloat(labelRect.minY),
@@ -105,24 +135,11 @@ class LabelView: UIView {
 		}
 	}
 	
-	func bindLabelsToNewMarkers(layout: [Int : LabelPlacement]) {
-		// Free up any labels whose markers are no longer on screen
-		_ = poiLabels
-			.filter({ $0.ownerHash != 0 && layout[$0.ownerHash] == nil })
-			.map(unbindLabel)
-		
-		let boundLabels = Set<Int>(poiLabels
-																.filter { $0.ownerHash != 0 }
-																.map { $0.ownerHash })
-		
-		// Find free labels and unbound markers
-		var freeLabels = poiLabels.filter { boundLabels.contains($0.ownerHash) == false}
-		let unboundMarkers = layout.filter { boundLabels.contains($0.key) == false }
-		
-		// Bind new markers into free labels
-		for markerHash in unboundMarkers.keys {
-			let freeLabel = freeLabels.popLast()!
-			bindLabel(freeLabel, to: poiPrimitives[markerHash]!)
+	func bindMarkers(_ newMarkers: [LabelMarker], to labels: [Label]) {
+		var markers = newMarkers
+		for label in labels {
+			guard let marker = markers.popLast() else { return }
+			bindLabel(label, to: marker)
 		}
 	}
 	
@@ -164,9 +181,12 @@ class LabelView: UIView {
 		
 		let text = marker.displayText as String
 		label.view.attributedText = NSAttributedString(string: text, attributes: attribs)
+		
+		labelAges[marker.ownerHash] = Date().timeIntervalSince1970
 	}
 	
 	func unbindLabel(_ label: Label) {
+		labelAges.removeValue(forKey: label.ownerHash)
 		label.ownerHash = 0
 		label.view.isHidden = true
 	}

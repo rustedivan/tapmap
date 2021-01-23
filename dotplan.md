@@ -6,15 +6,40 @@ Label layout, however, looks to be a right week-long beast. I've done some resea
 
 **Label collision detection:** on scroll or zoom, labels need to be laid out by collision detection. Fixable margins around fitted label boxes. As a first step, layout all labels where they want to be.
 **Label anchoring:** Maps seem to have a convention where labels are offset diagonally from their anchor points: NE, SE, NW, SW in that order. The offset in pixels would be a good Fixable.
-**Label prioritisation:** Insert labels into the view in rank order. Weaker ranks are inserted later.
+**Label prioritisation:** Select new labels into the view in rank order. Weaker ranks are inserted later. A bound label should keep its binding until zoomed/scrolled out of scope (prioritize existing labels)
 **Layout annealing:** When inserting, check for collisions. Incoming labels must move if colliding. If no free space can be found by selecting another anchor, restart from the first anchor point, and ask colliding labels to move to a "worse" anchor. Don't recurse. If a solution can't be found, drop the label.
 **Label polish:** Areas should print in small-caps, without a marker. POI labels should come in two weights with differing size, weight and brightness. Give multiline labels negative line height.
+**Label animation:** fade out labels before unbinding them; 
 
 Depending on how fast this layout step runs, it can be done on each zoom frame. Otherwise, put it on a backthread, and animate to the produced frame when it's done.
 - refactoring: break out other backthread jobs to their own files
 
+# Label layout engine
+The label layout engine kind of works already, but it has one big problem: frame-to-frame, the order of insertions changes, because it's all set/dictionary-based. This causes different labels to fit on different frames, which causes flickering.
+
+I have two approaches to consider: either keep the layout from the previous frame, layout any new labels that may fit, and then re-project all the labels before rendering; OR figure out a stable sorting so the insert order is the same on every layout frame.
+
+The first approach seems obviously better on first glance, but since scrolling causes _all_ labels to move, there isn't really that much useful information. Doing it in this way may be a bit faster (saving quadtree inserts, which are fast anyway) but also causes collision detection to happen with frame-old layouts. No biggie, but not clearly the best either.
+
+The second approach is more expensive in that hundreds of markers need to be sorted per frame, but it solves the problems of older labels being butted out by younger labels, too.
+
+Then, the actual binding to labels is turning out to be more of a problem than I thought. I'll try to formulate it more clearly than before.
+
+1. We have one large set of markers `M`, to allocate to a (probably) smaller set of labels `L`. This is a (simple) bipartite graph problem.
+2. The allocation of a label to a marker is said to _bind_ a marker to a label. Markers can be _bound_ or _unbound_; labels can be _used_ or _free_.
+3. `M` changes frame to frame, so some markers will need to be unbound from their labels, and possibly bound to new markers. Every frame forms a new set of free labels `Lf`, and a new set of unbound markers `Mu`.
+4. Markers have rank prioritizations that should be considered during layout insertion.
+5. The layout is dependent on insertion order from `M`, so `M` needs to sorted in a stable manner from frame to frame.
+6. A label should only disappear due to zooming or scrolling, and should not be freed up even if a higher-prioritized marker needs a label.
+
+Currently, the system is letting markers bind to free labels, but I think this becomes clearer if free labels can pick what markers to display. This is simply sorting `Mu`, and iterating over `Lf` and popping members off `Mu` to bind to each free label.
+
+- mark the binding with the frame ID
+
+
 # Optimizations
 - MetalRenderer spends effort to filter out the visible + available render sets, but they are already calculated and available in worldState. No need for `renderSet.filter(...`
+- Put label layout on a backthread
 
 # Rendering brief, step 2
  There are some effects I want to spice up the presentation. I'm a little stuck at how to lookup the color for a region at runtime, since the base color isn't always static. Specifically, provinces have different colors when visited and unvisited. I can definitely route around that, and ~100 O(1) dictionary lookups per frame isn't going to make a difference, but it's _wrong_. To help guide the stylesheet lookup design, let's take a look at those extra effects.

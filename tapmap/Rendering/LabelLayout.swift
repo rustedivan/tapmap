@@ -81,11 +81,7 @@ struct LabelMarker: Comparable {
 	static func < (lhs: LabelMarker, rhs: LabelMarker) -> Bool {
 		let lhsScore = lhs.rank - (lhs.kind == .Region ? 1 : 0)	// Value regions one step higher
 		let rhsScore = rhs.rank - (rhs.kind == .Region ? 1 : 0)
-		
-		let lVal = (lhsScore, lhs.ownerHash)
-		let rVal = (rhsScore, rhs.ownerHash)
-		
-		return lVal < rVal
+		return lhsScore < rhsScore
 	}
 }
 
@@ -119,13 +115,8 @@ class LabelLayoutEngine {
 	
 	// $ Re-implement zoom culling as a 3D box sweeping through point cloud
 	
-	func layoutLabels(labeledMarkers: [LabelMarker],
-										unlabeledMarkers: [LabelMarker],
+	func layoutLabels(markers: [LabelMarker],
 										projection project: (Vertex) -> CGPoint) -> [Int : LabelPlacement] {
-		let newCandidates = unlabeledMarkers.sorted(by: <)
-		let prioritizedMarkers = labeledMarkers + newCandidates
-		let workingSet = prioritizedMarkers.prefix(maxLabels * 2)	// Take enough markers to give each label two candidates
-		
 		let screen = UIScreen.main.bounds
 		var labelQuadTree = QuadTree<LabelPlacement>(minX: Float(screen.minX),
 																								 minY: Float(screen.minY),
@@ -135,7 +126,7 @@ class LabelLayoutEngine {
 		
 		let margin: Float = 3.0 // $ Stylesheet
 		var layout: [Int : LabelPlacement] = [:]
-		for marker in workingSet {
+		for marker in markers {
 			var anchor: LayoutAnchor? = (marker.kind == .Region ? .Center : .NE)	// Choose starting layout anchor
 			let origin = project(marker.worldPos)
 			let size = labelSize(forMarker: marker)
@@ -146,8 +137,7 @@ class LabelLayoutEngine {
 				
 				let closeLabels = labelQuadTree.query(search: paddedAabb)
 				let canPlaceLabel = closeLabels.allSatisfy { boxIntersects($0.aabb, paddedAabb) == false }
-				if canPlaceLabel
-				{
+				if canPlaceLabel {
 					let layoutNode = LabelPlacement(markerHash: marker.ownerHash, aabb: aabb, anchor: anchor!)	// Use the unpadded aabb for the actual label
 					labelQuadTree.insert(value: layoutNode, region: paddedAabb, clipToBounds: true)							// Use the padded aabb for collision detection
 					layout[marker.ownerHash] = layoutNode
