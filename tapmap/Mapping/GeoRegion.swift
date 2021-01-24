@@ -75,7 +75,7 @@ struct Aabb : Equatable, Codable {
 	}
 	
 	var width: Vertex.Precision { return maxX - minX }
-	var height: Vertex.Precision { return maxX - minX }
+	var height: Vertex.Precision { return maxY - minY }
 	var midpoint: Vertex { return Vertex(Vertex.Precision(minX + ((maxX - minX) / 2.0)),
 																			 Vertex.Precision(minY + ((maxY - minY) / 2.0))) }
 	
