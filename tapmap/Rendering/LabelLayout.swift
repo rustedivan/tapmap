@@ -106,17 +106,18 @@ struct LabelPlacement: Codable, Hashable {
 
 class LabelLayoutEngine {
 	let maxLabels: Int
+	var orderedLayout: [LabelPlacement] = []
 	var labelSizeCache: [Int : (w: Float, h: Float)] = [:]	// $ Limit size of this
 	
 	init(maxLabels: Int) {
 		self.maxLabels = maxLabels
-		// Collision detection structure for screen-space layout
 	}
 	
 	// $ Re-implement zoom culling as a 3D box sweeping through point cloud
 	
-	func layoutLabels(markers: [LabelMarker],
+	func layoutLabels(markers: [Int: LabelMarker],
 										projection project: (Vertex) -> CGPoint) -> [Int : LabelPlacement] {
+		// Collision detection structure for screen-space layout
 		let screen = UIScreen.main.bounds
 		var labelQuadTree = QuadTree<LabelPlacement>(minX: Float(screen.minX),
 																								 minY: Float(screen.minY),
@@ -124,35 +125,55 @@ class LabelLayoutEngine {
 																								 maxY: Float(screen.maxY),
 																								 maxDepth: 6)
 		
-		let margin: Float = 3.0 // $ Stylesheet
-		var layout: [Int : LabelPlacement] = [:]
-		for marker in markers {
+		var workingSet = markers
+		// Move and insert the previously placed labels in their established order
+		for (i, placement) in orderedLayout.enumerated() {
+			let marker = workingSet[placement.markerHash]!
+			let origin = project(marker.worldPos)
+			let size = labelSize(forMarker: marker)
+			let aabb = placeLabel(width: size.w, height: size.h,
+														at: origin, anchor: placement.anchor)
+			let paddedAabb = padAabb(aabb)
+			
+			labelQuadTree.insert(value: placement, region: paddedAabb, clipToBounds: true)	// $ Can insert hash only :+!:
+			orderedLayout[i] = LabelPlacement(markerHash: placement.markerHash, aabb: aabb, anchor: placement.anchor)
+			workingSet.removeValue(forKey: placement.markerHash)
+		}
+		
+		// Layout new incoming markers
+		let markersToLayout = Array(workingSet.values).sorted(by: <)
+		for marker in markersToLayout {
+			guard orderedLayout.count < maxLabels else { break }
+			
 			var anchor: LayoutAnchor? = (marker.kind == .Region ? .Center : .NE)	// Choose starting layout anchor
 			let origin = project(marker.worldPos)
 			let size = labelSize(forMarker: marker)
 			
-			repeat {
+			while anchor != nil {
 				let aabb = placeLabel(width: size.w, height: size.h, at: origin, anchor: anchor!)
-				let paddedAabb = Aabb(loX: aabb.minX - margin, loY: aabb.minY - margin, hiX: aabb.maxX + margin, hiY: aabb.maxY + margin)
+				let paddedAabb = padAabb(aabb)
 				
 				let closeLabels = labelQuadTree.query(search: paddedAabb)
 				let canPlaceLabel = closeLabels.allSatisfy { boxIntersects($0.aabb, paddedAabb) == false }
 				if canPlaceLabel {
-					let layoutNode = LabelPlacement(markerHash: marker.ownerHash, aabb: aabb, anchor: anchor!)	// Use the unpadded aabb for the actual label
-					labelQuadTree.insert(value: layoutNode, region: paddedAabb, clipToBounds: true)							// Use the padded aabb for collision detection
-					layout[marker.ownerHash] = layoutNode
+					let layoutNode = LabelPlacement(markerHash: marker.ownerHash, aabb: aabb, anchor: anchor!)	// Unpadded aabb for layout
+					labelQuadTree.insert(value: layoutNode, region: paddedAabb, clipToBounds: true)							// Padded aabb for collision
+					orderedLayout.append(layoutNode)
 					break
 				} else {
 					anchor = anchor?.next
 				}
-			} while anchor != nil
-			
-			if layout.count >= maxLabels {
-				break
 			}
 		}
 		
+		let layoutEntries = orderedLayout.map { ($0.markerHash, $0) }
+		let layout = Dictionary(uniqueKeysWithValues: layoutEntries)
 		return layout
+	}
+	
+	func removeLayout(for markerHash: Int) {
+		let i = orderedLayout.firstIndex { $0.markerHash == markerHash }!
+		orderedLayout.remove(at: i)
 	}
 	
 	func labelSize(forMarker marker: LabelMarker) -> (w: Float, h: Float) {
@@ -170,4 +191,9 @@ class LabelLayoutEngine {
 		labelSizeCache[marker.ownerHash] = wh
 		return wh
 	}
+}
+
+fileprivate func padAabb(_ aabb: Aabb) -> Aabb {
+	let margin: Float = 3.0 // $ Stylesheet
+	return Aabb(loX: aabb.minX - margin, loY: aabb.minY - margin, hiX: aabb.maxX + margin, hiY: aabb.maxY + margin)
 }

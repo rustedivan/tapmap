@@ -30,7 +30,6 @@ class LabelView: UIView {
 	var poiPrimitives: [Int : LabelMarker] = [:]
 	var poiLabels: [Label] = []
 	var layoutEngine = LabelLayoutEngine(maxLabels: s_maxLabels)
-	var labelAges: [Int : Double] = [:]	// $ Typealias the marker hash
 	
 	override func awakeFromNib() {
 		for _ in 0 ..< LabelView.s_maxLabels {
@@ -75,40 +74,37 @@ class LabelView: UIView {
 		
 		
 		let freeLabels = poiLabels.filter { $0.ownerHash == 0 || visibleMarkerHashes.contains($0.ownerHash)  == false}
-		freeLabels.forEach { unbindLabel($0) }
+		freeLabels.forEach {
+			if ($0.ownerHash != 0) {
+				unbindLabel($0)
+			}
+		}
 		
 		// Find new/unbound markers
-		let boundLabelsHashes = Set<Int>(poiLabels
-																.filter { $0.ownerHash != 0 }
-																.map { $0.ownerHash })
-		let boundMarkers = visibleMarkers
-			.filter { boundLabelsHashes.contains($0.ownerHash) == true }
-			.sorted { (lhs, rhs) -> Bool in
-				labelAges[lhs.ownerHash]! < labelAges[rhs.ownerHash]!	// Older labels layouted before newer
-			}
+		let boundLabelsHashes = Set<Int>(poiLabels.map { $0.ownerHash })
 		let unboundMarkers = visibleMarkers
 			.filter { boundLabelsHashes.contains($0.ownerHash) == false }
-			.sorted(by: <)
 		
-		let markersToLayout = boundMarkers + unboundMarkers
-		
+		let markerMapping = visibleMarkers.map { ($0.ownerHash, $0) }
+		let markersToLayout = Dictionary(uniqueKeysWithValues: markerMapping)
 		let layout = layoutEngine.layoutLabels(markers: markersToLayout,
 																					 projection: project)
-		let layoutContent = Set<Int>(layout.keys)
-		let newLayoutEntries = unboundMarkers.filter { layoutContent.contains($0.ownerHash) }
-
+		
+		// Bind new markers to free labels
+		let newLayoutEntries = unboundMarkers.filter { layout.keys.contains($0.ownerHash) }
 		bindMarkers(newLayoutEntries, to: freeLabels)
 
 		// Move all labels into place
 		for label in poiLabels {
 			guard let placement = layout[label.ownerHash] else {
 				// Labes that could not be laid out should be unbound
-				print("Warning: label for \(label.view.text) got knocked out of the layout.")
 				if label.view.isHidden == false {
+					print("Warning: label for \(label.view.text ?? "unknown") got knocked out of the layout.")
 					unbindLabel(label)
 				}
 				continue
 			}
+			
 			let labelRect = placement.aabb
 			label.view.frame = CGRect(x: CGFloat(labelRect.minX),
 																y: CGFloat(labelRect.minY),
@@ -181,12 +177,10 @@ class LabelView: UIView {
 		
 		let text = marker.displayText as String
 		label.view.attributedText = NSAttributedString(string: text, attributes: attribs)
-		
-		labelAges[marker.ownerHash] = Date().timeIntervalSince1970
 	}
 	
 	func unbindLabel(_ label: Label) {
-		labelAges.removeValue(forKey: label.ownerHash)
+		layoutEngine.removeLayout(for: label.ownerHash)
 		label.ownerHash = 0
 		label.view.isHidden = true
 	}
