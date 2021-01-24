@@ -135,7 +135,7 @@ class LabelLayoutEngine {
 														at: origin, anchor: placement.anchor)
 			let paddedAabb = padAabb(aabb)
 			
-			labelQuadTree.insert(value: placement, region: paddedAabb, clipToBounds: true)	// $ Can insert hash only :+!:
+			labelQuadTree.insert(value: placement, region: paddedAabb, clipToBounds: true)
 			orderedLayout[i] = LabelPlacement(markerHash: placement.markerHash, aabb: aabb, anchor: placement.anchor)
 			workingSet.removeValue(forKey: placement.markerHash)
 		}

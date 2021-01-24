@@ -99,7 +99,7 @@ class MapViewController: UIViewController, MTKViewDelegate {
 		renderers.zoomLevel = Float(scrollView.zoomScale)
 		
 		labelView.isHidden = !Stylesheet.shared.renderLabels.value
-		labelView.buildPoiPrimitives(withVisibleContinents: world.availableContinents,
+		labelView.initPoiMarkers(withVisibleContinents: world.availableContinents,
 																 countries: world.availableCountries,
 																 provinces: world.availableProvinces)
 		
@@ -182,7 +182,7 @@ class MapViewController: UIViewController, MTKViewDelegate {
 		}
 
 		renderers.poiRenderer.updatePrimitives(for: hit, with: hit.children)
-		labelView.updatePrimitives(for: hit, with: hit.children)
+		labelView.updatePoiMarkers(for: hit, with: hit.children)
 	}
 
 	func prepareFrame() {

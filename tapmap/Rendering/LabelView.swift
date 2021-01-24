@@ -26,8 +26,8 @@ class Label {
 }
 
 class LabelView: UIView {
-	static let s_maxLabels = 50
-	var poiPrimitives: [Int : LabelMarker] = [:]
+	static let s_maxLabels = 35
+	var poiMarkers: [Int : LabelMarker] = [:]
 	var poiLabels: [Label] = []
 	var layoutEngine = LabelLayoutEngine(maxLabels: s_maxLabels)
 	
@@ -39,10 +39,9 @@ class LabelView: UIView {
 		}
 	}
 	
-	func buildPoiPrimitives(withVisibleContinents continents: GeoContinentMap,
-													countries: GeoCountryMap,
-													provinces: GeoProvinceMap) {
-		
+	func initPoiMarkers(withVisibleContinents continents: GeoContinentMap,
+											countries: GeoCountryMap,
+											provinces: GeoProvinceMap) {
 		// Collect a flat list of all POIs and their hash keys
 		let continentPois = continents.flatMap { $0.value.places }
 		let countryPois = countries.flatMap { $0.value.places }
@@ -50,66 +49,63 @@ class LabelView: UIView {
 		let allPois = continentPois + countryPois + provincePois
 		let allPoiPrimitives = allPois.map { ($0.hashValue, LabelMarker(for: $0)) }
 		
-		// Insert them into the primitive dictionary, ignoring any later duplicates
-		self.poiPrimitives = Dictionary(allPoiPrimitives, uniquingKeysWith: { (l, r) in print("Inserting bad"); return l })
+		self.poiMarkers = Dictionary(uniqueKeysWithValues: allPoiPrimitives)
 	}
 	
-	func updatePrimitives<T:GeoNode & GeoPlaceContainer>(for node: T, with subRegions: Set<T.SubType>)
+	func updatePoiMarkers<T:GeoNode & GeoPlaceContainer>(for node: T, with subRegions: Set<T.SubType>)
 		where T.SubType: GeoPlaceContainer  {
 		for poi in node.places {
-			poiPrimitives.removeValue(forKey: poi.hashValue)
+			poiMarkers.removeValue(forKey: poi.hashValue)
 		}
 		
 		let subRegionPois = subRegions.flatMap { $0.places }
 		let hashedPrimitives = subRegionPois.map {
 			($0.hashValue, LabelMarker(for: $0))
 		}
-		poiPrimitives.merge(hashedPrimitives, uniquingKeysWith: { (l, r) in print("Replacing"); return l })
+		poiMarkers.merge(hashedPrimitives, uniquingKeysWith: { (l, r) in print("Replacing"); return l })
 	}
 	
 	func updateLabels(for activePoiHashes: Set<Int>, inArea focus: Aabb, atZoom zoom: Float, projection project: (Vertex) -> CGPoint) {
-		let activeMarkers = poiPrimitives.values.filter { activePoiHashes.contains($0.ownerHash) }
-		let visibleMarkers = activeMarkers.filter { zoomFilter($0, zoom) && boxContains(focus, $0.worldPos) }
-		let visibleMarkerHashes = Set<Int>(visibleMarkers.map { $0.ownerHash })
+		let activeMarkers = poiMarkers.filter { activePoiHashes.contains($0.value.ownerHash) }
+		let visibleMarkers = activeMarkers.filter { zoomFilter($0.value, zoom) && boxContains(focus, $0.value.worldPos) }
+		let visibleMarkerHashes = Set<Int>(visibleMarkers.keys)
 		
+		// $ Widen the poi marker viewbox by ~100px
+		// $ Speed up the projection func
 		
-		let freeLabels = poiLabels.filter { $0.ownerHash == 0 || visibleMarkerHashes.contains($0.ownerHash)  == false}
-		freeLabels.forEach {
-			if ($0.ownerHash != 0) {
-				unbindLabel($0)
-			}
-		}
+		// Free up labels whose markers disappeared
+		let freeLabels = poiLabels.filter { $0.ownerHash == 0 || visibleMarkerHashes.contains($0.ownerHash) == false}
+		freeLabels.forEach { unbindLabel($0) }
 		
 		// Find new/unbound markers
-		let boundLabelsHashes = Set<Int>(poiLabels.map { $0.ownerHash })
-		let unboundMarkers = visibleMarkers
-			.filter { boundLabelsHashes.contains($0.ownerHash) == false }
+		let labelBindings = Set<Int>(poiLabels.map { $0.ownerHash })
+		let unboundMarkers = visibleMarkers.filter { !labelBindings.contains($0.key) }
 		
-		let markerMapping = visibleMarkers.map { ($0.ownerHash, $0) }
-		let markersToLayout = Dictionary(uniqueKeysWithValues: markerMapping)
-		let layout = layoutEngine.layoutLabels(markers: markersToLayout,
+		// Run layout engine over all markers
+		let layout = layoutEngine.layoutLabels(markers: visibleMarkers,
 																					 projection: project)
 		
-		// Bind new markers to free labels
-		let newLayoutEntries = unboundMarkers.filter { layout.keys.contains($0.ownerHash) }
+		// Bind newly laid-out markers to free labels
+		let newLayoutEntries = unboundMarkers.filter { layout.keys.contains($0.key) }
 		bindMarkers(newLayoutEntries, to: freeLabels)
 
+		// Move UILabels into place
+		let usedLabels = poiLabels.filter { $0.ownerHash != 0 }
+		moveLabels(usedLabels, to: layout)
+	}
+	
+	func moveLabels(_ labels: [Label], to layout: [Int : LabelPlacement]) {
 		// Move all labels into place
-		for label in poiLabels {
+		for label in labels {
 			guard let placement = layout[label.ownerHash] else {
-				// Labes that could not be laid out should be unbound
-				if label.view.isHidden == false {
-					print("Warning: label for \(label.view.text ?? "unknown") got knocked out of the layout.")
-					unbindLabel(label)
-				}
-				continue
+				fatalError("Label for \(label.view.text!) is missing from layout.")
 			}
-			
+
 			let labelRect = placement.aabb
 			label.view.frame = CGRect(x: CGFloat(labelRect.minX),
 																y: CGFloat(labelRect.minY),
-																width: CGFloat(labelRect.maxX - labelRect.minX),
-																height: CGFloat(labelRect.maxY - labelRect.minY))
+																width: CGFloat(labelRect.width),
+																height: CGFloat(labelRect.height))
 			switch placement.anchor {
 				case .NE, .SE: label.view.textAlignment = .left
 				case .NW, .SW: label.view.textAlignment = .right
@@ -119,23 +115,19 @@ class LabelView: UIView {
 	}
 	
 	func zoomFilter(_ marker: LabelMarker, _ zoom: Float) -> Bool {
-		if marker.kind == .Region {
-			// Region markers should go away after we've zoomed "past" them
-			switch marker.rank {
-			case 0: return zoom < 5.0
-			case 1: return zoom < 10.0
+		// Region markers should go away after we've zoomed "past" them
+		switch(marker.kind, marker.rank) {
+			case (.Region, 0): return zoom < 5.0
+			case (.Region, 1): return zoom < 10.0
 			default: return true
-			}
-		} else {
-			return true
 		}
 	}
 	
-	func bindMarkers(_ newMarkers: [LabelMarker], to labels: [Label]) {
+	func bindMarkers(_ newMarkers: [Int : LabelMarker], to labels: [Label]) {
 		var markers = newMarkers
 		for label in labels {
-			guard let marker = markers.popLast() else { return }
-			bindLabel(label, to: marker)
+			guard let marker = markers.popFirst() else { return }
+			bindLabel(label, to: marker.value)
 		}
 	}
 	
@@ -180,6 +172,7 @@ class LabelView: UIView {
 	}
 	
 	func unbindLabel(_ label: Label) {
+		guard label.ownerHash != 0 else { return }
 		layoutEngine.removeLayout(for: label.ownerHash)
 		label.ownerHash = 0
 		label.view.isHidden = true
