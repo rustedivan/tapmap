@@ -86,9 +86,12 @@ class LabelView: UIView {
 																					 projection: project)
 		
 		// Bind newly laid-out markers to free labels
-		let newLayoutEntries = unboundMarkers.filter { layout.keys.contains($0.key) }
-		bindMarkers(newLayoutEntries, to: freeLabels)
-
+		var newLayoutEntries = unboundMarkers.filter { layout.keys.contains($0.key) }
+		for label in freeLabels {
+			guard let marker = newLayoutEntries.popFirst() else { break }
+			bindLabel(label, to: marker.value)
+		}
+		
 		// Move UILabels into place
 		let usedLabels = poiLabels.filter { $0.ownerHash != 0 }
 		moveLabels(usedLabels, to: layout)
@@ -120,14 +123,6 @@ class LabelView: UIView {
 			case (.Region, 0): return zoom < 5.0
 			case (.Region, 1): return zoom < 10.0
 			default: return true
-		}
-	}
-	
-	func bindMarkers(_ newMarkers: [Int : LabelMarker], to labels: [Label]) {
-		var markers = newMarkers
-		for label in labels {
-			guard let marker = markers.popFirst() else { return }
-			bindLabel(label, to: marker.value)
 		}
 	}
 	
