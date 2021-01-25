@@ -26,7 +26,7 @@ class Label {
 }
 
 class LabelView: UIView {
-	static let s_maxLabels = 35
+	static let s_maxLabels = 20
 	var poiMarkers: [Int : LabelMarker] = [:]
 	var poiLabels: [Label] = []
 	var layoutEngine = LabelLayoutEngine(maxLabels: s_maxLabels)
@@ -74,16 +74,27 @@ class LabelView: UIView {
 		// $ Speed up the projection func
 		
 		// Free up labels whose markers disappeared
-		let freeLabels = poiLabels.filter { $0.ownerHash == 0 || visibleMarkerHashes.contains($0.ownerHash) == false}
-		freeLabels.forEach { unbindLabel($0) }
+		var freeLabels = poiLabels.filter { $0.ownerHash == 0 || visibleMarkerHashes.contains($0.ownerHash) == false}
+		freeLabels
+			.filter { $0.ownerHash != 0 }
+			.forEach {
+				layoutEngine.removeLayout(for: $0.ownerHash)
+				unbindLabel($0)
+			}
 		
 		// Find new/unbound markers
 		let labelBindings = Set<Int>(poiLabels.map { $0.ownerHash })
 		let unboundMarkers = visibleMarkers.filter { !labelBindings.contains($0.key) }
 		
 		// Run layout engine over all markers
-		let layout = layoutEngine.layoutLabels(markers: visibleMarkers,
-																					 projection: project)
+		let (layout, removed) = layoutEngine.layoutLabels(markers: visibleMarkers,
+																											projection: project)
+		let removedLabels = poiLabels.filter { removed.contains($0.ownerHash) }
+		removedLabels.forEach {
+//			print("\($0.view.text!) (\($0.ownerHash)) got knocked out of the layout")
+			unbindLabel($0)
+		}
+		freeLabels.append(contentsOf: removedLabels)
 		
 		// Bind newly laid-out markers to free labels
 		var newLayoutEntries = unboundMarkers.filter { layout.keys.contains($0.key) }
@@ -101,7 +112,8 @@ class LabelView: UIView {
 		// Move all labels into place
 		for label in labels {
 			guard let placement = layout[label.ownerHash] else {
-				fatalError("Label for \(label.view.text!) is missing from layout.")
+//				print("Label for \(label.view.text!) knocked out from layout.")
+				continue
 			}
 
 			let labelRect = placement.aabb
@@ -164,11 +176,11 @@ class LabelView: UIView {
 		
 		let text = marker.displayText as String
 		label.view.attributedText = NSAttributedString(string: text, attributes: attribs)
+		label.view.backgroundColor = UIColor(red: 0.3, green: 0.0, blue: 0.0, alpha: 0.3)
 	}
 	
 	func unbindLabel(_ label: Label) {
 		guard label.ownerHash != 0 else { return }
-		layoutEngine.removeLayout(for: label.ownerHash)
 		label.ownerHash = 0
 		label.view.isHidden = true
 	}

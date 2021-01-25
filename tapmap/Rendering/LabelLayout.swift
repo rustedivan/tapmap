@@ -41,8 +41,8 @@ func placeLabel(width: Float, height: Float, at screenPos: CGPoint, anchor: Layo
 	}
 
 
-	return Aabb(loX: lowerLeft.x, loY: lowerLeft.y,
-							hiX: lowerLeft.x + width, hiY: lowerLeft.y + height)
+	return Aabb(loX: floor(lowerLeft.x), loY: floor(lowerLeft.y),
+							hiX: ceil(lowerLeft.x + width), hiY: ceil(lowerLeft.y + height))
 }
 
 struct LabelMarker: Comparable {
@@ -93,11 +93,13 @@ struct LabelPlacement: Codable, Hashable {
 	var markerHash: Int = 0
 	let aabb: Aabb
 	var anchor: LayoutAnchor = .NE
+	var debugName: String = "Unknown"
 	
-	init(markerHash: Int, aabb: Aabb, anchor: LayoutAnchor) {
+	init(markerHash: Int, aabb: Aabb, anchor: LayoutAnchor, debugName: String) {
 		self.markerHash = markerHash
 		self.aabb = aabb
 		self.anchor = anchor
+		self.debugName = debugName
 	}
 	func hash(into hasher: inout Hasher) {
 		hasher.combine(markerHash)
@@ -116,7 +118,7 @@ class LabelLayoutEngine {
 	// $ Re-implement zoom culling as a 3D box sweeping through point cloud
 	
 	func layoutLabels(markers: [Int: LabelMarker],
-										projection project: (Vertex) -> CGPoint) -> [Int : LabelPlacement] {
+										projection project: (Vertex) -> CGPoint) -> (layout: [Int : LabelPlacement], removed: [Int]) {
 		// Collision detection structure for screen-space layout
 		let screen = UIScreen.main.bounds
 		var labelQuadTree = QuadTree<LabelPlacement>(minX: Float(screen.minX),
@@ -124,54 +126,77 @@ class LabelLayoutEngine {
 																								 maxX: Float(screen.maxX),
 																								 maxY: Float(screen.maxY),
 																								 maxDepth: 6)
-		
+		print("Layout start")
 		var workingSet = markers
+		var removedFromLayout: [Int] = []
 		// Move and insert the previously placed labels in their established order
 		for (i, placement) in orderedLayout.enumerated() {
 			let marker = workingSet[placement.markerHash]!
-			let origin = project(marker.worldPos)
-			let size = labelSize(forMarker: marker)
-			let aabb = placeLabel(width: size.w, height: size.h,
-														at: origin, anchor: placement.anchor)
-			let paddedAabb = padAabb(aabb)
+
+			let result = layoutLabel(marker: marker, in: labelQuadTree, startAnchor: placement.anchor, project: project)
 			
-			labelQuadTree.insert(value: placement, region: paddedAabb, clipToBounds: true)
-			orderedLayout[i] = LabelPlacement(markerHash: placement.markerHash, aabb: aabb, anchor: placement.anchor)
+			if let (labelBox, layoutBox, anchor) = result {
+				labelQuadTree.insert(value: placement, region: layoutBox, clipToBounds: true)
+				orderedLayout[i] = LabelPlacement(markerHash: placement.markerHash, aabb: labelBox, anchor: anchor, debugName: marker.name)
+				print("  \(marker.name) stayed in layout on \(anchor) @ \(i)")
+			} else {
+				print("- \(marker.name) fell out of layout @ \(i)")
+				removedFromLayout.append(placement.markerHash)
+			}
 			workingSet.removeValue(forKey: placement.markerHash)
 		}
+		
+		removedFromLayout.forEach { removeLayout(for: $0) }
 		
 		// Layout new incoming markers
 		let markersToLayout = Array(workingSet.values).sorted(by: <)
 		for marker in markersToLayout {
 			guard orderedLayout.count < maxLabels else { break }
 			
-			var anchor: LayoutAnchor? = (marker.kind == .Region ? .Center : .NE)	// Choose starting layout anchor
-			let origin = project(marker.worldPos)
-			let size = labelSize(forMarker: marker)
-			
-			while anchor != nil {
-				let aabb = placeLabel(width: size.w, height: size.h, at: origin, anchor: anchor!)
-				let paddedAabb = padAabb(aabb)
-				
-				let closeLabels = labelQuadTree.query(search: paddedAabb)
-				let canPlaceLabel = closeLabels.allSatisfy { boxIntersects($0.aabb, paddedAabb) == false }
-				if canPlaceLabel {
-					let layoutNode = LabelPlacement(markerHash: marker.ownerHash, aabb: aabb, anchor: anchor!)	// Unpadded aabb for layout
-					labelQuadTree.insert(value: layoutNode, region: paddedAabb, clipToBounds: true)							// Padded aabb for collision
-					orderedLayout.append(layoutNode)
-					break
-				} else {
-					anchor = anchor?.next
+			let startAnchor: LayoutAnchor = (marker.kind == .Region ? .Center : .NE)	// Choose starting layout anchor
+			let result = layoutLabel(marker: marker, in: labelQuadTree, startAnchor: startAnchor, project: project)
+			if let (labelBox, layoutBox, anchor) = result {
+				let placement = LabelPlacement(markerHash: marker.ownerHash, aabb: labelBox, anchor: anchor, debugName: marker.name)	// Unpadded aabb for layout
+				labelQuadTree.insert(value: placement, region: layoutBox, clipToBounds: true)							// Padded aabb for collision
+				orderedLayout.append(placement)
+				print("+ \(marker.name) added to layout on \(anchor) @ \(orderedLayout.count - 1)")
+				if (removedFromLayout.contains(marker.ownerHash)) {
+//					print("Flickering for \(marker.name)")
 				}
+			} else {
+				print("x \(marker.name) rejected from layout @ \(orderedLayout.count)")
 			}
 		}
-		
+		print("Layout end")
 		let layoutEntries = orderedLayout.map { ($0.markerHash, $0) }
 		let layout = Dictionary(uniqueKeysWithValues: layoutEntries)
-		return layout
+		return (layout: layout, removed: removedFromLayout)
 	}
 	
-	func removeLayout(for markerHash: Int) {
+	func layoutLabel(marker: LabelMarker, in layout: QuadTree<LabelPlacement>, startAnchor: LayoutAnchor, project: (Vertex) -> CGPoint) -> (labelBox: Aabb, layoutBox: Aabb, anchor: LayoutAnchor)? {
+		var anchor: LayoutAnchor? = startAnchor
+		let origin = project(marker.worldPos)
+		let size = labelSize(forMarker: marker)
+		
+		while anchor != nil {
+			let aabb = placeLabel(width: size.w, height: size.h, at: origin, anchor: anchor!)
+			let paddedAabb = padAabb(aabb)
+			
+			let closeLabels = layout.query(search: paddedAabb)
+			let realCollisions = closeLabels.filter { boxIntersects($0.aabb, paddedAabb) }
+			let canPlaceLabel = closeLabels.allSatisfy { boxIntersects($0.aabb, paddedAabb) == false }
+			if canPlaceLabel {
+				return (labelBox: aabb, layoutBox: paddedAabb, anchor!)
+			} else {
+				print("\(marker.name) \(paddedAabb) collided with \(realCollisions.map { ($0.debugName, $0.aabb) })")
+				anchor = anchor?.next
+			}
+		}
+		return nil
+	}
+	
+	
+	func removeLayout(for markerHash: Int) {	// $ removeFromLayout
 		let i = orderedLayout.firstIndex { $0.markerHash == markerHash }!
 		orderedLayout.remove(at: i)
 	}
@@ -194,6 +219,6 @@ class LabelLayoutEngine {
 }
 
 fileprivate func padAabb(_ aabb: Aabb) -> Aabb {
-	let margin: Float = 3.0 // $ Stylesheet
+	let margin: Float = 50.0 // $ Stylesheet
 	return Aabb(loX: aabb.minX - margin, loY: aabb.minY - margin, hiX: aabb.maxX + margin, hiY: aabb.maxY + margin)
 }
