@@ -19,7 +19,7 @@ class GeometryTests: XCTestCase {
 		let q = mapPoint(p, from: viewRect, to: imageRect, space: space)
 		
 		XCTAssertEqual(q.x, -180, accuracy: 1.0)
-		XCTAssertEqual(q.y, -80, accuracy: 1.0)
+		XCTAssertEqual(q.y,  80, accuracy: 1.0)	// Note flipped Y
 	}
 	
 	func testTransformImageToViewSpace() {
