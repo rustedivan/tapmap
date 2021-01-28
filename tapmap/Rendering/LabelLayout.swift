@@ -112,6 +112,7 @@ class LabelLayoutEngine {
 	let maxLabels: Int
 	let space: Aabb
 	let measure: MeasureFunction
+	var labelMargin: Float = 50.0
 	var orderedLayout: [LabelPlacement] = []
 	var labelSizeCache: [Int : (w: Float, h: Float)] = [:]	// $ Limit size of this
 	
@@ -185,7 +186,7 @@ class LabelLayoutEngine {
 		
 		while anchor != nil {
 			let aabb = placeLabel(width: size.w, height: size.h, at: origin, anchor: anchor!)
-			let paddedAabb = padAabb(aabb)
+			let paddedAabb = padAabb(aabb, margin: labelMargin)
 			
 			let closeLabels = layout.query(search: paddedAabb)
 			let realCollisions = closeLabels.filter { boxIntersects($0.aabb, paddedAabb) }
@@ -217,7 +218,6 @@ class LabelLayoutEngine {
 	}
 }
 
-fileprivate func padAabb(_ aabb: Aabb) -> Aabb {
-	let margin: Float = 50.0 // $ Stylesheet
+fileprivate func padAabb(_ aabb: Aabb, margin: Float) -> Aabb {
 	return Aabb(loX: aabb.minX - margin, loY: aabb.minY - margin, hiX: aabb.maxX + margin, hiY: aabb.maxY + margin)
 }

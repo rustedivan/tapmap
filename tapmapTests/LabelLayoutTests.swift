@@ -18,12 +18,14 @@ class LabelLayoutTests: XCTestCase {
 		let layouter = LabelLayoutEngine(maxLabels: 5,
 																		 space: Aabb(loX: 0, loY: 0, hiX: 320, hiY: 240),
 																		 measure: measureLabel)
+		layouter.labelMargin = 3.0
 		let markers = [
 			1 : LabelMarker(for: GeoPlace(location: Vertex(5, 5), name: "Marker 1", kind: .City, rank: 1)),
-			2 : LabelMarker(for: GeoPlace(location: Vertex(5, 10), name: "Marker 2", kind: .City, rank: 1)),
+			2 : LabelMarker(for: GeoPlace(location: Vertex(5, 35), name: "Marker 2", kind: .City, rank: 1)),
 		]
 		
-		layouter.layoutLabels(markers: markers) { CGPoint(x: CGFloat($0.x), y: CGFloat($0.y)) }
+		let (layout, _) = layouter.layoutLabels(markers: markers) { CGPoint(x: CGFloat($0.x), y: CGFloat($0.y)) }
+		XCTAssertEqual(layout.count, 2)
 	}
 	
 	func testAddToExistingLayout() {
