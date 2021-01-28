@@ -29,9 +29,13 @@ class LabelView: UIView {
 	static let s_maxLabels = 20
 	var poiMarkers: [Int : LabelMarker] = [:]
 	var poiLabels: [Label] = []
-	var layoutEngine = LabelLayoutEngine(maxLabels: s_maxLabels)
+	var layoutEngine: LabelLayoutEngine!
 	
 	override func awakeFromNib() {
+		let s = UIScreen.main.bounds
+		layoutEngine = LabelLayoutEngine(maxLabels: LabelView.s_maxLabels,
+																		 space: Aabb(loX: Float(s.minX), loY: Float(s.minY),
+																								 hiX: Float(s.maxX), hiY: Float(s.maxY)))
 		for _ in 0 ..< LabelView.s_maxLabels {
 			let newLabel = Label()
 			poiLabels.append(newLabel)

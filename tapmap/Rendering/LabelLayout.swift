@@ -108,11 +108,13 @@ struct LabelPlacement: Codable, Hashable {
 
 class LabelLayoutEngine {
 	let maxLabels: Int
+	let space: Aabb
 	var orderedLayout: [LabelPlacement] = []
 	var labelSizeCache: [Int : (w: Float, h: Float)] = [:]	// $ Limit size of this
 	
-	init(maxLabels: Int) {
+	init(maxLabels: Int, space: Aabb) {
 		self.maxLabels = maxLabels
+		self.space = space
 	}
 	
 	// $ Re-implement zoom culling as a 3D box sweeping through point cloud
@@ -120,11 +122,10 @@ class LabelLayoutEngine {
 	func layoutLabels(markers: [Int: LabelMarker],
 										projection project: (Vertex) -> CGPoint) -> (layout: [Int : LabelPlacement], removed: [Int]) {
 		// Collision detection structure for screen-space layout
-		let screen = UIScreen.main.bounds
-		var labelQuadTree = QuadTree<LabelPlacement>(minX: Float(screen.minX),
-																								 minY: Float(screen.minY),
-																								 maxX: Float(screen.maxX),
-																								 maxY: Float(screen.maxY),
+		var labelQuadTree = QuadTree<LabelPlacement>(minX: space.minX,
+																								 minY: space.minY,
+																								 maxX: space.maxX,
+																								 maxY: space.maxY,
 																								 maxDepth: 6)
 		print("Layout start")
 		var workingSet = markers

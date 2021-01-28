@@ -30,6 +30,7 @@
 		1456690023E0EA3D001EF91E /* Geometry.swift in Sources */ = {isa = PBXBuildFile; fileRef = 148937DF22B97FDF009278A0 /* Geometry.swift */; };
 		1468830D23B4BC4100105E04 /* DebugRenderer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1468830C23B4BC4100105E04 /* DebugRenderer.swift */; };
 		146EA26A244AF14C009196BC /* RuntimeWorld.swift in Sources */ = {isa = PBXBuildFile; fileRef = 146EA269244AF14C009196BC /* RuntimeWorld.swift */; };
+		1472951B25C0CE4B00E6B129 /* LabelLayout.swift in Sources */ = {isa = PBXBuildFile; fileRef = 149EEA6C25B39D9D00B19285 /* LabelLayout.swift */; };
 		1476DC9825A5D79000F9518B /* LibTessSwift in Frameworks */ = {isa = PBXBuildFile; productRef = 1476DC9725A5D79000F9518B /* LibTessSwift */; };
 		1476DCA325A5D9E600F9518B /* SwiftyJSON in Frameworks */ = {isa = PBXBuildFile; productRef = 1476DCA225A5D9E600F9518B /* SwiftyJSON */; };
 		147B819223DA03B700942C9B /* QuadTree.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14532D9923B515BE00943ADC /* QuadTree.swift */; };
@@ -73,6 +74,7 @@
 		1489382022B9831C009278A0 /* OperationParseOSMJson.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14C665A322B97E670054D7F2 /* OperationParseOSMJson.swift */; };
 		1489382122B9831C009278A0 /* OperationTessellateRegions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14C6659A22B97E660054D7F2 /* OperationTessellateRegions.swift */; };
 		1489382322B98456009278A0 /* ViewCalculations.swift in Sources */ = {isa = PBXBuildFile; fileRef = 148937E122B97FDF009278A0 /* ViewCalculations.swift */; };
+		1490C75A25BF6E8600DAF62D /* LabelLayoutTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1490C75925BF6E8600DAF62D /* LabelLayoutTests.swift */; };
 		14985FED22F0ED0C00F68A1F /* RenderPrimitives.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14985FEC22F0ED0C00F68A1F /* RenderPrimitives.swift */; };
 		149B3FDD245EE8B1008A299E /* MapShader.metal in Sources */ = {isa = PBXBuildFile; fileRef = 149B3FDC245EE8B1008A299E /* MapShader.metal */; };
 		149CBDDD23CB230000A7AABB /* LabelView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 149CBDDC23CB230000A7AABB /* LabelView.swift */; };
@@ -163,6 +165,7 @@
 		148937F222B97FDF009278A0 /* AppDelegate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		148937F322B97FDF009278A0 /* UserState.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UserState.swift; sourceTree = "<group>"; };
 		148937F422B97FDF009278A0 /* Serialization.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Serialization.swift; sourceTree = "<group>"; };
+		1490C75925BF6E8600DAF62D /* LabelLayoutTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LabelLayoutTests.swift; sourceTree = "<group>"; };
 		14985FEC22F0ED0C00F68A1F /* RenderPrimitives.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RenderPrimitives.swift; sourceTree = "<group>"; };
 		14985FF522F0F35700F68A1F /* OutlineGeometry.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OutlineGeometry.swift; sourceTree = "<group>"; };
 		149B3FDC245EE8B1008A299E /* MapShader.metal */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.metal; path = MapShader.metal; sourceTree = "<group>"; };
@@ -381,6 +384,7 @@
 			isa = PBXGroup;
 			children = (
 				14C6657322B97D8B0054D7F2 /* tapmapTests.swift */,
+				1490C75925BF6E8600DAF62D /* LabelLayoutTests.swift */,
 				14C665CA22B97F250054D7F2 /* GeometryTests.swift */,
 				14C6657522B97D8B0054D7F2 /* Info.plist */,
 				140B990522E57D5700C912A4 /* EdgeGenerationTests.swift */,
@@ -643,9 +647,11 @@
 				1429B0A722EAFCE5001257AB /* Geometry.swift in Sources */,
 				1489382322B98456009278A0 /* ViewCalculations.swift in Sources */,
 				1429B0A922EAFD53001257AB /* nullrenderer.swift in Sources */,
+				1490C75A25BF6E8600DAF62D /* LabelLayoutTests.swift in Sources */,
 				14C6657422B97D8B0054D7F2 /* tapmapTests.swift in Sources */,
 				14532D9C23B5190F00943ADC /* QuadTreeTests.swift in Sources */,
 				14EACFB123CEDFEA00E25F53 /* LabelViewTests.swift in Sources */,
+				1472951B25C0CE4B00E6B129 /* LabelLayout.swift in Sources */,
 				1429B0A522EAFA87001257AB /* AppTypes.swift in Sources */,
 				147B819623DA043500942C9B /* WorldTree.swift in Sources */,
 				14532D9E23B5197600943ADC /* OutlineGeometry.swift in Sources */,
