@@ -35,7 +35,8 @@ class LabelView: UIView {
 		let s = UIScreen.main.bounds
 		layoutEngine = LabelLayoutEngine(maxLabels: LabelView.s_maxLabels,
 																		 space: Aabb(loX: Float(s.minX), loY: Float(s.minY),
-																								 hiX: Float(s.maxX), hiY: Float(s.maxY)))
+																								 hiX: Float(s.maxX), hiY: Float(s.maxY)),
+																		 measure: measureLabel)
 		for _ in 0 ..< LabelView.s_maxLabels {
 			let newLabel = Label()
 			poiLabels.append(newLabel)
@@ -188,4 +189,15 @@ class LabelView: UIView {
 		label.ownerHash = 0
 		label.view.isHidden = true
 	}
+}
+
+func measureLabel(marker: LabelMarker) -> (w: Float, h: Float) {
+	let font = marker.font
+	let size = marker.displayText.boundingRect(with: CGSize(width: 120.0, height: 120.0),
+																										options: .usesLineFragmentOrigin,
+																										attributes: [.font: font],
+																										context: nil)
+																										.size
+	let wh = (w: Float(ceil(size.width)), h: Float(ceil(size.height)))
+	return wh
 }

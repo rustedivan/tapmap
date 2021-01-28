@@ -106,15 +106,19 @@ struct LabelPlacement: Codable, Hashable {
 	}
 }
 
+typealias MeasureFunction = (LabelMarker) -> (w: Float, h: Float)
+
 class LabelLayoutEngine {
 	let maxLabels: Int
 	let space: Aabb
+	let measure: MeasureFunction
 	var orderedLayout: [LabelPlacement] = []
 	var labelSizeCache: [Int : (w: Float, h: Float)] = [:]	// $ Limit size of this
 	
-	init(maxLabels: Int, space: Aabb) {
+	init(maxLabels: Int, space: Aabb, measure: @escaping MeasureFunction) {
 		self.maxLabels = maxLabels
 		self.space = space
+		self.measure = measure
 	}
 	
 	// $ Re-implement zoom culling as a 3D box sweeping through point cloud
@@ -205,17 +209,11 @@ class LabelLayoutEngine {
 	func labelSize(forMarker marker: LabelMarker) -> (w: Float, h: Float) {
 		if let cachedSize = labelSizeCache[marker.ownerHash] {
 			return cachedSize
+		} else {
+			let m = measure(marker)
+			labelSizeCache[marker.ownerHash] = m
+			return m
 		}
-		
-		let font = marker.font
-		let size = marker.displayText.boundingRect(with: CGSize(width: 120.0, height: 120.0),
-																											options: .usesLineFragmentOrigin,
-																											attributes: [.font: font],
-																											context: nil)
-																											.size
-		let wh = (w: Float(ceil(size.width)), h: Float(ceil(size.height)))
-		labelSizeCache[marker.ownerHash] = wh
-		return wh
 	}
 }
 
