@@ -17,6 +17,11 @@ func nullProjection(v: Vertex) -> CGPoint {
 	return CGPoint(x: CGFloat(v.x), y: CGFloat(v.y))
 }
 
+func offsetProjection(v: Vertex) -> CGPoint {
+	return CGPoint(x: CGFloat(v.x + 4.0), y: CGFloat(v.y - 5.0))
+}
+
+
 func makeMarkers(_ places: [GeoPlace]) -> [Int : LabelMarker] {
 	return Dictionary(uniqueKeysWithValues: places.map { ($0.hashValue, LabelMarker(for: $0)) })
 }
@@ -105,8 +110,28 @@ class LabelLayoutTests: XCTestCase {
 		XCTAssertEqual(ls[4].anchor, .SW)
 	}
 	
-	func testStableInsertionOrdering() {
+	func testStableLayoutOrdering() {
+		let collidingMarkers = [
+			GeoPlace(location: Vertex(5, 5), name: "Marker #1", kind: .City, rank: 1),
+			GeoPlace(location: Vertex(5, 10), name: "Marker #2", kind: .City, rank: 2),
+			GeoPlace(location: Vertex(5, 15), name: "Marker #3", kind: .City, rank: 3),
+			GeoPlace(location: Vertex(5, 20), name: "Marker #4", kind: .City, rank: 4),
+			GeoPlace(location: Vertex(5, 25), name: "Marker #5", kind: .City, rank: 5),
+		]
 		
+		let markers = makeMarkers(collidingMarkers)
+		let (layout1, _) = layouter.layoutLabels(markers: markers, projection: nullProjection)
+		
+		let shuffledMarkers = makeMarkers(collidingMarkers.shuffled())
+		let (layout2, _) = layouter.layoutLabels(markers: shuffledMarkers, projection: offsetProjection)
+		
+		let ls1 = prepareForAsserts(layout1)
+		let ls2 = prepareForAsserts(layout2)
+		XCTAssertEqual(ls1[0].debugName, ls2[0].debugName)
+		XCTAssertEqual(ls1[1].debugName, ls2[1].debugName)
+		XCTAssertEqual(ls1[2].debugName, ls2[2].debugName)
+		XCTAssertEqual(ls1[3].debugName, ls2[3].debugName)
+		XCTAssertEqual(ls1[4].debugName, ls2[4].debugName)
 	}
 	
 	func testNewMarkerPrioritization() {

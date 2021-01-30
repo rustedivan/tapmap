@@ -84,6 +84,7 @@ struct LabelPlacement: Codable, Hashable {
 		self.anchor = anchor
 		self.debugName = debugName
 	}
+	
 	func hash(into hasher: inout Hasher) {
 		hasher.combine(markerHash)
 	}
@@ -96,7 +97,7 @@ class LabelLayoutEngine {
 	let maxLabels: Int
 	let space: Aabb
 	let measure: MeasureFunction
-	var labelMargin: Float = 50.0
+	var labelMargin: Float = 3.0
 	var labelDistance: Float = 2.0
 	var orderedLayout: [LabelPlacement] = []
 	var labelSizeCache: [Int : (w: Float, h: Float)] = [:]	// $ Limit size of this
@@ -117,7 +118,7 @@ class LabelLayoutEngine {
 																								 maxX: space.maxX,
 																								 maxY: space.maxY,
 																								 maxDepth: 6)
-		print("Layout start")
+//		print("Layout start")
 		var workingSet = markers
 		var removedFromLayout: [Int] = []
 		// Move and insert the previously placed labels in their established order
@@ -129,9 +130,9 @@ class LabelLayoutEngine {
 			if let (labelBox, layoutBox, anchor) = result {
 				labelQuadTree.insert(value: placement, region: layoutBox, clipToBounds: true)
 				orderedLayout[i] = LabelPlacement(markerHash: placement.markerHash, aabb: labelBox, anchor: anchor, debugName: marker.name)
-				print("  \(marker.name) stayed in layout on \(anchor) @ \(i)")
+//				print("  \(marker.name) stayed in layout on \(anchor) \(labelBox) @ \(i)")
 			} else {
-				print("- \(marker.name) fell out of layout @ \(i)")
+//				print("- \(marker.name) fell out of layout @ \(i)")
 				removedFromLayout.append(placement.markerHash)
 			}
 			workingSet.removeValue(forKey: placement.markerHash)
@@ -150,15 +151,12 @@ class LabelLayoutEngine {
 				let placement = LabelPlacement(markerHash: marker.ownerHash, aabb: labelBox, anchor: anchor, debugName: marker.name)	// Unpadded aabb for layout
 				labelQuadTree.insert(value: placement, region: layoutBox, clipToBounds: true)							// Padded aabb for collision
 				orderedLayout.append(placement)
-				print("+ \(marker.name) added to layout on \(anchor) @ \(orderedLayout.count - 1)")
-				if (removedFromLayout.contains(marker.ownerHash)) {
-//					print("Flickering for \(marker.name)")
-				}
+//				print("+ \(marker.name) added to layout on \(anchor) \(labelBox) @ \(orderedLayout.count - 1)")
 			} else {
-				print("x \(marker.name) rejected from layout @ \(orderedLayout.count)")
+//				print("x \(marker.name) rejected from layout @ \(orderedLayout.count)")
 			}
 		}
-		print("Layout end")
+//		print("Layout end")
 		let layoutEntries = orderedLayout.map { ($0.markerHash, $0) }
 		let layout: LabelLayout = Dictionary(uniqueKeysWithValues: layoutEntries)
 		return (layout: layout, removed: removedFromLayout)
@@ -179,7 +177,7 @@ class LabelLayoutEngine {
 			if canPlaceLabel {
 				return (labelBox: aabb, layoutBox: paddedAabb, anchor!)
 			} else {
-				print("\(marker.name) \(paddedAabb) collided with \(realCollisions.map { ($0.debugName, $0.aabb) })")
+//				print("\(marker.name) \(paddedAabb) on \(anchor!) collided with \(realCollisions.map { ($0.debugName, $0.aabb) })")
 				anchor = anchor?.next
 			}
 		}
