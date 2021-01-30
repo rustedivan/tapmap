@@ -83,7 +83,7 @@ class LabelView: UIView {
 		freeLabels
 			.filter { $0.ownerHash != 0 }
 			.forEach {
-				layoutEngine.removeLayout(for: $0.ownerHash)
+				layoutEngine.removeFromLayout($0.ownerHash)
 				unbindLabel($0)
 			}
 		

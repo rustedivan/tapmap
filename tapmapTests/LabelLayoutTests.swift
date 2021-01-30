@@ -25,7 +25,6 @@ func zoomProjection(v: Vertex) -> CGPoint {
 	return CGPoint(x: CGFloat(v.x * 0.5), y: CGFloat(v.y * 0.5))
 }
 
-
 func makeMarkers(_ places: [GeoPlace]) -> [Int : LabelMarker] {
 	return Dictionary(uniqueKeysWithValues: places.map { ($0.hashValue, LabelMarker(for: $0)) })
 }
@@ -182,7 +181,7 @@ class LabelLayoutTests: XCTestCase {
 		])
 		
 		_ = layouter.layoutLabels(markers: markers, projection: nullProjection)
-		layouter.removeLayout(for: markers.first!.value.ownerHash)
+		layouter.removeFromLayout(markers.first!.value.ownerHash)
 		XCTAssertEqual(layouter.orderedLayout.count, 1)
 	}
 	
