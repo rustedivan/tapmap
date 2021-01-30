@@ -113,7 +113,7 @@ class LabelView: UIView {
 		moveLabels(usedLabels, to: layout)
 	}
 	
-	func moveLabels(_ labels: [Label], to layout: [Int : LabelPlacement]) {
+	func moveLabels(_ labels: [Label], to layout: LabelLayout) {
 		// Move all labels into place
 		for label in labels {
 			guard let placement = layout[label.ownerHash] else {
