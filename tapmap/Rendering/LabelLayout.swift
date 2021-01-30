@@ -128,7 +128,8 @@ class LabelLayoutEngine {
 			let result = layoutLabel(marker: marker, in: labelQuadTree, startAnchor: placement.anchor, project: project)
 			
 			if let (labelBox, layoutBox, anchor) = result {
-				labelQuadTree.insert(value: placement, region: layoutBox, clipToBounds: true)
+				let reprojectedPlacement = LabelPlacement(markerHash: marker.ownerHash, aabb: labelBox, anchor: anchor, debugName: marker.name)
+				labelQuadTree.insert(value: reprojectedPlacement, region: layoutBox, clipToBounds: true)
 				orderedLayout[i] = LabelPlacement(markerHash: placement.markerHash, aabb: labelBox, anchor: anchor, debugName: marker.name)
 //				print("  \(marker.name) stayed in layout on \(anchor) \(labelBox) @ \(i)")
 			} else {
