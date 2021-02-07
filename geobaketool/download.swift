@@ -32,7 +32,7 @@ func downloadFiles(params: ArraySlice<String>) throws {
 	let archiveUrls = [PipelineConfig.shared.configUrl("source.countries"),
 										 PipelineConfig.shared.configUrl("source.provinces")]
 	
-	let _ = try archiveUrls.map({ (url: URL?) -> () in
+	try archiveUrls.forEach({ (url: URL?) -> () in
 		guard let url = url else { return }
 		let downloadTask = session.downloadTask(with: url)
 		downloadTask.resume()
@@ -52,7 +52,7 @@ func downloadFiles(params: ArraySlice<String>) throws {
 	let osmQueries = [(PipelineConfig.shared.configUrl("source.osmCitiesUrl"), "osm-cities.json"),
 										(PipelineConfig.shared.configUrl("source.osmTownsUrl"), "osm-towns.json")]
 	
-	let _ = try osmQueries.map({ (url: URL?, dst: String) -> () in
+	try osmQueries.forEach({ (url: URL?, dst: String) -> () in
 		guard let url = url else { return }
 		let downloadTask = session.downloadTask(with: url)
 		downloadTask.resume()
@@ -135,7 +135,7 @@ func pickGeometryFiles(from src: URL, to dst: URL) throws {
 	let allFiles = try FileManager.default.contentsOfDirectory(at: src, includingPropertiesForKeys: nil)
 	let usefulFiles = allFiles.filter { $0.pathExtension == "shp" || $0.pathExtension == "dbf" }
 	
-	_ = try usefulFiles.map {
+	try usefulFiles.forEach {
 		let target = dst.appendingPathComponent($0.lastPathComponent)
 		if FileManager.default.fileExists(atPath: target.absoluteString) {
 			do { try FileManager.default.removeItem(atPath: target.absoluteString)	}
