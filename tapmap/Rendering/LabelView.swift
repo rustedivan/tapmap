@@ -153,11 +153,11 @@ class LabelView: UIView {
 		
 		switch marker.kind {
 		case .Region:
-			textColor = .darkGray	// $ Stylesheet
+			textColor = .darkGray
 			strokeColor = .white
 			strokeWidth = -2.0
 		default:
-			textColor = .lightGray // $ Stylesheet
+			textColor = .lightGray
 			strokeColor = .darkGray
 			strokeWidth = -4.0
 		}

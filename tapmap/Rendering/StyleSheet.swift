@@ -10,6 +10,7 @@ import Foundation
 import UIKit.UIColor
 import fixa
 import simd
+import UIKit
 
 struct AppFixables {
 	static let renderLabels = FixableId("visible-labels")
@@ -46,12 +47,12 @@ class Stylesheet {
 	var renderLabels = FixableBool(AppFixables.renderLabels, initial: true)
 	
 	// Fonts
-	var largeRegionFont = UIFont(name: "HelveticaNeue-Bold", size: 20.0)!
-	var mediumRegionFont = UIFont(name: "HelveticaNeue-Bold", size: 16.0)!
-	var defaultRegionFont = UIFont(name: "HelveticaNeue-Bold", size: 12.0)!
-	var capitalFont = UIFont(name: "HelveticaNeue-Bold", size: 14.0)!
-	var cityFont = UIFont(name: "HelveticaNeue-Bold", size: 12.0)!
-	var townFont = UIFont(name: "HelveticaNeue-Bold", size: 10.0)!
+	var largeRegionFont = UIFont(name: "HelveticaNeue", size: 20.0)!
+	var mediumRegionFont = UIFont(name: "HelveticaNeue", size: 16.0)!
+	var defaultRegionFont = UIFont(name: "HelveticaNeue", size: 12.0)!
+	var capitalFont = UIFont(name: "HelveticaNeue", size: 14.0)!
+	var cityFont = UIFont(name: "HelveticaNeue", size: 12.0)!
+	var townFont = UIFont(name: "HelveticaNeue", size: 10.0)!
 	
 	// Border widths
 	var continentBorderWidthInner = FixableFloat(AppFixables.continentBorderInner, initial: 0.1)
@@ -95,6 +96,7 @@ class Stylesheet {
 			self.recalculateTints()
 		}
 		recalculateTints()
+		specifyFonts()
 	}
 	
 	func continentColor(for regionHash: Int, in mapping: GeoContinentMap) -> simd_float4 {
@@ -127,6 +129,23 @@ class Stylesheet {
 			continentColors[tint.key] = mixColor(tint.value, continentSaturation.value, continentBrightness.value)
 			countryColors[tint.key] = mixColor(tint.value, countrySaturation.value, countryBrightness.value)
 			provinceColors[tint.key] = mixColor(tint.value, provinceSaturation.value, provinceBrightness.value)
+		}
+	}
+	
+	func specifyFonts() {
+		do {
+			let descriptor = largeRegionFont.fontDescriptor.withSymbolicTraits([.traitBold])!
+			largeRegionFont = UIFont(descriptor: descriptor, size: 0)
+		}
+		
+		do {
+			let descriptor = mediumRegionFont.fontDescriptor.withSymbolicTraits([.traitBold, .traitCondensed])!
+			mediumRegionFont = UIFont(descriptor: descriptor, size: 0)
+		}
+		
+		do {
+			let defaultRegionDescriptor = defaultRegionFont.fontDescriptor.withSymbolicTraits([.traitBold, .traitCondensed])!
+			defaultRegionFont = UIFont(descriptor: defaultRegionDescriptor, size: 0)
 		}
 	}
 	
