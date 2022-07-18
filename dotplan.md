@@ -9,7 +9,7 @@ Label layout, however, looks to be a right week-long beast. I've done some resea
 **Label prioritisation:** Select new labels into the view in rank order. Weaker ranks are inserted later. A bound label should keep its binding until zoomed/scrolled out of scope (prioritize existing labels)
 **Layout annealing:** When inserting, check for collisions. Incoming labels must move if colliding. If no free space can be found by selecting another anchor, restart from the first anchor point, and ask colliding labels to move to a "worse" anchor. Don't recurse. If a solution can't be found, drop the label.
 **Label polish:** Areas should print in small-caps, without a marker. POI labels should come in two weights with differing size, weight and brightness. Give multiline labels negative line height.
-**Label animation:** fade out labels before unbinding them; 
+**Label animation:** fade out labels before unbinding them.
 
 Depending on how fast this layout step runs, it can be done on each zoom frame. Otherwise, put it on a backthread, and animate to the produced frame when it's done.
 - refactoring: break out other backthread jobs to their own files
@@ -40,6 +40,7 @@ Currently, the system is letting markers bind to free labels, but I think this b
 # Optimizations
 - MetalRenderer spends effort to filter out the visible + available render sets, but they are already calculated and available in worldState. No need for `renderSet.filter(...`
 - Put label layout on a backthread
+- Consider instance-based line rendering
 
 # Rendering brief, step 2
  There are some effects I want to spice up the presentation. I'm a little stuck at how to lookup the color for a region at runtime, since the base color isn't always static. Specifically, provinces have different colors when visited and unvisited. I can definitely route around that, and ~100 O(1) dictionary lookups per frame isn't going to make a difference, but it's _wrong_. To help guide the stylesheet lookup design, let's take a look at those extra effects.
@@ -184,6 +185,7 @@ Find public land travels and make maps from it. LWR/D/U
 ## Remove POIs
 ## Split Seven Seas continent into their own seas
 ## Figure out how to handle Clipperton and friends (see "skipping..." in bake log)
+## Trim off "(open ocean)" from Seven Seas 
 
 ----- ARCHIVE -----
 

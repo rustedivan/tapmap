@@ -181,7 +181,7 @@ class LabelView: UIView {
 		
 		let text = marker.displayText as String
 		label.view.attributedText = NSAttributedString(string: text, attributes: attribs)
-		label.view.backgroundColor = UIColor(red: 0.3, green: 0.0, blue: 0.0, alpha: 0.3)
+//		label.view.backgroundColor = UIColor(red: 0.3, green: 0.0, blue: 0.0, alpha: 0.3)
 	}
 	
 	func unbindLabel(_ label: Label) {
@@ -193,7 +193,7 @@ class LabelView: UIView {
 
 func measureLabel(marker: LabelMarker) -> (w: Float, h: Float) {
 	let font = marker.font
-	let size = marker.displayText.boundingRect(with: CGSize(width: 120.0, height: 120.0),
+	let size = marker.displayText.boundingRect(with: CGSize(width: 140.0, height: 120.0),
 																										options: .usesLineFragmentOrigin,
 																										attributes: [.font: font],
 																										context: nil)
