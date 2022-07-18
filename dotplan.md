@@ -34,8 +34,6 @@ Then, the actual binding to labels is turning out to be more of a problem than I
 
 Currently, the system is letting markers bind to free labels, but I think this becomes clearer if free labels can pick what markers to display. This is simply sorting `Mu`, and iterating over `Lf` and popping members off `Mu` to bind to each free label.
 
-- mark the binding with the frame ID
-
 
 # Optimizations
 - MetalRenderer spends effort to filter out the visible + available render sets, but they are already calculated and available in worldState. No need for `renderSet.filter(...`

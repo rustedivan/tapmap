@@ -45,6 +45,14 @@ class Stylesheet {
 	// Settings
 	var renderLabels = FixableBool(AppFixables.renderLabels, initial: true)
 	
+	// Fonts
+	var largeRegionFont = UIFont(name: "HelveticaNeue-Bold", size: 20.0)!
+	var mediumRegionFont = UIFont(name: "HelveticaNeue-Bold", size: 16.0)!
+	var defaultRegionFont = UIFont(name: "HelveticaNeue-Bold", size: 12.0)!
+	var capitalFont = UIFont(name: "HelveticaNeue-Bold", size: 14.0)!
+	var cityFont = UIFont(name: "HelveticaNeue-Bold", size: 12.0)!
+	var townFont = UIFont(name: "HelveticaNeue-Bold", size: 10.0)!
+	
 	// Border widths
 	var continentBorderWidthInner = FixableFloat(AppFixables.continentBorderInner, initial: 0.1)
 	var continentBorderWidthOuter = FixableFloat(AppFixables.continentBorderOuter, initial: 0.1)

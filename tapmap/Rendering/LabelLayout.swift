@@ -51,13 +51,13 @@ struct LabelMarker: Comparable {
 		switch kind {
 			case .Region:
 				switch rank {
-					case 0: return UIFont(name: "HelveticaNeue-Bold", size: 20.0)!	// $ Move to stylesheet
-					case 1: return UIFont(name: "HelveticaNeue-Bold", size: 16.0)!
-					default: return UIFont(name: "HelveticaNeue-Bold", size: 12.0)!
+					case 0: return Stylesheet.shared.largeRegionFont
+					case 1: return Stylesheet.shared.mediumRegionFont
+					default: return Stylesheet.shared.defaultRegionFont
 				}
-			case .Capital: return UIFont(name: "HelveticaNeue-Bold", size: 14.0)!
-			case .City: return UIFont(name: "HelveticaNeue-Bold", size: 12.0)!
-			case .Town: return UIFont(name: "HelveticaNeue-Bold", size: 10.0)!
+			case .Capital: return Stylesheet.shared.capitalFont
+			case .City: return Stylesheet.shared.cityFont
+			case .Town: return Stylesheet.shared.townFont
 		}
 	}
 	
