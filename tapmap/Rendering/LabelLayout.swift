@@ -56,7 +56,7 @@ struct LabelMarker: Comparable {
 
 // $ Can split out Codable into extension on QuadTree
 struct LabelPlacement: Codable, Hashable {
-	enum CodingKeys: CodingKey {
+	enum CodingKeys: CodingKey {	// $ Why is this codable?
 		case aabb
 	}
 	var markerHash: Int = 0
@@ -108,8 +108,11 @@ class LabelLayoutEngine {
 		var removedFromLayout: [Int] = []
 		// Move and insert the previously placed labels in their established order
 		for (i, placement) in orderedLayout.enumerated() {
-			let marker = workingSet[placement.markerHash]!
-
+			guard let marker = workingSet[placement.markerHash] else {
+				removedFromLayout.append(placement.markerHash)
+				continue
+			}
+			
 			let result = layoutLabel(marker: marker, in: labelQuadTree, startAnchor: placement.anchor, project: project)
 			
 			if let (labelBox, layoutBox, anchor) = result {
@@ -122,7 +125,7 @@ class LabelLayoutEngine {
 			workingSet.removeValue(forKey: placement.markerHash)
 		}
 		
-		removedFromLayout.forEach { removeFromLayout($0) }
+		orderedLayout.removeAll { removedFromLayout.contains($0.markerHash) }
 		
 		// Layout new incoming markers
 		let markersToLayout = Array(workingSet.values).sorted(by: <)
@@ -161,11 +164,6 @@ class LabelLayoutEngine {
 			}
 		}
 		return nil
-	}
-	
-	func removeFromLayout(_ markerHash: Int) {
-		let i = orderedLayout.firstIndex { $0.markerHash == markerHash }!
-		orderedLayout.remove(at: i)
 	}
 	
 	func labelSize(forMarker marker: LabelMarker) -> (w: Float, h: Float) {

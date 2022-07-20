@@ -10,7 +10,8 @@ import UIKit
 
 class Label {
 	let view: UILabel
-	var ownerHash: RegionHash
+	var ownerHash: RegionHash = 0
+	var isHiding = false
 	
 	init() {
 		view = UILabel()
@@ -20,8 +21,6 @@ class Label {
 		view.lineBreakMode = .byWordWrapping
 		view.numberOfLines = 2
 		view.allowsDefaultTighteningForTruncation = true
-		
-		ownerHash = 0
 	}
 	
 	var isBound: Bool {
@@ -80,29 +79,35 @@ class LabelView: UIView {
 		let zoomHiddenMarkerHashes = candidateMarkers.filter { !zoomFilter($0.value, zoom) }.keys
 		let visibleMarkers = candidateMarkers.filter { !clipHiddenMarkerHashes.contains($0.key) && !zoomHiddenMarkerHashes.contains($0.key) }
 		
-		// $ Widen the poi marker viewbox by ~100px
-		// $ Speed up the projection func
-		
-		// Immediately unbind clipped labels
-		let clippedLabels = poiLabels.filter { clipHiddenMarkerHashes.contains($0.ownerHash) }
-		clippedLabels.forEach { unbindLabel($0) }
-		
-		// $ Unbind faded labels
-				
-		// Find new/unbound markers
-		let labelBindings = Set<Int>(poiLabels.map { $0.ownerHash })
-		let unboundMarkers = visibleMarkers.filter { !labelBindings.contains($0.key) }
-		
 		// Run layout engine over all markers
 		let (layout, removed) = layoutEngine.layoutLabels(markers: visibleMarkers,
 																											projection: project)
-		let removedLabels = poiLabels.filter { removed.contains($0.ownerHash) }
-		removedLabels.forEach {
-//			print("\($0.view.text!) (\($0.ownerHash)) got knocked out of the layout")
-			unbindLabel($0)
+
+		// $ Widen the poi marker viewbox by ~100px
+		// $ Speed up the projection func
+		
+		let removedLabels = poiLabels.filter { zoomHiddenMarkerHashes.contains($0.ownerHash) || removed.contains($0.ownerHash) }
+		let clippedLabels = poiLabels.filter { clipHiddenMarkerHashes.contains($0.ownerHash) }
+		let fadedLabels = poiLabels.filter { $0.view.isHidden && $0.isBound }
+		
+		removedLabels.forEach { removedLabel in
+			if !removedLabel.isHiding {
+				hideLabel(removedLabel)
+			}
 		}
 		
-		// $ Fade labels for zoomHidden markers and removedLabels
+		clippedLabels.forEach { clippedLabel in
+			clippedLabel.view.isHidden = true
+			unbindLabel(clippedLabel)
+		}
+		
+		fadedLabels.forEach { fadedLabel in
+			unbindLabel(fadedLabel)
+		}
+
+		// Find new/unbound markers
+		let labelBindings = Set<Int>(poiLabels.map { $0.ownerHash })
+		let unboundMarkers = visibleMarkers.filter { !labelBindings.contains($0.key) }
 		
 		// Bind newly laid-out markers to free labels
 		var newLayoutEntries = unboundMarkers.filter { layout.keys.contains($0.key) }
@@ -150,6 +155,9 @@ class LabelView: UIView {
 	func bindLabel(_ label: Label, to marker: LabelMarker) {
 		label.ownerHash = marker.ownerHash
 		label.view.isHidden = false
+		UIView.animate(withDuration: 0.2) {
+			label.view.alpha = 1.0
+		}
 		
 		let textColor: UIColor
 		let strokeColor: UIColor
@@ -192,9 +200,18 @@ class LabelView: UIView {
 	func unbindLabel(_ label: Label) {
 		guard label.isBound else { return }
 		print("Unbinding label for \(label.view.text ?? "EMPTY") from marker \(label.ownerHash)")
-		layoutEngine.removeFromLayout(label.ownerHash)
 		label.ownerHash = 0
-		label.view.isHidden = true
+		label.isHiding = false
+	}
+	
+	func hideLabel(_ label: Label) {
+		guard label.isBound else { return }
+		label.isHiding = true
+		UIView.animate(withDuration: 0.2) {
+			label.view.alpha = 0.0
+		} completion: { done in
+			label.view.isHidden = true
+		}
 	}
 }
 
