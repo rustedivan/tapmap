@@ -201,3 +201,19 @@ func measureLabel(marker: LabelMarker) -> (w: Float, h: Float) {
 	let wh = (w: Float(ceil(size.width)), h: Float(ceil(size.height)))
 	return wh
 }
+
+extension LabelMarker {
+	var font: UIFont {
+		switch kind {
+			case .Region:
+				switch rank {
+					case 0: return Stylesheet.shared.largeRegionFont
+					case 1: return Stylesheet.shared.mediumRegionFont
+					default: return Stylesheet.shared.defaultRegionFont
+				}
+			case .Capital: return Stylesheet.shared.capitalFont
+			case .City: return Stylesheet.shared.cityFont
+			case .Town: return Stylesheet.shared.townFont
+		}
+	}
+}

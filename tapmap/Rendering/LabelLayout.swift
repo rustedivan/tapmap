@@ -47,20 +47,6 @@ struct LabelMarker: Comparable {
 		return ((kind == .Region) ? name.uppercased() : name) as NSString
 	}
 	
-	var font: UIFont {
-		switch kind {
-			case .Region:
-				switch rank {
-					case 0: return Stylesheet.shared.largeRegionFont
-					case 1: return Stylesheet.shared.mediumRegionFont
-					default: return Stylesheet.shared.defaultRegionFont
-				}
-			case .Capital: return Stylesheet.shared.capitalFont
-			case .City: return Stylesheet.shared.cityFont
-			case .Town: return Stylesheet.shared.townFont
-		}
-	}
-	
 	static func < (lhs: LabelMarker, rhs: LabelMarker) -> Bool {
 		let lhsScore = lhs.rank - (lhs.kind == .Region ? 1 : 0)	// Value regions one step higher
 		let rhsScore = rhs.rank - (rhs.kind == .Region ? 1 : 0)
