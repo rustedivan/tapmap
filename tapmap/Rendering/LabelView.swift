@@ -23,6 +23,10 @@ class Label {
 		
 		ownerHash = 0
 	}
+	
+	var isBound: Bool {
+		return ownerHash != 0
+	}
 }
 
 class LabelView: UIView {
@@ -70,23 +74,21 @@ class LabelView: UIView {
 		poiMarkers.merge(hashedPrimitives, uniquingKeysWith: { (l, r) in print("Replacing"); return l })
 	}
 	
-	func updateLabels(for activePoiHashes: Set<Int>, inArea focus: Aabb, atZoom zoom: Float, projection project: (Vertex) -> CGPoint) {
-		let activeMarkers = poiMarkers.filter { activePoiHashes.contains($0.value.ownerHash) }
-		let visibleMarkers = activeMarkers.filter { zoomFilter($0.value, zoom) && boxContains(focus, $0.value.worldPos) }
-		let visibleMarkerHashes = Set<Int>(visibleMarkers.keys)
+	func updateLabels(for candidatePoiHashes: Set<Int>, inArea focus: Aabb, atZoom zoom: Float, projection project: (Vertex) -> CGPoint) {
+		let candidateMarkers = poiMarkers.filter { candidatePoiHashes.contains($0.value.ownerHash) }
+		let clipHiddenMarkerHashes = candidateMarkers.filter { !boxContains(focus, $0.value.worldPos) }.keys
+		let zoomHiddenMarkerHashes = candidateMarkers.filter { !zoomFilter($0.value, zoom) }.keys
+		let visibleMarkers = candidateMarkers.filter { !clipHiddenMarkerHashes.contains($0.key) && !zoomHiddenMarkerHashes.contains($0.key) }
 		
 		// $ Widen the poi marker viewbox by ~100px
 		// $ Speed up the projection func
 		
-		// Free up labels whose markers disappeared
-		var freeLabels = poiLabels.filter { $0.ownerHash == 0 || visibleMarkerHashes.contains($0.ownerHash) == false}
-		freeLabels
-			.filter { $0.ownerHash != 0 }
-			.forEach {
-				layoutEngine.removeFromLayout($0.ownerHash)
-				unbindLabel($0)
-			}
+		// Immediately unbind clipped labels
+		let clippedLabels = poiLabels.filter { clipHiddenMarkerHashes.contains($0.ownerHash) }
+		clippedLabels.forEach { unbindLabel($0) }
 		
+		// $ Unbind faded labels
+				
 		// Find new/unbound markers
 		let labelBindings = Set<Int>(poiLabels.map { $0.ownerHash })
 		let unboundMarkers = visibleMarkers.filter { !labelBindings.contains($0.key) }
@@ -99,17 +101,19 @@ class LabelView: UIView {
 //			print("\($0.view.text!) (\($0.ownerHash)) got knocked out of the layout")
 			unbindLabel($0)
 		}
-		freeLabels.append(contentsOf: removedLabels)
+		
+		// $ Fade labels for zoomHidden markers and removedLabels
 		
 		// Bind newly laid-out markers to free labels
 		var newLayoutEntries = unboundMarkers.filter { layout.keys.contains($0.key) }
+		let freeLabels = poiLabels.filter { !$0.isBound }
 		for label in freeLabels {
 			guard let marker = newLayoutEntries.popFirst() else { break }
 			bindLabel(label, to: marker.value)
 		}
 		
 		// Move UILabels into place
-		let usedLabels = poiLabels.filter { $0.ownerHash != 0 }
+		let usedLabels = poiLabels.filter { $0.isBound }
 		moveLabels(usedLabels, to: layout)
 	}
 	
@@ -182,10 +186,13 @@ class LabelView: UIView {
 		let text = marker.displayText as String
 		label.view.attributedText = NSAttributedString(string: text, attributes: attribs)
 //		label.view.backgroundColor = UIColor(red: 0.3, green: 0.0, blue: 0.0, alpha: 0.3)
+		print("Binding label for \(text) to marker \(marker.ownerHash)")
 	}
 	
 	func unbindLabel(_ label: Label) {
-		guard label.ownerHash != 0 else { return }
+		guard label.isBound else { return }
+		print("Unbinding label for \(label.view.text ?? "EMPTY") from marker \(label.ownerHash)")
+		layoutEngine.removeFromLayout(label.ownerHash)
 		label.ownerHash = 0
 		label.view.isHidden = true
 	}
