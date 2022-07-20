@@ -74,31 +74,26 @@ class LabelView: UIView {
 	}
 	
 	func updateLabels(for candidatePoiHashes: Set<Int>, inArea focus: Aabb, atZoom zoom: Float, projection project: (Vertex) -> CGPoint) {
+		let viewportPadding = 10.0 / zoom
+		let labelViewport = Aabb(loX: focus.minX - viewportPadding, loY: focus.minY - viewportPadding,
+														 hiX: focus.maxX + viewportPadding, hiY: focus.maxY + viewportPadding)
 		let candidateMarkers = poiMarkers.filter { candidatePoiHashes.contains($0.value.ownerHash) }
-		let clipHiddenMarkerHashes = candidateMarkers.filter { !boxContains(focus, $0.value.worldPos) }.keys
+		let clipHiddenMarkerHashes = candidateMarkers.filter { !boxContains(labelViewport, $0.value.worldPos) }.keys
 		let zoomHiddenMarkerHashes = candidateMarkers.filter { !zoomFilter($0.value, zoom) }.keys
 		let visibleMarkers = candidateMarkers.filter { !clipHiddenMarkerHashes.contains($0.key) && !zoomHiddenMarkerHashes.contains($0.key) }
 		
 		// Run layout engine over all markers
 		let (layout, removed) = layoutEngine.layoutLabels(markers: visibleMarkers,
 																											projection: project)
-
-		// $ Widen the poi marker viewbox by ~100px
-		// $ Speed up the projection func
 		
-		let removedLabels = poiLabels.filter { zoomHiddenMarkerHashes.contains($0.ownerHash) || removed.contains($0.ownerHash) }
-		let clippedLabels = poiLabels.filter { clipHiddenMarkerHashes.contains($0.ownerHash) }
+		let removedLabelHashes = zoomHiddenMarkerHashes + removed + clipHiddenMarkerHashes
+		let removedLabels = poiLabels.filter { removedLabelHashes.contains($0.ownerHash) }
 		let fadedLabels = poiLabels.filter { $0.view.isHidden && $0.isBound }
 		
 		removedLabels.forEach { removedLabel in
 			if !removedLabel.isHiding {
 				hideLabel(removedLabel)
 			}
-		}
-		
-		clippedLabels.forEach { clippedLabel in
-			clippedLabel.view.isHidden = true
-			unbindLabel(clippedLabel)
 		}
 		
 		fadedLabels.forEach { fadedLabel in

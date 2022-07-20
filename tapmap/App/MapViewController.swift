@@ -192,9 +192,8 @@ class MapViewController: UIViewController, MTKViewDelegate {
 																	 zoomedTo: zoom)
 		let zoomRate = (zoom - zoomLimits.0) / (zoomLimits.1 - zoomLimits.0)	// How far down the zoom scale are we?
 		
-		// $ Start label layout on backthread here while renderers prepare their frame data...
 		renderers.prepareFrame(forWorld: world, zoomRate: zoomRate)
-		// $ ...and then move all the labels in place on the main thread afterwards - layout should be practically free
+
 		labelView.updateLabels(for: renderers.poiRenderer.activePoiHashes,
 													 inArea: renderRect,
 													 atZoom: zoom,
