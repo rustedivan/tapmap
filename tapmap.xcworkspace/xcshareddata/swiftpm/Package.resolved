@@ -1,43 +1,41 @@
 {
-  "object": {
-    "pins": [
-      {
-        "package": "fixa",
-        "repositoryURL": "https://github.com/rustedivan/fixa.git",
-        "state": {
-          "branch": null,
-          "revision": "9311c925faf29704e56c469c5cb6d52c59ba468f",
-          "version": "0.4.0"
-        }
-      },
-      {
-        "package": "LibTessSwift",
-        "repositoryURL": "https://github.com/LuizZak/LibTessSwift",
-        "state": {
-          "branch": null,
-          "revision": "da48d3f8e66a614df22d5b2fab2f04576130f46e",
-          "version": "0.8.2"
-        }
-      },
-      {
-        "package": "MiniLexer",
-        "repositoryURL": "https://github.com/LuizZak/MiniLexer.git",
-        "state": {
-          "branch": null,
-          "revision": "4da97d6f92d79402cd3cf35d6438ec723554ae7c",
-          "version": "0.9.5"
-        }
-      },
-      {
-        "package": "SwiftyJSON",
-        "repositoryURL": "https://github.com/SwiftyJSON/SwiftyJSON",
-        "state": {
-          "branch": null,
-          "revision": "b3dcd7dbd0d488e1a7077cb33b00f2083e382f07",
-          "version": "5.0.1"
-        }
+  "pins" : [
+    {
+      "identity" : "fixa",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/rustedivan/fixa.git",
+      "state" : {
+        "revision" : "9311c925faf29704e56c469c5cb6d52c59ba468f",
+        "version" : "0.4.0"
       }
-    ]
-  },
-  "version": 1
+    },
+    {
+      "identity" : "libtessswift",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/LuizZak/LibTessSwift",
+      "state" : {
+        "revision" : "da48d3f8e66a614df22d5b2fab2f04576130f46e",
+        "version" : "0.8.2"
+      }
+    },
+    {
+      "identity" : "minilexer",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/LuizZak/MiniLexer.git",
+      "state" : {
+        "revision" : "4da97d6f92d79402cd3cf35d6438ec723554ae7c",
+        "version" : "0.9.5"
+      }
+    },
+    {
+      "identity" : "swiftyjson",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/SwiftyJSON/SwiftyJSON",
+      "state" : {
+        "revision" : "b3dcd7dbd0d488e1a7077cb33b00f2083e382f07",
+        "version" : "5.0.1"
+      }
+    }
+  ],
+  "version" : 2
 }
