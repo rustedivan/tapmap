@@ -54,9 +54,8 @@ struct LabelMarker: Comparable {
 	}
 }
 
-// $ Can split out Codable into extension on QuadTree
 struct LabelPlacement: Codable, Hashable {
-	enum CodingKeys: CodingKey {	// $ Why is this codable?
+	enum CodingKeys: CodingKey {
 		case aabb
 	}
 	var markerHash: Int = 0
@@ -113,7 +112,7 @@ class LabelLayoutEngine {
 				continue
 			}
 			
-			let result = layoutLabel(marker: marker, in: labelQuadTree, startAnchor: placement.anchor, project: project)
+			let result = layoutLabel(marker: marker, in: labelQuadTree, startAnchor: placement.anchor, projection: project)
 			
 			if let (labelBox, layoutBox, anchor) = result {
 				let reprojectedPlacement = LabelPlacement(markerHash: marker.ownerHash, aabb: labelBox, anchor: anchor, debugName: marker.name)
@@ -133,7 +132,7 @@ class LabelLayoutEngine {
 			guard orderedLayout.count < maxLabels else { break }
 			
 			let startAnchor: LayoutAnchor = (marker.kind == .Region ? .Center : .NE)	// Choose starting layout anchor
-			let result = layoutLabel(marker: marker, in: labelQuadTree, startAnchor: startAnchor, project: project)
+			let result = layoutLabel(marker: marker, in: labelQuadTree, startAnchor: startAnchor, projection: project)
 			if let (labelBox, layoutBox, anchor) = result {
 				let placement = LabelPlacement(markerHash: marker.ownerHash, aabb: labelBox, anchor: anchor, debugName: marker.name)	// Unpadded aabb for layout
 				labelQuadTree.insert(value: placement, region: layoutBox, clipToBounds: true)							// Padded aabb for collision
@@ -146,7 +145,7 @@ class LabelLayoutEngine {
 		return (layout: layout, removed: removedFromLayout)
 	}
 	
-	func layoutLabel(marker: LabelMarker, in layout: QuadTree<LabelPlacement>, startAnchor: LayoutAnchor, project: (Vertex) -> CGPoint) -> (labelBox: Aabb, layoutBox: Aabb, anchor: LayoutAnchor)? {
+	func layoutLabel(marker: LabelMarker, in layout: QuadTree<LabelPlacement>, startAnchor: LayoutAnchor, projection project: (Vertex) -> CGPoint) -> (labelBox: Aabb, layoutBox: Aabb, anchor: LayoutAnchor)? {
 		var anchor: LayoutAnchor? = startAnchor
 		let origin = project(marker.worldPos)
 		let size = labelSize(forMarker: marker)

@@ -126,7 +126,6 @@ class LabelView: UIView {
 		// Move all labels into place
 		for label in labels {
 			guard let placement = layout[label.ownerHash] else {
-//				print("Label for \(label.view.text!) knocked out from layout.")
 				continue
 			}
 
@@ -193,13 +192,10 @@ class LabelView: UIView {
 		
 		let text = marker.displayText as String
 		label.view.attributedText = NSAttributedString(string: text, attributes: attribs)
-//		label.view.backgroundColor = UIColor(red: 0.3, green: 0.0, blue: 0.0, alpha: 0.3)
-		print("Binding label for \(text) to marker \(marker.ownerHash)")
 	}
 	
 	func unbindLabel(_ label: Label) {
 		guard label.isBound else { return }
-		print("Unbinding label for \(label.view.text ?? "EMPTY") from marker \(label.ownerHash)")
 		label.ownerHash = 0
 		label.isHiding = false
 	}

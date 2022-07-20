@@ -14,6 +14,18 @@ Label layout, however, looks to be a right week-long beast. I've done some resea
 Depending on how fast this layout step runs, it can be done on each zoom frame. Otherwise, put it on a backthread, and animate to the produced frame when it's done.
 - refactoring: break out other backthread jobs to their own files
 
+## Fading removed labels
+This turned out to be pretty messy under the current layout engine. Labels are unbound/removed from the layout immediately in the frame they disappear (from layoutLabels, line 139.)
+I think I need to restructure this a bit - the problem is that layoutLabels has a side effect it shouldn't. It's OK to call unbind() on the removed labels, but that should just start the fading animation. The animation's completion block should hide the backing view and disconnect the owner hash. Then, the updateLabels function is free to remove un-owned labels from the layout.
+There's another problem; labels that have fallen out of the viewbox are also culled immediately. I think that the _only_ reason to remove something from the layout is that the owner hash connection has been severed. It's OK to sever it without a fading animation, but the label must be formally unbound.
+The layout engine shouldn't removeFromLayout() for any other reason than a zero ownerHash. (It should still calculate and return the list of labels that should be removed - but the LabelView owns the process of hiding the labels. 
+
+Alright, so the problem is that the _markers_ are calculated per frame, and don't actually have any fade information. Markers disappear immediately, and with them, the labels get unbound too. There must be some mechanism to know whether a marker is being faded (and really, it's only the label that gets faded, the marker stays.)
+
+I think I have it working, but the layout engine crashes when one of the layouted labels disappears from the layout without explicitly calling removeFromLayout. I _think_ I can just remove it when it happens, instead of having to do that explicit removal from the outside. Basically, let the layout engine say "OK then" if the layout client no longer wants that marker to be laid out.
+
+Looks like it works just fine now! One minor polish thing is that a region label is likely to be kicked out by an older place label, since regions are always centered on the POI, and younger labels can't ask older labels to move out of the way. One example is VENEZUELA vs Georgetown after a bit of zooming in and out. I think it will have to be like this - I could sort regions higher since they have less room to move, but it's really hard to tell which way is the right one. It's more that a label that has started to flicker, is likely to keep flickering since it will never grow old enough to win.
+
 # Label layout engine
 The label layout engine kind of works already, but it has one big problem: frame-to-frame, the order of insertions changes, because it's all set/dictionary-based. This causes different labels to fit on different frames, which causes flickering.
 
