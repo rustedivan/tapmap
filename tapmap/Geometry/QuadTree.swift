@@ -60,14 +60,6 @@ indirect enum QuadNode<T: Hashable & Codable>: Codable {
 						a.maxX <  b.maxX && a.maxY <  b.maxY)
 	}
 	
-	func intersects(search a: Aabb) -> Bool {
-		let b = bounds
-		return !( a.minX >= b.maxX ||
-							a.maxX <= b.minX ||
-							a.minY >= b.maxY ||
-							a.maxY <= b.minY)
-	}
-	
 	func subnodes() -> (tl: QuadNode, tr: QuadNode, bl: QuadNode, br: QuadNode) {
 		let b = bounds
 		let tlOut = QuadNode.Empty(bounds: Aabb(loX: b.minX, loY: b.midpoint.y, hiX: b.midpoint.x, hiY: b.maxY))
@@ -97,12 +89,22 @@ struct QuadTree<T: Hashable & Codable>: Codable {
 		self.maxDepth = maxDepth
 	}
 	
-	mutating func insert(value: T, region: Aabb) {
-		guard root.contains(region: region) else {
-			print("Value \(value) lies outside quadtree bounds: \(region)")
-			return
+	mutating func insert(value: T, region: Aabb, clipToBounds: Bool = false) {
+		var newRegion = region
+		if root.contains(region: region) == false {
+			if clipToBounds {
+				let l = max(newRegion.minX, root.bounds.minX)
+				let r = min(newRegion.maxX, root.bounds.maxX)
+				let t = max(newRegion.minY, root.bounds.minY)
+				let b = min(newRegion.maxY, root.bounds.maxY)
+				newRegion = Aabb(loX: l, loY: t, hiX: r, hiY: b)
+			} else {
+				print("Value \(value) lies outside quadtree bounds: \(region)")
+				return
+			}
 		}
-		(root, _) = quadInsert(value, region: region, into: root, depth: 1, maxDepth: maxDepth)
+		
+		(root, _) = quadInsert(value, region: newRegion, into: root, depth: 1, maxDepth: maxDepth)
 	}
 	
 	mutating func remove(hashValue: Int) {
@@ -181,7 +183,7 @@ func quadQuery<T:Hashable>(search: Aabb, in node: QuadNode<T>) -> Set<T> {
 	case .Empty:
 		return Set<T>()
 	case let .Node(_, values, tl, tr, bl, br):
-		if node.intersects(search: search) {
+		if boxIntersects(node.bounds, search) {
 			var subtreeValues = Set<T>(values)
 			subtreeValues.formUnion(quadQuery(search: search, in: tl))
 			subtreeValues.formUnion(quadQuery(search: search, in: tr))

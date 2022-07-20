@@ -99,7 +99,7 @@ class MapViewController: UIViewController, MTKViewDelegate {
 		renderers.zoomLevel = Float(scrollView.zoomScale)
 		
 		labelView.isHidden = !Stylesheet.shared.renderLabels.value
-		labelView.buildPoiPrimitives(withVisibleContinents: world.availableContinents,
+		labelView.initPoiMarkers(withVisibleContinents: world.availableContinents,
 																 countries: world.availableCountries,
 																 provinces: world.availableProvinces)
 		
@@ -182,7 +182,7 @@ class MapViewController: UIViewController, MTKViewDelegate {
 		}
 
 		renderers.poiRenderer.updatePrimitives(for: hit, with: hit.children)
-		labelView.updatePrimitives(for: hit, with: hit.children)
+		labelView.updatePoiMarkers(for: hit, with: hit.children)
 	}
 
 	func prepareFrame() {
@@ -191,11 +191,13 @@ class MapViewController: UIViewController, MTKViewDelegate {
 																	 centeredOn: offset,
 																	 zoomedTo: zoom)
 		let zoomRate = (zoom - zoomLimits.0) / (zoomLimits.1 - zoomLimits.0)	// How far down the zoom scale are we?
-		renderers.prepareFrame(forWorld: world, zoomRate: zoomRate)
 		
+		renderers.prepareFrame(forWorld: world, zoomRate: zoomRate)
+
 		labelView.updateLabels(for: renderers.poiRenderer.activePoiHashes,
 													 inArea: renderRect,
-													 atZoom: zoom)
+													 atZoom: zoom,
+													 projection: mapToView)
 		
 		geometryStreamer.updateLodLevel()	// Must run after requests have been filed in renderers.prepareFrame, otherwise glitch when switching LOD level
 		geometryStreamer.updateStreaming()
@@ -209,10 +211,7 @@ class MapViewController: UIViewController, MTKViewDelegate {
 	
 	func draw(in view: MTKView) {
 		prepareFrame()
-		
 		renderers.render(forWorld: world, into: view)
-		labelView.renderLabels(projection: mapToView)
-
 		needsRender = false
 	}
 	

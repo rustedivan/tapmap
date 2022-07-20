@@ -47,7 +47,7 @@ class MetalRenderer {
 															provinces: world.availableProvinces)
 		
 		effectRenderer = EffectRenderer(withDevice: device, pixelFormat: view.colorPixelFormat, bufferCount: maxInflightFrames)
-		debugRenderer = DebugRenderer(withDevice: device, pixelFormat: view.colorPixelFormat)
+		debugRenderer = DebugRenderer(withDevice: device, pixelFormat: view.colorPixelFormat, bufferCount: maxInflightFrames)
 		
 		frameSemaphore = DispatchSemaphore(value: maxInflightFrames)
 	}
@@ -72,13 +72,14 @@ class MetalRenderer {
 		let borderedContinents = worldState.allContinents.filter { visible.contains($0.key) }	// All visible continents (even if visited)
 		let borderedCountries = worldState.visibleCountries
 		let borderedProvinces = worldState.visibleProvinces.filter { !visited.contains($0.key) }	// Visited provinces have no borders
-		let borderZoom = zoomLevel / (1.0 - zoomRate + zoomRate * Stylesheet.shared.borderZoomBias.value)	// Borders become wider at closer zoom levels
+		let poiZoom = zoomLevel / (1.0 - zoomRate + zoomRate * Stylesheet.shared.poiZoomBias.value)	// Pois become larger at closer zoom levels
 		let bufferIndex = frameId % maxInflightFrames
 		effectRenderer.prepareFrame(bufferIndex: bufferIndex)
 		regionRenderer.prepareFrame(visibleContinentSet: renderContinentSet, visibleCountrySet: renderCountrySet, visibleProvinceSet: renderProvinceSet, visitedSet: visited, regionContinentMap: worldState.continentForRegion, bufferIndex: bufferIndex)
-		borderRenderer.prepareFrame(borderedContinents: borderedContinents, borderedCountries: borderedCountries, borderedProvinces: borderedProvinces, zoom: borderZoom, bufferIndex: bufferIndex)
-		poiRenderer.prepareFrame(visibleSet: renderSet, zoom: zoomLevel, bufferIndex: bufferIndex)
+		borderRenderer.prepareFrame(borderedContinents: borderedContinents, borderedCountries: borderedCountries, borderedProvinces: borderedProvinces, zoom: zoomLevel, zoomRate: zoomRate, bufferIndex: bufferIndex)
+		poiRenderer.prepareFrame(visibleSet: renderSet, zoom: poiZoom, zoomRate: zoomRate, bufferIndex: bufferIndex)
 		selectionRenderer.prepareFrame(zoomLevel: zoomLevel)
+		debugRenderer.prepareFrame(bufferIndex: bufferIndex)
 	}
 	
 	func render(forWorld worldState: RuntimeWorld, into view: MTKView) {
@@ -110,6 +111,7 @@ class MetalRenderer {
 		self.effectRenderer.renderWorld(inProjection: mvpMatrix, inEncoder: encoder, bufferIndex: bufferIndex)
 		self.selectionRenderer.renderSelection(inProjection: mvpMatrix, inEncoder: encoder)
 		self.poiRenderer.renderWorld(inProjection: mvpMatrix, inEncoder: encoder, bufferIndex: bufferIndex)
+		self.debugRenderer.renderMarkers(inProjection: mvpMatrix, inEncoder: encoder, bufferIndex: bufferIndex)
 		
 		encoder.endEncoding()
 		commandBuffer.commit()

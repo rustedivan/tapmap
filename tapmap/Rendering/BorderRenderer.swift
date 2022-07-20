@@ -67,7 +67,7 @@ class BorderRenderer {
 		wantedBorderLod = GeometryStreamer.shared.wantedLodLevel
 	}
 	
-	func prepareFrame(borderedContinents: GeoContinentMap, borderedCountries: GeoCountryMap, borderedProvinces: GeoProvinceMap, zoom: Float, bufferIndex: Int) {
+	func prepareFrame(borderedContinents: GeoContinentMap, borderedCountries: GeoCountryMap, borderedProvinces: GeoProvinceMap, zoom: Float, zoomRate: Float, bufferIndex: Int) {
 		let streamer = GeometryStreamer.shared
 		let lodLevel = streamer.wantedLodLevel
 		var borderLodMiss = false
@@ -154,8 +154,9 @@ class BorderRenderer {
 			return borderPrimitives[loddedKey]
 		})
 		
+		let borderZoom = zoom / (1.0 - zoomRate + zoomRate * Stylesheet.shared.borderZoomBias.value)	// Borders become wider at closer zoom levels
 		frameSelectSemaphore.wait()
-			self.borderScale = 1.0 / zoom
+			self.borderScale = 1.0 / borderZoom
 			self.continentRenderLists[bufferIndex] = frameContinentRenderList
 			self.countryRenderLists[bufferIndex] = frameCountryRenderList
 			self.provinceRenderLists[bufferIndex] = frameProvinceRenderList

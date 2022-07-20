@@ -70,7 +70,7 @@ func tessellateGeometry(params: ArraySlice<String>) throws {
 			(tessProvinces, "provinces", lodLevel),
 			(tessCountries, "countries", lodLevel),
 			(tessContinents, "continents", lodLevel)]
-		try _ = archives.map(archiveTessellations)
+		try archives.forEach(archiveTessellations)
 	}
 }
 

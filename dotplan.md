@@ -1,5 +1,57 @@
 ROAD TO FINAL
 
+# POI styling
+POI styling needs better markers, and support for selecting different marker sprites. It looks pretty straight-forward - every rank has its own POI plane, so the marker index can be an instance uniform.
+Label layout, however, looks to be a right week-long beast. I've done some research of how MapBox and friends to do it, and here are some requirements and insights.
+
+**Label collision detection:** on scroll or zoom, labels need to be laid out by collision detection. Fixable margins around fitted label boxes. As a first step, layout all labels where they want to be.
+**Label anchoring:** Maps seem to have a convention where labels are offset diagonally from their anchor points: NE, SE, NW, SW in that order. The offset in pixels would be a good Fixable.
+**Label prioritisation:** Select new labels into the view in rank order. Weaker ranks are inserted later. A bound label should keep its binding until zoomed/scrolled out of scope (prioritize existing labels)
+**Layout annealing:** When inserting, check for collisions. Incoming labels must move if colliding. If no free space can be found by selecting another anchor, restart from the first anchor point, and ask colliding labels to move to a "worse" anchor. Don't recurse. If a solution can't be found, drop the label.
+**Label polish:** Areas should print in small-caps, without a marker. POI labels should come in two weights with differing size, weight and brightness. Give multiline labels negative line height.
+**Label animation:** fade out labels before unbinding them.
+
+Depending on how fast this layout step runs, it can be done on each zoom frame. Otherwise, put it on a backthread, and animate to the produced frame when it's done.
+- refactoring: break out other backthread jobs to their own files
+
+## Fading removed labels
+This turned out to be pretty messy under the current layout engine. Labels are unbound/removed from the layout immediately in the frame they disappear (from layoutLabels, line 139.)
+I think I need to restructure this a bit - the problem is that layoutLabels has a side effect it shouldn't. It's OK to call unbind() on the removed labels, but that should just start the fading animation. The animation's completion block should hide the backing view and disconnect the owner hash. Then, the updateLabels function is free to remove un-owned labels from the layout.
+There's another problem; labels that have fallen out of the viewbox are also culled immediately. I think that the _only_ reason to remove something from the layout is that the owner hash connection has been severed. It's OK to sever it without a fading animation, but the label must be formally unbound.
+The layout engine shouldn't removeFromLayout() for any other reason than a zero ownerHash. (It should still calculate and return the list of labels that should be removed - but the LabelView owns the process of hiding the labels. 
+
+Alright, so the problem is that the _markers_ are calculated per frame, and don't actually have any fade information. Markers disappear immediately, and with them, the labels get unbound too. There must be some mechanism to know whether a marker is being faded (and really, it's only the label that gets faded, the marker stays.)
+
+I think I have it working, but the layout engine crashes when one of the layouted labels disappears from the layout without explicitly calling removeFromLayout. I _think_ I can just remove it when it happens, instead of having to do that explicit removal from the outside. Basically, let the layout engine say "OK then" if the layout client no longer wants that marker to be laid out.
+
+Looks like it works just fine now! One minor polish thing is that a region label is likely to be kicked out by an older place label, since regions are always centered on the POI, and younger labels can't ask older labels to move out of the way. One example is VENEZUELA vs Georgetown after a bit of zooming in and out. I think it will have to be like this - I could sort regions higher since they have less room to move, but it's really hard to tell which way is the right one. It's more that a label that has started to flicker, is likely to keep flickering since it will never grow old enough to win.
+
+# Label layout engine
+The label layout engine kind of works already, but it has one big problem: frame-to-frame, the order of insertions changes, because it's all set/dictionary-based. This causes different labels to fit on different frames, which causes flickering.
+
+I have two approaches to consider: either keep the layout from the previous frame, layout any new labels that may fit, and then re-project all the labels before rendering; OR figure out a stable sorting so the insert order is the same on every layout frame.
+
+The first approach seems obviously better on first glance, but since scrolling causes _all_ labels to move, there isn't really that much useful information. Doing it in this way may be a bit faster (saving quadtree inserts, which are fast anyway) but also causes collision detection to happen with frame-old layouts. No biggie, but not clearly the best either.
+
+The second approach is more expensive in that hundreds of markers need to be sorted per frame, but it solves the problems of older labels being butted out by younger labels, too.
+
+Then, the actual binding to labels is turning out to be more of a problem than I thought. I'll try to formulate it more clearly than before.
+
+1. We have one large set of markers `M`, to allocate to a (probably) smaller set of labels `L`. This is a (simple) bipartite graph problem.
+2. The allocation of a label to a marker is said to _bind_ a marker to a label. Markers can be _bound_ or _unbound_; labels can be _used_ or _free_.
+3. `M` changes frame to frame, so some markers will need to be unbound from their labels, and possibly bound to new markers. Every frame forms a new set of free labels `Lf`, and a new set of unbound markers `Mu`.
+4. Markers have rank prioritizations that should be considered during layout insertion.
+5. The layout is dependent on insertion order from `M`, so `M` needs to sorted in a stable manner from frame to frame.
+6. A label should only disappear due to zooming or scrolling, and should not be freed up even if a higher-prioritized marker needs a label.
+
+Currently, the system is letting markers bind to free labels, but I think this becomes clearer if free labels can pick what markers to display. This is simply sorting `Mu`, and iterating over `Lf` and popping members off `Mu` to bind to each free label.
+
+
+# Optimizations
+- MetalRenderer spends effort to filter out the visible + available render sets, but they are already calculated and available in worldState. No need for `renderSet.filter(...`
+- Put label layout on a backthread
+- Consider instance-based line rendering
+
 # Rendering brief, step 2
  There are some effects I want to spice up the presentation. I'm a little stuck at how to lookup the color for a region at runtime, since the base color isn't always static. Specifically, provinces have different colors when visited and unvisited. I can definitely route around that, and ~100 O(1) dictionary lookups per frame isn't going to make a difference, but it's _wrong_. To help guide the stylesheet lookup design, let's take a look at those extra effects.
  
@@ -13,7 +65,7 @@ ROAD TO FINAL
  The province colors should represent the their continents. I think this could be a cool way to achieve a faceted, sharp, consistent look that still sells the proximity between areas, and would look really nice for long overland trips.
  
 - Prerender an image with the continents' key colors.
-- Blur it heavily to get soft gradients where continents are close, and along coastlines
+- Blur it heavily to get soft gradients where continents are close, and along coastlines (maybe even bring dark blue into the continent coastlines?)
 - For each province (and optionally country, if needed), sample the blurred map at the pole of inaccessibility
  
  I did a quick test by just taking a continent-color map, blurring it in Pixelmator and taking a Voronoi filter to simulate countries. Looked good after one minute of work. This is the thing.
@@ -143,6 +195,7 @@ Find public land travels and make maps from it. LWR/D/U
 ## Remove POIs
 ## Split Seven Seas continent into their own seas
 ## Figure out how to handle Clipperton and friends (see "skipping..." in bake log)
+## Trim off "(open ocean)" from Seven Seas 
 
 ----- ARCHIVE -----
 

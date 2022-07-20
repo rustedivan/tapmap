@@ -7,6 +7,7 @@
 //
 
 import Metal
+import MetalKit
 import simd
 
 fileprivate struct FrameUniforms {
@@ -84,6 +85,7 @@ class PoiRenderer {
 	let device: MTLDevice
 	let pipeline: MTLRenderPipelineState
 	let instanceUniforms: [MTLBuffer]
+	let markerAtlas: MTLTexture
 	
 	var rankThreshold: Float = -1.0
 	var poiBaseSize: Float = 0.0
@@ -125,6 +127,8 @@ class PoiRenderer {
 		let visibleProvincePoiPlanes = provinces.values.flatMap { sortPlacesIntoPoiPlanes($0.places, in: $0, inDevice: device) }
 		
 		poiPlanePrimitives = visibleContinentPoiPlanes + visibleCountryPoiPlanes + visibleProvincePoiPlanes
+		
+		markerAtlas = loadMarkerAtlas("MarkerAtlas", inDevice: device)
 	}
 	
 	var activePoiHashes: Set<Int> {
@@ -150,7 +154,7 @@ class PoiRenderer {
 		return sortPlacesIntoPoiPlanes(region.places, in: region, inDevice: device);
 	}
 	
-	func prepareFrame(visibleSet: Set<RegionHash>, zoom: Float, bufferIndex: Int) {
+	func prepareFrame(visibleSet: Set<RegionHash>, zoom: Float, zoomRate: Float, bufferIndex: Int) {
 		let now = Date()
 		for (key, p) in poiVisibility {
 			switch(p) {
@@ -167,13 +171,13 @@ class PoiRenderer {
 			}
 		}
 		
-		var poiScreenSize: Float = 2.0
-		poiScreenSize = 2.0 / (zoom)
-		poiScreenSize += min(zoom * 0.01, 0.1)	// Boost POI sizes a bit when zooming in // $ Copy border zoom bias
+		let poiZoom = zoom / (1.0 - zoomRate + zoomRate * Stylesheet.shared.poiZoomBias.value)	// POIs become larger at closer zoom levels
+		let poiScreenSize: Float = 2.0 / poiZoom
 		let newRankThreshold = updateZoomThreshold(viewZoom: zoom)
 		
-		let framePlanes = poiPlanePrimitives.filter { visibleSet.contains($0.ownerHash) }
-																			  .filter { poiVisibility[$0.hashValue] != nil }
+		let framePlanes = poiPlanePrimitives.filter { $0.representsArea == false }					// Hide area markers (but keep the labels)
+																				.filter { visibleSet.contains($0.ownerHash) }		// Hide markers outside the frame
+																			  .filter { poiVisibility[$0.hashValue] != nil }	// Don't render hidden markers
 		
 		var fades = Array<InstanceUniforms>()
 		fades.reserveCapacity(framePlanes.count)
@@ -236,6 +240,7 @@ class PoiRenderer {
 	func renderWorld(inProjection projection: simd_float4x4, inEncoder encoder: MTLRenderCommandEncoder, bufferIndex: Int) {
 		encoder.pushDebugGroup("Render POI plane")
 		encoder.setRenderPipelineState(pipeline)
+		encoder.setFragmentTexture(markerAtlas, index: 0)
 		
 		frameSwitchSemaphore.wait()
 			let renderList = self.renderLists[bufferIndex]
@@ -258,6 +263,19 @@ class PoiRenderer {
 		
 		encoder.popDebugGroup()
 	}
+}
+
+// MARK: Texture management
+func loadMarkerAtlas(_ name: String, inDevice device: MTLDevice) -> MTLTexture {
+	let loader = MTKTextureLoader(device: device)
+	let path = Bundle.main.url(forResource: "atlas", withExtension: "pvr")!
+	guard let atlas = try? loader.newTexture(URL: path, options: .none) else {
+		fatalError("Could not load marker atlas")
+	}
+	
+	print("Loaded marker atlas with \(atlas.mipmapLevelCount) mip levels")
+	
+	return atlas
 }
 
 // MARK: Generating POI planes

@@ -94,11 +94,11 @@ class QuadTreeTests: XCTestCase {
 	
 	func testSplitAabb() {
 		let n = QuadNode<Int>.Empty(bounds: Aabb(loX: -50.0, loY: -40.0, hiX: 50.0, hiY: 30.0))
-		let splits = n.subcells()
-		XCTAssertTrue(splits.tl == Aabb(loX: -50.0, loY:  -5.0, hiX:  0.0, hiY: 30.0))
-		XCTAssertTrue(splits.tr == Aabb(loX:   0.0, loY:  -5.0, hiX: 50.0, hiY: 30.0))
-		XCTAssertTrue(splits.bl == Aabb(loX: -50.0, loY: -40.0, hiX:  0.0, hiY: -5.0))
-		XCTAssertTrue(splits.br == Aabb(loX:   0.0, loY: -40.0, hiX: 50.0, hiY: -5.0))
+		let splits = n.subnodes()
+		XCTAssertTrue(splits.tl.bounds == Aabb(loX: -50.0, loY:  -5.0, hiX:  0.0, hiY: 30.0))
+		XCTAssertTrue(splits.tr.bounds == Aabb(loX:   0.0, loY:  -5.0, hiX: 50.0, hiY: 30.0))
+		XCTAssertTrue(splits.bl.bounds == Aabb(loX: -50.0, loY: -40.0, hiX:  0.0, hiY: -5.0))
+		XCTAssertTrue(splits.br.bounds == Aabb(loX:   0.0, loY: -40.0, hiX: 50.0, hiY: -5.0))
 	}
 
 	func testRemoveValue() {

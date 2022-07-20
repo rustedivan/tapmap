@@ -50,24 +50,34 @@ protocol DebugMarker {
 	var renderPrimitive: DebugRenderPrimitive { get }
 }
 
-struct DebugUniforms {
+// DebugRenderer borrows Map shader, so this must match RegionRenderer's FrameUniforms
+fileprivate struct FrameUniforms {
 	let mvpMatrix: simd_float4x4
-	var color: simd_float4
+}
+
+// DebugRenderer borrows Map shader, so this must match RegionRenderer's InstanceUniforms
+fileprivate struct InstanceUniforms {
+	let color: simd_float4
 }
 
 class DebugRenderer {
+	typealias DebugPrimitive = DebugRenderPrimitive
+	typealias RenderList = ContiguousArray<DebugPrimitive>
 	static private var _shared: DebugRenderer!
 	static var shared: DebugRenderer {
 		return _shared
 	}
-
+	
 	let device: MTLDevice
 	let pipeline: MTLRenderPipelineState
+	let instanceUniforms: [MTLBuffer]
+
 	var primitives: [UUID: DebugRenderPrimitive]
 	var transientPrimitives: [DebugRenderPrimitive]
-	
 	var mainCursorHandle: UUID?
 	var mainSelectionHandle: UUID?
+	var renderLists: [RenderList] = []
+	var frameSwitchSemaphore = DispatchSemaphore(value: 1)
 	
 	func moveCursor(_ x: CGFloat, _ y: CGFloat) {
 		if mainCursorHandle == nil {
@@ -104,7 +114,7 @@ class DebugRenderer {
 		transientPrimitives.append(newQuad)
 	}
 	
-	init(withDevice device: MTLDevice, pixelFormat: MTLPixelFormat) {
+	init(withDevice device: MTLDevice, pixelFormat: MTLPixelFormat, bufferCount: Int) {
 		let shaderLib = device.makeDefaultLibrary()!
 		
 		let pipelineDescriptor = MTLRenderPipelineDescriptor()
@@ -121,6 +131,10 @@ class DebugRenderer {
 		do {
 			try pipeline = device.makeRenderPipelineState(descriptor: pipelineDescriptor)
 			self.device = device
+			self.renderLists = Array(repeating: RenderList(), count: bufferCount)
+			self.instanceUniforms = (0..<bufferCount).map { _ in
+				return device.makeBuffer(length: PoiRenderer.kMaxVisibleInstances * MemoryLayout<InstanceUniforms>.stride, options: .storageModeShared)!
+			}
 		} catch let error {
 			fatalError(error.localizedDescription)
 		}
@@ -131,26 +145,45 @@ class DebugRenderer {
 		DebugRenderer._shared = self
 	}
 	
-	func renderMarkers(inProjection projection: simd_float4x4, inEncoder encoder: MTLRenderCommandEncoder) {
+	func prepareFrame(bufferIndex: Int) {
+		let frameRenderList = RenderList(primitives.values + transientPrimitives)
+		
+		var markerColors = Array<InstanceUniforms>()
+		markerColors.reserveCapacity(frameRenderList.count)
+		for marker in frameRenderList {
+			let u = InstanceUniforms(color: marker.color.vector)
+			markerColors.append(u)
+		}
+		
+		frameSwitchSemaphore.wait()
+			self.renderLists[bufferIndex] = frameRenderList
+			self.instanceUniforms[bufferIndex].contents().copyMemory(from: markerColors, byteCount: MemoryLayout<InstanceUniforms>.stride * markerColors.count)
+			transientPrimitives.removeAll()
+		frameSwitchSemaphore.signal()
+	}
+	
+	func renderMarkers(inProjection projection: simd_float4x4, inEncoder encoder: MTLRenderCommandEncoder, bufferIndex: Int) {
 		encoder.pushDebugGroup("Render debug layer")
 		encoder.setRenderPipelineState(pipeline)
 		
-		var uniforms = DebugUniforms(mvpMatrix: projection,
-																 color: simd_float4())
+		frameSwitchSemaphore.wait()
+			let renderList = self.renderLists[bufferIndex]
+			var frameUniforms = FrameUniforms(mvpMatrix: projection)
+			let uniforms = self.instanceUniforms[bufferIndex]
+		frameSwitchSemaphore.signal()
 		
+		encoder.setVertexBytes(&frameUniforms, length: MemoryLayout<FrameUniforms>.stride, index: 1)
+		encoder.setVertexBuffer(uniforms, offset: 0, index: 2)
 		
-		// Permanent markers
-		for primitive in primitives.values {
-			uniforms.color = primitive.color.vector
+		var instanceCursor = 0
+		for primitive in renderList {
+			encoder.setVertexBufferOffset(instanceCursor, index: 2)
 			render(primitive: primitive, into: encoder)
+			
+			instanceCursor += MemoryLayout<InstanceUniforms>.stride
 		}
 		
-		// One-frame markers
-		for primitive in transientPrimitives {
-			uniforms.color = primitive.color.vector
-			render(primitive: primitive, into: encoder)
-		}
-		transientPrimitives.removeAll()
+		encoder.popDebugGroup()
 	}
 	
 	func makeDebugCursor(at p: Vertex, name: String) -> DebugRenderPrimitive {

@@ -27,7 +27,7 @@ class EdgeGenerationTests: XCTestCase {
 		let v0 = Vertex( 0.0,  10.0)
 		let v1 = Vertex(10.0, 10.0)
 		let v2 = Vertex(10.0, -10.0)
-		let rib = makeMiterRib(v0, v1, v2)
+		let rib = makeMiterRib(v0, v1, v2, 1.0, 1.0)
 		
 		let inner = Vertex(rib.p.x + rib.miterIn.x, rib.p.y + rib.miterIn.y)
 		let outer = Vertex(rib.p.x + rib.miterOut.x, rib.p.y + rib.miterOut.y)
@@ -47,7 +47,7 @@ class EdgeGenerationTests: XCTestCase {
 		
 		let width: Vertex.Precision = 2.5
 		let expandedVertices = vertices.map {
-			Vertex($0.x + $0.miterX * width, $0.y + $0.miterY * width)
+			Vertex($0.x + $0.normalX * width, $0.y + $0.normalY * width)
 		}
 		
 		XCTAssertEqual(expandedVertices[0].x,  0.0, accuracy: 0.1)
@@ -55,10 +55,10 @@ class EdgeGenerationTests: XCTestCase {
 		XCTAssertEqual(expandedVertices[1].x,  0.0, accuracy: 0.1)
 		XCTAssertEqual(expandedVertices[1].y, 12.5, accuracy: 0.1)
 		
-		XCTAssertEqual(expandedVertices[2].x,  7.5, accuracy: 0.1)
-		XCTAssertEqual(expandedVertices[2].y,  7.5, accuracy: 0.1)
-		XCTAssertEqual(expandedVertices[3].x, 12.5, accuracy: 0.1)
-		XCTAssertEqual(expandedVertices[3].y, 12.5, accuracy: 0.1)
+		XCTAssertEqual(expandedVertices[2].x,  8.75, accuracy: 0.1)
+		XCTAssertEqual(expandedVertices[2].y,  8.75, accuracy: 0.1)
+		XCTAssertEqual(expandedVertices[3].x, 11.25, accuracy: 0.1)
+		XCTAssertEqual(expandedVertices[3].y, 11.25, accuracy: 0.1)
 		
 		XCTAssertEqual(expandedVertices[4].x,   7.5, accuracy: 0.1)
 		XCTAssertEqual(expandedVertices[4].y, -10.0, accuracy: 0.1)
@@ -76,7 +76,7 @@ class EdgeGenerationTests: XCTestCase {
 		
 		let width: Vertex.Precision = 2.5
 		let expandedVertices = vertices.map {
-			Vertex($0.x + $0.miterX * width, $0.y + $0.miterY * width)
+			Vertex($0.x + $0.normalX * width, $0.y + $0.normalY * width)
 		}
 		
 		XCTAssertEqual(expandedVertices[0].x,  0.0, accuracy: 0.1)
@@ -84,10 +84,10 @@ class EdgeGenerationTests: XCTestCase {
 		XCTAssertEqual(expandedVertices[1].x,  0.0, accuracy: 0.1)
 		XCTAssertEqual(expandedVertices[1].y, 12.5, accuracy: 0.1)
 		
-		XCTAssertEqual(expandedVertices[2].x,  7.5, accuracy: 0.1)
-		XCTAssertEqual(expandedVertices[2].y,  7.5, accuracy: 0.1)
-		XCTAssertEqual(expandedVertices[3].x, 12.5, accuracy: 0.1)
-		XCTAssertEqual(expandedVertices[3].y, 12.5, accuracy: 0.1)
+		XCTAssertEqual(expandedVertices[2].x,  8.75, accuracy: 0.1)
+		XCTAssertEqual(expandedVertices[2].y,  8.75, accuracy: 0.1)
+		XCTAssertEqual(expandedVertices[3].x, 11.25, accuracy: 0.1)
+		XCTAssertEqual(expandedVertices[3].y, 11.25, accuracy: 0.1)
 		
 		XCTAssertEqual(expandedVertices[4].x,   7.5, accuracy: 0.1)
 		XCTAssertEqual(expandedVertices[4].y, -10.0, accuracy: 0.1)

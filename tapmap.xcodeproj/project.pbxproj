@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		1407688C25AD0CCE00DABCFE /* atlas.pvr in Resources */ = {isa = PBXBuildFile; fileRef = 1407688B25AD0CC000DABCFE /* atlas.pvr */; };
 		140835BC22B98F89004697FB /* pipeline.json in CopyFiles */ = {isa = PBXBuildFile; fileRef = 140835BB22B98F76004697FB /* pipeline.json */; };
 		140B990622E57D5700C912A4 /* EdgeGenerationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 140B990522E57D5700C912A4 /* EdgeGenerationTests.swift */; };
 		1416641B2463E2690006A2D4 /* EffectRenderer.metal in Sources */ = {isa = PBXBuildFile; fileRef = 1416641A2463E2690006A2D4 /* EffectRenderer.metal */; };
@@ -29,6 +30,7 @@
 		1456690023E0EA3D001EF91E /* Geometry.swift in Sources */ = {isa = PBXBuildFile; fileRef = 148937DF22B97FDF009278A0 /* Geometry.swift */; };
 		1468830D23B4BC4100105E04 /* DebugRenderer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1468830C23B4BC4100105E04 /* DebugRenderer.swift */; };
 		146EA26A244AF14C009196BC /* RuntimeWorld.swift in Sources */ = {isa = PBXBuildFile; fileRef = 146EA269244AF14C009196BC /* RuntimeWorld.swift */; };
+		1472951B25C0CE4B00E6B129 /* LabelLayout.swift in Sources */ = {isa = PBXBuildFile; fileRef = 149EEA6C25B39D9D00B19285 /* LabelLayout.swift */; };
 		1476DC9825A5D79000F9518B /* LibTessSwift in Frameworks */ = {isa = PBXBuildFile; productRef = 1476DC9725A5D79000F9518B /* LibTessSwift */; };
 		1476DCA325A5D9E600F9518B /* SwiftyJSON in Frameworks */ = {isa = PBXBuildFile; productRef = 1476DCA225A5D9E600F9518B /* SwiftyJSON */; };
 		147B819223DA03B700942C9B /* QuadTree.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14532D9923B515BE00943ADC /* QuadTree.swift */; };
@@ -72,9 +74,11 @@
 		1489382022B9831C009278A0 /* OperationParseOSMJson.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14C665A322B97E670054D7F2 /* OperationParseOSMJson.swift */; };
 		1489382122B9831C009278A0 /* OperationTessellateRegions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14C6659A22B97E660054D7F2 /* OperationTessellateRegions.swift */; };
 		1489382322B98456009278A0 /* ViewCalculations.swift in Sources */ = {isa = PBXBuildFile; fileRef = 148937E122B97FDF009278A0 /* ViewCalculations.swift */; };
+		1490C75A25BF6E8600DAF62D /* LabelLayoutTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1490C75925BF6E8600DAF62D /* LabelLayoutTests.swift */; };
 		14985FED22F0ED0C00F68A1F /* RenderPrimitives.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14985FEC22F0ED0C00F68A1F /* RenderPrimitives.swift */; };
 		149B3FDD245EE8B1008A299E /* MapShader.metal in Sources */ = {isa = PBXBuildFile; fileRef = 149B3FDC245EE8B1008A299E /* MapShader.metal */; };
 		149CBDDD23CB230000A7AABB /* LabelView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 149CBDDC23CB230000A7AABB /* LabelView.swift */; };
+		149EEA6D25B39D9D00B19285 /* LabelLayout.swift in Sources */ = {isa = PBXBuildFile; fileRef = 149EEA6C25B39D9D00B19285 /* LabelLayout.swift */; };
 		14B63F052460BDFF00A4A433 /* BorderShader.metal in Sources */ = {isa = PBXBuildFile; fileRef = 14B63F042460BDFF00A4A433 /* BorderShader.metal */; };
 		14B63F072461450F00A4A433 /* PoiShader.metal in Sources */ = {isa = PBXBuildFile; fileRef = 14B63F062461450F00A4A433 /* PoiShader.metal */; };
 		14BAA333240EF95000DC64B9 /* OperationFitLabels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14BAA332240EF95000DC64B9 /* OperationFitLabels.swift */; };
@@ -99,7 +103,6 @@
 		14C665C722B97EC30054D7F2 /* toolgeometry.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14C665C622B97EC30054D7F2 /* toolgeometry.swift */; };
 		14C665C922B97ED40054D7F2 /* JobHelpers.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14C665C822B97ED40054D7F2 /* JobHelpers.swift */; };
 		14C665CB22B97F250054D7F2 /* GeometryTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14C665CA22B97F250054D7F2 /* GeometryTests.swift */; };
-		14EACFB123CEDFEA00E25F53 /* LabelViewTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14EACFB023CEDFEA00E25F53 /* LabelViewTests.swift */; };
 		14EDA502242C8F38000B3954 /* tessellate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14EDA501242C8F38000B3954 /* tessellate.swift */; };
 		14F481F42462875A00E4C001 /* SelectionShader.metal in Sources */ = {isa = PBXBuildFile; fileRef = 14F481F32462875A00E4C001 /* SelectionShader.metal */; };
 		14F8918B22F0F3F7008CCCF3 /* OutlineGeometry.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14985FF522F0F35700F68A1F /* OutlineGeometry.swift */; };
@@ -130,6 +133,7 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		1407688B25AD0CC000DABCFE /* atlas.pvr */ = {isa = PBXFileReference; lastKnownFileType = file; path = atlas.pvr; sourceTree = "<group>"; };
 		140835BB22B98F76004697FB /* pipeline.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = pipeline.json; sourceTree = "<group>"; };
 		140B990522E57D5700C912A4 /* EdgeGenerationTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EdgeGenerationTests.swift; sourceTree = "<group>"; };
 		1416641A2463E2690006A2D4 /* EffectRenderer.metal */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.metal; path = EffectRenderer.metal; sourceTree = "<group>"; };
@@ -160,10 +164,12 @@
 		148937F222B97FDF009278A0 /* AppDelegate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		148937F322B97FDF009278A0 /* UserState.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UserState.swift; sourceTree = "<group>"; };
 		148937F422B97FDF009278A0 /* Serialization.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Serialization.swift; sourceTree = "<group>"; };
+		1490C75925BF6E8600DAF62D /* LabelLayoutTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LabelLayoutTests.swift; sourceTree = "<group>"; };
 		14985FEC22F0ED0C00F68A1F /* RenderPrimitives.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RenderPrimitives.swift; sourceTree = "<group>"; };
 		14985FF522F0F35700F68A1F /* OutlineGeometry.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OutlineGeometry.swift; sourceTree = "<group>"; };
 		149B3FDC245EE8B1008A299E /* MapShader.metal */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.metal; path = MapShader.metal; sourceTree = "<group>"; };
 		149CBDDC23CB230000A7AABB /* LabelView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LabelView.swift; sourceTree = "<group>"; };
+		149EEA6C25B39D9D00B19285 /* LabelLayout.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LabelLayout.swift; sourceTree = "<group>"; };
 		14B63F042460BDFF00A4A433 /* BorderShader.metal */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.metal; path = BorderShader.metal; sourceTree = "<group>"; };
 		14B63F062461450F00A4A433 /* PoiShader.metal */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.metal; path = PoiShader.metal; sourceTree = "<group>"; };
 		14BAA332240EF95000DC64B9 /* OperationFitLabels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OperationFitLabels.swift; sourceTree = "<group>"; };
@@ -197,7 +203,6 @@
 		14C665C622B97EC30054D7F2 /* toolgeometry.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = toolgeometry.swift; sourceTree = "<group>"; };
 		14C665C822B97ED40054D7F2 /* JobHelpers.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = JobHelpers.swift; sourceTree = "<group>"; };
 		14C665CA22B97F250054D7F2 /* GeometryTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = GeometryTests.swift; sourceTree = "<group>"; };
-		14EACFB023CEDFEA00E25F53 /* LabelViewTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LabelViewTests.swift; sourceTree = "<group>"; };
 		14EDA501242C8F38000B3954 /* tessellate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = tessellate.swift; sourceTree = "<group>"; };
 		14F481F32462875A00E4C001 /* SelectionShader.metal */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.metal; path = SelectionShader.metal; sourceTree = "<group>"; };
 		14FCC068245ED44D006116E7 /* MetalRenderer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MetalRenderer.swift; sourceTree = "<group>"; };
@@ -238,6 +243,14 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		1407688A25AD0CAD00DABCFE /* Assets */ = {
+			isa = PBXGroup;
+			children = (
+				1407688B25AD0CC000DABCFE /* atlas.pvr */,
+			);
+			path = Assets;
+			sourceTree = "<group>";
+		};
 		142A21ED23DC6189000DA4FA /* Streaming */ = {
 			isa = PBXGroup;
 			children = (
@@ -286,6 +299,7 @@
 				148937EE22B97FDF009278A0 /* PoiRenderer.swift */,
 				144B5D5722D9E092001E2A85 /* SelectionRenderer.swift */,
 				149CBDDC23CB230000A7AABB /* LabelView.swift */,
+				149EEA6C25B39D9D00B19285 /* LabelLayout.swift */,
 				148937E622B97FDF009278A0 /* EffectRenderer.swift */,
 				1468830C23B4BC4100105E04 /* DebugRenderer.swift */,
 				14985FEC22F0ED0C00F68A1F /* RenderPrimitives.swift */,
@@ -359,6 +373,7 @@
 				14C6656A22B97D8A0054D7F2 /* Info.plist */,
 				143A601E23DD954100BE554D /* world.geo */,
 				1484A6B024B8E5DF0049C0CF /* tapmap.entitlements */,
+				1407688A25AD0CAD00DABCFE /* Assets */,
 			);
 			path = tapmap;
 			sourceTree = "<group>";
@@ -367,11 +382,11 @@
 			isa = PBXGroup;
 			children = (
 				14C6657322B97D8B0054D7F2 /* tapmapTests.swift */,
+				1490C75925BF6E8600DAF62D /* LabelLayoutTests.swift */,
 				14C665CA22B97F250054D7F2 /* GeometryTests.swift */,
 				14C6657522B97D8B0054D7F2 /* Info.plist */,
 				140B990522E57D5700C912A4 /* EdgeGenerationTests.swift */,
 				14532D9B23B5190F00943ADC /* QuadTreeTests.swift */,
-				14EACFB023CEDFEA00E25F53 /* LabelViewTests.swift */,
 			);
 			path = tapmapTests;
 			sourceTree = "<group>";
@@ -557,6 +572,7 @@
 				14C6656622B97D8A0054D7F2 /* Assets.xcassets in Resources */,
 				14C6656422B97D890054D7F2 /* Main.storyboard in Resources */,
 				143A601F23DD954900BE554D /* world.geo in Resources */,
+				1407688C25AD0CCE00DABCFE /* atlas.pvr in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -593,6 +609,7 @@
 				14FCC069245ED44D006116E7 /* MetalRenderer.swift in Sources */,
 				148937FC22B97FDF009278A0 /* RegionRenderer.swift in Sources */,
 				149CBDDD23CB230000A7AABB /* LabelView.swift in Sources */,
+				149EEA6D25B39D9D00B19285 /* LabelLayout.swift in Sources */,
 				1489380422B97FE0009278A0 /* MapViewController.swift in Sources */,
 				148937F822B97FDF009278A0 /* GeoRegion.swift in Sources */,
 				14532D9A23B515BE00943ADC /* QuadTree.swift in Sources */,
@@ -627,9 +644,10 @@
 				1429B0A722EAFCE5001257AB /* Geometry.swift in Sources */,
 				1489382322B98456009278A0 /* ViewCalculations.swift in Sources */,
 				1429B0A922EAFD53001257AB /* nullrenderer.swift in Sources */,
+				1490C75A25BF6E8600DAF62D /* LabelLayoutTests.swift in Sources */,
 				14C6657422B97D8B0054D7F2 /* tapmapTests.swift in Sources */,
 				14532D9C23B5190F00943ADC /* QuadTreeTests.swift in Sources */,
-				14EACFB123CEDFEA00E25F53 /* LabelViewTests.swift in Sources */,
+				1472951B25C0CE4B00E6B129 /* LabelLayout.swift in Sources */,
 				1429B0A522EAFA87001257AB /* AppTypes.swift in Sources */,
 				147B819623DA043500942C9B /* WorldTree.swift in Sources */,
 				14532D9E23B5197600943ADC /* OutlineGeometry.swift in Sources */,
