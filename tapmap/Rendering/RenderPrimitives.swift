@@ -35,7 +35,7 @@ class BaseRenderPrimitive<VertexType> {
 			fatalError("Do not create render primitive for empty meshes")
 		}
 		
-		// Concatenate all vertex rings into one buffer
+		// Concatenate all vertices into one buffer
 		var allVertices: [VertexType] = []
 		var allIndices: [UInt32] = []
 		var polyRanges: [Int] = []

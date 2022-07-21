@@ -5,6 +5,27 @@ ROAD TO FINAL
 x Put label layout on a backthread (no, it's plenty fast as it is, no problems)
 - Consider instance-based line rendering
 
+## Instance-based line rendering
+Looking to implement this method [Instanced line rendering](https://wwwtyro.net/2019/11/18/instanced-lines.html) by Rye Terrell. I think this is actually worthwhile, because I have statically generated border geometry, but at least one draw call per region. It's a bit awkward that I don't have control over how many drawcalls I'm making - potentially hundreds to cover, say, France's provinces. Since all the borders (of a type) share the same width and color, they can all be baked into a massive, massive drawcall. I can dispatch all country borders in one (two, to fill out the joins). Currently I can't do that, since they are drawn as triangle strips, which means I have to start and stop between each loop.
+
+With IBLR, each line segment in the entire map is one independent quad, transformed into place by an offset+stride into a huge uniform buffer.
+
+The model for each line segment is a unit box, centered vertically and left-aligned. (Each segment is constructed from two basis vectors, one for the direction and one for the width.) For each segment in the border loop, push the line segment instance's two vertices, calculate the AB vector and the normal N. Terrell has a fun trick for creating line-strips: each vertex consists of two floats (XY) and each segment instance draws two vertices (AB). However, when drawing the segments, set the stride to only one vertex, and draw 2N instances. This way, a uniform buffer with vertices ABCDA will draw (AB, BC, CD, DA).
+
+Bevel joins are constructed as one extra draw call. Create instance geometry from each point in the linestrip, with P and the adjoining segments' normal vectors. For each point in the linestrip, a triangle can be constructed in the same way, and dispatched in the same draw call.
+
+Since this solution looks like FixedScaleRenderPrimitive, I can control the line width in the same way. With that, I can actually replace the selection renderer AND the POI renderer with the same tech. When POIs are instance rendered, I can probably render them as geometry instead of as textured quads, which is nice. So let's make a proper instance-renderer setup.
+
+## Instance rendering support
+What I want is a BaseRenderPrimitive that can hold a short bit of indexed geometry, and a large buffer of per-instance uniforms. Would work fine to inherit InstancedRenderPrimitive<T> from BRP and just add a buffer for the per-instance data. The poly/index geometry data is fine as it is; the MTLPrimitiveType will be just as useful.
+
+Well... actually, the uniform buffers belong to the _renderer_, not the primitive? So I need a small BaseRenderPrimitive, and then the rest is up to the instanced border renderer? Sweet. Just need to write a specialisation of render<T> to take the instance count. The half-segment stride stuff is part of the pipeline descriptor - which is also part of the border renderer.
+
+With triple-buffering, it will be fairly OK to recreate the entire per-instance buffer when the border set changes - that's fine. Currently, I'm creating a new primitive per region border on a backthread - recreating one primitive with a larger per-instance uniform buffer built on the CPU is probably fast enough, and I can definitely build a method that just updates the per-instance uniform buffer and keeps the rest of the data intact.
+Ah-hah - actually, there's no requirement for all uniform buffers in the triple-buffer ring to be of the same size. I can make the instance count a part of the uniform buffer, or just triple-buffer the count as well. This will be super nice.
+
+
+
 # Rendering brief, step 2
  There are some effects I want to spice up the presentation. I'm a little stuck at how to lookup the color for a region at runtime, since the base color isn't always static. Specifically, provinces have different colors when visited and unvisited. I can definitely route around that, and ~100 O(1) dictionary lookups per frame isn't going to make a difference, but it's _wrong_. To help guide the stylesheet lookup design, let's take a look at those extra effects.
  
