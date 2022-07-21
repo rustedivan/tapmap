@@ -52,9 +52,9 @@ class RegionRenderer {
 		}
 	}
 	
-	func prepareFrame(visibleContinentSet: Set<RegionHash>,
-										visibleCountrySet: Set<RegionHash>,
-										visibleProvinceSet: Set<RegionHash>,
+	func prepareFrame(visibleContinentSet: Dictionary<RegionHash, GeoContinent>.Keys,
+										visibleCountrySet: Dictionary<RegionHash, GeoCountry>.Keys,
+										visibleProvinceSet: Dictionary<RegionHash, GeoProvince>.Keys,
 										visitedSet: Set<RegionHash>,
 										regionContinentMap: GeoContinentMap,
 										bufferIndex: Int) {

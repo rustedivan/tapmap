@@ -66,17 +66,21 @@ class MetalRenderer {
 		let visible = AppDelegate.sharedUIState.visibleRegionHashes
 		let visited = AppDelegate.sharedUserState.visitedPlaces
 		let renderSet = available.intersection(visible)
-		let renderContinentSet = renderSet.filter { worldState.visibleContinents.keys.contains($0) }
-		let renderCountrySet = renderSet.filter { worldState.visibleCountries.keys.contains($0) }
-		let renderProvinceSet = renderSet.filter { worldState.visibleProvinces.keys.contains($0) }
 		let borderedContinents = worldState.allContinents.filter { visible.contains($0.key) }	// All visible continents (even if visited)
 		let borderedCountries = worldState.visibleCountries
 		let borderedProvinces = worldState.visibleProvinces.filter { !visited.contains($0.key) }	// Visited provinces have no borders
 		let poiZoom = zoomLevel / (1.0 - zoomRate + zoomRate * Stylesheet.shared.poiZoomBias.value)	// Pois become larger at closer zoom levels
 		let bufferIndex = frameId % maxInflightFrames
+		
 		effectRenderer.prepareFrame(bufferIndex: bufferIndex)
-		regionRenderer.prepareFrame(visibleContinentSet: renderContinentSet, visibleCountrySet: renderCountrySet, visibleProvinceSet: renderProvinceSet, visitedSet: visited, regionContinentMap: worldState.continentForRegion, bufferIndex: bufferIndex)
-		borderRenderer.prepareFrame(borderedContinents: borderedContinents, borderedCountries: borderedCountries, borderedProvinces: borderedProvinces, zoom: zoomLevel, zoomRate: zoomRate, bufferIndex: bufferIndex)
+		regionRenderer.prepareFrame(visibleContinentSet: worldState.visibleContinents.keys,
+																visibleCountrySet: worldState.visibleCountries.keys,
+																visibleProvinceSet: worldState.visibleProvinces.keys,
+																visitedSet: visited, regionContinentMap: worldState.continentForRegion, bufferIndex: bufferIndex)
+		borderRenderer.prepareFrame(borderedContinents: borderedContinents,
+																borderedCountries: borderedCountries,
+																borderedProvinces: borderedProvinces,
+																zoom: zoomLevel, zoomRate: zoomRate, bufferIndex: bufferIndex)
 		poiRenderer.prepareFrame(visibleSet: renderSet, zoom: poiZoom, zoomRate: zoomRate, bufferIndex: bufferIndex)
 		selectionRenderer.prepareFrame(zoomLevel: zoomLevel)
 		debugRenderer.prepareFrame(bufferIndex: bufferIndex)
