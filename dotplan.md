@@ -2,8 +2,8 @@ ROAD TO FINAL
 
 # Optimizations
 √ MetalRenderer spends effort to filter out the visible + available render sets, but they are already calculated and available in worldState. No need for `renderSet.filter(...`
+x Put label layout on a backthread (no, it's plenty fast as it is, no problems)
 - Consider instance-based line rendering
-- Put label layout on a backthread
 
 # Rendering brief, step 2
  There are some effects I want to spice up the presentation. I'm a little stuck at how to lookup the color for a region at runtime, since the base color isn't always static. Specifically, provinces have different colors when visited and unvisited. I can definitely route around that, and ~100 O(1) dictionary lookups per frame isn't going to make a difference, but it's _wrong_. To help guide the stylesheet lookup design, let's take a look at those extra effects.
