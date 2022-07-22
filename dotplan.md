@@ -32,6 +32,10 @@ I ran a high-water mark test just north of 200k vertices (which comes out to N+1
 
 Oh, actually I'm going to need double that - I can't both do the half-segment-stride trick _and_ have multiple outlines in the same drawcall - there will be lines going between each ring if so (linestrip vs lines.) But even at 12MB peak memory for the borders, it's totally doable. So, the per-instance uniform will contain both endpoints (A->B).
 
+For region borders, this is pretty darn fast. Not even rebuilding the geometry frame-by-frame seems to bother it. I guess I'm pretty far from being CPU-bound yet, and whatever it cost is a good tradeoff against the lowered memory pressure of keeping all the tristrips in memory.
+
+I've decided to skip rewriting the selection renderer (unless I actually feel like it) but the POI renderer looks like a great candidate.
+
 
 # Rendering brief, step 2
  There are some effects I want to spice up the presentation. I'm a little stuck at how to lookup the color for a region at runtime, since the base color isn't always static. Specifically, provinces have different colors when visited and unvisited. I can definitely route around that, and ~100 O(1) dictionary lookups per frame isn't going to make a difference, but it's _wrong_. To help guide the stylesheet lookup design, let's take a look at those extra effects.
