@@ -89,8 +89,6 @@ class BorderRenderer<RegionType> {
 		let lodLevel = streamer.wantedLodLevel
 		var borderLodMiss = false
 		
-		// $ Only need to update if the data or viewbox are dirty
-		
 		// Stream in any missing geometries at the wanted LOD level
 		for borderHash in borderedRegions.keys {
 			let loddedBorderHash = borderHashLodKey(borderHash, atLod: lodLevel)
@@ -109,8 +107,6 @@ class BorderRenderer<RegionType> {
 		if !borderLodMiss && actualBorderLod != streamer.wantedLodLevel {
 			actualBorderLod = streamer.wantedLodLevel
 		}
-		
-		// $ Move this to backthread
 		
 		// Collect the vertex rings for the visible set of borders
 		let frameRenderList = RenderList(borderedRegions.compactMap {
