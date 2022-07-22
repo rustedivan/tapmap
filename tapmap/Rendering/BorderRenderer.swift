@@ -11,13 +11,13 @@ import simd
 
 fileprivate struct FrameUniforms {
 	let mvpMatrix: simd_float4x4
-	let widthInner: simd_float1
-	let widthOuter: simd_float1
+	let width: simd_float1
 	var color: simd_float4
 }
 
 fileprivate struct InstanceUniforms {
-	var vertex: simd_float2
+	var a: simd_float2
+	var b: simd_float2
 }
 
 struct BorderContour {
@@ -41,8 +41,7 @@ class BorderRenderer<RegionType> {
 	var frameLineSegmentCount: [Int] = []
 	
 	var borderScale: Float
-	var innerWidth: Float = 1.0
-	var outerWidth: Float = 1.0
+	var width: Float = 1.0
 	var color: simd_float4 = simd_float4(0.0, 0.0, 0.0, 1.0)
 	
 	var actualBorderLod: Int = 10
@@ -81,8 +80,7 @@ class BorderRenderer<RegionType> {
 	}
 	
 	func setStyle(innerWidth: Float, outerWidth: Float, color: simd_float4) {
-		self.innerWidth = innerWidth
-		self.outerWidth = outerWidth
+		self.width = innerWidth
 		self.color = color
 	}
 
@@ -148,8 +146,7 @@ class BorderRenderer<RegionType> {
 		
 		frameSelectSemaphore.wait()
 			var uniforms = FrameUniforms(mvpMatrix: projection,
-																	 widthInner: innerWidth * borderScale,
-																	 widthOuter: outerWidth * borderScale,
+																	 width: width * borderScale,
 																	 color: color)
 			let instances = instanceUniforms[bufferIndex]
 			let count = frameLineSegmentCount[bufferIndex]
@@ -173,6 +170,7 @@ class BorderRenderer<RegionType> {
 }
 
 func makeLineSegmentPrimitive(in device: MTLDevice) -> RenderPrimitive {
+	// $ Can use these Y coords to control inner/outer border width
 	let vertices: [Vertex] = [
 		Vertex(0.0, -0.5),
 		Vertex(1.0, -0.5),
@@ -197,8 +195,13 @@ fileprivate func generateContourCollectionGeometry(contours: [VertexRing]) -> Ar
 	var vertices = Array<InstanceUniforms>()
 	vertices.reserveCapacity(segmentCount)
 	for contour in contours {
-		for v in contour.vertices {
-			vertices.append(InstanceUniforms(vertex: simd_float2(x: v.x, y: v.y)))
+		for i in 0..<contour.vertices.count - 1 {
+			let a = contour.vertices[i]
+			let b = contour.vertices[i + 1]
+			vertices.append(InstanceUniforms(
+				a: simd_float2(x: a.x, y: a.y),
+				b: simd_float2(x: b.x, y: b.y)
+			))
 		}
 	}
 	return vertices
