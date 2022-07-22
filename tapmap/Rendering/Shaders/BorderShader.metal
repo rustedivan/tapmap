@@ -16,9 +16,12 @@ struct FrameUniforms {
 	float4 color;
 };
 
-struct ScaleVertex {
+struct Vertex {
 	float2 position;
-	float2 normal;
+};
+
+struct InstanceUniform {
+	float2 position;
 };
 
 struct VertexOut {
@@ -26,14 +29,14 @@ struct VertexOut {
 	float4 color;
 };
 
-vertex VertexOut borderVertex(const device ScaleVertex* vertexArray [[ buffer(0) ]],
+vertex VertexOut borderVertex(const device Vertex* vertexArray [[ buffer(0) ]],
 															constant FrameUniforms *frame [[ buffer(1) ]],
-															unsigned int vid [[ vertex_id ]]) {
-	ScaleVertex v = vertexArray[vid];
+															constant InstanceUniform *instanceUniforms [[ buffer(2) ]],
+															unsigned int vid [[ vertex_id ]],
+															unsigned int iid [[ instance_id ]]) {
+	Vertex v = vertexArray[vid];
 	VertexOut outVertex = VertexOut();
-	float usedWidth = (frame->scaleWidthOuter * (vid % 2)) + (frame->scaleWidthInner * ((vid + 1) % 2));
-	float2 rib = v.normal * usedWidth;
-	outVertex.position = frame->modelViewProjectionMatrix * float4(v.position + rib, 0.0, 1.0);
+	outVertex.position = frame->modelViewProjectionMatrix * float4(v.position + instanceUniforms[iid].position, 0.0, 1.0);
 	outVertex.color = frame->color;
 	return outVertex;
 }

@@ -79,3 +79,18 @@ func render<T>(primitive: BaseRenderPrimitive<T>, into encoder: MTLRenderCommand
 		cursor += range * MemoryLayout<UInt32>.stride
 	}
 }
+
+func renderInstanced<T>(primitive: BaseRenderPrimitive<T>, count: Int, into encoder: MTLRenderCommandEncoder) {
+	encoder.setVertexBuffer(primitive.vertexBuffer, offset: 0, index: 0)
+	
+	var cursor = 0
+	for range in primitive.elementCounts {
+		encoder.drawIndexedPrimitives(type: primitive.drawMode,
+																	indexCount: range,
+																	indexType: .uint32,
+																	indexBuffer: primitive.indexBuffer,
+																	indexBufferOffset: cursor,
+																	instanceCount: count)
+		cursor += range * MemoryLayout<UInt32>.stride
+	}
+}

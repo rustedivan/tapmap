@@ -4,6 +4,7 @@ ROAD TO FINAL
 √ MetalRenderer spends effort to filter out the visible + available render sets, but they are already calculated and available in worldState. No need for `renderSet.filter(...`
 x Put label layout on a backthread (no, it's plenty fast as it is, no problems)
 - Consider instance-based line rendering
+-- cleanup: make three border renderers instead of having continent-country-province on everything
 
 ## Instance-based line rendering
 Looking to implement this method [Instanced line rendering](https://wwwtyro.net/2019/11/18/instanced-lines.html) by Rye Terrell. I think this is actually worthwhile, because I have statically generated border geometry, but at least one draw call per region. It's a bit awkward that I don't have control over how many drawcalls I'm making - potentially hundreds to cover, say, France's provinces. Since all the borders (of a type) share the same width and color, they can all be baked into a massive, massive drawcall. I can dispatch all country borders in one (two, to fill out the joins). Currently I can't do that, since they are drawn as triangle strips, which means I have to start and stop between each loop.
@@ -24,6 +25,12 @@ Well... actually, the uniform buffers belong to the _renderer_, not the primitiv
 With triple-buffering, it will be fairly OK to recreate the entire per-instance buffer when the border set changes - that's fine. Currently, I'm creating a new primitive per region border on a backthread - recreating one primitive with a larger per-instance uniform buffer built on the CPU is probably fast enough, and I can definitely build a method that just updates the per-instance uniform buffer and keeps the rest of the data intact.
 Ah-hah - actually, there's no requirement for all uniform buffers in the triple-buffer ring to be of the same size. I can make the instance count a part of the uniform buffer, or just triple-buffer the count as well. This will be super nice.
 
+Hm, two challenges.
+- Culling against the viewbox will require that I rebuild the huge uniform block every time the viewbox changes. I guess that's OK, I already have something similar setup on a backthread for streaming border geometry. Also, I could establish a high-water mark, allocate up-front and not recreate the buffer unnecessarily. Just one memcpy.
+- LOD:ing comes with the same issue - lots of requirements to recreate the entire uniform buffer just because one region changes.
+I ran a high-water mark test just north of 200k vertices (which comes out to N+1 line segments.) Peak memory usage when zooming into a fully opened Croatia - super dense provinces! - is just under 1.3MB. Up-fronting 3 x 2MB buffers is nothing, especially considering I no longer have to keep the triangle strips for all the border rings around. Should be a memory win too, no doubt. No-brainer. (This is on git commit d3b860 for later reference)
+
+Oh, actually I'm going to need double that - I can't both do the half-segment-stride trick _and_ have multiple outlines in the same drawcall - there will be lines going between each ring if so (linestrip vs lines.) But even at 12MB peak memory for the borders, it's totally doable. So, the per-instance uniform will contain both endpoints (A->B).
 
 
 # Rendering brief, step 2
