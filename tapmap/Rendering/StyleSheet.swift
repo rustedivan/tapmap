@@ -23,6 +23,7 @@ struct AppFixables {
 	static let borderZoomBias = FixableId("border-zoom-bias")
 	static let poiZoomBias = FixableId("poi-zoom-bias")
 	static let oceanColor = FixableId("ocean-color")
+	static let continentBorderColor = FixableId("continent-border-color")
 	static let countryBorderColor = FixableId("country-border-color")
 	static let provinceBorderColor = FixableId("province-border-color")
 	static let continentSaturation = FixableId("continent-saturation")
@@ -66,6 +67,7 @@ class Stylesheet {
 	
 	// Map colors
 	var oceanColor = FixableColor(AppFixables.oceanColor, initial: UIColor(hue: 0.55, saturation: 0.07, brightness: 0.90, alpha: 1.0).cgColor)
+	var continentBorderColor = FixableColor(AppFixables.continentBorderColor, initial: UIColor(hue: 0.00, saturation: 0.00, brightness: 0.25, alpha: 1.0).cgColor)
 	var countryBorderColor = FixableColor(AppFixables.countryBorderColor, initial: UIColor(hue: 0.55, saturation: 0.00, brightness: 0.50, alpha: 1.0).cgColor)
 	var provinceBorderColor = FixableColor(AppFixables.provinceBorderColor, initial: UIColor(hue: 0.55, saturation: 0.00, brightness: 0.50, alpha: 1.0).cgColor)
 	
