@@ -176,8 +176,8 @@ class PoiRenderer {
 		let newRankThreshold = updateZoomThreshold(viewZoom: zoom)
 		
 		let framePlanes = poiPlanePrimitives.filter { $0.representsArea == false }					// Hide area markers (but keep the labels)
-																				.filter { visibleSet.contains($0.ownerHash) }		// Hide markers outside the frame
-																			  .filter { poiVisibility[$0.hashValue] != nil }	// Don't render hidden markers
+																				.filter { visibleSet.contains($0.ownerHash) }		// Hide POI planes outside the frame
+																			  .filter { poiVisibility[$0.hashValue] != nil }	// Don't render hidden POI planes
 		
 		var fades = Array<InstanceUniforms>()
 		fades.reserveCapacity(framePlanes.count)

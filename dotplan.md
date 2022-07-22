@@ -36,6 +36,12 @@ For region borders, this is pretty darn fast. Not even rebuilding the geometry f
 
 I've decided to skip rewriting the selection renderer (unless I actually feel like it) but the POI renderer looks like a great candidate.
 
+## Instanced POI rendering
+The POI renderer is already somewhat instance-oriented with a per-marker `progress` value. The InstanceUniforms need to have a position. Then add the POI positions to the instance uniforms instead of building a large vertex buffer. There's currently no proper texture atlas support, so drop that and render different primitives for the different POI planes.
+
+Again, the big work is in prepareFrame. It builds primitives for the different POI planes, but now it should just keep the marker render primitive, and the per-instance uniform buffer. The uniform buffer should contain all the marker positions for all visible planes of a certain type. The PoiPlane type can keep its `primitive` reference and point to the marker geometry. However, the `ownerHash` is probably going to be a problem...
+
+No, actually... this isn't going to be worth the effort. I can't blast out all markers in one drawcall, since they may be at different opacities. I still need one drawcall per region, and I actually think the difference is going to be very small. This can be worth a revisit if it is necessary to draw markers as geometry, but with perfect control over markers' render size, I can probaby get perfectly crisp markers of a texture atlas too. 
 
 # Rendering brief, step 2
  There are some effects I want to spice up the presentation. I'm a little stuck at how to lookup the color for a region at runtime, since the base color isn't always static. Specifically, provinces have different colors when visited and unvisited. I can definitely route around that, and ~100 O(1) dictionary lookups per frame isn't going to make a difference, but it's _wrong_. To help guide the stylesheet lookup design, let's take a look at those extra effects.
