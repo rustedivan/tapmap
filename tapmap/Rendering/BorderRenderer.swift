@@ -170,12 +170,12 @@ class BorderRenderer<RegionType> {
 }
 
 func makeLineSegmentPrimitive(in device: MTLDevice) -> RenderPrimitive {
-	// $ Can use these Y coords to control inner/outer border width
+	// The 95/5 values place borders at 95% inward, with some small overlap outward
 	let vertices: [Vertex] = [
-		Vertex(0.0, -0.5),
-		Vertex(1.0, -0.5),
-		Vertex(1.0,  0.5),
-		Vertex(0.0,  0.5)
+		Vertex(0.0, -0.05),
+		Vertex(1.0, -0.05),
+		Vertex(1.0,  0.95),
+		Vertex(0.0,  0.95)
 	]
 	let indices: [UInt16] = [
 		0, 1, 2, 0, 2, 3
