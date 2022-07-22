@@ -1,48 +1,5 @@
 ROAD TO FINAL
 
-# Optimizations
-√ MetalRenderer spends effort to filter out the visible + available render sets, but they are already calculated and available in worldState. No need for `renderSet.filter(...`
-x Put label layout on a backthread (no, it's plenty fast as it is, no problems)
-- Consider instance-based line rendering
--- cleanup: make three border renderers instead of having continent-country-province on everything
-
-## Instance-based line rendering
-Looking to implement this method [Instanced line rendering](https://wwwtyro.net/2019/11/18/instanced-lines.html) by Rye Terrell. I think this is actually worthwhile, because I have statically generated border geometry, but at least one draw call per region. It's a bit awkward that I don't have control over how many drawcalls I'm making - potentially hundreds to cover, say, France's provinces. Since all the borders (of a type) share the same width and color, they can all be baked into a massive, massive drawcall. I can dispatch all country borders in one (two, to fill out the joins). Currently I can't do that, since they are drawn as triangle strips, which means I have to start and stop between each loop.
-
-With IBLR, each line segment in the entire map is one independent quad, transformed into place by an offset+stride into a huge uniform buffer.
-
-The model for each line segment is a unit box, centered vertically and left-aligned. (Each segment is constructed from two basis vectors, one for the direction and one for the width.) For each segment in the border loop, push the line segment instance's two vertices, calculate the AB vector and the normal N. Terrell has a fun trick for creating line-strips: each vertex consists of two floats (XY) and each segment instance draws two vertices (AB). However, when drawing the segments, set the stride to only one vertex, and draw 2N instances. This way, a uniform buffer with vertices ABCDA will draw (AB, BC, CD, DA).
-
-Bevel joins are constructed as one extra draw call. Create instance geometry from each point in the linestrip, with P and the adjoining segments' normal vectors. For each point in the linestrip, a triangle can be constructed in the same way, and dispatched in the same draw call.
-
-Since this solution looks like FixedScaleRenderPrimitive, I can control the line width in the same way. With that, I can actually replace the selection renderer AND the POI renderer with the same tech. When POIs are instance rendered, I can probably render them as geometry instead of as textured quads, which is nice. So let's make a proper instance-renderer setup.
-
-## Instance rendering support
-What I want is a BaseRenderPrimitive that can hold a short bit of indexed geometry, and a large buffer of per-instance uniforms. Would work fine to inherit InstancedRenderPrimitive<T> from BRP and just add a buffer for the per-instance data. The poly/index geometry data is fine as it is; the MTLPrimitiveType will be just as useful.
-
-Well... actually, the uniform buffers belong to the _renderer_, not the primitive? So I need a small BaseRenderPrimitive, and then the rest is up to the instanced border renderer? Sweet. Just need to write a specialisation of render<T> to take the instance count. The half-segment stride stuff is part of the pipeline descriptor - which is also part of the border renderer.
-
-With triple-buffering, it will be fairly OK to recreate the entire per-instance buffer when the border set changes - that's fine. Currently, I'm creating a new primitive per region border on a backthread - recreating one primitive with a larger per-instance uniform buffer built on the CPU is probably fast enough, and I can definitely build a method that just updates the per-instance uniform buffer and keeps the rest of the data intact.
-Ah-hah - actually, there's no requirement for all uniform buffers in the triple-buffer ring to be of the same size. I can make the instance count a part of the uniform buffer, or just triple-buffer the count as well. This will be super nice.
-
-Hm, two challenges.
-- Culling against the viewbox will require that I rebuild the huge uniform block every time the viewbox changes. I guess that's OK, I already have something similar setup on a backthread for streaming border geometry. Also, I could establish a high-water mark, allocate up-front and not recreate the buffer unnecessarily. Just one memcpy.
-- LOD:ing comes with the same issue - lots of requirements to recreate the entire uniform buffer just because one region changes.
-I ran a high-water mark test just north of 200k vertices (which comes out to N+1 line segments.) Peak memory usage when zooming into a fully opened Croatia - super dense provinces! - is just under 1.3MB. Up-fronting 3 x 2MB buffers is nothing, especially considering I no longer have to keep the triangle strips for all the border rings around. Should be a memory win too, no doubt. No-brainer. (This is on git commit d3b860 for later reference)
-
-Oh, actually I'm going to need double that - I can't both do the half-segment-stride trick _and_ have multiple outlines in the same drawcall - there will be lines going between each ring if so (linestrip vs lines.) But even at 12MB peak memory for the borders, it's totally doable. So, the per-instance uniform will contain both endpoints (A->B).
-
-For region borders, this is pretty darn fast. Not even rebuilding the geometry frame-by-frame seems to bother it. I guess I'm pretty far from being CPU-bound yet, and whatever it cost is a good tradeoff against the lowered memory pressure of keeping all the tristrips in memory.
-
-I've decided to skip rewriting the selection renderer (unless I actually feel like it) but the POI renderer looks like a great candidate.
-
-## Instanced POI rendering
-The POI renderer is already somewhat instance-oriented with a per-marker `progress` value. The InstanceUniforms need to have a position. Then add the POI positions to the instance uniforms instead of building a large vertex buffer. There's currently no proper texture atlas support, so drop that and render different primitives for the different POI planes.
-
-Again, the big work is in prepareFrame. It builds primitives for the different POI planes, but now it should just keep the marker render primitive, and the per-instance uniform buffer. The uniform buffer should contain all the marker positions for all visible planes of a certain type. The PoiPlane type can keep its `primitive` reference and point to the marker geometry. However, the `ownerHash` is probably going to be a problem...
-
-No, actually... this isn't going to be worth the effort. I can't blast out all markers in one drawcall, since they may be at different opacities. I still need one drawcall per region, and I actually think the difference is going to be very small. This can be worth a revisit if it is necessary to draw markers as geometry, but with perfect control over markers' render size, I can probaby get perfectly crisp markers of a texture atlas too. 
-
 # Rendering brief, step 2
  There are some effects I want to spice up the presentation. I'm a little stuck at how to lookup the color for a region at runtime, since the base color isn't always static. Specifically, provinces have different colors when visited and unvisited. I can definitely route around that, and ~100 O(1) dictionary lookups per frame isn't going to make a difference, but it's _wrong_. To help guide the stylesheet lookup design, let's take a look at those extra effects.
  
@@ -189,6 +146,48 @@ Find public land travels and make maps from it. LWR/D/U
 ## Trim off "(open ocean)" from Seven Seas 
 
 ----- ARCHIVE -----
+
+# Optimizations
+√ MetalRenderer spends effort to filter out the visible + available render sets, but they are already calculated and available in worldState. No need for `renderSet.filter(...`
+x Put label layout on a backthread (no, it's plenty fast as it is, no problems)
+√ Consider instance-based line rendering
+
+## Instance-based line rendering
+Looking to implement this method [Instanced line rendering](https://wwwtyro.net/2019/11/18/instanced-lines.html) by Rye Terrell. I think this is actually worthwhile, because I have statically generated border geometry, but at least one draw call per region. It's a bit awkward that I don't have control over how many drawcalls I'm making - potentially hundreds to cover, say, France's provinces. Since all the borders (of a type) share the same width and color, they can all be baked into a massive, massive drawcall. I can dispatch all country borders in one (two, to fill out the joins). Currently I can't do that, since they are drawn as triangle strips, which means I have to start and stop between each loop.
+
+With IBLR, each line segment in the entire map is one independent quad, transformed into place by an offset+stride into a huge uniform buffer.
+
+The model for each line segment is a unit box, centered vertically and left-aligned. (Each segment is constructed from two basis vectors, one for the direction and one for the width.) For each segment in the border loop, push the line segment instance's two vertices, calculate the AB vector and the normal N. Terrell has a fun trick for creating line-strips: each vertex consists of two floats (XY) and each segment instance draws two vertices (AB). However, when drawing the segments, set the stride to only one vertex, and draw 2N instances. This way, a uniform buffer with vertices ABCDA will draw (AB, BC, CD, DA).
+
+Bevel joins are constructed as one extra draw call. Create instance geometry from each point in the linestrip, with P and the adjoining segments' normal vectors. For each point in the linestrip, a triangle can be constructed in the same way, and dispatched in the same draw call.
+
+Since this solution looks like FixedScaleRenderPrimitive, I can control the line width in the same way. With that, I can actually replace the selection renderer AND the POI renderer with the same tech. When POIs are instance rendered, I can probably render them as geometry instead of as textured quads, which is nice. So let's make a proper instance-renderer setup.
+
+## Instance rendering support
+What I want is a BaseRenderPrimitive that can hold a short bit of indexed geometry, and a large buffer of per-instance uniforms. Would work fine to inherit InstancedRenderPrimitive<T> from BRP and just add a buffer for the per-instance data. The poly/index geometry data is fine as it is; the MTLPrimitiveType will be just as useful.
+
+Well... actually, the uniform buffers belong to the _renderer_, not the primitive? So I need a small BaseRenderPrimitive, and then the rest is up to the instanced border renderer? Sweet. Just need to write a specialisation of render<T> to take the instance count. The half-segment stride stuff is part of the pipeline descriptor - which is also part of the border renderer.
+
+With triple-buffering, it will be fairly OK to recreate the entire per-instance buffer when the border set changes - that's fine. Currently, I'm creating a new primitive per region border on a backthread - recreating one primitive with a larger per-instance uniform buffer built on the CPU is probably fast enough, and I can definitely build a method that just updates the per-instance uniform buffer and keeps the rest of the data intact.
+Ah-hah - actually, there's no requirement for all uniform buffers in the triple-buffer ring to be of the same size. I can make the instance count a part of the uniform buffer, or just triple-buffer the count as well. This will be super nice.
+
+Hm, two challenges.
+- Culling against the viewbox will require that I rebuild the huge uniform block every time the viewbox changes. I guess that's OK, I already have something similar setup on a backthread for streaming border geometry. Also, I could establish a high-water mark, allocate up-front and not recreate the buffer unnecessarily. Just one memcpy.
+- LOD:ing comes with the same issue - lots of requirements to recreate the entire uniform buffer just because one region changes.
+I ran a high-water mark test just north of 200k vertices (which comes out to N+1 line segments.) Peak memory usage when zooming into a fully opened Croatia - super dense provinces! - is just under 1.3MB. Up-fronting 3 x 2MB buffers is nothing, especially considering I no longer have to keep the triangle strips for all the border rings around. Should be a memory win too, no doubt. No-brainer. (This is on git commit d3b860 for later reference)
+
+Oh, actually I'm going to need double that - I can't both do the half-segment-stride trick _and_ have multiple outlines in the same drawcall - there will be lines going between each ring if so (linestrip vs lines.) But even at 12MB peak memory for the borders, it's totally doable. So, the per-instance uniform will contain both endpoints (A->B).
+
+For region borders, this is pretty darn fast. Not even rebuilding the geometry frame-by-frame seems to bother it. I guess I'm pretty far from being CPU-bound yet, and whatever it cost is a good tradeoff against the lowered memory pressure of keeping all the tristrips in memory.
+
+I've decided to skip rewriting the selection renderer (unless I actually feel like it) but the POI renderer looks like a great candidate.
+
+## Instanced POI rendering
+The POI renderer is already somewhat instance-oriented with a per-marker `progress` value. The InstanceUniforms need to have a position. Then add the POI positions to the instance uniforms instead of building a large vertex buffer. There's currently no proper texture atlas support, so drop that and render different primitives for the different POI planes.
+
+Again, the big work is in prepareFrame. It builds primitives for the different POI planes, but now it should just keep the marker render primitive, and the per-instance uniform buffer. The uniform buffer should contain all the marker positions for all visible planes of a certain type. The PoiPlane type can keep its `primitive` reference and point to the marker geometry. However, the `ownerHash` is probably going to be a problem...
+
+No, actually... this isn't going to be worth the effort. I can't blast out all markers in one drawcall, since they may be at different opacities. I still need one drawcall per region, and I actually think the difference is going to be very small. This can be worth a revisit if it is necessary to draw markers as geometry, but with perfect control over markers' render size, I can probaby get perfectly crisp markers of a texture atlas too. 
 
 # POI styling
 POI styling needs better markers, and support for selecting different marker sprites. It looks pretty straight-forward - every rank has its own POI plane, so the marker index can be an instance uniform.
