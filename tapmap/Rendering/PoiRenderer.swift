@@ -57,7 +57,7 @@ struct PoiGroup: Hashable {
 class PoiRenderer {
 	typealias RenderList = ContiguousArray<PoiGroup>
 	
-	static let kMaxVisiblePoiMarkers = 1024
+	static let kMaxVisiblePoiMarkers = 8192
 	enum Visibility {
 		static let FadeInDuration = 0.4
 		static let FadeOutDuration = 0.2
@@ -258,7 +258,6 @@ class PoiRenderer {
 		}
 		
 		encoder.setRenderPipelineState(pipeline)
-		encoder.setFragmentTexture(markerAtlas, index: 0)
 		
 		encoder.setVertexBytes(&frameUniforms, length: MemoryLayout<FrameUniforms>.stride, index: 1)
 		encoder.setVertexBuffer(instances, offset: 0, index: 2)
@@ -291,31 +290,6 @@ func bucketPlaceMarkers(places: Set<GeoPlace>) -> [Int: Set<GeoPlace>] {
 		}
 	}
 	return bins
-}
-
-// $ remove
-func buildPlaceMarkers(places: Set<GeoPlace>) -> ([ScaleVertex], [UInt16]) {
-	let vertices = places.reduce([]) { (accumulator: [ScaleVertex], place: GeoPlace) in
-		let size = 1.0 / Float(place.rank > 0 ? place.rank : 1)
-		let v0 = ScaleVertex(0.0, 0.0, normalX: -size, normalY: -size)
-		let v1 = ScaleVertex(0.0, 0.0, normalX: size, normalY: -size)
-		let v2 = ScaleVertex(0.0, 0.0, normalX: size, normalY: size)
-		let v3 = ScaleVertex(0.0, 0.0, normalX: -size, normalY: size)
-		let verts = [v0, v1, v2, v3].map {
-			ScaleVertex(place.location.x, place.location.y, normalX: $0.normalX, normalY: $0.normalY)
-		}
-		return accumulator + verts
-	}
-	
-	let quadRange = 0..<UInt16(places.count)
-	let indices = quadRange.reduce([]) { (accumulator: [UInt16], quadIndex: UInt16) in
-		let quadIndices: [UInt16] = [0, 2, 1, 0, 3, 2]	// Build two triangles from the four quad vertices
-		let vertexOffset = quadIndex * 4
-		let offsetIndices = quadIndices.map { $0 + vertexOffset }
-		return accumulator + offsetIndices
-	}
-	
-	return (vertices, indices)
 }
 
 func sortPlacesIntoPoiGroups<T: GeoIdentifiable>(_ places: Set<GeoPlace>, in container: T) -> [PoiGroup] {
