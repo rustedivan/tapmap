@@ -20,9 +20,9 @@ fileprivate struct InstanceUniforms {
 	var progress: simd_float1
 }
 
-struct PoiPlane: Hashable {
 	typealias PoiPlanePrimitive = FixedScaleRenderPrimitive
 	let primitive: PoiPlanePrimitive
+struct PoiGroup: Hashable {
 	let rank: Int
 	let representsArea: Bool
 	var ownerHash: Int { return primitive.ownerHash }
@@ -33,28 +33,28 @@ struct PoiPlane: Hashable {
 		hasher.combine(rank)
 	}
 	
-	static func == (lhs: PoiPlane, rhs: PoiPlane) -> Bool {
+	static func == (lhs: PoiGroup, rhs: PoiGroup) -> Bool {
 		return lhs.hashValue == rhs.hashValue
 	}
 }
 
 /*
-	The POI renderer is oriented around sets of "POI planes". A POI plane is a render primitive that
+	The POI renderer is oriented around sets of "POI groups". A POI group is a render primitive that
 	holds a collection of POIs that will follow the same culling/fading events. For instance,
-	all the capitals in Europe are on the same POI plane, all the cities in Bavaria are on the same plane,
-	and all the towns in Jalisco are on the same plane - because they will be made visible together, and
+	all the capitals in Europe are in the same POI group, all the cities in Bavaria are in the same group,
+	and all the towns in Jalisco are in the same group - because they will be made visible together, and
 	will fade in and out at the same time.
 
-	Each POI plane knows if it contains point or area markers, as area markers (country, region, park...)
-	are only visible at a zoom _range_, while point markers are visible above a zoom _threshold. This logic
-	sits in cullPlaneToZoomRange()
+	Each POI group knows if it contains point or area markers, as area markers (country, region, park...)
+	are only visible at a zoom _range_, while point markers are visible above a zoom _threshold_. This logic
+	sits in cullGroupToZoomRange()
 
 	The PoiRenderer also provides the activePoiHashes comp-prop to export the list of exactly which POIs
 	are rendered. This list is fed to the LabelView that needs the detailed information.
 */
 
 class PoiRenderer {
-	typealias PoiPrimitive = PoiPlane.PoiPlanePrimitive
+	typealias PoiPrimitive = PoiGroup.PoiPlanePrimitive
 	typealias RenderList = ContiguousArray<PoiPrimitive>
 	
 	static let kMaxVisibleInstances = 1024
@@ -77,7 +77,8 @@ class PoiRenderer {
 			}
 		}
 	}
-	var poiPlanePrimitives : [PoiPlane]
+	
+	var poiGroups : [PoiGroup]
 	var poiVisibility: [Int : Visibility] = [:]
 	var renderLists: [RenderList] = []
 	var frameSwitchSemaphore = DispatchSemaphore(value: 1)
@@ -122,26 +123,26 @@ class PoiRenderer {
 			fatalError(error.localizedDescription)
 		}
 		
-		let visibleContinentPoiPlanes = continents.values.flatMap { sortPlacesIntoPoiPlanes($0.places, in: $0, inDevice: device) }
-		let visibleCountryPoiPlanes = countries.values.flatMap { sortPlacesIntoPoiPlanes($0.places, in: $0, inDevice: device) }
-		let visibleProvincePoiPlanes = provinces.values.flatMap { sortPlacesIntoPoiPlanes($0.places, in: $0, inDevice: device) }
+		let visibleContinentPoiGroups = continents.values.flatMap { sortPlacesIntoPoiGroups($0.places, in: $0, inDevice: device) }
+		let visibleCountryPoiGroups = countries.values.flatMap { sortPlacesIntoPoiGroups($0.places, in: $0, inDevice: device) }
+		let visibleProvincePoiGroups = provinces.values.flatMap { sortPlacesIntoPoiGroups($0.places, in: $0, inDevice: device) }
 		
-		poiPlanePrimitives = visibleContinentPoiPlanes + visibleCountryPoiPlanes + visibleProvincePoiPlanes
+		poiGroups = visibleContinentPoiGroups + visibleCountryPoiGroups + visibleProvincePoiGroups
 		
 		markerAtlas = loadMarkerAtlas("MarkerAtlas", inDevice: device)
 	}
 	
 	var activePoiHashes: Set<Int> {
-		let visiblePoiPlanes = poiPlanePrimitives.filter { self.poiVisibility[$0.hashValue] != nil }
-		return Set(visiblePoiPlanes.flatMap { $0.poiHashes })
+		let visiblePoiGroups = poiGroups.filter { self.poiVisibility[$0.hashValue] != nil }
+		return Set(visiblePoiGroups.flatMap { $0.poiHashes })
 	}
 	
 	func updatePrimitives<T:GeoNode>(for node: T, with subRegions: Set<T.SubType>) where T.SubType : GeoPlaceContainer {
 		let removedRegionsHash = node.geographyId.hashed
-		poiPlanePrimitives = poiPlanePrimitives.filter { $0.ownerHash != removedRegionsHash }
+		poiGroups = poiGroups.filter { $0.ownerHash != removedRegionsHash }
 		
-		let subregionPrimitives = subRegions.flatMap { buildPoiPlanes(of: $0) }
-		poiPlanePrimitives.append(contentsOf: subregionPrimitives)
+		let subregionPrimitives = subRegions.flatMap { buildPoiGroups(of: $0) }
+		poiGroups.append(contentsOf: subregionPrimitives)
 		
 		for newRegion in subregionPrimitives {
 			if Float(newRegion.rank) <= rankThreshold {
@@ -150,8 +151,8 @@ class PoiRenderer {
 		}
 	}
 	
-	func buildPoiPlanes<T:GeoPlaceContainer & GeoIdentifiable>(of region: T) -> [PoiPlane] {
-		return sortPlacesIntoPoiPlanes(region.places, in: region, inDevice: device);
+	func buildPoiGroups<T:GeoPlaceContainer & GeoIdentifiable>(of region: T) -> [PoiGroup] {
+		return sortPlacesIntoPoiGroups(region.places, in: region, inDevice: device);
 	}
 	
 	func prepareFrame(visibleSet: Set<RegionHash>, zoom: Float, zoomRate: Float, bufferIndex: Int) {
@@ -175,18 +176,18 @@ class PoiRenderer {
 		let poiScreenSize: Float = 2.0 / poiZoom
 		let newRankThreshold = updateZoomThreshold(viewZoom: zoom)
 		
-		let framePlanes = poiPlanePrimitives.filter { $0.representsArea == false }					// Hide area markers (but keep the labels)
-																				.filter { visibleSet.contains($0.ownerHash) }		// Hide POI planes outside the frame
-																			  .filter { poiVisibility[$0.hashValue] != nil }	// Don't render hidden POI planes
+		let poiGroupsInFrame = poiGroups.filter { $0.representsArea == false }					// Hide area markers (but keep the labels)
+																		.filter { visibleSet.contains($0.ownerHash) }		// Hide POI groups outside the frame
+																		.filter { poiVisibility[$0.hashValue] != nil }	// Don't render hidden POI groups
 		
 		var fades = Array<InstanceUniforms>()
-		fades.reserveCapacity(framePlanes.count)
-		for plane in framePlanes {
-			let u = InstanceUniforms(progress: poiVisibility[plane.hashValue]!.alpha())
+		fades.reserveCapacity(poiGroupsInFrame.count) // $ per marker, not per group
+		for poiGroup in poiGroupsInFrame {
+			let u = InstanceUniforms(progress: poiVisibility[poiGroup.hashValue]!.alpha())
 			fades.append(u)
 		}
 		
-		let frameRenderList = RenderList(framePlanes.map { $0.primitive })
+		let frameRenderList = RenderList(poiGroupsInFrame.map { $0.primitive })
 		frameSwitchSemaphore.wait()
 			self.renderLists[bufferIndex] = frameRenderList
 			self.instanceUniforms[bufferIndex].contents().copyMemory(from: fades, byteCount: MemoryLayout<InstanceUniforms>.stride * fades.count)
@@ -200,8 +201,8 @@ class PoiRenderer {
 			return rankThreshold
 		}
 		
-		let previousPois = Set(poiPlanePrimitives.filter { cullPlaneToZoomRange(plane: $0, zoom: rankThreshold) })
-		let visiblePois = Set(poiPlanePrimitives.filter { cullPlaneToZoomRange(plane: $0, zoom: viewZoom) })
+		let previousPois = Set(poiGroups.filter { cullGroupToZoomRange(poiGroup: $0, zoom: rankThreshold) })
+		let visiblePois = Set(poiGroups.filter { cullGroupToZoomRange(poiGroup: $0, zoom: viewZoom) })
 
 		let poisToHide = previousPois.subtracting(visiblePois)	// Culled this frame
 		let poisToShow = visiblePois.subtracting(previousPois) // Shown this frame
@@ -217,9 +218,9 @@ class PoiRenderer {
 		return viewZoom
 	}
 	
-	func cullPlaneToZoomRange(plane: PoiPlane, zoom: Float) -> Bool {
+	func cullGroupToZoomRange(poiGroup: PoiGroup, zoom: Float) -> Bool {
 		var minZoom: Float = 0.0, maxZoom: Float = 1000.0
-		switch (plane.rank, plane.representsArea) {
+		switch (poiGroup.rank, poiGroup.representsArea) {
 		case (0...1, false): 		minZoom = 2.0			// Captials; not visible at outmost zoom
 		case (2, false): 				minZoom = 5.0			// Cities
 		case (3, false): 				minZoom = 10.0
@@ -238,7 +239,7 @@ class PoiRenderer {
 	}
 	
 	func renderWorld(inProjection projection: simd_float4x4, inEncoder encoder: MTLRenderCommandEncoder, bufferIndex: Int) {
-		encoder.pushDebugGroup("Render POI plane")
+		encoder.pushDebugGroup("Render POI groups")
 		encoder.setRenderPipelineState(pipeline)
 		encoder.setFragmentTexture(markerAtlas, index: 0)
 		
@@ -278,7 +279,7 @@ func loadMarkerAtlas(_ name: String, inDevice device: MTLDevice) -> MTLTexture {
 	return atlas
 }
 
-// MARK: Generating POI planes
+// MARK: Generating POI groups
 func bucketPlaceMarkers(places: Set<GeoPlace>) -> [Int: Set<GeoPlace>] {
 	var bins: [Int: Set<GeoPlace>] = [:]
 	for place in places {
@@ -315,33 +316,33 @@ func buildPlaceMarkers(places: Set<GeoPlace>) -> ([ScaleVertex], [UInt16]) {
 	return (vertices, indices)
 }
 
-func sortPlacesIntoPoiPlanes<T: GeoIdentifiable>(_ places: Set<GeoPlace>, in container: T, inDevice device: MTLDevice) -> [PoiPlane] {
+func sortPlacesIntoPoiGroups<T: GeoIdentifiable>(_ places: Set<GeoPlace>, in container: T, inDevice device: MTLDevice) -> [PoiGroup] {
 	let placeMarkers = places.filter { $0.kind != .Region }
 	let areaMarkers = places.filter { $0.kind == .Region }
 	let rankedPlaces = bucketPlaceMarkers(places: placeMarkers)
 	let rankedAreas = bucketPlaceMarkers(places: areaMarkers )
 	
-	let generatePlacePlanes = makePoiPlaneFactory(forArea: false, in: container, inDevice: device)
-	let generateAreaPlanes = makePoiPlaneFactory(forArea: true, in: container, inDevice: device)
+	let generatePlaceGroups = makePoiGroupFactory(forArea: false, in: container, inDevice: device)
+	let generateAreaGroups = makePoiGroupFactory(forArea: true, in: container, inDevice: device)
 	
-	let placePlanes = rankedPlaces.map(generatePlacePlanes)
-	let areaPlanes = rankedAreas.map(generateAreaPlanes)
+	let placeGroups = rankedPlaces.map(generatePlaceGroups)
+	let areaGroups = rankedAreas.map(generateAreaGroups)
 	
-	return areaPlanes + placePlanes
+	return areaGroups + placeGroups
 }
 
-typealias PoiFactory = (Int, Set<GeoPlace>) -> PoiPlane
-func makePoiPlaneFactory<T:GeoIdentifiable>(forArea: Bool, in container: T, inDevice device: MTLDevice) -> PoiFactory {
-	return { (rank: Int, pois: Set<GeoPlace>) -> PoiPlane in
+typealias PoiFactory = (Int, Set<GeoPlace>) -> PoiGroup
+func makePoiGroupFactory<T:GeoIdentifiable>(forArea: Bool, in container: T, inDevice device: MTLDevice) -> PoiFactory {
+	return { (rank: Int, pois: Set<GeoPlace>) -> PoiGroup in
 		let (vertices, indices) = buildPlaceMarkers(places: pois)
-		let primitive = PoiPlane.PoiPlanePrimitive(polygons: [vertices],
+		let primitive = PoiGroup.PoiPlanePrimitive(polygons: [vertices],
 																							 indices: [indices],
 																							 drawMode: .triangle,
 																							 device: device,
 																							 color: rank.hashColor.tuple(),
 																							 ownerHash: container.geographyId.hashed,	// The hash of the owning region
-																							 debugName: "\(container.name) - \(forArea ? "area" : "poi") plane @ \(rank)")
+																							 debugName: "\(container.name) - \(forArea ? "area" : "poi") group @ \(rank)")
 		let hashes = pois.map { $0.hashValue }
-		return PoiPlane(primitive: primitive, rank: rank, representsArea: forArea, poiHashes: hashes)
+		return PoiGroup(primitive: primitive, rank: rank, representsArea: forArea, poiHashes: hashes)
 	}
 }
