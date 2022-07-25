@@ -67,6 +67,7 @@ class DebugRenderer {
 	static var shared: DebugRenderer {
 		return _shared
 	}
+	static let kMaxDebugMarkers = 500
 	
 	let device: MTLDevice
 	let pipeline: MTLRenderPipelineState
@@ -133,7 +134,7 @@ class DebugRenderer {
 			self.device = device
 			self.renderLists = Array(repeating: RenderList(), count: bufferCount)
 			self.instanceUniforms = (0..<bufferCount).map { _ in
-				return device.makeBuffer(length: PoiRenderer.kMaxVisibleInstances * MemoryLayout<InstanceUniforms>.stride, options: .storageModeShared)!
+				return device.makeBuffer(length: DebugRenderer.kMaxDebugMarkers * MemoryLayout<InstanceUniforms>.stride, options: .storageModeShared)!
 			}
 		} catch let error {
 			fatalError(error.localizedDescription)

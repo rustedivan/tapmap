@@ -165,7 +165,7 @@ class BorderRenderer<RegionType> {
 	}
 }
 
-func makeLineSegmentPrimitive(in device: MTLDevice) -> RenderPrimitive {
+fileprivate func makeLineSegmentPrimitive(in device: MTLDevice) -> RenderPrimitive {
 	// The 95/5 values place borders at 95% inward, with some small overlap outward
 	let vertices: [Vertex] = [
 		Vertex(0.0, -0.05),
