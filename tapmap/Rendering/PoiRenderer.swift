@@ -16,11 +16,13 @@ fileprivate struct FrameUniforms {
 	let poiBaseSize: simd_float1
 }
 
-fileprivate struct InstanceUniforms {
+fileprivate struct InstanceUniform {
+	var position: simd_float2
 	var progress: simd_float1
 }
 
 struct PoiGroup: Hashable {
+	let locations: [Vertex]
 	let rank: Int
 	let representsArea: Bool
 	var ownerHash: Int
@@ -118,7 +120,7 @@ class PoiRenderer {
 			self.renderLists = Array(repeating: RenderList(), count: bufferCount)
 			self.framePoiMarkerCount = Array(repeating: 0, count: bufferCount)
 			self.instanceUniforms = (0..<bufferCount).map { _ in
-				return device.makeBuffer(length: PoiRenderer.kMaxVisiblePoiMarkers * MemoryLayout<InstanceUniforms>.stride, options: .storageModeShared)!
+				return device.makeBuffer(length: PoiRenderer.kMaxVisiblePoiMarkers * MemoryLayout<InstanceUniform>.stride, options: .storageModeShared)!
 			}
 			self.poiMarkerPrimitive = makePoiPrimitive(in: device)
 		} catch let error {
@@ -188,7 +190,7 @@ class PoiRenderer {
 		let frameRenderList = RenderList(poiGroupsInFrame.map { $0 })
 		frameSwitchSemaphore.wait()
 			self.renderLists[bufferIndex] = frameRenderList
-			self.instanceUniforms[bufferIndex].contents().copyMemory(from: poiBuffer, byteCount: MemoryLayout<InstanceUniforms>.stride * poiBuffer.count)
+			self.instanceUniforms[bufferIndex].contents().copyMemory(from: poiBuffer, byteCount: MemoryLayout<InstanceUniform>.stride * poiBuffer.count)
 			self.framePoiMarkerCount[bufferIndex] = poiBuffer.count
 			self.poiBaseSize = poiScreenSize
 			self.rankThreshold = newRankThreshold
@@ -291,6 +293,7 @@ func bucketPlaceMarkers(places: Set<GeoPlace>) -> [Int: Set<GeoPlace>] {
 	return bins
 }
 
+// $ remove
 func buildPlaceMarkers(places: Set<GeoPlace>) -> ([ScaleVertex], [UInt16]) {
 	let vertices = places.reduce([]) { (accumulator: [ScaleVertex], place: GeoPlace) in
 		let size = 1.0 / Float(place.rank > 0 ? place.rank : 1)
@@ -321,14 +324,29 @@ func sortPlacesIntoPoiGroups<T: GeoIdentifiable>(_ places: Set<GeoPlace>, in con
 	let rankedPlaces = bucketPlaceMarkers(places: placeMarkers)
 	let rankedAreas = bucketPlaceMarkers(places: areaMarkers )
 	
-	for (rank, place) in rankedPlaces {
-		
+	let placeGroups = rankedPlaces.map { (rank, pois) -> PoiGroup in
+		let locations: [Vertex] = pois.map { $0.location }
+		let hashes = pois.map { $0.hashValue }
+		return PoiGroup(locations: locations,
+										rank: rank,
+										representsArea: false,
+										ownerHash: container.geographyId.hashed,
+										poiHashes: hashes,
+										debugName: "\(container.name) - poi group @ \(rank)")
 	}
 	
-	for (rank, place) in rankedAreas {
+	let areaGroups = rankedAreas.map { (rank, pois) -> PoiGroup in
+		let locations: [Vertex] = pois.map { $0.location }
+		let hashes = pois.map { $0.hashValue }
+		return PoiGroup(locations: locations,
+										rank: rank,
+										representsArea: true,
+										ownerHash: container.geographyId.hashed,
+										poiHashes: hashes,
+										debugName: "\(container.name) - area group @ \(rank)")
 	}
 	
-	let poiGroups: [PoiGroup] = []
+	let poiGroups: [PoiGroup] = placeGroups + areaGroups
 	return poiGroups
 }
 
@@ -352,6 +370,17 @@ fileprivate func makePoiPrimitive(in device: MTLDevice) -> RenderPrimitive {
 													debugName: "POI primitive")
 }
 
-fileprivate func generatePoiMarkerGeometry(poiGroups: [PoiGroup], visibilities: [Int : PoiRenderer.Visibility], maxMarkers: Int) -> Array<InstanceUniforms> {
-	return []
+fileprivate func generatePoiMarkerGeometry(poiGroups: [PoiGroup], visibilities: [Int : PoiRenderer.Visibility], maxMarkers: Int) -> Array<InstanceUniform> {
+	let markerCount = poiGroups.reduce(0) { $0 + $1.locations.count }
+	var markers = Array<InstanceUniform>()
+	markers.reserveCapacity(markerCount)
+	for group in poiGroups {
+		for marker in group.locations {
+			markers.append(InstanceUniform(
+				position: simd_float2(x: marker.x, y: marker.y),
+				progress: 1.0	// $ lookup in visibility + small offset of .2 bias, max
+			))
+		}
+	}
+	return markers
 }
