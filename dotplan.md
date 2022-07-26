@@ -1,5 +1,15 @@
 ROAD TO FINAL
 
+## Instance-based POI rendering
+OK, but let's take a stab at this anyway. It would be nice to get everything that's renderable as instances to be so. I'll have to take one draw call per POI plane, _or_ bake the fade value into the per-instance uniform, and I think that's actually totally doable – and with a tiny tiny offset (based on the distance from screen center?) it might actually look a lot better.
+So, pretty much all I need to to is to add the marker position and marker size to the instance uniform block, remove the PoiPlane::PoiPlanePrimitive and let buildPlaceMarkers spit out instance uniform buffers.
+buildPlaceMarkers will be called from prepareFrame instead.
+Instead of bucketing POIs into region-based planes, they should be bucketed based on their shape.
+Again - there is no way this is more expensive on memory than building the actual quads into vertex buffers. The only thing is the requirement to re-write the per-instance uniforms for thousands of place markers, but it works great for hundreds of thousands of line segments (on device too, I hope...) But the uniform buffer fill is just filling an air bubble in the CPU pipeline so far.
+Worked on the first attempt, 2-3 hours' work. Amazing. Total memory for POIs is ~1MB for the triple-buffer. Some more polish needed, but it worked, right off the bat.
+
+Now, this all puts some contrast on how many drawcalls are needed to draw the actual _map_. Now that I can blast out the borders and POIs in around 5 drawcalls, the ~200 drawcalls for the regions is... well. Well, I'll have to benchmark that on an actual device. 
+
 # Rendering brief, step 2
  There are some effects I want to spice up the presentation. I'm a little stuck at how to lookup the color for a region at runtime, since the base color isn't always static. Specifically, provinces have different colors when visited and unvisited. I can definitely route around that, and ~100 O(1) dictionary lookups per frame isn't going to make a difference, but it's _wrong_. To help guide the stylesheet lookup design, let's take a look at those extra effects.
  
@@ -35,7 +45,7 @@ ROAD TO FINAL
  
  ## Polish
  √ author continent hue and build HSB tuples from from Stylesheet for all regions to get the tinted black/white
- 
+ - fade in POI markers from center of screen to outsides.
 
 
 # Marketing

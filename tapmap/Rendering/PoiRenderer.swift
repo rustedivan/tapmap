@@ -87,6 +87,8 @@ class PoiRenderer {
 	let pipeline: MTLRenderPipelineState
 	let instanceUniforms: [MTLBuffer]
 	var framePoiMarkerCount: [Int] = []
+	var poiMarkersHighwaterMark: Int = 0
+	
 	let markerAtlas: MTLTexture
 	let poiMarkerPrimitive: BaseRenderPrimitive<Vertex>!
 
@@ -194,6 +196,10 @@ class PoiRenderer {
 			self.framePoiMarkerCount[bufferIndex] = poiBuffer.count
 			self.poiBaseSize = poiScreenSize
 			self.rankThreshold = newRankThreshold
+			if poiBuffer.count > poiMarkersHighwaterMark {
+				poiMarkersHighwaterMark = poiBuffer.count
+				print("POI renderer used a max of \(poiMarkersHighwaterMark) markers")
+			}
 		frameSwitchSemaphore.signal()
 	}
 	
