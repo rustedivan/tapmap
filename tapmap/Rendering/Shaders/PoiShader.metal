@@ -36,13 +36,12 @@ vertex VertexOut poiVertex(const device Vertex* vertexArray [[ buffer(0) ]],
 													 unsigned int iid [[ instance_id ]]) {
 	Vertex v = vertexArray[vid];
 	float2 p = pois[iid].position;
-	float a = pois[iid].progress;
+	float alpha = pois[iid].progress;
 	
 	VertexOut outVertex = VertexOut();
 	outVertex.position = frame->modelViewProjectionMatrix * float4(p + v.position * frame->baseSize, 0.0, 1.0);
-	float d = max(0.0, 0.2 - length_squared(outVertex.position.xy));
-	a += d;
-	outVertex.color = float4(1.0, 1.0, 1.0, a);
+	float speedUp = max(0.0, 0.2 - length_squared(outVertex.position.xy));
+	outVertex.color = float4(1.0, 1.0, 1.0, alpha + speedUp);
 	
 	return outVertex;
 }
