@@ -355,10 +355,11 @@ fileprivate func generatePoiMarkerGeometry(poiGroups: [PoiGroup], visibilities: 
 	var markers = Array<InstanceUniform>()
 	markers.reserveCapacity(markerCount)
 	for group in poiGroups {
+		let groupAlpha = visibilities[group.hashValue]?.alpha() ?? 0.0
 		for marker in group.locations {
 			markers.append(InstanceUniform(
 				position: simd_float2(x: marker.x, y: marker.y),
-				progress: 1.0	// $ lookup in visibility + small offset of .2 bias, max
+				progress: groupAlpha
 			))
 		}
 	}
