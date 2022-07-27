@@ -25,7 +25,6 @@ struct BorderContour {
 }
 
 class BorderRenderer<RegionType> {
-	typealias RenderList = ContiguousArray<BorderContour>
 	typealias LoddedBorderHash = Int
 
 	let rendererLabel: String
@@ -109,14 +108,13 @@ class BorderRenderer<RegionType> {
 		}
 		
 		// Collect the vertex rings for the visible set of borders
-		let frameRenderList = RenderList(borderedRegions.compactMap {
+		let frameRenderList: [BorderContour] = borderedRegions.compactMap {
 			let loddedKey = borderHashLodKey($0.key, atLod: actualBorderLod)
 			return borderContours[loddedKey]
-		})
-		
-		let regionContours = frameRenderList.flatMap { $0.contours }
+		}
 		
 		// Generate all the vertices in all the outlines
+		let regionContours = frameRenderList.flatMap { $0.contours }
 		let borderBuffer = generateContourCollectionGeometry(contours: regionContours)
 		guard borderBuffer.count < maxVisibleLineSegments else {
 			fatalError("line segment buffer blew out at \(borderBuffer.count) vertices (max \(maxVisibleLineSegments))")

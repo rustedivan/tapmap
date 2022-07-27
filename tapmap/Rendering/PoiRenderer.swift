@@ -55,9 +55,10 @@ struct PoiGroup: Hashable {
 */
 
 class PoiRenderer {
-	typealias RenderList = ContiguousArray<PoiGroup>
+	static let kMaxVisibleCapitalMarkers = 256
+	static let kMaxVisibleCityMarkers = 4096
+	static let kMaxVisibleTownMarkers = 512
 	
-	static let kMaxVisiblePoiMarkers = 8192
 	enum Visibility {
 		static let FadeInDuration = 0.4
 		static let FadeOutDuration = 0.2
@@ -80,14 +81,19 @@ class PoiRenderer {
 	
 	var poiGroups : [PoiGroup]
 	var poiVisibility: [Int : Visibility] = [:]
-	var renderLists: [RenderList] = []
 	var frameSwitchSemaphore = DispatchSemaphore(value: 1)
 	
 	let device: MTLDevice
 	let pipeline: MTLRenderPipelineState
-	let instanceUniforms: [MTLBuffer]
-	var framePoiMarkerCount: [Int] = []
-	var poiMarkersHighwaterMark: Int = 0
+	let capitalMarkerUniforms: [MTLBuffer]
+	let cityMarkerUniforms: [MTLBuffer]
+	let townMarkerUniforms: [MTLBuffer]
+	var frameCapitalMarkerCount: [Int] = []
+	var frameCityMarkerCount: [Int] = []
+	var frameTownMarkerCount: [Int] = []
+	var capitalMarkersHighwaterMark: Int = 0
+	var cityMarkersHighwaterMark: Int = 0
+	var townMarkersHighwaterMark: Int = 0
 	
 	let markerAtlas: MTLTexture
 	let poiMarkerPrimitive: BaseRenderPrimitive<Vertex>!
@@ -119,11 +125,20 @@ class PoiRenderer {
 		do {
 			try pipeline = device.makeRenderPipelineState(descriptor: pipelineDescriptor)
 			self.device = device
-			self.renderLists = Array(repeating: RenderList(), count: bufferCount)
-			self.framePoiMarkerCount = Array(repeating: 0, count: bufferCount)
-			self.instanceUniforms = (0..<bufferCount).map { _ in
-				return device.makeBuffer(length: PoiRenderer.kMaxVisiblePoiMarkers * MemoryLayout<InstanceUniform>.stride, options: .storageModeShared)!
+			self.frameCapitalMarkerCount = Array(repeating: 0, count: bufferCount)
+			self.frameCityMarkerCount = Array(repeating: 0, count: bufferCount)
+			self.frameTownMarkerCount = Array(repeating: 0, count: bufferCount)
+			
+			self.capitalMarkerUniforms = (0..<bufferCount).map { _ in
+				return device.makeBuffer(length: PoiRenderer.kMaxVisibleCapitalMarkers * MemoryLayout<InstanceUniform>.stride, options: .storageModeShared)!
 			}
+			self.cityMarkerUniforms = (0..<bufferCount).map { _ in
+				return device.makeBuffer(length: PoiRenderer.kMaxVisibleCityMarkers * MemoryLayout<InstanceUniform>.stride, options: .storageModeShared)!
+			}
+			self.townMarkerUniforms = (0..<bufferCount).map { _ in
+				return device.makeBuffer(length: PoiRenderer.kMaxVisibleTownMarkers * MemoryLayout<InstanceUniform>.stride, options: .storageModeShared)!
+			}
+			
 			self.poiMarkerPrimitive = makePoiPrimitive(in: device)
 		} catch let error {
 			fatalError(error.localizedDescription)
@@ -149,12 +164,6 @@ class PoiRenderer {
 		
 		let subregionPrimitives = subRegions.flatMap { sortPlacesIntoPoiGroups($0.places, in: $0) }
 		poiGroups.append(contentsOf: subregionPrimitives)
-		
-		for newRegion in subregionPrimitives {
-			if Float(newRegion.rank) <= rankThreshold {
-				poiVisibility.updateValue(.visible, forKey: newRegion.hashValue)
-			}
-		}
 	}
 	
 	func prepareFrame(visibleSet: Set<RegionHash>, zoom: Float, zoomRate: Float, bufferIndex: Int) {
@@ -162,7 +171,7 @@ class PoiRenderer {
 		for (key, p) in poiVisibility {
 			switch(p) {
 			case .fadeIn(let startTime):
-				if startTime.addingTimeInterval(1.0) < now {
+				if startTime.addingTimeInterval(1.0) < now {	// $ 1.0 is a fixed fade time, fix this
 					poiVisibility.updateValue(.visible, forKey: key)
 				}
 			case .fadeOut(let startTime):
@@ -182,23 +191,44 @@ class PoiRenderer {
 																		.filter { visibleSet.contains($0.ownerHash) }	// Hide POI groups outside the frame
 																		.filter { poiVisibility[$0.hashValue] != nil }	// Don't render hidden POI groups
 		
-		let poiBuffer = generatePoiMarkerGeometry(poiGroups: poiGroupsInFrame,
-																							visibilities: poiVisibility,
-																							maxMarkers: PoiRenderer.kMaxVisiblePoiMarkers)
-		guard poiBuffer.count < PoiRenderer.kMaxVisiblePoiMarkers else {
-			fatalError("POI marker buffer blew out at \(poiBuffer.count) markers (max \(PoiRenderer.kMaxVisiblePoiMarkers))")
-		}
+		// These rank levels reverse the ranking done in OperationParseOSMJson::determineRank
+		let capitalMarkersInFrame = poiGroupsInFrame.filter { $0.rank <= 2 }
+		let cityMarkersInFrame = poiGroupsInFrame.filter { $0.rank > 2 && $0.rank <= 5}
+		let townMarkersInFrame = poiGroupsInFrame.filter { $0.rank > 5 }
 		
-		let frameRenderList = RenderList(poiGroupsInFrame.map { $0 })
+		let capitalsBuffer = generateMarkerUniforms(poiGroups: capitalMarkersInFrame,
+																								visibilities: poiVisibility,
+																								maxMarkers: PoiRenderer.kMaxVisibleCapitalMarkers)
+		let citiesBuffer = generateMarkerUniforms(poiGroups: cityMarkersInFrame,
+																							visibilities: poiVisibility,
+																							maxMarkers: PoiRenderer.kMaxVisibleCityMarkers)
+		let townsBuffer = generateMarkerUniforms(poiGroups: townMarkersInFrame,
+																						 visibilities: poiVisibility,
+																						 maxMarkers: PoiRenderer.kMaxVisibleTownMarkers)
+		
 		frameSwitchSemaphore.wait()
-			self.renderLists[bufferIndex] = frameRenderList
-			self.instanceUniforms[bufferIndex].contents().copyMemory(from: poiBuffer, byteCount: MemoryLayout<InstanceUniform>.stride * poiBuffer.count)
-			self.framePoiMarkerCount[bufferIndex] = poiBuffer.count
+			self.capitalMarkerUniforms[bufferIndex].contents().copyMemory(from: capitalsBuffer, byteCount: MemoryLayout<InstanceUniform>.stride * capitalsBuffer.count)
+			self.cityMarkerUniforms[bufferIndex].contents().copyMemory(from: citiesBuffer, byteCount: MemoryLayout<InstanceUniform>.stride * citiesBuffer.count)
+			self.townMarkerUniforms[bufferIndex].contents().copyMemory(from: townsBuffer, byteCount: MemoryLayout<InstanceUniform>.stride * townsBuffer.count)
+		
+			self.frameCapitalMarkerCount[bufferIndex] = capitalsBuffer.count
+			self.frameCityMarkerCount[bufferIndex] = citiesBuffer.count
+			self.frameTownMarkerCount[bufferIndex] = townsBuffer.count
+		
 			self.poiBaseSize = poiScreenSize
 			self.rankThreshold = newRankThreshold
-			if poiBuffer.count > poiMarkersHighwaterMark {
-				poiMarkersHighwaterMark = poiBuffer.count
-				print("POI renderer used a max of \(poiMarkersHighwaterMark) markers")
+		
+			if capitalsBuffer.count > capitalMarkersHighwaterMark {
+				capitalMarkersHighwaterMark = capitalsBuffer.count
+				print("POI renderer used a max of \(capitalMarkersHighwaterMark) capital markers")
+			}
+			if citiesBuffer.count > cityMarkersHighwaterMark {
+				cityMarkersHighwaterMark = citiesBuffer.count
+				print("POI renderer used a max of \(cityMarkersHighwaterMark) city markers")
+			}
+			if townsBuffer.count > townMarkersHighwaterMark {
+				townMarkersHighwaterMark = townsBuffer.count
+				print("POI renderer used a max of \(capitalMarkersHighwaterMark) town markers")
 			}
 		frameSwitchSemaphore.signal()
 	}
@@ -255,20 +285,29 @@ class PoiRenderer {
 			var frameUniforms = FrameUniforms(mvpMatrix: projection,
 																				rankThreshold: self.rankThreshold,
 																				poiBaseSize: self.poiBaseSize)
-			let instances = self.instanceUniforms[bufferIndex]
-			let count = framePoiMarkerCount[bufferIndex]
+			let capitalInstances = self.capitalMarkerUniforms[bufferIndex]
+			let capitalCount = frameCapitalMarkerCount[bufferIndex]
+			let cityInstances = self.cityMarkerUniforms[bufferIndex]
+			let cityCount = frameCityMarkerCount[bufferIndex]
+			let townInstances = self.townMarkerUniforms[bufferIndex]
+			let townCount = frameTownMarkerCount[bufferIndex]
 		frameSwitchSemaphore.signal()
 		
-		if count == 0 {
-			return
-		}
-		
 		encoder.setRenderPipelineState(pipeline)
-		
 		encoder.setVertexBytes(&frameUniforms, length: MemoryLayout<FrameUniforms>.stride, index: 1)
-		encoder.setVertexBuffer(instances, offset: 0, index: 2)
-		
-		renderInstanced(primitive: poiMarkerPrimitive, count: count, into: encoder)
+
+		if capitalCount > 0 {
+			encoder.setVertexBuffer(capitalInstances, offset: 0, index: 2)
+			renderInstanced(primitive: poiMarkerPrimitive, count: capitalCount, into: encoder)
+		}
+		if cityCount > 0 {
+			encoder.setVertexBuffer(cityInstances, offset: 0, index: 2)
+			renderInstanced(primitive: poiMarkerPrimitive, count: cityCount, into: encoder)
+		}
+		if townCount > 0 {
+			encoder.setVertexBuffer(townInstances, offset: 0, index: 2)
+			renderInstanced(primitive: poiMarkerPrimitive, count: townCount, into: encoder)
+		}
 	}
 }
 
@@ -302,7 +341,7 @@ func sortPlacesIntoPoiGroups<T: GeoIdentifiable>(_ places: Set<GeoPlace>, in con
 	let placeMarkers = places.filter { $0.kind != .Region }
 	let areaMarkers = places.filter { $0.kind == .Region }
 	let rankedPlaces = bucketPlaceMarkers(places: placeMarkers)
-	let rankedAreas = bucketPlaceMarkers(places: areaMarkers )
+	let rankedAreas = bucketPlaceMarkers(places: areaMarkers)
 	
 	let placeGroups = rankedPlaces.map { (rank, pois) -> PoiGroup in
 		let locations: [Vertex] = pois.map { $0.location }
@@ -350,7 +389,7 @@ fileprivate func makePoiPrimitive(in device: MTLDevice) -> RenderPrimitive {
 													debugName: "POI primitive")
 }
 
-fileprivate func generatePoiMarkerGeometry(poiGroups: [PoiGroup], visibilities: [Int : PoiRenderer.Visibility], maxMarkers: Int) -> Array<InstanceUniform> {
+fileprivate func generateMarkerUniforms(poiGroups: [PoiGroup], visibilities: [Int : PoiRenderer.Visibility], maxMarkers: Int) -> Array<InstanceUniform> {
 	let markerCount = poiGroups.reduce(0) { $0 + $1.locations.count }
 	var markers = Array<InstanceUniform>()
 	markers.reserveCapacity(markerCount)
@@ -363,5 +402,10 @@ fileprivate func generatePoiMarkerGeometry(poiGroups: [PoiGroup], visibilities: 
 			))
 		}
 	}
+	
+	guard markers.count < maxMarkers else {
+		fatalError("POI marker buffer blew out at \(markers.count) markers (max \(maxMarkers))")
+	}
+	
 	return markers
 }
