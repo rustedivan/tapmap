@@ -10,6 +10,12 @@ Worked on the first attempt, 2-3 hours' work. Amazing. Total memory for POIs is 
 
 Now, this all puts some contrast on how many drawcalls are needed to draw the actual _map_. Now that I can blast out the borders and POIs in around 5 drawcalls, the ~200 drawcalls for the regions is... well. Well, I'll have to benchmark that on an actual device. 
 
+Final step is to bucket the POI groups by which marker to render them with. The border-strategy of setting up three different renderers would be more difficult, since the markers must be laid out with respect to their rank. But, it should be fine to partition the resulting POI groups into three groups: {capitals, large cities, all others}. When I actually have the POI groups, I've already thrown away the `rank` enum which is a shame, but it's trivial to map the ranks back to kinds anyway (OperationParseOSMJson::determineRank gives capitals at [1, 2], cities at [3, 6], towns at [6, 8]) Binning can be done by scaling off the towns first, and then splitting the remainder into cities and capitals (starting with towns, since they're the largest group and leave the smallest remainder for the second pass).
+
+! Seems like we're drawing a lot more POI groups than needed - zooming in on China still considers Azerbaijan to be interesting...
+! Really need to audit how markers are displayed/added/faded in when a new region opens - seems they're not being picked up by the renderer properly
+! Likewise, there are issues with culling marker planes - focus on London and how it behaves together with its surrounding cities. 
+
 # Rendering brief, step 2
  There are some effects I want to spice up the presentation. I'm a little stuck at how to lookup the color for a region at runtime, since the base color isn't always static. Specifically, provinces have different colors when visited and unvisited. I can definitely route around that, and ~100 O(1) dictionary lookups per frame isn't going to make a difference, but it's _wrong_. To help guide the stylesheet lookup design, let's take a look at those extra effects.
  
