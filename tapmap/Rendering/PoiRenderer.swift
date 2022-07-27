@@ -56,7 +56,7 @@ struct PoiGroup: Hashable {
 
 class PoiRenderer {
 	static let kMaxVisibleCapitalMarkers = 256
-	static let kMaxVisibleCityMarkers = 4096
+	static let kMaxVisibleCityMarkers = 8192
 	static let kMaxVisibleTownMarkers = 512
 	
 	enum Visibility {
@@ -96,8 +96,10 @@ class PoiRenderer {
 	var townMarkersHighwaterMark: Int = 0
 	
 	let markerAtlas: MTLTexture
-	let poiMarkerPrimitive: BaseRenderPrimitive<Vertex>!
-
+	let capitalMarkerPrimitive: BaseRenderPrimitive<Vertex>!
+	let cityMarkerPrimitive: BaseRenderPrimitive<Vertex>!
+	let townMarkerPrimitive: BaseRenderPrimitive<Vertex>!
+	
 	var rankThreshold: Float = -1.0
 	var poiBaseSize: Float = 0.0
 	
@@ -139,7 +141,9 @@ class PoiRenderer {
 				return device.makeBuffer(length: PoiRenderer.kMaxVisibleTownMarkers * MemoryLayout<InstanceUniform>.stride, options: .storageModeShared)!
 			}
 			
-			self.poiMarkerPrimitive = makePoiPrimitive(in: device)
+			self.capitalMarkerPrimitive = makeCapitalPrimitive(in: device)
+			self.cityMarkerPrimitive = makeCityPrimitive(in: device)
+			self.townMarkerPrimitive = makeTownPrimitive(in: device)
 		} catch let error {
 			fatalError(error.localizedDescription)
 		}
@@ -188,7 +192,7 @@ class PoiRenderer {
 		let newRankThreshold = updateZoomThreshold(viewZoom: zoom)
 		
 		let poiGroupsInFrame = poiGroups.filter { $0.representsArea == false }					// Hide area markers (but keep the labels)
-																		.filter { visibleSet.contains($0.ownerHash) }	// Hide POI groups outside the frame
+																		.filter { visibleSet.contains($0.ownerHash) }		// Hide POI groups outside the frame
 																		.filter { poiVisibility[$0.hashValue] != nil }	// Don't render hidden POI groups
 		
 		// These rank levels reverse the ranking done in OperationParseOSMJson::determineRank
@@ -298,15 +302,15 @@ class PoiRenderer {
 
 		if capitalCount > 0 {
 			encoder.setVertexBuffer(capitalInstances, offset: 0, index: 2)
-			renderInstanced(primitive: poiMarkerPrimitive, count: capitalCount, into: encoder)
+			renderInstanced(primitive: capitalMarkerPrimitive, count: capitalCount, into: encoder)
 		}
 		if cityCount > 0 {
 			encoder.setVertexBuffer(cityInstances, offset: 0, index: 2)
-			renderInstanced(primitive: poiMarkerPrimitive, count: cityCount, into: encoder)
+			renderInstanced(primitive: cityMarkerPrimitive, count: cityCount, into: encoder)
 		}
 		if townCount > 0 {
 			encoder.setVertexBuffer(townInstances, offset: 0, index: 2)
-			renderInstanced(primitive: poiMarkerPrimitive, count: townCount, into: encoder)
+			renderInstanced(primitive: townMarkerPrimitive, count: townCount, into: encoder)
 		}
 	}
 }
@@ -369,24 +373,40 @@ func sortPlacesIntoPoiGroups<T: GeoIdentifiable>(_ places: Set<GeoPlace>, in con
 	return poiGroups
 }
 
-fileprivate func makePoiPrimitive(in device: MTLDevice) -> RenderPrimitive {
-	let vertices: [Vertex] = [
-		Vertex(-0.5, -0.5),
-		Vertex(+0.5, -0.5),
-		Vertex(+0.5, +0.5),
-		Vertex(-0.5, +0.5)
-	]
-	let indices: [UInt16] = [
-		0, 1, 2, 0, 2, 3
-	]
+fileprivate func makeCapitalPrimitive(in device: MTLDevice) -> RenderPrimitive {
+	let vertices: [Vertex] = [Vertex( 0.00, -0.80),
+														Vertex(-0.80, -0.40), Vertex(+0.80, -0.40),
+														Vertex(-0.80, +0.40), Vertex(+0.80, +0.40),
+														Vertex( 0.00, +0.80)]
+	let indices: [UInt16] = [0, 3, 4, 1, 2, 5]
 	
-	return RenderPrimitive(	polygons: [vertices],
-													indices: [indices],
-													drawMode: .triangle,
-													device: device,
+	return RenderPrimitive(	polygons: [vertices],	indices: [indices],
+													drawMode: .triangle, device: device,
 													color: Color(r: 0.0, g: 0.0, b: 0.0, a: 1.0),
-													ownerHash: 0,
-													debugName: "POI primitive")
+													ownerHash: 0,	debugName: "Capital POI primitive")
+}
+
+fileprivate func makeCityPrimitive(in device: MTLDevice) -> RenderPrimitive {
+	let vertices: [Vertex] = [Vertex(-0.5, -0.5), Vertex(+0.5, -0.5),
+														Vertex(-0.5, +0.5), Vertex(+0.5, +0.5)]
+	let indices: [UInt16] = [0, 1, 2, 1, 2, 3]
+	
+	return RenderPrimitive(	polygons: [vertices],	indices: [indices],
+													drawMode: .triangle, device: device,
+													color: Color(r: 0.0, g: 0.0, b: 0.0, a: 1.0),
+													ownerHash: 0,	debugName: "City POI primitive")
+}
+
+fileprivate func makeTownPrimitive(in device: MTLDevice) -> RenderPrimitive {
+	let vertices: [Vertex] = [Vertex( 0.00, -0.25),
+														Vertex(-0.25,  0.00), Vertex(+0.25, 0.00),
+														Vertex( 0.00, +0.25)]
+	let indices: [UInt16] = [0, 1, 2, 1, 2, 3]
+	
+	return RenderPrimitive(	polygons: [vertices],	indices: [indices],
+													drawMode: .triangle, device: device,
+													color: Color(r: 0.0, g: 0.0, b: 0.0, a: 1.0),
+													ownerHash: 0,	debugName: "Town POI primitive")
 }
 
 fileprivate func generateMarkerUniforms(poiGroups: [PoiGroup], visibilities: [Int : PoiRenderer.Visibility], maxMarkers: Int) -> Array<InstanceUniform> {

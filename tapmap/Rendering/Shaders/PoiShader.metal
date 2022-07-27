@@ -41,7 +41,7 @@ vertex VertexOut poiVertex(const device Vertex* vertexArray [[ buffer(0) ]],
 	VertexOut outVertex = VertexOut();
 	outVertex.position = frame->modelViewProjectionMatrix * float4(p + v.position * frame->baseSize, 0.0, 1.0);
 	float speedUp = max(0.0, 0.2 - length_squared(outVertex.position.xy));
-	outVertex.color = float4(1.0, 1.0, 1.0, alpha + speedUp);
+	outVertex.color = float4(1.0, 0.3, 0.3, alpha + speedUp);
 	
 	return outVertex;
 }
