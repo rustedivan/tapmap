@@ -35,7 +35,7 @@ class BaseRenderPrimitive<VertexType> {
 			fatalError("Do not create render primitive for empty meshes")
 		}
 		
-		// Concatenate all vertex rings into one buffer
+		// Concatenate all vertices into one buffer
 		var allVertices: [VertexType] = []
 		var allIndices: [UInt32] = []
 		var polyRanges: [Int] = []
@@ -76,6 +76,21 @@ func render<T>(primitive: BaseRenderPrimitive<T>, into encoder: MTLRenderCommand
 																	indexType: .uint32,
 																	indexBuffer: primitive.indexBuffer,
 																	indexBufferOffset: cursor)
+		cursor += range * MemoryLayout<UInt32>.stride
+	}
+}
+
+func renderInstanced<T>(primitive: BaseRenderPrimitive<T>, count: Int, into encoder: MTLRenderCommandEncoder) {
+	encoder.setVertexBuffer(primitive.vertexBuffer, offset: 0, index: 0)
+	
+	var cursor = 0
+	for range in primitive.elementCounts {
+		encoder.drawIndexedPrimitives(type: primitive.drawMode,
+																	indexCount: range,
+																	indexType: .uint32,
+																	indexBuffer: primitive.indexBuffer,
+																	indexBufferOffset: cursor,
+																	instanceCount: count)
 		cursor += range * MemoryLayout<UInt32>.stride
 	}
 }

@@ -181,7 +181,7 @@ class MapViewController: UIViewController, MTKViewDelegate {
 			geometryStreamer.evictPrimitive(for: hit.geographyId.hashed)
 		}
 
-		renderers.poiRenderer.updatePrimitives(for: hit, with: hit.children)
+		renderers.poiRenderer.updatePoiGroups(for: hit, with: hit.children)
 		labelView.updatePoiMarkers(for: hit, with: hit.children)
 	}
 

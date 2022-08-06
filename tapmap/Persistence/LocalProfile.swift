@@ -17,6 +17,7 @@ var persistentProfileUrl: URL {
 func saveVisitsToDevice(_ hashes: Set<RegionHash>, as key: String) {
 	var url = persistentProfileUrl
 	// Expect tapmap to run offline for long periods, so don't allow iOS to offload the savefile to iCloud
+	// $ I think this is sketchy?
 	var dontOffloadUserstate = URLResourceValues()
 	dontOffloadUserstate.isExcludedFromBackup = true
 	try? url.setResourceValues(dontOffloadUserstate)

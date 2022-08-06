@@ -28,7 +28,9 @@ class MetalRenderer {
 	var poiRenderer: PoiRenderer
 	var effectRenderer: EffectRenderer
 	var selectionRenderer: SelectionRenderer
-	var borderRenderer: BorderRenderer
+	var continentBorderRenderer: BorderRenderer<GeoContinent>
+	var countryBorderRenderer: BorderRenderer<GeoCountry>
+	var provinceBorderRenderer: BorderRenderer<GeoProvince>
 	var debugRenderer: DebugRenderer
 	
 	init(in view: MTKView, forWorld world: RuntimeWorld) {
@@ -39,7 +41,9 @@ class MetalRenderer {
 		
 		// Create renderers
 		regionRenderer = RegionRenderer(withDevice: device, pixelFormat: view.colorPixelFormat, bufferCount: maxInflightFrames)
-		borderRenderer = BorderRenderer(withDevice: device, pixelFormat: view.colorPixelFormat, bufferCount: maxInflightFrames)
+		continentBorderRenderer = BorderRenderer(withDevice: device, pixelFormat: view.colorPixelFormat, bufferCount: maxInflightFrames, maxSegments: 150000, label: "Continent border renderer")
+		countryBorderRenderer = BorderRenderer(withDevice: device, pixelFormat: view.colorPixelFormat, bufferCount: maxInflightFrames, maxSegments: 50000, label: "Country border renderer")
+		provinceBorderRenderer = BorderRenderer(withDevice: device, pixelFormat: view.colorPixelFormat, bufferCount: maxInflightFrames, maxSegments: 30000, label: "Province border renderer")
 		selectionRenderer = SelectionRenderer(withDevice: device, pixelFormat: view.colorPixelFormat)
 		poiRenderer = PoiRenderer(withDevice: device, pixelFormat: view.colorPixelFormat, bufferCount: maxInflightFrames,
 															withVisibleContinents: world.availableContinents,
@@ -50,6 +54,17 @@ class MetalRenderer {
 		debugRenderer = DebugRenderer(withDevice: device, pixelFormat: view.colorPixelFormat, bufferCount: maxInflightFrames)
 		
 		frameSemaphore = DispatchSemaphore(value: maxInflightFrames)
+		
+		let style = Stylesheet.shared
+		continentBorderRenderer.setStyle(innerWidth: style.continentBorderWidthInner.value,
+																		 outerWidth: style.continentBorderWidthOuter.value,
+																		 color: style.continentBorderColor.float4)
+		countryBorderRenderer.setStyle(innerWidth: style.countryBorderWidthInner.value,
+																		 outerWidth: style.countryBorderWidthOuter.value,
+																		 color: style.countryBorderColor.float4)
+		provinceBorderRenderer.setStyle(innerWidth: style.provinceBorderWidthInner.value,
+																		 outerWidth: style.provinceBorderWidthOuter.value,
+																		 color: style.provinceBorderColor.float4)
 	}
 	
 	func updateProjection(viewSize: CGSize, mapSize: CGSize, centeredOn offset: CGPoint, zoomedTo zoom: Float) {
@@ -77,10 +92,13 @@ class MetalRenderer {
 																visibleCountrySet: worldState.visibleCountries.keys,
 																visibleProvinceSet: worldState.visibleProvinces.keys,
 																visitedSet: visited, regionContinentMap: worldState.continentForRegion, bufferIndex: bufferIndex)
-		borderRenderer.prepareFrame(borderedContinents: borderedContinents,
-																borderedCountries: borderedCountries,
-																borderedProvinces: borderedProvinces,
-																zoom: zoomLevel, zoomRate: zoomRate, bufferIndex: bufferIndex)
+		continentBorderRenderer.prepareFrame(borderedRegions: borderedContinents,
+																			   zoom: zoomLevel, zoomRate: zoomRate, bufferIndex: bufferIndex)
+		countryBorderRenderer.prepareFrame(borderedRegions: borderedCountries,
+																			 zoom: zoomLevel, zoomRate: zoomRate, bufferIndex: bufferIndex)
+		provinceBorderRenderer.prepareFrame(borderedRegions: borderedProvinces,
+																			  zoom: zoomLevel, zoomRate: zoomRate, bufferIndex: bufferIndex)
+							 
 		poiRenderer.prepareFrame(visibleSet: renderSet, zoom: poiZoom, zoomRate: zoomRate, bufferIndex: bufferIndex)
 		selectionRenderer.prepareFrame(zoomLevel: zoomLevel)
 		debugRenderer.prepareFrame(bufferIndex: bufferIndex)
@@ -108,10 +126,10 @@ class MetalRenderer {
 		guard let encoder = commandBuffer.makeRenderCommandEncoder(descriptor: passDescriptor) else { return }
 		encoder.label = "Main render pass encoder @ \(frameId)"
 		
-		// self.borderRenderer.renderContinentBorders(inProjection: mvpMatrix, inEncoder: encoder, bufferIndex: bufferIndex)
 		self.regionRenderer.renderWorld(inProjection: mvpMatrix, inEncoder: encoder, bufferIndex: bufferIndex)
-		self.borderRenderer.renderCountryBorders(inProjection: mvpMatrix, inEncoder: encoder, bufferIndex: bufferIndex)
-		self.borderRenderer.renderProvinceBorders(inProjection: mvpMatrix, inEncoder: encoder, bufferIndex: bufferIndex)
+		self.continentBorderRenderer.renderBorders(inProjection: mvpMatrix, inEncoder: encoder, bufferIndex: bufferIndex)
+		self.countryBorderRenderer.renderBorders(inProjection: mvpMatrix, inEncoder: encoder, bufferIndex: bufferIndex)
+		self.provinceBorderRenderer.renderBorders(inProjection: mvpMatrix, inEncoder: encoder, bufferIndex: bufferIndex)
 		self.effectRenderer.renderWorld(inProjection: mvpMatrix, inEncoder: encoder, bufferIndex: bufferIndex)
 		self.selectionRenderer.renderSelection(inProjection: mvpMatrix, inEncoder: encoder)
 		self.poiRenderer.renderWorld(inProjection: mvpMatrix, inEncoder: encoder, bufferIndex: bufferIndex)

@@ -11,34 +11,42 @@ import simd
 
 fileprivate struct FrameUniforms {
 	let mvpMatrix: simd_float4x4
-	let widthInner: simd_float1
-	let widthOuter: simd_float1
+	let width: simd_float1
 	var color: simd_float4
 }
 
-class BorderRenderer {
-	typealias BorderPrimitive = FixedScaleRenderPrimitive
-	typealias RenderList = ContiguousArray<BorderPrimitive>
+fileprivate struct InstanceUniforms {
+	var a: simd_float2
+	var b: simd_float2
+}
+
+struct BorderContour {
+	let contours: [VertexRing]
+}
+
+class BorderRenderer<RegionType> {
+	typealias LoddedBorderHash = Int
+
+	let rendererLabel: String
 	
 	let device: MTLDevice
 	let pipeline: MTLRenderPipelineState
-	
-	var borderPrimitives: [Int : BorderPrimitive]
-	var continentRenderLists: [RenderList] = []
-	var countryRenderLists: [RenderList] = []
-	var provinceRenderLists: [RenderList] = []
+	let maxVisibleLineSegments: Int
+	var lineSegmentsHighwaterMark: Int = 0
+	var borderContours: [LoddedBorderHash : BorderContour]
 	var frameSelectSemaphore = DispatchSemaphore(value: 1)
-
+	let lineSegmentPrimitive: BaseRenderPrimitive<Vertex>!
+	let instanceUniforms: [MTLBuffer]
+	var frameLineSegmentCount: [Int] = []
+	
 	var borderScale: Float
+	var width: Float = 1.0
+	var color: simd_float4 = simd_float4(0.0, 0.0, 0.0, 1.0)
+	
 	var actualBorderLod: Int = 10
 	var wantedBorderLod: Int
 	
-	let borderQueue: DispatchQueue
-	let publishQueue: DispatchQueue
-	var pendingBorders: Set<Int> = []
-	var generatedBorders: [(Int, BorderPrimitive)] = []	// Border primitives that were generated this frame
-
-	init(withDevice device: MTLDevice, pixelFormat: MTLPixelFormat, bufferCount: Int) {
+	init(withDevice device: MTLDevice, pixelFormat: MTLPixelFormat, bufferCount: Int, maxSegments: Int, label: String) {
 		borderScale = 0.0
 		
 		let shaderLib = device.makeDefaultLibrary()!
@@ -52,178 +60,143 @@ class BorderRenderer {
 				
 		do {
 			try pipeline = device.makeRenderPipelineState(descriptor: pipelineDescriptor)
+			self.rendererLabel = label
 			self.device = device
-			self.continentRenderLists = Array(repeating: RenderList(), count: bufferCount)
-			self.countryRenderLists = Array(repeating: RenderList(), count: bufferCount)
-			self.provinceRenderLists = Array(repeating: RenderList(), count: bufferCount)
+			self.frameLineSegmentCount = Array(repeating: 0, count: bufferCount)
+			self.maxVisibleLineSegments = maxSegments	// Determined experimentally and rounded up a lot
+			self.instanceUniforms = (0..<bufferCount).map { bufferIndex in
+				device.makeBuffer(length: maxSegments * MemoryLayout<InstanceUniforms>.stride, options: .storageModeShared)!
+			}
+			
+			self.lineSegmentPrimitive = makeLineSegmentPrimitive(in: device)
 		} catch let error {
 			fatalError(error.localizedDescription)
 		}
 		
-		borderPrimitives = [:]
+		borderContours = [:]
 		
-		borderQueue = DispatchQueue(label: "Border construction", qos: .userInitiated, attributes: .concurrent)
-		publishQueue = DispatchQueue(label: "Border delivery")
 		wantedBorderLod = GeometryStreamer.shared.wantedLodLevel
 	}
 	
-	func prepareFrame(borderedContinents: GeoContinentMap, borderedCountries: GeoCountryMap, borderedProvinces: GeoProvinceMap, zoom: Float, zoomRate: Float, bufferIndex: Int) {
+	func setStyle(innerWidth: Float, outerWidth: Float, color: simd_float4) {
+		self.width = innerWidth
+		self.color = color
+	}
+
+	func prepareFrame(borderedRegions: [Int : RegionType], zoom: Float, zoomRate: Float, bufferIndex: Int) {
 		let streamer = GeometryStreamer.shared
 		let lodLevel = streamer.wantedLodLevel
 		var borderLodMiss = false
 		
-		let updateSet: [Int] = Array(borderedContinents.keys) + Array(borderedCountries.keys) + Array(borderedProvinces.keys)
-		for borderHash in updateSet {
+		// Stream in any missing geometries at the wanted LOD level
+		for borderHash in borderedRegions.keys {
 			let loddedBorderHash = borderHashLodKey(borderHash, atLod: lodLevel)
-			if borderPrimitives[loddedBorderHash] == nil {
+			if borderContours[loddedBorderHash] == nil {
 				borderLodMiss = true
-				if pendingBorders.contains(loddedBorderHash) {
-					continue
-				}
 				
 				guard let tessellation = streamer.tessellation(for: borderHash, atLod: lodLevel, streamIfMissing: true) else {
 					return
 				}
 				
-				// Create the render primitive and update book-keeping on the main thread
-				pendingBorders.insert(loddedBorderHash)
-				borderQueue.async {
-					let countourVertices: [[Vertex]]
-					if borderedContinents[borderHash] != nil {
-						countourVertices = [(tessellation.contours.first?.vertices ?? [])]
-					} else {
-						countourVertices = tessellation.contours.map({$0.vertices})
-					}
-					
-					let borderOutline = { (outline: [Vertex]) in generateClosedOutlineGeometry(outline: outline, innerExtent: 1.0, outerExtent: 1.0) }
-					let outlineGeometry: RegionContours = countourVertices.map(borderOutline)
-					
-					var cursor = 0
-					var stackedIndices: [[UInt16]] = []
-					for outline in outlineGeometry {
-						let indices = 0..<UInt16(outline.count)
-						let stackedRing = indices.map { $0 + UInt16(cursor) }
-						stackedIndices.append(stackedRing)
-						cursor += outline.count
-					}
-					
-					let outlinePrimitive = BorderPrimitive(polygons: outlineGeometry,
-																								 indices: stackedIndices,
-																								 drawMode: .triangleStrip,
-																								 device: self.device,
-																								 color: Color(r: 1.0, g: 1.0, b: 1.0, a: 1.0),
-																								 ownerHash: 0,
-																								 debugName: "Border \(borderHash)@\(lodLevel)")
-					
-					// Don't allow reads while publishing finished primitive
-					self.publishQueue.async(flags: .barrier) {
-						self.generatedBorders.append((loddedBorderHash, outlinePrimitive))
-					}
-				}
+				borderContours[loddedBorderHash] = BorderContour(contours: tessellation.contours)
 			}
 		}
-		
-		// Publish newly generated borders to the renderer
-		publishQueue.sync {
-			for (key, primitive) in generatedBorders {
-				self.borderPrimitives[key] = primitive
-				self.pendingBorders.remove(key)
-			}
-			let finishedBorders = generatedBorders.map { $0.0 }
-			pendingBorders = pendingBorders.subtracting(finishedBorders)
-			generatedBorders = []
-		}
-		
+
+		// Update the LOD level if we have all its geometries
 		if !borderLodMiss && actualBorderLod != streamer.wantedLodLevel {
 			actualBorderLod = streamer.wantedLodLevel
 		}
 		
-		let continentOutlineLod = max(actualBorderLod, 0)	// $ Turn up the limit once border width is under control (set min/max outline width and ramp between )
-		let frameContinentRenderList = RenderList(borderedContinents.compactMap {
-			let loddedKey = borderHashLodKey($0.key, atLod: continentOutlineLod)
-			return borderPrimitives[loddedKey]
-		})
-		
-		let frameCountryRenderList = RenderList(borderedCountries.compactMap {
+		// Collect the vertex rings for the visible set of borders
+		let frameRenderList: [BorderContour] = borderedRegions.compactMap {
 			let loddedKey = borderHashLodKey($0.key, atLod: actualBorderLod)
-			return borderPrimitives[loddedKey]
-		})
+			return borderContours[loddedKey]
+		}
 		
-		let frameProvinceRenderList = RenderList(borderedProvinces.compactMap {
-			let loddedKey = borderHashLodKey($0.key, atLod: actualBorderLod)
-			return borderPrimitives[loddedKey]
-		})
-		
+		// Generate all the vertices in all the outlines
+		let regionContours = frameRenderList.flatMap { $0.contours }
+		let borderBuffer = generateContourCollectionGeometry(contours: regionContours)
+		guard borderBuffer.count < maxVisibleLineSegments else {
+			fatalError("line segment buffer blew out at \(borderBuffer.count) vertices (max \(maxVisibleLineSegments))")
+		}
+
 		let borderZoom = zoom / (1.0 - zoomRate + zoomRate * Stylesheet.shared.borderZoomBias.value)	// Borders become wider at closer zoom levels
 		frameSelectSemaphore.wait()
 			self.borderScale = 1.0 / borderZoom
-			self.continentRenderLists[bufferIndex] = frameContinentRenderList
-			self.countryRenderLists[bufferIndex] = frameCountryRenderList
-			self.provinceRenderLists[bufferIndex] = frameProvinceRenderList
+			self.frameLineSegmentCount[bufferIndex] = borderBuffer.count
+			self.instanceUniforms[bufferIndex].contents().copyMemory(from: borderBuffer, byteCount: MemoryLayout<InstanceUniforms>.stride * borderBuffer.count)
+			if borderBuffer.count > lineSegmentsHighwaterMark {
+				lineSegmentsHighwaterMark = borderBuffer.count
+				print("\(rendererLabel) used a max of \(lineSegmentsHighwaterMark) line segments.")
+			}
 		frameSelectSemaphore.signal()
 	}
-	
-	func renderContinentBorders(inProjection projection: simd_float4x4, inEncoder encoder: MTLRenderCommandEncoder, bufferIndex: Int) {
-		encoder.pushDebugGroup("Render continent borders")
-		encoder.setRenderPipelineState(pipeline)
-		
-		frameSelectSemaphore.wait()
-			var frameUniforms = FrameUniforms(mvpMatrix: projection,
-																				widthInner: Stylesheet.shared.continentBorderWidthInner.value * borderScale,
-																				widthOuter: Stylesheet.shared.continentBorderWidthOuter.value * borderScale,
-																				color: Color(r: 1.0, g: 0.5, b: 0.7, a: 1.0).vector)
-			let renderList = continentRenderLists[bufferIndex]
-		frameSelectSemaphore.signal()
-		
-		encoder.setVertexBytes(&frameUniforms, length: MemoryLayout<FrameUniforms>.stride, index: 1)
-		for primitive in renderList {
-			render(primitive: primitive, into: encoder)
+
+	func renderBorders(inProjection projection: simd_float4x4, inEncoder encoder: MTLRenderCommandEncoder, bufferIndex: Int) {
+		encoder.pushDebugGroup("Render \(rendererLabel)'s borders")
+		defer {
+			encoder.popDebugGroup()
 		}
-		
-		encoder.popDebugGroup()
-	}
-	
-	func renderCountryBorders(inProjection projection: simd_float4x4, inEncoder encoder: MTLRenderCommandEncoder, bufferIndex: Int) {
-		encoder.pushDebugGroup("Render country borders")
-		encoder.setRenderPipelineState(pipeline)
 		
 		frameSelectSemaphore.wait()
 			var uniforms = FrameUniforms(mvpMatrix: projection,
-																	 widthInner: Stylesheet.shared.countryBorderWidthInner.value * borderScale,
-																	 widthOuter: Stylesheet.shared.countryBorderWidthOuter.value * borderScale,
-																	 color: Stylesheet.shared.countryBorderColor.float4)
-			let renderList = countryRenderLists[bufferIndex]
+																	 width: width * borderScale,
+																	 color: color)
+			let instances = instanceUniforms[bufferIndex]
+			let count = frameLineSegmentCount[bufferIndex]
 		frameSelectSemaphore.signal()
 		
-		encoder.setVertexBytes(&uniforms, length: MemoryLayout.stride(ofValue: uniforms), index: 1)
-		for primitive in renderList {
-			render(primitive: primitive, into: encoder)
+		if count == 0 {
+			return
 		}
 		
-		encoder.popDebugGroup()
-	}
-	
-	func renderProvinceBorders(inProjection projection: simd_float4x4, inEncoder encoder: MTLRenderCommandEncoder, bufferIndex: Int) {
-		encoder.pushDebugGroup("Render province borders")
 		encoder.setRenderPipelineState(pipeline)
 		
-		frameSelectSemaphore.wait()
-			var uniforms = FrameUniforms(mvpMatrix: projection,
-																	 widthInner: Stylesheet.shared.provinceBorderWidthInner.value * borderScale,
-																	 widthOuter: Stylesheet.shared.provinceBorderWidthOuter.value * borderScale,
-																	 color: Stylesheet.shared.provinceBorderColor.float4)
-			let renderList = provinceRenderLists[bufferIndex]
-		frameSelectSemaphore.signal()
-		
 		encoder.setVertexBytes(&uniforms, length: MemoryLayout.stride(ofValue: uniforms), index: 1)
-		for primitive in renderList {
-			render(primitive: primitive, into: encoder)
-		}
+		encoder.setVertexBuffer(instances, offset: 0, index: 2)
 		
-		encoder.popDebugGroup()
+		renderInstanced(primitive: lineSegmentPrimitive, count: count, into: encoder)
 	}
 	
-	func borderHashLodKey(_ regionHash: RegionHash, atLod lod: Int) -> Int {
+	func borderHashLodKey(_ regionHash: RegionHash, atLod lod: Int) -> LoddedBorderHash {
 		return "\(regionHash)-\(lod)".hashValue
 	}
+}
+
+fileprivate func makeLineSegmentPrimitive(in device: MTLDevice) -> RenderPrimitive {
+	// The 95/5 values place borders at 95% inward, with some small overlap outward
+	let vertices: [Vertex] = [
+		Vertex(0.0, -0.05),
+		Vertex(1.0, -0.05),
+		Vertex(1.0,  0.95),
+		Vertex(0.0,  0.95)
+	]
+	let indices: [UInt16] = [
+		0, 1, 2, 0, 2, 3
+	]
+	
+	return RenderPrimitive(	polygons: [vertices],
+													indices: [indices],
+													drawMode: .triangle,
+													device: device,
+													color: Color(r: 0.0, g: 0.0, b: 0.0, a: 1.0),
+													ownerHash: 0,
+													debugName: "Line segment primitive")
+}
+
+fileprivate func generateContourCollectionGeometry(contours: [VertexRing]) -> Array<InstanceUniforms> {
+	let segmentCount = contours.reduce(0) { $0 + $1.vertices.count }
+	var vertices = Array<InstanceUniforms>()
+	vertices.reserveCapacity(segmentCount)
+	for contour in contours {
+		for i in 0..<contour.vertices.count - 1 {
+			let a = contour.vertices[i]
+			let b = contour.vertices[i + 1]
+			vertices.append(InstanceUniforms(
+				a: simd_float2(x: a.x, y: a.y),
+				b: simd_float2(x: b.x, y: b.y)
+			))
+		}
+	}
+	return vertices
 }

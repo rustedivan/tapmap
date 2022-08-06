@@ -89,6 +89,7 @@ class OperationParseOSMJson : Operation {
 										rank: rank)
 	}
 	
+	// If these rank levels change, please update PoiRenderer too.
 	fileprivate func determineRank(kind: GeoPlace.Kind, name: String, adminLevel: Int?, population: Int?) -> Int {
 		let logPopulation: Double? = population != nil ? log10(Double(population!)) : nil
 		

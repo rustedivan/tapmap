@@ -15,38 +15,45 @@ struct FrameUniforms {
 	float baseSize;
 };
 
-struct InstanceUniforms {
+struct InstanceUniform {
+	float2 position;
 	float progress;
 };
 
-struct ScaleVertex {
+struct Vertex {
 	float2 position;
-	float2 normal;
 };
 
 struct VertexOut {
 	float4 position [[position]];
-	float2 uv;
 	float4 color;
 };
 
-vertex VertexOut poiVertex(const device ScaleVertex* vertexArray [[ buffer(0) ]],
+vertex VertexOut poiVertex(const device Vertex* vertexArray [[ buffer(0) ]],
 													 constant FrameUniforms *frame [[ buffer(1) ]],
-													 const device InstanceUniforms *poi [[ buffer(2) ]],
-													 unsigned int vid [[ vertex_id ]]) {
-	ScaleVertex v = vertexArray[vid];
+													 const device InstanceUniform *pois [[ buffer(2) ]],
+													 unsigned int vid [[ vertex_id ]],
+													 unsigned int iid [[ instance_id ]]) {
+	Vertex v = vertexArray[vid];
+	float2 p = pois[iid].position;
+	float alpha = pois[iid].progress;
+	
 	VertexOut outVertex = VertexOut();
-	float2 rib = v.normal * frame->baseSize;
-	outVertex.position = frame->modelViewProjectionMatrix * float4(v.position + rib, 0.0, 1.0);
-	outVertex.color = float4(1.0, 1.0, 1.0, poi->progress);
-	outVertex.uv = float2((v.normal.x > 0.0) * 0.25, (v.normal.y < 0.0) * 1.00);
+	outVertex.position = frame->modelViewProjectionMatrix * float4(p + v.position * frame->baseSize, 0.0, 1.0);
+	float speedUp = max(0.0, 0.2 - length_squared(outVertex.position.xy));
+	outVertex.color = float4(1.0, 0.3, 0.3, alpha + speedUp);
+	
 	return outVertex;
 }
 
-fragment float4 poiFragment(VertexOut interpolated [[ stage_in ]], texture2d<float> markerAtlas [[texture(0)]]) {
-	constexpr sampler markers(coord::normalized, address::clamp_to_zero, filter::linear, mip_filter::linear);
-	float4 color = markerAtlas.sample(markers, interpolated.uv);
-	color.a *= interpolated.color.a;
-	return float4(color);
+fragment float4 poiFragment(VertexOut interpolated [[ stage_in ]]) {
+	return float4(interpolated.color);
 }
+
+//fragment float4 poiFragment(VertexOut interpolated [[ stage_in ]], texture2d<float> markerAtlas [[texture(0)]]) {
+//	constexpr sampler markers(coord::normalized, address::clamp_to_zero, filter::linear, mip_filter::linear);
+//	float4 color = markerAtlas.sample(markers, interpolated.uv);
+//	color.a *= interpolated.color.a;
+//	return float4(color);
+//}
 
