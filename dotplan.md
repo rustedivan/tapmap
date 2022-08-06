@@ -16,6 +16,7 @@ Final step is to bucket the POI groups by which marker to render them with. The 
 ! Seems like we're drawing a lot more POI groups than needed - zooming in on China still considers Azerbaijan to be interesting...
 ! Really need to audit how markers are displayed/added/faded in when a new region opens - seems they're not being picked up by the renderer properly
 ! Likewise, there are issues with culling marker planes - focus on London and how it behaves together with its surrounding cities. 
+! Border IBLR loops are not closed
 
 # Rendering brief, step 2
  There are some effects I want to spice up the presentation. I'm a little stuck at how to lookup the color for a region at runtime, since the base color isn't always static. Specifically, provinces have different colors when visited and unvisited. I can definitely route around that, and ~100 O(1) dictionary lookups per frame isn't going to make a difference, but it's _wrong_. To help guide the stylesheet lookup design, let's take a look at those extra effects.

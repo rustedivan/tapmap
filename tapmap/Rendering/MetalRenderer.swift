@@ -23,6 +23,9 @@ class MetalRenderer {
 	let frameSemaphore: DispatchSemaphore
 	let encodingQueue = DispatchQueue(label: "Parallel command encoding", attributes: .concurrent)
 	
+	// Post-processing shader target
+	var renderTargetTexture: MTLTexture!
+	
 	// App renderers
 	var regionRenderer: RegionRenderer
 	var poiRenderer: PoiRenderer
@@ -107,8 +110,24 @@ class MetalRenderer {
 	func render(forWorld worldState: RuntimeWorld, into view: MTKView) {
 		guard let drawable = view.currentDrawable else { frameSemaphore.signal(); return }
 		
-		guard let passDescriptor = view.currentRenderPassDescriptor else { frameSemaphore.signal(); return }
+		if renderTargetTexture == nil || renderTargetTexture.width != drawable.texture.width || renderTargetTexture.height != drawable.texture.height {
+			// $ needs one per inflight frame
+			let renderTargetDescriptor = MTLTextureDescriptor()
+			renderTargetDescriptor.textureType = MTLTextureType.type2DMultisample
+			renderTargetDescriptor.width = Int(view.drawableSize.width)
+			renderTargetDescriptor.height = Int(view.drawableSize.height)
+			renderTargetDescriptor.pixelFormat = view.colorPixelFormat
+			renderTargetDescriptor.storageMode = .private
+			renderTargetDescriptor.sampleCount = 4
+			renderTargetDescriptor.usage = [.renderTarget, .shaderRead]
+			
+			renderTargetTexture = device.makeTexture(descriptor: renderTargetDescriptor)
+		}
+		
+		let passDescriptor = MTLRenderPassDescriptor()
 		let ocean = Stylesheet.shared.oceanColor.components
+		passDescriptor.colorAttachments[0].resolveTexture = drawable.texture
+		passDescriptor.colorAttachments[0].texture = renderTargetTexture
 		passDescriptor.colorAttachments[0].loadAction = .clear
 		passDescriptor.colorAttachments[0].storeAction = .multisampleResolve
 		passDescriptor.colorAttachments[0].clearColor = MTLClearColor(red: Double(ocean.r), green: Double(ocean.g), blue: Double(ocean.b), alpha: Double(ocean.a))
@@ -139,18 +158,6 @@ class MetalRenderer {
 		commandBuffer.commit()
 		
 //		commandQueue.insertDebugCaptureBoundary()	// $ For GPU Frame capture
-	}
-	
-	typealias MapRenderPass = () -> ()
-	func makeRenderPass(_ buffer: MTLCommandBuffer, _ renderPass: MTLRenderPassDescriptor, render: @escaping (MTLRenderCommandEncoder) -> ()) -> MapRenderPass {
-		let passLabel = "\(buffer.label ?? "Unnamed") encoder @ \(frameId)"
-		return {
-			guard let encoder = buffer.makeRenderCommandEncoder(descriptor: renderPass) else { return }
-			encoder.label = passLabel
-			render(encoder)
-			encoder.endEncoding()
-			buffer.commit()
-		}
 	}
 	
 	func shouldIdle(appUpdated: Bool) -> Bool {
