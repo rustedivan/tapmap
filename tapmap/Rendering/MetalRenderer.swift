@@ -24,7 +24,8 @@ class MetalRenderer {
 	let encodingQueue = DispatchQueue(label: "Parallel command encoding", attributes: .concurrent)
 	
 	// Post-processing shader target
-	var renderTargetTexture: MTLTexture!
+	var msaaRenderTarget: [MTLTexture]
+	var sseRenderTarget: [MTLTexture]
 	
 	// App renderers
 	var regionRenderer: RegionRenderer
@@ -35,18 +36,23 @@ class MetalRenderer {
 	var countryBorderRenderer: BorderRenderer<GeoCountry>
 	var provinceBorderRenderer: BorderRenderer<GeoProvince>
 	var debugRenderer: DebugRenderer
+	var postProcessingRenderer: PostProcessingRenderer
 	
 	init(in view: MTKView, forWorld world: RuntimeWorld) {
-		device = MTLCreateSystemDefaultDevice()
+		let newDevice = MTLCreateSystemDefaultDevice()!
+		device = newDevice
 		commandQueue = device.makeCommandQueue()!
 		view.device = device
-		view.colorPixelFormat = .bgra8Unorm
+		view.colorPixelFormat = .bgra8Unorm	// Also used in setupRenderTargets
 		
 		// Create renderers
 		regionRenderer = RegionRenderer(withDevice: device, pixelFormat: view.colorPixelFormat, bufferCount: maxInflightFrames)
-		continentBorderRenderer = BorderRenderer(withDevice: device, pixelFormat: view.colorPixelFormat, bufferCount: maxInflightFrames, maxSegments: 150000, label: "Continent border renderer")
-		countryBorderRenderer = BorderRenderer(withDevice: device, pixelFormat: view.colorPixelFormat, bufferCount: maxInflightFrames, maxSegments: 50000, label: "Country border renderer")
-		provinceBorderRenderer = BorderRenderer(withDevice: device, pixelFormat: view.colorPixelFormat, bufferCount: maxInflightFrames, maxSegments: 30000, label: "Province border renderer")
+		continentBorderRenderer = BorderRenderer(withDevice: device, pixelFormat: view.colorPixelFormat, bufferCount: maxInflightFrames,
+																						 maxSegments: 150000, label: "Continent border renderer")
+		countryBorderRenderer = BorderRenderer(withDevice: device, pixelFormat: view.colorPixelFormat, bufferCount: maxInflightFrames,
+																					 maxSegments: 50000, label: "Country border renderer")
+		provinceBorderRenderer = BorderRenderer(withDevice: device, pixelFormat: view.colorPixelFormat, bufferCount: maxInflightFrames,
+																						maxSegments: 30000, label: "Province border renderer")
 		selectionRenderer = SelectionRenderer(withDevice: device, pixelFormat: view.colorPixelFormat)
 		poiRenderer = PoiRenderer(withDevice: device, pixelFormat: view.colorPixelFormat, bufferCount: maxInflightFrames,
 															withVisibleContinents: world.availableContinents,
@@ -55,9 +61,11 @@ class MetalRenderer {
 		
 		effectRenderer = EffectRenderer(withDevice: device, pixelFormat: view.colorPixelFormat, bufferCount: maxInflightFrames)
 		debugRenderer = DebugRenderer(withDevice: device, pixelFormat: view.colorPixelFormat, bufferCount: maxInflightFrames)
-		
+		postProcessingRenderer = PostProcessingRenderer(withDevice: device, pixelFormat: view.colorPixelFormat, bufferCount: maxInflightFrames,
+																										drawableSize: simd_float2(Float(view.drawableSize.width), Float(view.drawableSize.height)))
+
 		frameSemaphore = DispatchSemaphore(value: maxInflightFrames)
-		
+	
 		let style = Stylesheet.shared
 		continentBorderRenderer.setStyle(innerWidth: style.continentBorderWidthInner.value,
 																		 outerWidth: style.continentBorderWidthOuter.value,
@@ -68,6 +76,13 @@ class MetalRenderer {
 		provinceBorderRenderer.setStyle(innerWidth: style.provinceBorderWidthInner.value,
 																		 outerWidth: style.provinceBorderWidthOuter.value,
 																		 color: style.provinceBorderColor.float4)
+		
+		msaaRenderTarget = (0..<maxInflightFrames).map { i in
+			return makeRenderTarget(inDevice: newDevice, width: Int(view.drawableSize.width), height: Int(view.drawableSize.height), bufferIndex: i)
+		}
+		sseRenderTarget = (0..<maxInflightFrames).map { i in
+			return makeOffscreenTexture(inDevice: newDevice, width: Int(view.drawableSize.width), height: Int(view.drawableSize.height), bufferIndex: i)
+		}
 	}
 	
 	func updateProjection(viewSize: CGSize, mapSize: CGSize, centeredOn offset: CGPoint, zoomedTo zoom: Float) {
@@ -75,6 +90,7 @@ class MetalRenderer {
 																											mapSize: mapSize,
 																											centeredOn: offset,
 																											zoomedTo: zoom)
+		postProcessingRenderer.screenSize = simd_float2(Float(viewSize.width), Float(viewSize.height))
 	}
 	
 	func prepareFrame(forWorld worldState: RuntimeWorld, zoomRate: Float) {
@@ -105,35 +121,16 @@ class MetalRenderer {
 		poiRenderer.prepareFrame(visibleSet: renderSet, zoom: poiZoom, zoomRate: zoomRate, bufferIndex: bufferIndex)
 		selectionRenderer.prepareFrame(zoomLevel: zoomLevel)
 		debugRenderer.prepareFrame(bufferIndex: bufferIndex)
+		
+		postProcessingRenderer.prepareFrame(offscreenTexture: sseRenderTarget[bufferIndex], bufferIndex: bufferIndex)
 	}
 	
 	func render(forWorld worldState: RuntimeWorld, into view: MTKView) {
 		guard let drawable = view.currentDrawable else { frameSemaphore.signal(); return }
-		
-		if renderTargetTexture == nil || renderTargetTexture.width != drawable.texture.width || renderTargetTexture.height != drawable.texture.height {
-			// $ needs one per inflight frame
-			let renderTargetDescriptor = MTLTextureDescriptor()
-			renderTargetDescriptor.textureType = MTLTextureType.type2DMultisample
-			renderTargetDescriptor.width = Int(view.drawableSize.width)
-			renderTargetDescriptor.height = Int(view.drawableSize.height)
-			renderTargetDescriptor.pixelFormat = view.colorPixelFormat
-			renderTargetDescriptor.storageMode = .private
-			renderTargetDescriptor.sampleCount = 4
-			renderTargetDescriptor.usage = [.renderTarget, .shaderRead]
-			
-			renderTargetTexture = device.makeTexture(descriptor: renderTargetDescriptor)
-		}
-		
-		let passDescriptor = MTLRenderPassDescriptor()
-		let ocean = Stylesheet.shared.oceanColor.components
-		passDescriptor.colorAttachments[0].resolveTexture = drawable.texture
-		passDescriptor.colorAttachments[0].texture = renderTargetTexture
-		passDescriptor.colorAttachments[0].loadAction = .clear
-		passDescriptor.colorAttachments[0].storeAction = .multisampleResolve
-		passDescriptor.colorAttachments[0].clearColor = MTLClearColor(red: Double(ocean.r), green: Double(ocean.g), blue: Double(ocean.b), alpha: Double(ocean.a))
+		guard let renderPassDescriptor = view.currentRenderPassDescriptor else { frameSemaphore.signal(); return }
 		
 		guard let commandBuffer = commandQueue.makeCommandBuffer() else { return }
-		commandBuffer.label = "Geography buffer"
+		commandBuffer.label = "Geography buffer"	// $ clearer label
 		commandBuffer.addCompletedHandler { buffer in
 			drawable.present()						// Render
 			self.frameSemaphore.signal()	// Make this in-flight frame available
@@ -142,22 +139,41 @@ class MetalRenderer {
 		let mvpMatrix = modelViewProjectionMatrix
 		let bufferIndex = frameId % maxInflightFrames
 		
-		guard let encoder = commandBuffer.makeRenderCommandEncoder(descriptor: passDescriptor) else { return }
-		encoder.label = "Main render pass encoder @ \(frameId)"
+		let ocean = Stylesheet.shared.oceanColor.components
+		
+		let mapRenderPassDescriptor = MTLRenderPassDescriptor()	// $ better name
+		mapRenderPassDescriptor.colorAttachments[0].resolveTexture = sseRenderTarget[bufferIndex]
+		mapRenderPassDescriptor.colorAttachments[0].texture = msaaRenderTarget[bufferIndex]
+		mapRenderPassDescriptor.colorAttachments[0].loadAction = .clear
+		mapRenderPassDescriptor.colorAttachments[0].storeAction = .multisampleResolve
+		mapRenderPassDescriptor.colorAttachments[0].clearColor = MTLClearColor(red: Double(ocean.r), green: Double(ocean.g), blue: Double(ocean.b), alpha: Double(ocean.a))
+		
+		guard let encoder = commandBuffer.makeRenderCommandEncoder(descriptor: mapRenderPassDescriptor) else { return }
+		encoder.label = "Map render pass encoder @ \(frameId)"
 		
 		self.regionRenderer.renderWorld(inProjection: mvpMatrix, inEncoder: encoder, bufferIndex: bufferIndex)
 		self.continentBorderRenderer.renderBorders(inProjection: mvpMatrix, inEncoder: encoder, bufferIndex: bufferIndex)
 		self.countryBorderRenderer.renderBorders(inProjection: mvpMatrix, inEncoder: encoder, bufferIndex: bufferIndex)
 		self.provinceBorderRenderer.renderBorders(inProjection: mvpMatrix, inEncoder: encoder, bufferIndex: bufferIndex)
 		self.effectRenderer.renderWorld(inProjection: mvpMatrix, inEncoder: encoder, bufferIndex: bufferIndex)
+		// $ move selection, poi and debug into the SSE render pass, so they're not affected by the SSE
 		self.selectionRenderer.renderSelection(inProjection: mvpMatrix, inEncoder: encoder)
 		self.poiRenderer.renderWorld(inProjection: mvpMatrix, inEncoder: encoder, bufferIndex: bufferIndex)
 		self.debugRenderer.renderMarkers(inProjection: mvpMatrix, inEncoder: encoder, bufferIndex: bufferIndex)
 		
 		encoder.endEncoding()
-		commandBuffer.commit()
 		
-//		commandQueue.insertDebugCaptureBoundary()	// $ For GPU Frame capture
+		
+		renderPassDescriptor.colorAttachments[0].loadAction = .clear
+		renderPassDescriptor.colorAttachments[0].storeAction = .store
+		renderPassDescriptor.colorAttachments[0].clearColor = MTLClearColor(red: Double(ocean.r), green: Double(ocean.g), blue: Double(ocean.b), alpha: Double(ocean.a))
+		
+		guard let sseCommandEncoder = commandBuffer.makeRenderCommandEncoder(descriptor: renderPassDescriptor) else { return }
+		// $ label
+		self.postProcessingRenderer.renderPostProcessing(inProjection: mvpMatrix, inEncoder: sseCommandEncoder, bufferIndex: bufferIndex)
+		sseCommandEncoder.endEncoding()
+		
+		commandBuffer.commit()
 	}
 	
 	func shouldIdle(appUpdated: Bool) -> Bool {
@@ -171,6 +187,33 @@ class MetalRenderer {
 		}
 		return sleepRenderer
 	}
+}
+
+fileprivate func makeRenderTarget(inDevice device: MTLDevice, width: Int, height: Int, bufferIndex: Int) -> MTLTexture {
+	let renderTargetDescriptor = MTLTextureDescriptor()
+	renderTargetDescriptor.textureType = MTLTextureType.type2DMultisample
+	renderTargetDescriptor.width = width
+	renderTargetDescriptor.height = height
+	renderTargetDescriptor.pixelFormat = .bgra8Unorm
+	renderTargetDescriptor.storageMode = .memoryless
+	renderTargetDescriptor.sampleCount = 4
+	renderTargetDescriptor.usage = [.renderTarget]
+	let out = device.makeTexture(descriptor: renderTargetDescriptor)!
+	out.label = "Fullscreen render target @ \(bufferIndex)"
+	return out
+}
+ 
+fileprivate func makeOffscreenTexture(inDevice device: MTLDevice, width: Int, height: Int, bufferIndex: Int) -> MTLTexture {
+	let sseTargetDescriptor = MTLTextureDescriptor()
+	sseTargetDescriptor.textureType = MTLTextureType.type2D
+	sseTargetDescriptor.width = width
+	sseTargetDescriptor.height = height
+	sseTargetDescriptor.pixelFormat = .bgra8Unorm
+	sseTargetDescriptor.storageMode = .private
+	sseTargetDescriptor.usage = [.renderTarget, .shaderRead]
+	let out = device.makeTexture(descriptor: sseTargetDescriptor)!
+	out.label = "Screen-space effect texture @ \(bufferIndex)"
+	return out
 }
 
 extension Color {
