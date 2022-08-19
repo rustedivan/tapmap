@@ -72,8 +72,3 @@ func buildScaleAboutPointMatrix(scale: Float, center: Vertex) -> simd_float4x4 {
 																 simd_float4(x: out.m20, y: out.m21, z: out.m22, w: out.m23),
 																 simd_float4(x: out.m30, y: out.m31, z: out.m32, w: out.m33)))
 }
-
-func mapZoomLimits(viewSize: CGSize, mapSize: CGSize) -> (CGFloat, CGFloat) {
-	let height = viewSize.height / UIScreen.main.scale
-	return (height / mapSize.height, 50.0)
-}

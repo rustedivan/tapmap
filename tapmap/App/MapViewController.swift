@@ -75,7 +75,6 @@ class MapViewController: UIViewController, MTKViewDelegate {
 	override func viewDidLoad() {
 		super.viewDidLoad()
 		
-		let metalView = view as! MTKView
 		metalView.sampleCount = 4
 		renderers = MetalRenderer(in: metalView, forWorld: world)
 		geometryStreamer.metalDevice = renderers.device
@@ -91,7 +90,7 @@ class MapViewController: UIViewController, MTKViewDelegate {
 		let heightDiff = dummyView.bounds.height - (mapSpace.height / (mapSpace.width / dummyView.bounds.width))
 		mapFrame = dummyView.bounds.insetBy(dx: 0.0, dy: heightDiff / 2.0)
 		
-		let limits = mapZoomLimits(viewSize: view.frame.size, mapSize: mapSpace.size)
+		let limits = (1.0, 60.0)
 		scrollView.minimumZoomScale = limits.0
 		scrollView.zoomScale = limits.0
 		scrollView.maximumZoomScale = limits.1
