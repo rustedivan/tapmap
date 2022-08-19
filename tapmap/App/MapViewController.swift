@@ -94,6 +94,8 @@ class MapViewController: UIViewController, MTKViewDelegate {
 		scrollView.minimumZoomScale = limits.0
 		scrollView.zoomScale = limits.0
 		scrollView.maximumZoomScale = limits.1
+		scrollView.showsHorizontalScrollIndicator = false
+		scrollView.showsVerticalScrollIndicator = false
 		zoomLimits = (Float(limits.0), Float(limits.1))
 		renderers.zoomLevel = Float(scrollView.zoomScale)
 		
