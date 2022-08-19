@@ -1,5 +1,18 @@
 ROAD TO FINAL
 
+## Layout bug
+Noticed that the app layout breaks on devices that are shaped differently than the iPhone SE.
+Something's wrong with the constraints on the MTKView or the scrollview.
+Fixed the UIView layout issue; the calculation for min zoom limit was unnecessary.
+However, there is something wrong with the Metal layer's rendering of the actual map content. At default zoom on iPhone 13, there is map content being clipped from the screen. The MTKView and the scroll view are snug, so it is a projection problem.
+Actually, it might just be scale-to-fill doing its job... yes, the iP13 is "longer." OK, so centering the map should do the trick, then.
+iPad Air is shorter than the phones, so it needs to scale up to scale-to-fill... Ah, but when I do that, the vertical scroll axis becomes available! And if I zoom in the rendering, that will clip the content horizontally without enabling the horizontal scroll axis!
+
+It must be the actual scroll content view that is the wrong size, then? That's the only thing that actually affects the scrollview. And what is the actuall scroll content view? The dummy, right? Yup, and that is set to the MTKView's size, not the map content. I'm getting somewhere. The dummy should have the same shape as the map (360ºx160º), scaled-to-fit.
+Scroll and scale is correct an all three shapes now; but the actual map rendering is offset.
+
+The dummy view must cover the entire screen, so it must be scale-to-fill, but it should also be allowed to overshoot _on one axis_. Alright, it's the dummy that needs to scale-to-fill! Finally!
+
 ## Instance-based POI rendering
 OK, but let's take a stab at this anyway. It would be nice to get everything that's renderable as instances to be so. I'll have to take one draw call per POI plane, _or_ bake the fade value into the per-instance uniform, and I think that's actually totally doable – and with a tiny tiny offset (based on the distance from screen center?) it might actually look a lot better.
 So, pretty much all I need to to is to add the marker position and marker size to the instance uniform block, remove the PoiPlane::PoiPlanePrimitive and let buildPlaceMarkers spit out instance uniform buffers.
