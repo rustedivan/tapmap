@@ -20,13 +20,13 @@ class MapViewController: UIViewController, MTKViewDelegate {
 	
 	// Presentation
 	var world: RuntimeWorld
-	var dummyView: UIView!
+	var inputView: UIView!
 	
 	// Navigation
 	var zoom: Float = 1.0
 	var zoomLimits: (Float, Float) = (1.0, 1.0)
 	var offset: CGPoint = .zero
-	let mapSpace = CGRect(x: -180.0, y: -80.0, width: 360.0, height: 160.0)
+	let mapSpace = CGRect(x: -180.0, y: -90.0, width: 360.0, height: 180.0)
 	var mapFrame = CGRect.zero
 	var lastRenderFrame: Int = Int.max
 	var needsRender: Bool = true { didSet {
@@ -82,16 +82,22 @@ class MapViewController: UIViewController, MTKViewDelegate {
 		metalView.delegate = self
 		
 		// Scroll view setup
-		dummyView = UIView(frame: view.frame)
-		scrollView.contentSize = dummyView.frame.size
-		scrollView.addSubview(dummyView)
-		dummyView.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(handleTap)))
+		let inputViewW = view.frame.width
+		let inputViewH = view.frame.width * (mapSpace.height / mapSpace.width) // View-size, map-aspect
+		let inputViewFrame = CGRect(x: 0.0, y: 0.0, width: inputViewW, height: inputViewH)
+		
+		inputView = UIView(frame: inputViewFrame)
+		inputView.backgroundColor = .init(red: 1.0, green: 1.0, blue: 0.0, alpha: 0.4)
+		
+		scrollView.contentSize = inputView.frame.size
+		scrollView.addSubview(inputView)
+		inputView.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(handleTap)))
 		
 		// Calculate view-space frame of the map (scale map to fit in view, calculate the vertical offset to center it)
-		let heightDiff = dummyView.bounds.height - (mapSpace.height / (mapSpace.width / dummyView.bounds.width))
-		mapFrame = dummyView.bounds.insetBy(dx: 0.0, dy: heightDiff / 2.0)
+		let heightDiff = inputView.bounds.height - (mapSpace.height / (mapSpace.width / inputView.bounds.width))
+		mapFrame = inputView.bounds.insetBy(dx: 0.0, dy: heightDiff / 2.0)
 		
-		let limits = mapZoomLimits(viewSize: view.frame.size, mapSize: mapSpace.size)
+		let limits = mapZoomLimits(viewSize: scrollView.bounds.size, inputViewSize: inputViewFrame.size)
 		scrollView.minimumZoomScale = limits.0
 		scrollView.zoomScale = limits.0
 		scrollView.maximumZoomScale = limits.1
@@ -118,8 +124,8 @@ class MapViewController: UIViewController, MTKViewDelegate {
 		needsRender = true
 		
 		if sender.state == .ended {
-			let viewP = sender.location(in: dummyView)
-			let mapP = mapPoint(viewP, from: dummyView.bounds, to: mapFrame, space: mapSpace)
+			let viewP = sender.location(in: inputView)
+			let mapP = mapPoint(viewP, from: inputView.bounds, to: mapFrame, space: mapSpace)
 			let tapPoint = Vertex(Float(mapP.x), Float(mapP.y))
 			
 			let userState = AppDelegate.sharedUserState
@@ -227,7 +233,7 @@ class MapViewController: UIViewController, MTKViewDelegate {
 
 extension MapViewController : UIScrollViewDelegate {
 	func viewForZooming(in scrollView: UIScrollView) -> UIView? {
-		return dummyView
+		return inputView
 	}
 	
 	func scrollViewDidZoom(_ scrollView: UIScrollView) {
@@ -250,9 +256,9 @@ extension MapViewController : UIScrollViewDelegate {
 		let bottomLeft = CGPoint(x: focusBox.minX, y: focusBox.minY)
 		let topRight = CGPoint(x: focusBox.maxX, y: focusBox.maxY)
 		let worldCorners = [bottomLeft, topRight].map({ (p: CGPoint) -> CGPoint in
-			let viewP = view.convert(p, to: dummyView)
+			let viewP = view.convert(p, to: inputView)
 			return mapPoint(viewP,
-											from: dummyView.bounds,
+											from: inputView.bounds,
 											to: mapFrame,
 											space: mapSpace)
 		})
@@ -265,10 +271,10 @@ extension MapViewController : UIScrollViewDelegate {
 	var mapToView: ((Vertex) -> CGPoint) {
 		return { (p: Vertex) -> CGPoint in
 			let mp = projectPoint(CGPoint(x: CGFloat(p.x), y: CGFloat(p.y)),
-														 from: self.dummyView.bounds,
+														 from: self.inputView.bounds,
 														 to: self.mapFrame,
 														 space: self.mapSpace)
-			return self.view.convert(mp, from: self.dummyView)
+			return self.view.convert(mp, from: self.inputView)
 		}
 	}
 }

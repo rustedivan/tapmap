@@ -38,12 +38,11 @@ func buildProjectionMatrix(viewSize: CGSize, mapSize: CGSize, centeredOn center:
 																						 0.1, 2.0)
 	let lng = Float((center.x / viewSize.width) * fittedMapSize.width)
 	let lat = Float((center.y / viewSize.height) * fittedMapSize.height)
-	let lngOffset = Float(fittedMapSize.width / 2.0)
-	let latOffset = Float(fittedMapSize.height / 2.0)
+	let lngOffset = Float(mapSize.width / 2.0)
+	let latOffset = Float(mapSize.height / 2.0)
 	
 	// (Z = -1.0 to position between the clipping planes)
 	var modelViewMatrix = GLKMatrix4Translate(GLKMatrix4Identity, 0.0, 0.0, -1.5)
-	
 	
 	// Matrix operations, applied in reverse order
 	// 3: Move to scaled UIScrollView content offset
@@ -73,7 +72,8 @@ func buildScaleAboutPointMatrix(scale: Float, center: Vertex) -> simd_float4x4 {
 																 simd_float4(x: out.m30, y: out.m31, z: out.m32, w: out.m33)))
 }
 
-func mapZoomLimits(viewSize: CGSize, mapSize: CGSize) -> (CGFloat, CGFloat) {
-	let height = viewSize.height / UIScreen.main.scale
-	return (height / mapSize.height, 50.0)
+func mapZoomLimits(viewSize: CGSize, inputViewSize: CGSize) -> (CGFloat, CGFloat) {
+	let wRatio = viewSize.width / inputViewSize.width
+	let hRatio = viewSize.height / inputViewSize.height
+	return (max(wRatio, hRatio), 80.0)
 }
