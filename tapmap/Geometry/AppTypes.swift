@@ -50,7 +50,7 @@ struct TexturedVertex {
 	let u: Float
 	let v: Float
 	
-	init(_ _x: Float, _ _y: Float, u _u: Float, u _v: Float) {
+	init(_ _x: Float, _ _y: Float, u _u: Float, v _v: Float) {
 		x = _x; y = _y;
 		u = _u; v = _v;
 	}

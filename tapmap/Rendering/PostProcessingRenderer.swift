@@ -72,8 +72,8 @@ class PostProcessingRenderer {
 }
 
 fileprivate func makeFullscreenQuadPrimitive(in device: MTLDevice) -> TexturedRenderPrimitive {
-	let vertices: [TexturedVertex] = [TexturedVertex(-0.5, -0.5, u: 0.0, u: 0.0), TexturedVertex(0.5, -0.5, u: 1.0, u: 0.0),
-																		TexturedVertex(-0.5,  0.5, u: 0.0, u: 1.0), TexturedVertex(0.5,  0.5, u: 1.0, u: 1.0)]
+	let vertices: [TexturedVertex] = [TexturedVertex(-0.5, -0.5, u: 0.0, v: 1.0), TexturedVertex(0.5, -0.5, u: 1.0, v: 1.0),
+																		TexturedVertex(-0.5,  0.5, u: 0.0, v: 0.0), TexturedVertex(0.5,  0.5, u: 1.0, v: 0.0)]
 	let indices: [UInt16] = [0, 1, 2, 1, 2, 3]
 	
 	return TexturedRenderPrimitive(	polygons: [vertices],	indices: [indices],
