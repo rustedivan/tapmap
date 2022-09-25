@@ -20,7 +20,7 @@ class MapViewController: UIViewController, MTKViewDelegate {
 	
 	// Presentation
 	var world: RuntimeWorld
-	var inputView: UIView!
+	var inputOverlayView: UIView!
 	
 	// Navigation
 	var zoom: Float = 1.0
@@ -82,22 +82,21 @@ class MapViewController: UIViewController, MTKViewDelegate {
 		metalView.delegate = self
 		
 		// Scroll view setup
-		let inputViewW = view.frame.width
-		let inputViewH = view.frame.width * (mapSpace.height / mapSpace.width) // View-size, map-aspect
-		let inputViewFrame = CGRect(x: 0.0, y: 0.0, width: inputViewW, height: inputViewH)
+		let inputOverlayViewW = view.frame.width
+		let inputOverlayViewH = view.frame.width * (mapSpace.height / mapSpace.width) // View-size, map-aspect
+		let inputOverlayViewFrame = CGRect(x: 0.0, y: 0.0, width: inputOverlayViewW, height: inputOverlayViewH)
 		
-		inputView = UIView(frame: inputViewFrame)
-		inputView.backgroundColor = .init(red: 1.0, green: 1.0, blue: 0.0, alpha: 0.4)
+		inputOverlayView = UIView(frame: inputOverlayViewFrame)
 		
-		scrollView.contentSize = inputView.frame.size
-		scrollView.addSubview(inputView)
-		inputView.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(handleTap)))
+		scrollView.contentSize = inputOverlayView.frame.size
+		scrollView.addSubview(inputOverlayView)
+		inputOverlayView.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(handleTap)))
 		
 		// Calculate view-space frame of the map (scale map to fit in view, calculate the vertical offset to center it)
-		let heightDiff = inputView.bounds.height - (mapSpace.height / (mapSpace.width / inputView.bounds.width))
-		mapFrame = inputView.bounds.insetBy(dx: 0.0, dy: heightDiff / 2.0)
+		let heightDiff = inputOverlayView.bounds.height - (mapSpace.height / (mapSpace.width / inputOverlayView.bounds.width))
+		mapFrame = inputOverlayView.bounds.insetBy(dx: 0.0, dy: heightDiff / 2.0)
 		
-		let limits = mapZoomLimits(viewSize: scrollView.bounds.size, inputViewSize: inputViewFrame.size)
+		let limits = mapZoomLimits(viewSize: scrollView.bounds.size, inputViewSize: inputOverlayViewFrame.size)
 		scrollView.minimumZoomScale = limits.0
 		scrollView.zoomScale = limits.0
 		scrollView.maximumZoomScale = limits.1
@@ -124,8 +123,8 @@ class MapViewController: UIViewController, MTKViewDelegate {
 		needsRender = true
 		
 		if sender.state == .ended {
-			let viewP = sender.location(in: inputView)
-			let mapP = mapPoint(viewP, from: inputView.bounds, to: mapFrame, space: mapSpace)
+			let viewP = sender.location(in: inputOverlayView)
+			let mapP = mapPoint(viewP, from: inputOverlayView.bounds, to: mapFrame, space: mapSpace)
 			let tapPoint = Vertex(Float(mapP.x), Float(mapP.y))
 			
 			let userState = AppDelegate.sharedUserState
@@ -233,7 +232,7 @@ class MapViewController: UIViewController, MTKViewDelegate {
 
 extension MapViewController : UIScrollViewDelegate {
 	func viewForZooming(in scrollView: UIScrollView) -> UIView? {
-		return inputView
+		return inputOverlayView
 	}
 	
 	func scrollViewDidZoom(_ scrollView: UIScrollView) {
@@ -256,9 +255,9 @@ extension MapViewController : UIScrollViewDelegate {
 		let bottomLeft = CGPoint(x: focusBox.minX, y: focusBox.minY)
 		let topRight = CGPoint(x: focusBox.maxX, y: focusBox.maxY)
 		let worldCorners = [bottomLeft, topRight].map({ (p: CGPoint) -> CGPoint in
-			let viewP = view.convert(p, to: inputView)
+			let viewP = view.convert(p, to: inputOverlayView)
 			return mapPoint(viewP,
-											from: inputView.bounds,
+											from: inputOverlayView.bounds,
 											to: mapFrame,
 											space: mapSpace)
 		})
@@ -271,10 +270,10 @@ extension MapViewController : UIScrollViewDelegate {
 	var mapToView: ((Vertex) -> CGPoint) {
 		return { (p: Vertex) -> CGPoint in
 			let mp = projectPoint(CGPoint(x: CGFloat(p.x), y: CGFloat(p.y)),
-														 from: self.inputView.bounds,
+														 from: self.inputOverlayView.bounds,
 														 to: self.mapFrame,
 														 space: self.mapSpace)
-			return self.view.convert(mp, from: self.inputView)
+			return self.view.convert(mp, from: self.inputOverlayView)
 		}
 	}
 }
