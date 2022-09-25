@@ -115,6 +115,13 @@ class DebugRenderer {
 		transientPrimitives.append(newQuad)
 	}
 	
+	func addCrossbox(for box: Aabb, alpha: Float, name: String, color: UIColor = .magenta) -> UUID {
+		let handle = UUID()
+		let newBox = makeDebugCrossbox(for: box, color: color, name: name)
+		primitives[handle] = newBox
+		return handle
+	}
+	
 	init(withDevice device: MTLDevice, pixelFormat: MTLPixelFormat, bufferCount: Int) {
 		let shaderLib = device.makeDefaultLibrary()!
 		
@@ -207,6 +214,24 @@ class DebugRenderer {
 			Vertex(box.maxX, box.maxY),
 			Vertex(box.minX, box.maxY),
 			Vertex(box.minX, box.minY)	// Close the quad
+		]
+		return DebugRenderPrimitive(mode: .lineStrip,
+																vertices: vertices,
+																device: device,
+																color: color.tuple(),
+																debugName: name)
+	}
+	
+	func makeDebugCrossbox(for box: Aabb, color: UIColor, name: String) -> DebugRenderPrimitive {
+		let vertices: [Vertex] = [
+			Vertex(box.minX, box.minY),
+			Vertex(box.maxX, box.minY),
+			Vertex(box.maxX, box.maxY),
+			Vertex(box.minX, box.maxY),
+			Vertex(box.minX, box.minY),	// Close the quad
+			Vertex(box.maxX, box.maxY), // Cross the quad
+			Vertex(box.maxX, box.minY),
+			Vertex(box.minX, box.maxY)
 		]
 		return DebugRenderPrimitive(mode: .lineStrip,
 																vertices: vertices,
