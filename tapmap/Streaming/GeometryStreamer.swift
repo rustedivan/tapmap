@@ -154,7 +154,7 @@ class GeometryStreamer {
 																					device: self.metalDevice!,
 																					color: Color(r: tessellation.color.r, g: tessellation.color.g, b: tessellation.color.b, a: 1.0),
 																					ownerHash: regionHash,
-																					debugName: "Unnamed")	// $ Embed name in tessellation
+																					debugName: "primitive-" + chunkName)
 				
 				// Don't allow reads while publishing finished chunk
 				os_unfair_lock_lock(&self.chunkLock)

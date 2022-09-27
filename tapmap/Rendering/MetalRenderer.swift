@@ -129,7 +129,7 @@ class MetalRenderer {
 		guard let renderPassDescriptor = view.currentRenderPassDescriptor else { frameSemaphore.signal(); return }
 		
 		guard let commandBuffer = commandQueue.makeCommandBuffer() else { return }
-		commandBuffer.label = "Geography buffer"	// $ clearer label
+		commandBuffer.label = "Frame command buffer"
 		commandBuffer.addCompletedHandler { buffer in
 			drawable.present()						// Render
 			self.frameSemaphore.signal()	// Make this in-flight frame available
@@ -140,35 +140,35 @@ class MetalRenderer {
 		
 		let ocean = Stylesheet.shared.oceanColor.components
 		
-		let mapRenderPassDescriptor = MTLRenderPassDescriptor()	// $ better name
+		let mapRenderPassDescriptor = MTLRenderPassDescriptor()
 		mapRenderPassDescriptor.colorAttachments[0].resolveTexture = sseRenderTarget[bufferIndex]
 		mapRenderPassDescriptor.colorAttachments[0].texture = msaaRenderTarget[bufferIndex]
 		mapRenderPassDescriptor.colorAttachments[0].loadAction = .clear
 		mapRenderPassDescriptor.colorAttachments[0].storeAction = .multisampleResolve
 		mapRenderPassDescriptor.colorAttachments[0].clearColor = MTLClearColor(red: Double(ocean.r), green: Double(ocean.g), blue: Double(ocean.b), alpha: Double(ocean.a))
 		
-		guard let encoder = commandBuffer.makeRenderCommandEncoder(descriptor: mapRenderPassDescriptor) else { return }
-		encoder.label = "Map render pass encoder @ \(frameId)"
+		guard let baseMapEncoder = commandBuffer.makeRenderCommandEncoder(descriptor: mapRenderPassDescriptor) else { return }
+		baseMapEncoder.label = "Base map render pass encoder @ \(frameId)"
 		
-		self.regionRenderer.renderWorld(inProjection: mvpMatrix, inEncoder: encoder, bufferIndex: bufferIndex)
-		self.continentBorderRenderer.renderBorders(inProjection: mvpMatrix, inEncoder: encoder, bufferIndex: bufferIndex)
-		self.countryBorderRenderer.renderBorders(inProjection: mvpMatrix, inEncoder: encoder, bufferIndex: bufferIndex)
-		self.provinceBorderRenderer.renderBorders(inProjection: mvpMatrix, inEncoder: encoder, bufferIndex: bufferIndex)
-		self.effectRenderer.renderWorld(inProjection: mvpMatrix, inEncoder: encoder, bufferIndex: bufferIndex)
+		self.regionRenderer.renderWorld(inProjection: mvpMatrix, inEncoder: baseMapEncoder, bufferIndex: bufferIndex)
+		self.continentBorderRenderer.renderBorders(inProjection: mvpMatrix, inEncoder: baseMapEncoder, bufferIndex: bufferIndex)
+		self.countryBorderRenderer.renderBorders(inProjection: mvpMatrix, inEncoder: baseMapEncoder, bufferIndex: bufferIndex)
+		self.provinceBorderRenderer.renderBorders(inProjection: mvpMatrix, inEncoder: baseMapEncoder, bufferIndex: bufferIndex)
+		self.effectRenderer.renderWorld(inProjection: mvpMatrix, inEncoder: baseMapEncoder, bufferIndex: bufferIndex)
 		// $ move selection, poi and debug into the SSE render pass, so they're not affected by the SSE
-		self.selectionRenderer.renderSelection(inProjection: mvpMatrix, inEncoder: encoder)
-		self.poiRenderer.renderWorld(inProjection: mvpMatrix, inEncoder: encoder, bufferIndex: bufferIndex)
-		self.debugRenderer.renderMarkers(inProjection: mvpMatrix, inEncoder: encoder, bufferIndex: bufferIndex)
+		self.selectionRenderer.renderSelection(inProjection: mvpMatrix, inEncoder: baseMapEncoder)
+		self.poiRenderer.renderWorld(inProjection: mvpMatrix, inEncoder: baseMapEncoder, bufferIndex: bufferIndex)
+		self.debugRenderer.renderMarkers(inProjection: mvpMatrix, inEncoder: baseMapEncoder, bufferIndex: bufferIndex)
 		
-		encoder.endEncoding()
-		
+		baseMapEncoder.endEncoding()
 		
 		renderPassDescriptor.colorAttachments[0].loadAction = .clear
 		renderPassDescriptor.colorAttachments[0].storeAction = .store
 		renderPassDescriptor.colorAttachments[0].clearColor = MTLClearColor(red: Double(ocean.r), green: Double(ocean.g), blue: Double(ocean.b), alpha: Double(ocean.a))
 		
 		guard let sseCommandEncoder = commandBuffer.makeRenderCommandEncoder(descriptor: renderPassDescriptor) else { return }
-		// $ label
+		sseCommandEncoder.label = "Screen-space effect render pass encoder @ \(frameId)"
+		
 		self.postProcessingRenderer.renderPostProcessing(inEncoder: sseCommandEncoder, bufferIndex: bufferIndex)
 		sseCommandEncoder.endEncoding()
 		

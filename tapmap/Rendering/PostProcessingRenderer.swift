@@ -9,8 +9,8 @@
 import Metal
 import simd
 
-// $ put time into frame uniform block
 fileprivate struct FrameUniforms {
+	let timestamp: Float
 }
 
 class PostProcessingRenderer {
@@ -18,10 +18,12 @@ class PostProcessingRenderer {
 	var frameOffscreenTexture: [MTLTexture?]
 	
 	let fullscreenQuadPrimitive: TexturedRenderPrimitive
+	let startTime: Date
 	
 	var frameSwitchSemaphore = DispatchSemaphore(value: 1)
 	
 	init(withDevice device: MTLDevice, pixelFormat: MTLPixelFormat, bufferCount: Int, drawableSize: simd_float2) {
+		startTime = Date()
 		let shaderLib = device.makeDefaultLibrary()!
 		
 		let pipelineDescriptor = MTLRenderPipelineDescriptor()
@@ -41,10 +43,7 @@ class PostProcessingRenderer {
 	
 	func prepareFrame(offscreenTexture: MTLTexture, bufferIndex: Int) {
 		frameSwitchSemaphore.wait()
-		
-		self.frameOffscreenTexture[bufferIndex] = offscreenTexture
-		// $ write time
-		
+			self.frameOffscreenTexture[bufferIndex] = offscreenTexture
 		frameSwitchSemaphore.signal()
 	}
 	
@@ -54,14 +53,16 @@ class PostProcessingRenderer {
 			encoder.popDebugGroup()
 		}
 		
+		let frameTime = Float(Date().timeIntervalSince(startTime))
 		frameSwitchSemaphore.wait()
-		var frameUniforms = FrameUniforms()
+		var frameUniforms = FrameUniforms(timestamp: frameTime)
 			let offscreenTexture = self.frameOffscreenTexture[bufferIndex]
 		frameSwitchSemaphore.signal()
 		
 		encoder.setRenderPipelineState(pipeline)
 		encoder.setVertexBytes(&frameUniforms, length: MemoryLayout<FrameUniforms>.stride, index: 1)
 		encoder.setFragmentTexture(offscreenTexture, index: 0)
+		encoder.setFragmentBytes(&frameUniforms, length: MemoryLayout<FrameUniforms>.stride, index: 1)
 		
 		render(primitive: fullscreenQuadPrimitive, into: encoder)
 	}

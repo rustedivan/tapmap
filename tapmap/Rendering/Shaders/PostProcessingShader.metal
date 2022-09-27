@@ -10,6 +10,7 @@
 using namespace metal;
 
 struct FrameUniforms {
+	float timestamp;
 };
 
 struct TexturedVertex {
@@ -32,11 +33,12 @@ vertex VertexOut texturedVertex(const device TexturedVertex* vertexArray [[ buff
 	return outVertex;
 }
 
-fragment float4 chromaticAberrationFragment(VertexOut interpolated [[ stage_in ]], texture2d<float> offscreenTexture [[texture(0)]]) {
+fragment float4 chromaticAberrationFragment(VertexOut interpolated [[ stage_in ]],
+																						texture2d<float> offscreenTexture [[texture(0)]],
+																						constant FrameUniforms* frame [[ buffer(1) ]]) {
 	constexpr sampler offscreen(coord::normalized, address::clamp_to_zero, filter::linear, mip_filter::linear);
 	float4 color = offscreenTexture.sample(offscreen, interpolated.uv);
 	color.r += 0.2;
-	color.g -= 0.2;
 	color.b += 0.2;
 	return float4(color);
 }
