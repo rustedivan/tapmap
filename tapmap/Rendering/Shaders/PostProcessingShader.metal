@@ -39,7 +39,7 @@ fragment float4 chromaticAberrationFragment(VertexOut interpolated [[ stage_in ]
 	constexpr sampler offscreen(coord::normalized, address::clamp_to_zero, filter::linear, mip_filter::linear);
 	float4 color = offscreenTexture.sample(offscreen, interpolated.uv);
 	color.r += 0.2;
-	color.b += 0.2;
+	color.b = interpolated.uv.x;
 	return float4(color);
 }
 

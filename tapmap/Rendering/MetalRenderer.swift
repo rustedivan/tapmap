@@ -149,17 +149,11 @@ class MetalRenderer {
 		
 		guard let baseMapEncoder = commandBuffer.makeRenderCommandEncoder(descriptor: mapRenderPassDescriptor) else { return }
 		baseMapEncoder.label = "Base map render pass encoder @ \(frameId)"
-		
-		self.regionRenderer.renderWorld(inProjection: mvpMatrix, inEncoder: baseMapEncoder, bufferIndex: bufferIndex)
-		self.continentBorderRenderer.renderBorders(inProjection: mvpMatrix, inEncoder: baseMapEncoder, bufferIndex: bufferIndex)
-		self.countryBorderRenderer.renderBorders(inProjection: mvpMatrix, inEncoder: baseMapEncoder, bufferIndex: bufferIndex)
-		self.provinceBorderRenderer.renderBorders(inProjection: mvpMatrix, inEncoder: baseMapEncoder, bufferIndex: bufferIndex)
-		self.effectRenderer.renderWorld(inProjection: mvpMatrix, inEncoder: baseMapEncoder, bufferIndex: bufferIndex)
-		// $ move selection, poi and debug into the SSE render pass, so they're not affected by the SSE
-		self.selectionRenderer.renderSelection(inProjection: mvpMatrix, inEncoder: baseMapEncoder)
-		self.poiRenderer.renderWorld(inProjection: mvpMatrix, inEncoder: baseMapEncoder, bufferIndex: bufferIndex)
-		self.debugRenderer.renderMarkers(inProjection: mvpMatrix, inEncoder: baseMapEncoder, bufferIndex: bufferIndex)
-		
+			self.regionRenderer.renderWorld(inProjection: mvpMatrix, inEncoder: baseMapEncoder, bufferIndex: bufferIndex)
+			self.continentBorderRenderer.renderBorders(inProjection: mvpMatrix, inEncoder: baseMapEncoder, bufferIndex: bufferIndex)
+			self.countryBorderRenderer.renderBorders(inProjection: mvpMatrix, inEncoder: baseMapEncoder, bufferIndex: bufferIndex)
+			self.provinceBorderRenderer.renderBorders(inProjection: mvpMatrix, inEncoder: baseMapEncoder, bufferIndex: bufferIndex)
+			self.effectRenderer.renderWorld(inProjection: mvpMatrix, inEncoder: baseMapEncoder, bufferIndex: bufferIndex)
 		baseMapEncoder.endEncoding()
 		
 		renderPassDescriptor.colorAttachments[0].loadAction = .clear
@@ -168,8 +162,10 @@ class MetalRenderer {
 		
 		guard let sseCommandEncoder = commandBuffer.makeRenderCommandEncoder(descriptor: renderPassDescriptor) else { return }
 		sseCommandEncoder.label = "Screen-space effect render pass encoder @ \(frameId)"
-		
-		self.postProcessingRenderer.renderPostProcessing(inEncoder: sseCommandEncoder, bufferIndex: bufferIndex)
+			self.postProcessingRenderer.renderPostProcessing(inEncoder: sseCommandEncoder, bufferIndex: bufferIndex)
+			self.selectionRenderer.renderSelection(inProjection: mvpMatrix, inEncoder: sseCommandEncoder)
+			self.poiRenderer.renderWorld(inProjection: mvpMatrix, inEncoder: sseCommandEncoder, bufferIndex: bufferIndex)
+			self.debugRenderer.renderMarkers(inProjection: mvpMatrix, inEncoder: sseCommandEncoder, bufferIndex: bufferIndex)
 		sseCommandEncoder.endEncoding()
 		
 		commandBuffer.commit()

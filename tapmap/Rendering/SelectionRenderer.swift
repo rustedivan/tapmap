@@ -33,7 +33,6 @@ class SelectionRenderer {
 		let shaderLib = device.makeDefaultLibrary()!
 		
 		let pipelineDescriptor = MTLRenderPipelineDescriptor()
-		pipelineDescriptor.sampleCount = 4
 		pipelineDescriptor.vertexFunction = shaderLib.makeFunction(name: "selectionVertex")
 		pipelineDescriptor.fragmentFunction = shaderLib.makeFunction(name: "selectionFragment")
 		pipelineDescriptor.colorAttachments[0].pixelFormat = pixelFormat;
