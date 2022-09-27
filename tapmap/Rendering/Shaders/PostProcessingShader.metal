@@ -10,8 +10,6 @@
 using namespace metal;
 
 struct FrameUniforms {
-	float4x4 modelViewProjectionMatrix;
-	float2 screenSize;
 };
 
 struct TexturedVertex {
@@ -29,8 +27,7 @@ vertex VertexOut texturedVertex(const device TexturedVertex* vertexArray [[ buff
 																unsigned int vid [[ vertex_id ]]) {
 	TexturedVertex v = vertexArray[vid];
 	VertexOut outVertex = VertexOut();
-	float2 p = v.position * frame->screenSize;
-	outVertex.position = frame->modelViewProjectionMatrix * float4(p, 0.0, 1.0);
+	outVertex.position = float4(v.position, 0.0, 1.0);
 	outVertex.uv = v.uv;
 	return outVertex;
 }
@@ -38,6 +35,9 @@ vertex VertexOut texturedVertex(const device TexturedVertex* vertexArray [[ buff
 fragment float4 chromaticAberrationFragment(VertexOut interpolated [[ stage_in ]], texture2d<float> offscreenTexture [[texture(0)]]) {
 	constexpr sampler offscreen(coord::normalized, address::clamp_to_zero, filter::linear, mip_filter::linear);
 	float4 color = offscreenTexture.sample(offscreen, interpolated.uv);
+	color.r += 0.2;
+	color.g -= 0.2;
+	color.b += 0.2;
 	return float4(color);
 }
 

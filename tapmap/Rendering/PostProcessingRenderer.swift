@@ -11,14 +11,11 @@ import simd
 
 // $ put time into frame uniform block
 fileprivate struct FrameUniforms {
-	let mvpMatrix: simd_float4x4
-	let screenSize: simd_float2
 }
 
 class PostProcessingRenderer {
 	let pipeline: MTLRenderPipelineState
 	var frameOffscreenTexture: [MTLTexture?]
-	var screenSize: simd_float2
 	
 	let fullscreenQuadPrimitive: TexturedRenderPrimitive
 	
@@ -36,7 +33,6 @@ class PostProcessingRenderer {
 		do {
 			try pipeline = device.makeRenderPipelineState(descriptor: pipelineDescriptor)
 			self.frameOffscreenTexture = Array(repeating: nil, count: bufferCount)
-			self.screenSize = drawableSize
 			self.fullscreenQuadPrimitive = makeFullscreenQuadPrimitive(in: device)
 		} catch let error {
 			fatalError(error.localizedDescription)
@@ -52,14 +48,14 @@ class PostProcessingRenderer {
 		frameSwitchSemaphore.signal()
 	}
 	
-	func renderPostProcessing(inProjection projection: simd_float4x4, inEncoder encoder: MTLRenderCommandEncoder, bufferIndex: Int) {
+	func renderPostProcessing(inEncoder encoder: MTLRenderCommandEncoder, bufferIndex: Int) {
 		encoder.pushDebugGroup("Render postprocessing pass")
 		defer {
 			encoder.popDebugGroup()
 		}
 		
 		frameSwitchSemaphore.wait()
-		var frameUniforms = FrameUniforms(mvpMatrix: projection, screenSize: simd_float2(screenSize.x / 2.0, screenSize.y / 2.0))
+		var frameUniforms = FrameUniforms()
 			let offscreenTexture = self.frameOffscreenTexture[bufferIndex]
 		frameSwitchSemaphore.signal()
 		
@@ -72,8 +68,8 @@ class PostProcessingRenderer {
 }
 
 fileprivate func makeFullscreenQuadPrimitive(in device: MTLDevice) -> TexturedRenderPrimitive {
-	let vertices: [TexturedVertex] = [TexturedVertex(-0.5, -0.5, u: 0.0, v: 1.0), TexturedVertex(0.5, -0.5, u: 1.0, v: 1.0),
-																		TexturedVertex(-0.5,  0.5, u: 0.0, v: 0.0), TexturedVertex(0.5,  0.5, u: 1.0, v: 0.0)]
+	let vertices: [TexturedVertex] = [TexturedVertex(-1.0, -1.0, u: 0.0, v: 1.0), TexturedVertex(1.0, -1.0, u: 1.0, v: 1.0),
+																		TexturedVertex(-1.0,  1.0, u: 0.0, v: 0.0), TexturedVertex(1.0,  1.0, u: 1.0, v: 0.0)]
 	let indices: [UInt16] = [0, 1, 2, 1, 2, 3]
 	
 	return TexturedRenderPrimitive(	polygons: [vertices],	indices: [indices],

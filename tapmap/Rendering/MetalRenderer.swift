@@ -15,7 +15,6 @@ class MetalRenderer {
 	var commandQueue: MTLCommandQueue
 	var latestFrame = Date()
 	var modelViewProjectionMatrix = simd_float4x4()
-	var postprocessViewProjectionMatrix = simd_float4x4()
 	var zoomLevel: Float = 0.0
 	
 	// Parallel rendering setup
@@ -91,11 +90,6 @@ class MetalRenderer {
 																											mapSize: mapSize,
 																											centeredOn: offset,
 																											zoomedTo: zoom)
-		postprocessViewProjectionMatrix = buildProjectionMatrix(viewSize: viewSize,
-																														mapSize: mapSize,
-																														centeredOn: CGPoint(),
-																														zoomedTo: 1.0)
-		postProcessingRenderer.screenSize = simd_float2(Float(viewSize.width), Float(viewSize.height))
 	}
 	
 	func prepareFrame(forWorld worldState: RuntimeWorld, zoomRate: Float) {
@@ -175,7 +169,7 @@ class MetalRenderer {
 		
 		guard let sseCommandEncoder = commandBuffer.makeRenderCommandEncoder(descriptor: renderPassDescriptor) else { return }
 		// $ label
-		self.postProcessingRenderer.renderPostProcessing(inProjection: postprocessViewProjectionMatrix, inEncoder: sseCommandEncoder, bufferIndex: bufferIndex)
+		self.postProcessingRenderer.renderPostProcessing(inEncoder: sseCommandEncoder, bufferIndex: bufferIndex)
 		sseCommandEncoder.endEncoding()
 		
 		commandBuffer.commit()
