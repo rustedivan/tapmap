@@ -65,6 +65,7 @@ class BaseRenderPrimitive<VertexType> {
 
 typealias RenderPrimitive = BaseRenderPrimitive<Vertex>
 typealias FixedScaleRenderPrimitive = BaseRenderPrimitive<ScaleVertex>
+typealias TexturedRenderPrimitive = BaseRenderPrimitive<TexturedVertex>
 
 func render<T>(primitive: BaseRenderPrimitive<T>, into encoder: MTLRenderCommandEncoder) {
 	encoder.setVertexBuffer(primitive.vertexBuffer, offset: 0, index: 0)
