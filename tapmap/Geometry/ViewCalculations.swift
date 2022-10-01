@@ -22,10 +22,10 @@ func mapPoint(_ p: CGPoint, from view: CGRect, to subView: CGRect, space: CGRect
 }
 
 // Project from map space to screen space (mapPoint, in reverse)
-func projectPoint(_ m: CGPoint, from view: CGRect, to subView: CGRect, space: CGRect) -> CGPoint {
+func projectPoint(_ m: CGPoint, from view: CGRect, to subView: CGRect, space: CGRect, wRatio: CGFloat, hRatio: CGFloat) -> CGPoint {
 	let mp = CGPoint(x: m.x, y: -m.y)	// Flip Y axis
-	let x = (mp.x - space.minX) * (subView.width / space.width)	// $ Optimization: pass the w/h ratios from outside, it is fixed per frame
-	let y = (mp.y - space.minY) * (subView.height / space.height)
+	let x = (mp.x - space.minX) * wRatio
+	let y = (mp.y - space.minY) * hRatio
 	return CGPoint(x: x + subView.minX + view.minX,
 								 y: y + subView.minY + view.minY)
 }

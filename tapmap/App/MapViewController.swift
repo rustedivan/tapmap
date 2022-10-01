@@ -268,10 +268,13 @@ extension MapViewController : UIScrollViewDelegate {
 	
 	var mapToView: ((Vertex) -> CGPoint) {
 		return { (p: Vertex) -> CGPoint in
+			let wRatio = self.mapFrame.width / self.mapSpace.width
+			let hRatio = self.mapFrame.height / self.mapSpace.height
 			let mp = projectPoint(CGPoint(x: CGFloat(p.x), y: CGFloat(p.y)),
 														 from: self.inputOverlayView.bounds,
 														 to: self.mapFrame,
-														 space: self.mapSpace)
+														 space: self.mapSpace,
+														 wRatio: wRatio, hRatio: hRatio)
 			return self.view.convert(mp, from: self.inputOverlayView)
 		}
 	}
