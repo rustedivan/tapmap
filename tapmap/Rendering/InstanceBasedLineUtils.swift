@@ -25,10 +25,10 @@ typealias JoinSegmentPrimitive = RenderPrimitive
 
 func makeLineSegmentPrimitive(in device: MTLDevice, inside: Float, outside: Float) -> LineSegmentPrimitive {
 	let vertices: [Vertex] = [
-		Vertex(0.0, inside),
-		Vertex(1.0, inside),
-		Vertex(1.0,  outside),
-		Vertex(0.0,  outside)
+		Vertex(0.0,  inside),
+		Vertex(1.0,  inside),
+		Vertex(1.0, -outside),
+		Vertex(0.0, -outside)
 	]
 	let indices: [UInt16] = [
 		0, 1, 2, 0, 2, 3
@@ -43,11 +43,11 @@ func makeLineSegmentPrimitive(in device: MTLDevice, inside: Float, outside: Floa
 																debugName: "Line segment primitive")
 }
 
-func makeBevelJoinPrimitive(in device: MTLDevice, halfWidth: Float) -> JoinSegmentPrimitive {
+func makeBevelJoinPrimitive(in device: MTLDevice, width: Float) -> JoinSegmentPrimitive {
 	let vertices: [Vertex] = [
 		Vertex(0.0, 0.0),
-		Vertex(halfWidth, 0.0),
-		Vertex(0.0, halfWidth),
+		Vertex(width, 0.0),
+		Vertex(0.0, width),
 	]
 	let indices: [UInt16] = [
 		0, 1, 2

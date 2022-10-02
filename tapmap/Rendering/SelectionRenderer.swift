@@ -44,12 +44,22 @@ class SelectionRenderer {
 		linePipelineDescriptor.fragmentFunction = shaderLib.makeFunction(name: "lineFragment")
 		linePipelineDescriptor.colorAttachments[0].pixelFormat = pixelFormat;
 		linePipelineDescriptor.vertexBuffers[0].mutability = .immutable
+		linePipelineDescriptor.colorAttachments[0].isBlendingEnabled = true
+		linePipelineDescriptor.colorAttachments[0].sourceRGBBlendFactor = .sourceAlpha
+		linePipelineDescriptor.colorAttachments[0].sourceAlphaBlendFactor = .sourceAlpha
+		linePipelineDescriptor.colorAttachments[0].destinationRGBBlendFactor = .oneMinusSourceAlpha
+		linePipelineDescriptor.colorAttachments[0].destinationAlphaBlendFactor = .oneMinusSourceAlpha
 		
 		let joinPipelineDescriptor = MTLRenderPipelineDescriptor()
 		joinPipelineDescriptor.vertexFunction = shaderLib.makeFunction(name: "bevelVertex")
 		joinPipelineDescriptor.fragmentFunction = shaderLib.makeFunction(name: "bevelFragment")
 		joinPipelineDescriptor.colorAttachments[0].pixelFormat = pixelFormat;
 		joinPipelineDescriptor.vertexBuffers[0].mutability = .immutable
+		joinPipelineDescriptor.colorAttachments[0].isBlendingEnabled = true
+		joinPipelineDescriptor.colorAttachments[0].sourceRGBBlendFactor = .sourceAlpha
+		joinPipelineDescriptor.colorAttachments[0].sourceAlphaBlendFactor = .sourceAlpha
+		joinPipelineDescriptor.colorAttachments[0].destinationRGBBlendFactor = .oneMinusSourceAlpha
+		joinPipelineDescriptor.colorAttachments[0].destinationAlphaBlendFactor = .oneMinusSourceAlpha
 		
 		do {
 			try linePipeline = device.makeRenderPipelineState(descriptor: linePipelineDescriptor)
@@ -64,8 +74,8 @@ class SelectionRenderer {
 				device.makeBuffer(length: kMaxLineSegments * MemoryLayout<JoinInstanceUniforms>.stride, options: .storageModeShared)!
 			}
 	
-			self.lineSegmentPrimitive = makeLineSegmentPrimitive(in: device, inside: -0.5, outside: 0.5)
-			self.joinSegmentPrimitive = makeBevelJoinPrimitive(in: device, halfWidth: 0.5)
+			self.lineSegmentPrimitive = makeLineSegmentPrimitive(in: device, inside: 0.0, outside: 1.0)
+			self.joinSegmentPrimitive = makeBevelJoinPrimitive(in: device, width: 1.0)
 		} catch let error {
 			fatalError(error.localizedDescription)
 		}
@@ -97,7 +107,8 @@ class SelectionRenderer {
 			lodLevel = GeometryStreamer.shared.actualLodLevel
 			print("Selection lod changed to \(lodLevel)")
 		}
-		self.outlineWidth = 2.0 / zoomLevel
+		
+		self.outlineWidth = 1.5 / zoomLevel
 
 		frameSelectSemaphore.wait()
 			self.frameLineSegmentCount[bufferIndex] = selectionLineBuffer.count
@@ -119,7 +130,7 @@ class SelectionRenderer {
 		frameSelectSemaphore.wait()
 			var uniforms = FrameUniforms(mvpMatrix: projection,
 																	 width: self.outlineWidth,
-																	 color: Color(r: 0.0, g: 0.0, b: 0.0, a: 1.0).vector)
+																	 color: Color(r: 0.8, g: 0.6, b: 0.1, a: 0.7).vector)
 			let lineInstances = lineInstanceUniforms[bufferIndex]
 			let joinInstances = joinInstanceUniforms[bufferIndex]
 			let count = frameLineSegmentCount[bufferIndex]

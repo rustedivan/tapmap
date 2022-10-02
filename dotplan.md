@@ -1,39 +1,9 @@
 ROAD TO FINAL
 
-## Layout bug
-Noticed that the app layout breaks on devices that are shaped differently than the iPhone SE.
-Something's wrong with the constraints on the MTKView or the scrollview.
-Fixed the UIView layout issue; the calculation for min zoom limit was unnecessary.
-However, there is something wrong with the Metal layer's rendering of the actual map content. At default zoom on iPhone 13, there is map content being clipped from the screen. The MTKView and the scroll view are snug, so it is a projection problem.
-Actually, it might just be scale-to-fill doing its job... yes, the iP13 is "longer." OK, so centering the map should do the trick, then.
-iPad Air is shorter than the phones, so it needs to scale up to scale-to-fill... Ah, but when I do that, the vertical scroll axis becomes available! And if I zoom in the rendering, that will clip the content horizontally without enabling the horizontal scroll axis!
+## IBLR with joins
+Since the selection outline is so thick, the gaps between the straight line segments become very visible. tyro.net shows how to fill out the gaps with an additional, single-triangle primitive inserted at each vertex in the outline. Looks a lot better, but the border renderer is so dense and thin that the country borders look fine without it.
+I think that, after lookdev, I will want to adjust this further. I want to have the selection biased to the outside or the inside, and I will need to sort alpha overdraw on it. Same article has an adjusted setup that avoids alpha overdraw, but for now, this looks pretty cool. (...) Nah, I can live with the overdraw; the selection geometry is so incredibly dense that it doesn't show - everything is pretty much doubled anyway.
 
-It must be the actual scroll content view that is the wrong size, then? That's the only thing that actually affects the scrollview. And what is the actuall scroll content view? The dummy, right? Yup, and that is set to the MTKView's size, not the map content. I'm getting somewhere. The dummy should have the same shape as the map (360ºx160º), scaled-to-fit.
-Scroll and scale is correct an all three shapes now; but the actual map rendering is offset.
-
-The dummy view must cover the entire screen, so it must be scale-to-fill, but it should also be allowed to overshoot _on one axis_. Alright, it's the dummy that needs to scale-to-fill! Finally!
-
---
-I need to remind myself how this all works though. Numbers are for the problematic iPad.
-This is the view stack, bottom to top:
-- MTKView that covers the screen and takes rendering
--- scroll view (should be scaled to fill the MTKView)
---- input view (takes tap inputs, should be renamed from dummyView, created at runtime)
--- label view (covers the screen, renders UILabels at points mapped from map engine)
-
-At the bottom of the stack sits an MTKView that covers the screen.
-When rendering, I set a projection matrix from the view's size (the scroll view's bounds) and the map size (long/lat with poles clipped out). The scrollView is 1180x820. The map size is 360x160 (10º clipped from each pole). I want rendering to scale-to-fill, so the -170º/+170º should map to 0px/820px.
-
-The rendering setup is weird because I can't ask UIKit to create a pixel-perfect canvas of the world when zoomed in (even if I cull rendering outside the viewport). So, I keep a screen-sized MTKView as rendering viewport. Then, I cover the screen with a scrollview, and fill that with a "dummy" view with the same dimensions as the map space. The scrollview will move the dummy view according to UIKit models, and I can read off the scrollview's transform, and apply it to the MTK-rendered viewport.
-
-As state above, I think it should work fine to take the screen-covering scrollview, and insert a map-space dummy view into it. It would occupy a small rectangle at the top left. Then, zoom in until it fills the scrollview (scale-to-fill, not scale-to-fit). At this point, the transform should be applicable to the render view. Regardless, this can't work in any other way, so the dummy view is a fixed solution, and then the MTK viewport can make downstream adjustments.
-
-As it is now, I make the dummyView larger than the map-space, which might be a bad idea. Should be better to just make it map-sized and zoom more aggressively. (...) Hm no, because then the base zoom factor is ~5x, while the map wants to start at 1x. 
-
-Now, most everything seems to work except a weird vertical offset. The region renderer is offset by, what, 45º south. The labels seem to be in the right place if the map would be corrected, so that's a last thing to dig into.
-The projection matrix doesn't set (-180,-90) to (0,0) as it should.
-
-Found it - the code that centers the rendering offset for the map tried to center the fitted map, not the actual mapspace.
 
 ## Instance-based POI rendering
 OK, but let's take a stab at this anyway. It would be nice to get everything that's renderable as instances to be so. I'll have to take one draw call per POI plane, _or_ bake the fade value into the per-instance uniform, and I think that's actually totally doable – and with a tiny tiny offset (based on the distance from screen center?) it might actually look a lot better.
@@ -852,4 +822,37 @@ U has marked and opened the parts of the world U has visited.
 There is a button on the map, that flips it around to the backside.
 On the backside is a wealth of presentation modes
 
+## Layout bug
+Noticed that the app layout breaks on devices that are shaped differently than the iPhone SE.
+Something's wrong with the constraints on the MTKView or the scrollview.
+Fixed the UIView layout issue; the calculation for min zoom limit was unnecessary.
+However, there is something wrong with the Metal layer's rendering of the actual map content. At default zoom on iPhone 13, there is map content being clipped from the screen. The MTKView and the scroll view are snug, so it is a projection problem.
+Actually, it might just be scale-to-fill doing its job... yes, the iP13 is "longer." OK, so centering the map should do the trick, then.
+iPad Air is shorter than the phones, so it needs to scale up to scale-to-fill... Ah, but when I do that, the vertical scroll axis becomes available! And if I zoom in the rendering, that will clip the content horizontally without enabling the horizontal scroll axis!
 
+It must be the actual scroll content view that is the wrong size, then? That's the only thing that actually affects the scrollview. And what is the actuall scroll content view? The dummy, right? Yup, and that is set to the MTKView's size, not the map content. I'm getting somewhere. The dummy should have the same shape as the map (360ºx160º), scaled-to-fit.
+Scroll and scale is correct an all three shapes now; but the actual map rendering is offset.
+
+The dummy view must cover the entire screen, so it must be scale-to-fill, but it should also be allowed to overshoot _on one axis_. Alright, it's the dummy that needs to scale-to-fill! Finally!
+
+--
+I need to remind myself how this all works though. Numbers are for the problematic iPad.
+This is the view stack, bottom to top:
+- MTKView that covers the screen and takes rendering
+-- scroll view (should be scaled to fill the MTKView)
+--- input view (takes tap inputs, should be renamed from dummyView, created at runtime)
+-- label view (covers the screen, renders UILabels at points mapped from map engine)
+
+At the bottom of the stack sits an MTKView that covers the screen.
+When rendering, I set a projection matrix from the view's size (the scroll view's bounds) and the map size (long/lat with poles clipped out). The scrollView is 1180x820. The map size is 360x160 (10º clipped from each pole). I want rendering to scale-to-fill, so the -170º/+170º should map to 0px/820px.
+
+The rendering setup is weird because I can't ask UIKit to create a pixel-perfect canvas of the world when zoomed in (even if I cull rendering outside the viewport). So, I keep a screen-sized MTKView as rendering viewport. Then, I cover the screen with a scrollview, and fill that with a "dummy" view with the same dimensions as the map space. The scrollview will move the dummy view according to UIKit models, and I can read off the scrollview's transform, and apply it to the MTK-rendered viewport.
+
+As state above, I think it should work fine to take the screen-covering scrollview, and insert a map-space dummy view into it. It would occupy a small rectangle at the top left. Then, zoom in until it fills the scrollview (scale-to-fill, not scale-to-fit). At this point, the transform should be applicable to the render view. Regardless, this can't work in any other way, so the dummy view is a fixed solution, and then the MTK viewport can make downstream adjustments.
+
+As it is now, I make the dummyView larger than the map-space, which might be a bad idea. Should be better to just make it map-sized and zoom more aggressively. (...) Hm no, because then the base zoom factor is ~5x, while the map wants to start at 1x. 
+
+Now, most everything seems to work except a weird vertical offset. The region renderer is offset by, what, 45º south. The labels seem to be in the right place if the map would be corrected, so that's a last thing to dig into.
+The projection matrix doesn't set (-180,-90) to (0,0) as it should.
+
+Found it - the code that centers the rendering offset for the map tried to center the fitted map, not the actual mapspace.
