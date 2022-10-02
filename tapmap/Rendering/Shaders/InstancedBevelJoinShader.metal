@@ -12,6 +12,8 @@ using namespace metal;
 struct FrameUniforms {
 	float4x4 modelViewProjectionMatrix;
 	float width;
+	float alignmentIn;
+	float alignmentOut;
 	float4 color;
 };
 
@@ -52,8 +54,9 @@ vertex VertexOut bevelVertex(const device Vertex* vertexArray [[ buffer(0) ]],
 	float2 prevNormal = normalize(float2(-prevSegment.y, prevSegment.x));
 	float2 nextNormal = -normalize(float2(-nextSegment.y, nextSegment.x));
 	
-	float2 p0 = direction * frame->width * (direction < 0.0 ? prevNormal : nextNormal);
-	float2 p1 = direction * frame->width * (direction < 0.0 ? nextNormal : prevNormal);
+	float alignment = direction * (direction < 0.0 ? frame->alignmentOut : frame->alignmentIn);
+	float2 p0 = alignment * frame->width * (direction < 0.0 ? prevNormal : nextNormal);
+	float2 p1 = alignment * frame->width * (direction < 0.0 ? nextNormal : prevNormal);
 	
 	float2 p = b + v.position.x * p0 + v.position.y * p1;
 	VertexOut outVertex = VertexOut();

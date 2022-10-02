@@ -12,10 +12,12 @@ import simd
 fileprivate struct FrameUniforms {
 	let mvpMatrix: simd_float4x4
 	let width: simd_float1
+	let alignmentIn: simd_float1
+	let alignmentOut: simd_float1
 	let color: simd_float4
 }
 
-fileprivate let kMaxLineSegments = 32768
+fileprivate let kMaxLineSegments = 65535
 
 class SelectionRenderer {
 	let device: MTLDevice
@@ -33,6 +35,8 @@ class SelectionRenderer {
 	var frameLineSegmentCount: [Int] = []
 	
 	var outlineWidth: Float
+	let alignmentIn: Float = 0.0
+	let alignmentOut: Float = 1.0
 	var lodLevel: Int
 	var selectionHash: RegionHash?
 	
@@ -74,8 +78,8 @@ class SelectionRenderer {
 				device.makeBuffer(length: kMaxLineSegments * MemoryLayout<JoinInstanceUniforms>.stride, options: .storageModeShared)!
 			}
 	
-			self.lineSegmentPrimitive = makeLineSegmentPrimitive(in: device, inside: 0.0, outside: 1.0)
-			self.joinSegmentPrimitive = makeBevelJoinPrimitive(in: device, width: 1.0)
+			self.lineSegmentPrimitive = makeLineSegmentPrimitive(in: device, inside: alignmentIn, outside: alignmentOut)
+			self.joinSegmentPrimitive = makeBevelJoinPrimitive(in: device, width: abs(alignmentIn - alignmentOut))
 		} catch let error {
 			fatalError(error.localizedDescription)
 		}
@@ -96,7 +100,8 @@ class SelectionRenderer {
 		guard let tessellation = streamer.tessellation(for: selectionHash, atLod: lodLevel, streamIfMissing: true) else {
 			return
 		}
-
+		
+		// $ cull line geometry against viewbox
 		let selectionLineBuffer = generateContourLineGeometry(contours: tessellation.contours)
 		guard selectionLineBuffer.count < kMaxLineSegments else {
 			fatalError("line segment buffer blew out at \(selectionLineBuffer.count) vertices (max \(kMaxLineSegments))")
@@ -130,7 +135,9 @@ class SelectionRenderer {
 		frameSelectSemaphore.wait()
 			var uniforms = FrameUniforms(mvpMatrix: projection,
 																	 width: self.outlineWidth,
-																	 color: Color(r: 0.8, g: 0.6, b: 0.1, a: 0.7).vector)
+																	 alignmentIn: alignmentIn,
+																	 alignmentOut: alignmentOut,
+																	 color: Color(r: 0.1, g: 0.1, b: 0.2, a: 0.7).vector)
 			let lineInstances = lineInstanceUniforms[bufferIndex]
 			let joinInstances = joinInstanceUniforms[bufferIndex]
 			let count = frameLineSegmentCount[bufferIndex]
