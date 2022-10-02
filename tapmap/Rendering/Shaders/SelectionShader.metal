@@ -9,15 +9,19 @@
 #include <metal_stdlib>
 using namespace metal;
 
-struct SelectionUniforms {
+struct FrameUniforms {
 	float4x4 modelViewProjectionMatrix;
-	float scaleWidth;
+	float width;
 	float4 color;
 };
 
-struct ScaleVertex {
+struct Vertex {
 	float2 position;
-	float2 normal;
+};
+
+struct InstanceUniform {
+	float2 a;
+	float2 b;
 };
 
 struct VertexOut {
@@ -25,14 +29,21 @@ struct VertexOut {
 	float4 color;
 };
 
-vertex VertexOut selectionVertex(const device ScaleVertex* vertexArray [[ buffer(0) ]],
-																 constant SelectionUniforms *uniforms [[ buffer(1) ]],
-																 unsigned int vid [[ vertex_id ]]) {
-	ScaleVertex v = vertexArray[vid];
+vertex VertexOut selectionVertex(const device Vertex* vertexArray [[ buffer(0) ]],
+																 constant FrameUniforms *frame [[ buffer(1) ]],
+																 constant InstanceUniform *instanceUniforms [[ buffer(2) ]],
+																 unsigned int vid [[ vertex_id ]],
+																 unsigned int iid [[ instance_id ]]) {
+	Vertex v = vertexArray[vid];
+	float2 a = instanceUniforms[iid].a;
+	float2 b = instanceUniforms[iid].b;
+	float2 spine = b - a;
+	float2 rib = normalize(float2(-spine.y, spine.x));
+	float2 p = a + (v.position.x * spine) +
+								 (v.position.y * rib) * frame->width;
 	VertexOut outVertex = VertexOut();
-	float2 rib = v.normal * uniforms->scaleWidth;
-	outVertex.position = uniforms->modelViewProjectionMatrix * float4(v.position + rib, 0.0, 1.0);
-	outVertex.color = uniforms->color;
+	outVertex.position = frame->modelViewProjectionMatrix * float4(p, 0.0, 1.0);
+	outVertex.color = frame->color;
 	return outVertex;
 }
 

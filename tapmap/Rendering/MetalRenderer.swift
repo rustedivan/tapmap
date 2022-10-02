@@ -53,7 +53,7 @@ class MetalRenderer {
 																					 maxSegments: 50000, label: "Country border renderer")
 		provinceBorderRenderer = BorderRenderer(withDevice: device, pixelFormat: view.colorPixelFormat, bufferCount: maxInflightFrames,
 																						maxSegments: 30000, label: "Province border renderer")
-		selectionRenderer = SelectionRenderer(withDevice: device, pixelFormat: view.colorPixelFormat)
+		selectionRenderer = SelectionRenderer(withDevice: device, pixelFormat: view.colorPixelFormat, bufferCount: maxInflightFrames)
 		poiRenderer = PoiRenderer(withDevice: device, pixelFormat: view.colorPixelFormat, bufferCount: maxInflightFrames,
 															withVisibleContinents: world.availableContinents,
 															countries: world.availableCountries,
@@ -118,7 +118,7 @@ class MetalRenderer {
 																			  zoom: zoomLevel, zoomRate: zoomRate, bufferIndex: bufferIndex)
 							 
 		poiRenderer.prepareFrame(visibleSet: renderSet, zoom: poiZoom, zoomRate: zoomRate, bufferIndex: bufferIndex)
-		selectionRenderer.prepareFrame(zoomLevel: zoomLevel)
+		selectionRenderer.prepareFrame(zoomLevel: zoomLevel, bufferIndex: bufferIndex)
 		debugRenderer.prepareFrame(bufferIndex: bufferIndex)
 		
 		postProcessingRenderer.prepareFrame(offscreenTexture: sseRenderTarget[bufferIndex], bufferIndex: bufferIndex)
@@ -163,7 +163,7 @@ class MetalRenderer {
 		guard let sseCommandEncoder = commandBuffer.makeRenderCommandEncoder(descriptor: renderPassDescriptor) else { return }
 		sseCommandEncoder.label = "Screen-space effect render pass encoder @ \(frameId)"
 			self.postProcessingRenderer.renderPostProcessing(inEncoder: sseCommandEncoder, bufferIndex: bufferIndex)
-			self.selectionRenderer.renderSelection(inProjection: mvpMatrix, inEncoder: sseCommandEncoder)
+			self.selectionRenderer.renderSelection(inProjection: mvpMatrix, inEncoder: sseCommandEncoder, bufferIndex: bufferIndex)
 			self.poiRenderer.renderWorld(inProjection: mvpMatrix, inEncoder: sseCommandEncoder, bufferIndex: bufferIndex)
 			self.debugRenderer.renderMarkers(inProjection: mvpMatrix, inEncoder: sseCommandEncoder, bufferIndex: bufferIndex)
 		sseCommandEncoder.endEncoding()

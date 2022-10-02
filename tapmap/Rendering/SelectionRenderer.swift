@@ -15,21 +15,30 @@ fileprivate struct FrameUniforms {
 	let color: simd_float4
 }
 
+fileprivate struct InstanceUniforms {
+	var a: simd_float2
+	var b: simd_float2
+}
+
+fileprivate let kMaxLineSegments = 4096
+
 class SelectionRenderer {
-	typealias SelectionPrimitive = FixedScaleRenderPrimitive
-	typealias RenderList = ContiguousArray<SelectionPrimitive>
-	
 	let device: MTLDevice
 	let pipeline: MTLRenderPipelineState
 	
-	var outlinePrimitive: SelectionPrimitive?
-	var renderList: RenderList
+	var lineSegmentPrimitive: BaseRenderPrimitive<Vertex>!
 	var frameSelectSemaphore = DispatchSemaphore(value: 1)
+
+	var lineSegmentsHighwaterMark: Int = 0
 	
+	let instanceUniforms: [MTLBuffer]
+	var frameLineSegmentCount: [Int] = []
+
 	var outlineWidth: Float
 	var lodLevel: Int
+	var selectionHash: RegionHash?
 	
-	init(withDevice device: MTLDevice, pixelFormat: MTLPixelFormat) {
+	init(withDevice device: MTLDevice, pixelFormat: MTLPixelFormat, bufferCount: Int) {
 		let shaderLib = device.makeDefaultLibrary()!
 		
 		let pipelineDescriptor = MTLRenderPipelineDescriptor()
@@ -37,12 +46,16 @@ class SelectionRenderer {
 		pipelineDescriptor.fragmentFunction = shaderLib.makeFunction(name: "selectionFragment")
 		pipelineDescriptor.colorAttachments[0].pixelFormat = pixelFormat;
 		pipelineDescriptor.vertexBuffers[0].mutability = .immutable
-		pipelineDescriptor.vertexBuffers[1].mutability = .immutable
 		
 		do {
 			try pipeline = device.makeRenderPipelineState(descriptor: pipelineDescriptor)
 			self.device = device
-			self.renderList = RenderList()	// SelectionRenderer does not need to triple-buffer
+			self.frameLineSegmentCount = Array(repeating: 0, count: bufferCount)
+
+			self.instanceUniforms = (0..<bufferCount).map { bufferIndex in
+				device.makeBuffer(length: kMaxLineSegments * MemoryLayout<InstanceUniforms>.stride, options: .storageModeShared)!
+			}
+			self.lineSegmentPrimitive = makeLineSegmentPrimitive(in: device)
 		} catch let error {
 			fatalError(error.localizedDescription)
 		}
@@ -50,66 +63,99 @@ class SelectionRenderer {
 		outlineWidth = 0.0
 		lodLevel = GeometryStreamer.shared.wantedLodLevel
 	}
+
+	func clear() {
+		selectionHash = nil
+	}
 	
-	func updatePrimitive(selectedRegionHash: RegionHash) {
+	func prepareFrame(zoomLevel: Float, bufferIndex: Int) {
 		let streamer = GeometryStreamer.shared
-		guard let tessellation = streamer.tessellation(for: selectedRegionHash, atLod: streamer.actualLodLevel) else { return }
-		
-		let thinOutline = { (outline: [Vertex]) in generateClosedOutlineGeometry(outline: outline, innerExtent: 0.2, outerExtent: 0.5) }
-		let countourVertices = tessellation.contours.map({$0.vertices})
-		let outlineGeometry: RegionContours = countourVertices.map(thinOutline)
-		
-		var cursor = 0
-		var stackedIndices: [[UInt16]] = []
-		for outline in outlineGeometry {
-			let indices = 0..<UInt16(outline.count)
-			let stackedRing = indices.map { $0 + UInt16(cursor) }
-			stackedIndices.append(stackedRing)
-			cursor += outline.count
+		guard let selectionHash = selectionHash else {
+			return
+		}
+		guard let tessellation = streamer.tessellation(for: selectionHash, atLod: lodLevel, streamIfMissing: true) else {
+			return
+		}
+
+		let selectionBuffer = generateContourCollectionGeometry(contours: tessellation.contours)
+		guard selectionBuffer.count < kMaxLineSegments else {
+			fatalError("line segment buffer blew out at \(selectionBuffer.count) vertices (max \(kMaxLineSegments))")
 		}
 		
-		outlinePrimitive = SelectionPrimitive(polygons: outlineGeometry,
-																					indices: stackedIndices,
-																					drawMode: .triangleStrip,
-																					device: device,
-																					color: Color(r: 0.0, g: 0.0, b: 0.0, a: 1.0),
-																					ownerHash: selectedRegionHash,
-																					debugName: "Selection contours")
-	}
-	
-	func clear() {
-		outlinePrimitive = nil
-	}
-	
-	func prepareFrame(zoomLevel: Float) {
-		
-		if let selectionHash = outlinePrimitive?.ownerHash, lodLevel != GeometryStreamer.shared.actualLodLevel {
-			updatePrimitive(selectedRegionHash: selectionHash)
+		if lodLevel != GeometryStreamer.shared.actualLodLevel {
 			lodLevel = GeometryStreamer.shared.actualLodLevel
 		}
-		
+		self.outlineWidth = 1.0 / zoomLevel
+
 		frameSelectSemaphore.wait()
-			self.outlineWidth = 1.0 / zoomLevel
-			self.renderList = outlinePrimitive != nil ? [outlinePrimitive!] : []
+			self.frameLineSegmentCount[bufferIndex] = selectionBuffer.count
+			self.instanceUniforms[bufferIndex].contents().copyMemory(from: selectionBuffer, byteCount: MemoryLayout<InstanceUniforms>.stride * selectionBuffer.count)
+			if selectionBuffer.count > lineSegmentsHighwaterMark {
+				lineSegmentsHighwaterMark = selectionBuffer.count
+				print("Selection renderer used a max of \(lineSegmentsHighwaterMark) line segments.")
+			}
 		frameSelectSemaphore.signal()
 	}
 	
-	func renderSelection(inProjection projection: simd_float4x4, inEncoder encoder: MTLRenderCommandEncoder) {
-		guard !renderList.isEmpty else { return }
-	
-		encoder.pushDebugGroup("Render outlines")
-		encoder.setRenderPipelineState(pipeline)
-	
-		frameSelectSemaphore.wait()
-			var uniforms = FrameUniforms(mvpMatrix: projection, width: self.outlineWidth, color: Color(r: 0.0, g: 0.0, b: 0.0, a: 1.0).vector)
-		frameSelectSemaphore.signal()
-		
-		encoder.setVertexBytes(&uniforms, length: MemoryLayout.stride(ofValue: uniforms), index: 1)
-		
-		for primitive in renderList {
-			render(primitive: primitive, into: encoder)
+	func renderSelection(inProjection projection: simd_float4x4, inEncoder encoder: MTLRenderCommandEncoder, bufferIndex: Int) {
+		encoder.pushDebugGroup("Render selection")
+		defer {
+			encoder.popDebugGroup()
 		}
 	
-		encoder.popDebugGroup()
+		frameSelectSemaphore.wait()
+			var uniforms = FrameUniforms(mvpMatrix: projection,
+																	 width: self.outlineWidth,
+																	 color: Color(r: 0.0, g: 0.0, b: 0.0, a: 1.0).vector)
+			let instances = instanceUniforms[bufferIndex]
+			let count = frameLineSegmentCount[bufferIndex]
+		frameSelectSemaphore.signal()
+		
+		if count == 0 {
+			return
+		}
+		
+		encoder.setRenderPipelineState(pipeline)
+		encoder.setVertexBytes(&uniforms, length: MemoryLayout.stride(ofValue: uniforms), index: 1)
+		encoder.setVertexBuffer(instances, offset: 0, index: 2)
+		
+		renderInstanced(primitive: lineSegmentPrimitive, count: count, into: encoder)
 	}
+}
+
+fileprivate func makeLineSegmentPrimitive(in device: MTLDevice) -> RenderPrimitive {
+	let vertices: [Vertex] = [
+		Vertex(0.0, 0.0),
+		Vertex(1.0, 0.0),
+		Vertex(1.0, 1.0),
+		Vertex(0.0, 1.0)
+	]
+	let indices: [UInt16] = [
+		0, 1, 2, 0, 2, 3
+	]
+	
+	return RenderPrimitive(	polygons: [vertices],
+													indices: [indices],
+													drawMode: .triangle,
+													device: device,
+													color: Color(r: 0.0, g: 0.0, b: 0.0, a: 1.0),
+													ownerHash: 0,
+													debugName: "Line segment primitive")
+}
+
+fileprivate func generateContourCollectionGeometry(contours: [VertexRing]) -> Array<InstanceUniforms> {
+	let segmentCount = contours.reduce(0) { $0 + $1.vertices.count }
+	var vertices = Array<InstanceUniforms>()
+	vertices.reserveCapacity(segmentCount)
+	for contour in contours {
+		for i in 0..<contour.vertices.count - 1 {
+			let a = contour.vertices[i]
+			let b = contour.vertices[i + 1]
+			vertices.append(InstanceUniforms(
+				a: simd_float2(x: a.x, y: a.y),
+				b: simd_float2(x: b.x, y: b.y)
+			))
+		}
+	}
+	return vertices
 }
