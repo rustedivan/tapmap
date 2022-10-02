@@ -1,8 +1,8 @@
 //
-//  SelectionShader.metal
+//  InstancedLineShader.metal
 //  tapmap
 //
-//  Created by Ivan Milles on 2020-05-06.
+//  Created by Ivan Milles on 2022-10-02.
 //  Copyright © 2020 Wildbrain. All rights reserved.
 //
 
@@ -29,11 +29,11 @@ struct VertexOut {
 	float4 color;
 };
 
-vertex VertexOut selectionVertex(const device Vertex* vertexArray [[ buffer(0) ]],
-																 constant FrameUniforms *frame [[ buffer(1) ]],
-																 constant InstanceUniform *instanceUniforms [[ buffer(2) ]],
-																 unsigned int vid [[ vertex_id ]],
-																 unsigned int iid [[ instance_id ]]) {
+vertex VertexOut lineVertex(const device Vertex* vertexArray [[ buffer(0) ]],
+														constant FrameUniforms *frame [[ buffer(1) ]],
+														constant InstanceUniform *instanceUniforms [[ buffer(2) ]],
+														unsigned int vid [[ vertex_id ]],
+														unsigned int iid [[ instance_id ]]) {
 	Vertex v = vertexArray[vid];
 	float2 a = instanceUniforms[iid].a;
 	float2 b = instanceUniforms[iid].b;
@@ -47,7 +47,6 @@ vertex VertexOut selectionVertex(const device Vertex* vertexArray [[ buffer(0) ]
 	return outVertex;
 }
 
-fragment float4 selectionFragment(VertexOut interpolated [[ stage_in ]]) {
+fragment float4 lineFragment(VertexOut interpolated [[ stage_in ]]) {
 	return float4(interpolated.color);
 }
-

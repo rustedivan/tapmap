@@ -81,7 +81,7 @@
 		149B3FDD245EE8B1008A299E /* MapShader.metal in Sources */ = {isa = PBXBuildFile; fileRef = 149B3FDC245EE8B1008A299E /* MapShader.metal */; };
 		149CBDDD23CB230000A7AABB /* LabelView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 149CBDDC23CB230000A7AABB /* LabelView.swift */; };
 		149EEA6D25B39D9D00B19285 /* LabelLayout.swift in Sources */ = {isa = PBXBuildFile; fileRef = 149EEA6C25B39D9D00B19285 /* LabelLayout.swift */; };
-		14B63F052460BDFF00A4A433 /* BorderShader.metal in Sources */ = {isa = PBXBuildFile; fileRef = 14B63F042460BDFF00A4A433 /* BorderShader.metal */; };
+		14B63F052460BDFF00A4A433 /* InstancedLineShader.metal in Sources */ = {isa = PBXBuildFile; fileRef = 14B63F042460BDFF00A4A433 /* InstancedLineShader.metal */; };
 		14B63F072461450F00A4A433 /* PoiShader.metal in Sources */ = {isa = PBXBuildFile; fileRef = 14B63F062461450F00A4A433 /* PoiShader.metal */; };
 		14BAA333240EF95000DC64B9 /* OperationFitLabels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14BAA332240EF95000DC64B9 /* OperationFitLabels.swift */; };
 		14BD433A2444AD50007A3D67 /* BorderRenderer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14BD43392444AD50007A3D67 /* BorderRenderer.swift */; };
@@ -106,9 +106,9 @@
 		14C665C922B97ED40054D7F2 /* JobHelpers.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14C665C822B97ED40054D7F2 /* JobHelpers.swift */; };
 		14C665CB22B97F250054D7F2 /* GeometryTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14C665CA22B97F250054D7F2 /* GeometryTests.swift */; };
 		14EDA502242C8F38000B3954 /* tessellate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14EDA501242C8F38000B3954 /* tessellate.swift */; };
-		14F481F42462875A00E4C001 /* SelectionShader.metal in Sources */ = {isa = PBXBuildFile; fileRef = 14F481F32462875A00E4C001 /* SelectionShader.metal */; };
 		14F8918B22F0F3F7008CCCF3 /* OutlineGeometry.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14985FF522F0F35700F68A1F /* OutlineGeometry.swift */; };
 		14FCC069245ED44D006116E7 /* MetalRenderer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14FCC068245ED44D006116E7 /* MetalRenderer.swift */; };
+		14FEEEC428E9A45A0085847F /* InstanceBasedLineUtils.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14FEEEC328E9A45A0085847F /* InstanceBasedLineUtils.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -174,7 +174,7 @@
 		149B3FDC245EE8B1008A299E /* MapShader.metal */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.metal; path = MapShader.metal; sourceTree = "<group>"; };
 		149CBDDC23CB230000A7AABB /* LabelView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LabelView.swift; sourceTree = "<group>"; };
 		149EEA6C25B39D9D00B19285 /* LabelLayout.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LabelLayout.swift; sourceTree = "<group>"; };
-		14B63F042460BDFF00A4A433 /* BorderShader.metal */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.metal; path = BorderShader.metal; sourceTree = "<group>"; };
+		14B63F042460BDFF00A4A433 /* InstancedLineShader.metal */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.metal; path = InstancedLineShader.metal; sourceTree = "<group>"; };
 		14B63F062461450F00A4A433 /* PoiShader.metal */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.metal; path = PoiShader.metal; sourceTree = "<group>"; };
 		14BAA332240EF95000DC64B9 /* OperationFitLabels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OperationFitLabels.swift; sourceTree = "<group>"; };
 		14BD43392444AD50007A3D67 /* BorderRenderer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BorderRenderer.swift; sourceTree = "<group>"; };
@@ -208,8 +208,8 @@
 		14C665C822B97ED40054D7F2 /* JobHelpers.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = JobHelpers.swift; sourceTree = "<group>"; };
 		14C665CA22B97F250054D7F2 /* GeometryTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = GeometryTests.swift; sourceTree = "<group>"; };
 		14EDA501242C8F38000B3954 /* tessellate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = tessellate.swift; sourceTree = "<group>"; };
-		14F481F32462875A00E4C001 /* SelectionShader.metal */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.metal; path = SelectionShader.metal; sourceTree = "<group>"; };
 		14FCC068245ED44D006116E7 /* MetalRenderer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MetalRenderer.swift; sourceTree = "<group>"; };
+		14FEEEC328E9A45A0085847F /* InstanceBasedLineUtils.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InstanceBasedLineUtils.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -310,6 +310,7 @@
 				14985FEC22F0ED0C00F68A1F /* RenderPrimitives.swift */,
 				14553285250E3BE1002729F1 /* StyleSheet.swift */,
 				148937E922B97FDF009278A0 /* ColoredHash.swift */,
+				14FEEEC328E9A45A0085847F /* InstanceBasedLineUtils.swift */,
 				14985FE822F0EC7500F68A1F /* Shaders */,
 			);
 			path = Rendering;
@@ -332,9 +333,8 @@
 			isa = PBXGroup;
 			children = (
 				149B3FDC245EE8B1008A299E /* MapShader.metal */,
-				14B63F042460BDFF00A4A433 /* BorderShader.metal */,
+				14B63F042460BDFF00A4A433 /* InstancedLineShader.metal */,
 				14B63F062461450F00A4A433 /* PoiShader.metal */,
-				14F481F32462875A00E4C001 /* SelectionShader.metal */,
 				1416641A2463E2690006A2D4 /* EffectRenderer.metal */,
 				148846FF289FC1A200FD02F7 /* PostProcessingShader.metal */,
 			);
@@ -606,7 +606,7 @@
 				1416641B2463E2690006A2D4 /* EffectRenderer.metal in Sources */,
 				14869B3E24BA1183008E580F /* LocalProfile.swift in Sources */,
 				144B5D5A22D9E092001E2A85 /* SelectionRenderer.swift in Sources */,
-				14B63F052460BDFF00A4A433 /* BorderShader.metal in Sources */,
+				14B63F052460BDFF00A4A433 /* InstancedLineShader.metal in Sources */,
 				1489380622B97FE0009278A0 /* AppDelegate.swift in Sources */,
 				148937FE22B97FDF009278A0 /* ColoredHash.swift in Sources */,
 				142A21EF23DC61A3000DA4FA /* ChunkTable.swift in Sources */,
@@ -623,8 +623,8 @@
 				1440944C23DCC1DB0067F7D6 /* GeometryStreamer.swift in Sources */,
 				149B3FDD245EE8B1008A299E /* MapShader.metal in Sources */,
 				1489380522B97FE0009278A0 /* UIState.swift in Sources */,
+				14FEEEC428E9A45A0085847F /* InstanceBasedLineUtils.swift in Sources */,
 				14F8918B22F0F3F7008CCCF3 /* OutlineGeometry.swift in Sources */,
-				14F481F42462875A00E4C001 /* SelectionShader.metal in Sources */,
 				147B819523DA043500942C9B /* WorldTree.swift in Sources */,
 				14869B4024BA1191008E580F /* CloudProfile.swift in Sources */,
 				1468830D23B4BC4100105E04 /* DebugRenderer.swift in Sources */,

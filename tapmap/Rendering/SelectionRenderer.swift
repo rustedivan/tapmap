@@ -15,18 +15,13 @@ fileprivate struct FrameUniforms {
 	let color: simd_float4
 }
 
-fileprivate struct InstanceUniforms {
-	var a: simd_float2
-	var b: simd_float2
-}
-
 fileprivate let kMaxLineSegments = 16384
 
 class SelectionRenderer {
 	let device: MTLDevice
 	let pipeline: MTLRenderPipelineState
 	
-	var lineSegmentPrimitive: BaseRenderPrimitive<Vertex>!
+	var lineSegmentPrimitive: LineSegmentPrimitive
 	var frameSelectSemaphore = DispatchSemaphore(value: 1)
 
 	var lineSegmentsHighwaterMark: Int = 0
@@ -42,8 +37,8 @@ class SelectionRenderer {
 		let shaderLib = device.makeDefaultLibrary()!
 		
 		let pipelineDescriptor = MTLRenderPipelineDescriptor()
-		pipelineDescriptor.vertexFunction = shaderLib.makeFunction(name: "selectionVertex")
-		pipelineDescriptor.fragmentFunction = shaderLib.makeFunction(name: "selectionFragment")
+		pipelineDescriptor.vertexFunction = shaderLib.makeFunction(name: "lineVertex")
+		pipelineDescriptor.fragmentFunction = shaderLib.makeFunction(name: "lineFragment")
 		pipelineDescriptor.colorAttachments[0].pixelFormat = pixelFormat;
 		pipelineDescriptor.vertexBuffers[0].mutability = .immutable
 		
@@ -53,9 +48,9 @@ class SelectionRenderer {
 			self.frameLineSegmentCount = Array(repeating: 0, count: bufferCount)
 
 			self.instanceUniforms = (0..<bufferCount).map { bufferIndex in
-				device.makeBuffer(length: kMaxLineSegments * MemoryLayout<InstanceUniforms>.stride, options: .storageModeShared)!
+				device.makeBuffer(length: kMaxLineSegments * MemoryLayout<LineInstanceUniforms>.stride, options: .storageModeShared)!
 			}
-			self.lineSegmentPrimitive = makeLineSegmentPrimitive(in: device)
+			self.lineSegmentPrimitive = makeLineSegmentPrimitive(in: device, inside: 0.0, outside: -1.0)
 		} catch let error {
 			fatalError(error.localizedDescription)
 		}
@@ -90,7 +85,7 @@ class SelectionRenderer {
 
 		frameSelectSemaphore.wait()
 			self.frameLineSegmentCount[bufferIndex] = selectionBuffer.count
-			self.instanceUniforms[bufferIndex].contents().copyMemory(from: selectionBuffer, byteCount: MemoryLayout<InstanceUniforms>.stride * selectionBuffer.count)
+			self.instanceUniforms[bufferIndex].contents().copyMemory(from: selectionBuffer, byteCount: MemoryLayout<LineInstanceUniforms>.stride * selectionBuffer.count)
 			if selectionBuffer.count > lineSegmentsHighwaterMark {
 				lineSegmentsHighwaterMark = selectionBuffer.count
 				print("Selection renderer used a max of \(lineSegmentsHighwaterMark) line segments.")
@@ -124,39 +119,3 @@ class SelectionRenderer {
 	}
 }
 
-fileprivate func makeLineSegmentPrimitive(in device: MTLDevice) -> RenderPrimitive {
-	let vertices: [Vertex] = [
-		Vertex(0.0, 0.0),
-		Vertex(1.0, 0.0),
-		Vertex(1.0, -1.0),
-		Vertex(0.0, -1.0)
-	]
-	let indices: [UInt16] = [
-		0, 1, 2, 0, 2, 3
-	]
-	
-	return RenderPrimitive(	polygons: [vertices],
-													indices: [indices],
-													drawMode: .triangle,
-													device: device,
-													color: Color(r: 0.0, g: 0.0, b: 0.0, a: 1.0),
-													ownerHash: 0,
-													debugName: "Line segment primitive")
-}
-
-fileprivate func generateContourCollectionGeometry(contours: [VertexRing]) -> Array<InstanceUniforms> {
-	let segmentCount = contours.reduce(0) { $0 + $1.vertices.count }
-	var vertices = Array<InstanceUniforms>()
-	vertices.reserveCapacity(segmentCount)
-	for contour in contours {
-		for i in 0..<contour.vertices.count - 1 {
-			let a = contour.vertices[i]
-			let b = contour.vertices[i + 1]
-			vertices.append(InstanceUniforms(
-				a: simd_float2(x: a.x, y: a.y),
-				b: simd_float2(x: b.x, y: b.y)
-			))
-		}
-	}
-	return vertices
-}
