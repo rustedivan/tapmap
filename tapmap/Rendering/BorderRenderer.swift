@@ -110,7 +110,7 @@ class BorderRenderer<RegionType> {
 		
 		// Generate all the vertices in all the outlines
 		let regionContours = frameRenderList.flatMap { $0.contours }
-		let borderBuffer = generateContourCollectionGeometry(contours: regionContours)
+		let borderBuffer = generateContourLineGeometry(contours: regionContours)
 		guard borderBuffer.count < maxVisibleLineSegments else {
 			fatalError("line segment buffer blew out at \(borderBuffer.count) vertices (max \(maxVisibleLineSegments))")
 		}

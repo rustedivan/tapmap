@@ -109,6 +109,7 @@
 		14F8918B22F0F3F7008CCCF3 /* OutlineGeometry.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14985FF522F0F35700F68A1F /* OutlineGeometry.swift */; };
 		14FCC069245ED44D006116E7 /* MetalRenderer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14FCC068245ED44D006116E7 /* MetalRenderer.swift */; };
 		14FEEEC428E9A45A0085847F /* InstanceBasedLineUtils.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14FEEEC328E9A45A0085847F /* InstanceBasedLineUtils.swift */; };
+		14FEEEC628E9A88F0085847F /* InstancedBevelJoinShader.metal in Sources */ = {isa = PBXBuildFile; fileRef = 14FEEEC528E9A88F0085847F /* InstancedBevelJoinShader.metal */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -210,6 +211,7 @@
 		14EDA501242C8F38000B3954 /* tessellate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = tessellate.swift; sourceTree = "<group>"; };
 		14FCC068245ED44D006116E7 /* MetalRenderer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MetalRenderer.swift; sourceTree = "<group>"; };
 		14FEEEC328E9A45A0085847F /* InstanceBasedLineUtils.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InstanceBasedLineUtils.swift; sourceTree = "<group>"; };
+		14FEEEC528E9A88F0085847F /* InstancedBevelJoinShader.metal */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.metal; path = InstancedBevelJoinShader.metal; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -334,6 +336,7 @@
 			children = (
 				149B3FDC245EE8B1008A299E /* MapShader.metal */,
 				14B63F042460BDFF00A4A433 /* InstancedLineShader.metal */,
+				14FEEEC528E9A88F0085847F /* InstancedBevelJoinShader.metal */,
 				14B63F062461450F00A4A433 /* PoiShader.metal */,
 				1416641A2463E2690006A2D4 /* EffectRenderer.metal */,
 				148846FF289FC1A200FD02F7 /* PostProcessingShader.metal */,
@@ -620,6 +623,7 @@
 				1489380422B97FE0009278A0 /* MapViewController.swift in Sources */,
 				148937F822B97FDF009278A0 /* GeoRegion.swift in Sources */,
 				14532D9A23B515BE00943ADC /* QuadTree.swift in Sources */,
+				14FEEEC628E9A88F0085847F /* InstancedBevelJoinShader.metal in Sources */,
 				1440944C23DCC1DB0067F7D6 /* GeometryStreamer.swift in Sources */,
 				149B3FDD245EE8B1008A299E /* MapShader.metal in Sources */,
 				1489380522B97FE0009278A0 /* UIState.swift in Sources */,

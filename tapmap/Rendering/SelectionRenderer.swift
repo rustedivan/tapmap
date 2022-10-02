@@ -15,20 +15,23 @@ fileprivate struct FrameUniforms {
 	let color: simd_float4
 }
 
-fileprivate let kMaxLineSegments = 16384
+fileprivate let kMaxLineSegments = 32768
 
 class SelectionRenderer {
 	let device: MTLDevice
-	let pipeline: MTLRenderPipelineState
+	let linePipeline: MTLRenderPipelineState
+	let joinPipeline: MTLRenderPipelineState
 	
 	var lineSegmentPrimitive: LineSegmentPrimitive
+	var joinSegmentPrimitive: LineSegmentPrimitive
 	var frameSelectSemaphore = DispatchSemaphore(value: 1)
 
 	var lineSegmentsHighwaterMark: Int = 0
 	
-	let instanceUniforms: [MTLBuffer]
+	let lineInstanceUniforms: [MTLBuffer]
+	let joinInstanceUniforms: [MTLBuffer]
 	var frameLineSegmentCount: [Int] = []
-
+	
 	var outlineWidth: Float
 	var lodLevel: Int
 	var selectionHash: RegionHash?
@@ -36,21 +39,33 @@ class SelectionRenderer {
 	init(withDevice device: MTLDevice, pixelFormat: MTLPixelFormat, bufferCount: Int) {
 		let shaderLib = device.makeDefaultLibrary()!
 		
-		let pipelineDescriptor = MTLRenderPipelineDescriptor()
-		pipelineDescriptor.vertexFunction = shaderLib.makeFunction(name: "lineVertex")
-		pipelineDescriptor.fragmentFunction = shaderLib.makeFunction(name: "lineFragment")
-		pipelineDescriptor.colorAttachments[0].pixelFormat = pixelFormat;
-		pipelineDescriptor.vertexBuffers[0].mutability = .immutable
+		let linePipelineDescriptor = MTLRenderPipelineDescriptor()
+		linePipelineDescriptor.vertexFunction = shaderLib.makeFunction(name: "lineVertex")
+		linePipelineDescriptor.fragmentFunction = shaderLib.makeFunction(name: "lineFragment")
+		linePipelineDescriptor.colorAttachments[0].pixelFormat = pixelFormat;
+		linePipelineDescriptor.vertexBuffers[0].mutability = .immutable
+		
+		let joinPipelineDescriptor = MTLRenderPipelineDescriptor()
+		joinPipelineDescriptor.vertexFunction = shaderLib.makeFunction(name: "bevelVertex")
+		joinPipelineDescriptor.fragmentFunction = shaderLib.makeFunction(name: "bevelFragment")
+		joinPipelineDescriptor.colorAttachments[0].pixelFormat = pixelFormat;
+		joinPipelineDescriptor.vertexBuffers[0].mutability = .immutable
 		
 		do {
-			try pipeline = device.makeRenderPipelineState(descriptor: pipelineDescriptor)
+			try linePipeline = device.makeRenderPipelineState(descriptor: linePipelineDescriptor)
+			try joinPipeline = device.makeRenderPipelineState(descriptor: joinPipelineDescriptor)
 			self.device = device
 			self.frameLineSegmentCount = Array(repeating: 0, count: bufferCount)
 
-			self.instanceUniforms = (0..<bufferCount).map { bufferIndex in
+			self.lineInstanceUniforms = (0..<bufferCount).map { bufferIndex in
 				device.makeBuffer(length: kMaxLineSegments * MemoryLayout<LineInstanceUniforms>.stride, options: .storageModeShared)!
 			}
-			self.lineSegmentPrimitive = makeLineSegmentPrimitive(in: device, inside: 0.0, outside: -1.0)
+			self.joinInstanceUniforms = (0..<bufferCount).map { bufferIndex in
+				device.makeBuffer(length: kMaxLineSegments * MemoryLayout<JoinInstanceUniforms>.stride, options: .storageModeShared)!
+			}
+	
+			self.lineSegmentPrimitive = makeLineSegmentPrimitive(in: device, inside: -0.5, outside: 0.5)
+			self.joinSegmentPrimitive = makeBevelJoinPrimitive(in: device, halfWidth: 0.5)
 		} catch let error {
 			fatalError(error.localizedDescription)
 		}
@@ -72,22 +87,24 @@ class SelectionRenderer {
 			return
 		}
 
-		let selectionBuffer = generateContourCollectionGeometry(contours: tessellation.contours)
-		guard selectionBuffer.count < kMaxLineSegments else {
-			fatalError("line segment buffer blew out at \(selectionBuffer.count) vertices (max \(kMaxLineSegments))")
+		let selectionLineBuffer = generateContourLineGeometry(contours: tessellation.contours)
+		guard selectionLineBuffer.count < kMaxLineSegments else {
+			fatalError("line segment buffer blew out at \(selectionLineBuffer.count) vertices (max \(kMaxLineSegments))")
 		}
+		let selectionJoinBuffer = generateContourJoinGeometry(contours: tessellation.contours)
 		
 		if lodLevel != GeometryStreamer.shared.actualLodLevel {
 			lodLevel = GeometryStreamer.shared.actualLodLevel
 			print("Selection lod changed to \(lodLevel)")
 		}
-		self.outlineWidth = 3.0 / zoomLevel
+		self.outlineWidth = 2.0 / zoomLevel
 
 		frameSelectSemaphore.wait()
-			self.frameLineSegmentCount[bufferIndex] = selectionBuffer.count
-			self.instanceUniforms[bufferIndex].contents().copyMemory(from: selectionBuffer, byteCount: MemoryLayout<LineInstanceUniforms>.stride * selectionBuffer.count)
-			if selectionBuffer.count > lineSegmentsHighwaterMark {
-				lineSegmentsHighwaterMark = selectionBuffer.count
+			self.frameLineSegmentCount[bufferIndex] = selectionLineBuffer.count
+			self.lineInstanceUniforms[bufferIndex].contents().copyMemory(from: selectionLineBuffer, byteCount: MemoryLayout<LineInstanceUniforms>.stride * selectionLineBuffer.count)
+			self.joinInstanceUniforms[bufferIndex].contents().copyMemory(from: selectionJoinBuffer, byteCount: MemoryLayout<JoinInstanceUniforms>.stride * selectionJoinBuffer.count)
+			if selectionLineBuffer.count > lineSegmentsHighwaterMark {
+				lineSegmentsHighwaterMark = selectionLineBuffer.count
 				print("Selection renderer used a max of \(lineSegmentsHighwaterMark) line segments.")
 			}
 		frameSelectSemaphore.signal()
@@ -103,7 +120,8 @@ class SelectionRenderer {
 			var uniforms = FrameUniforms(mvpMatrix: projection,
 																	 width: self.outlineWidth,
 																	 color: Color(r: 0.0, g: 0.0, b: 0.0, a: 1.0).vector)
-			let instances = instanceUniforms[bufferIndex]
+			let lineInstances = lineInstanceUniforms[bufferIndex]
+			let joinInstances = joinInstanceUniforms[bufferIndex]
 			let count = frameLineSegmentCount[bufferIndex]
 		frameSelectSemaphore.signal()
 		
@@ -111,11 +129,15 @@ class SelectionRenderer {
 			return
 		}
 		
-		encoder.setRenderPipelineState(pipeline)
+		encoder.setRenderPipelineState(linePipeline)
 		encoder.setVertexBytes(&uniforms, length: MemoryLayout.stride(ofValue: uniforms), index: 1)
-		encoder.setVertexBuffer(instances, offset: 0, index: 2)
-		
+		encoder.setVertexBuffer(lineInstances, offset: 0, index: 2)
 		renderInstanced(primitive: lineSegmentPrimitive, count: count, into: encoder)
+		
+		encoder.setRenderPipelineState(joinPipeline)
+		encoder.setVertexBytes(&uniforms, length: MemoryLayout.stride(ofValue: uniforms), index: 1)
+		encoder.setVertexBuffer(joinInstances, offset: 0, index: 2)
+		renderInstanced(primitive: joinSegmentPrimitive, count: count, into: encoder)
 	}
 }
 
