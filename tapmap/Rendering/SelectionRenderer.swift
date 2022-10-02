@@ -20,7 +20,7 @@ fileprivate struct InstanceUniforms {
 	var b: simd_float2
 }
 
-fileprivate let kMaxLineSegments = 4096
+fileprivate let kMaxLineSegments = 16384
 
 class SelectionRenderer {
 	let device: MTLDevice
@@ -84,8 +84,9 @@ class SelectionRenderer {
 		
 		if lodLevel != GeometryStreamer.shared.actualLodLevel {
 			lodLevel = GeometryStreamer.shared.actualLodLevel
+			print("Selection lod changed to \(lodLevel)")
 		}
-		self.outlineWidth = 1.0 / zoomLevel
+		self.outlineWidth = 3.0 / zoomLevel
 
 		frameSelectSemaphore.wait()
 			self.frameLineSegmentCount[bufferIndex] = selectionBuffer.count
@@ -127,8 +128,8 @@ fileprivate func makeLineSegmentPrimitive(in device: MTLDevice) -> RenderPrimiti
 	let vertices: [Vertex] = [
 		Vertex(0.0, 0.0),
 		Vertex(1.0, 0.0),
-		Vertex(1.0, 1.0),
-		Vertex(0.0, 1.0)
+		Vertex(1.0, -1.0),
+		Vertex(0.0, -1.0)
 	]
 	let indices: [UInt16] = [
 		0, 1, 2, 0, 2, 3
