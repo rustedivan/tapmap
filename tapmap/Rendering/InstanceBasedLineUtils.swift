@@ -49,6 +49,12 @@ func generateContourCollectionGeometry(contours: [VertexRing]) -> Array<LineInst
 				b: simd_float2(x: b.x, y: b.y)
 			))
 		}
+		let first = contour.vertices.first!
+		let last = contour.vertices.last!
+		vertices.append(LineInstanceUniforms(
+			a: simd_float2(last.x, last.y),
+			b: simd_float2(first.x, first.y)
+		))
 	}
 	return vertices
 }
