@@ -78,7 +78,7 @@ class BorderRenderer<RegionType> {
 		self.color = color
 	}
 
-	func prepareFrame(borderedRegions: [Int : RegionType], zoom: Float, zoomRate: Float, bufferIndex: Int) {
+	func prepareFrame(borderedRegions: [Int : RegionType], zoom: Float, zoomRate: Float, inside renderBox: Aabb, bufferIndex: Int) {
 		let streamer = GeometryStreamer.shared
 		let lodLevel = streamer.wantedLodLevel
 		var borderLodMiss = false
@@ -89,11 +89,9 @@ class BorderRenderer<RegionType> {
 			if borderContours[loddedBorderHash] == nil {
 				borderLodMiss = true
 				
-				guard let tessellation = streamer.tessellation(for: borderHash, atLod: lodLevel, streamIfMissing: true) else {
-					return
+				if let tessellation = streamer.tessellation(for: borderHash, atLod: lodLevel, streamIfMissing: true) {
+					borderContours[loddedBorderHash] = BorderContour(contours: tessellation.contours)
 				}
-				
-				borderContours[loddedBorderHash] = BorderContour(contours: tessellation.contours)
 			}
 		}
 
@@ -110,7 +108,7 @@ class BorderRenderer<RegionType> {
 		
 		// Generate all the vertices in all the outlines
 		let regionContours = frameRenderList.flatMap { $0.contours }
-		let borderBuffer = generateContourLineGeometry(contours: regionContours)
+		let borderBuffer = generateContourLineGeometry(contours: regionContours, inside: renderBox)
 		guard borderBuffer.count < maxVisibleLineSegments else {
 			fatalError("line segment buffer blew out at \(borderBuffer.count) vertices (max \(maxVisibleLineSegments))")
 		}

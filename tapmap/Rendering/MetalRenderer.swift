@@ -92,7 +92,7 @@ class MetalRenderer {
 																											zoomedTo: zoom)
 	}
 	
-	func prepareFrame(forWorld worldState: RuntimeWorld, zoomRate: Float) {
+	func prepareFrame(forWorld worldState: RuntimeWorld, zoomRate: Float, inside renderBox: Aabb) {
 		frameSemaphore.wait()
 		frameId += 1
 		let available = AppDelegate.sharedUserState.availableSet
@@ -111,14 +111,14 @@ class MetalRenderer {
 																visibleProvinceSet: worldState.visibleProvinces.keys,
 																visitedSet: visited, regionContinentMap: worldState.continentForRegion, bufferIndex: bufferIndex)
 		continentBorderRenderer.prepareFrame(borderedRegions: borderedContinents,
-																			   zoom: zoomLevel, zoomRate: zoomRate, bufferIndex: bufferIndex)
+																				 zoom: zoomLevel, zoomRate: zoomRate, inside: renderBox, bufferIndex: bufferIndex)
 		countryBorderRenderer.prepareFrame(borderedRegions: borderedCountries,
-																			 zoom: zoomLevel, zoomRate: zoomRate, bufferIndex: bufferIndex)
+																			 zoom: zoomLevel, zoomRate: zoomRate, inside: renderBox, bufferIndex: bufferIndex)
 		provinceBorderRenderer.prepareFrame(borderedRegions: borderedProvinces,
-																			  zoom: zoomLevel, zoomRate: zoomRate, bufferIndex: bufferIndex)
+																			  zoom: zoomLevel, zoomRate: zoomRate, inside: renderBox, bufferIndex: bufferIndex)
 							 
 		poiRenderer.prepareFrame(visibleSet: renderSet, zoom: poiZoom, zoomRate: zoomRate, bufferIndex: bufferIndex)
-		selectionRenderer.prepareFrame(zoomLevel: zoomLevel, bufferIndex: bufferIndex)
+		selectionRenderer.prepareFrame(zoomLevel: zoomLevel, inside: renderBox, bufferIndex: bufferIndex)
 		debugRenderer.prepareFrame(bufferIndex: bufferIndex)
 		
 		postProcessingRenderer.prepareFrame(offscreenTexture: sseRenderTarget[bufferIndex], bufferIndex: bufferIndex)

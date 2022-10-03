@@ -33,6 +33,7 @@ class SelectionRenderer {
 	let lineInstanceUniforms: [MTLBuffer]
 	let joinInstanceUniforms: [MTLBuffer]
 	var frameLineSegmentCount: [Int] = []
+	var frameJoinSegmentCount: [Int] = []
 	
 	var outlineWidth: Float
 	let alignmentIn: Float = 0.0
@@ -70,6 +71,7 @@ class SelectionRenderer {
 			try joinPipeline = device.makeRenderPipelineState(descriptor: joinPipelineDescriptor)
 			self.device = device
 			self.frameLineSegmentCount = Array(repeating: 0, count: bufferCount)
+			self.frameJoinSegmentCount = Array(repeating: 0, count: bufferCount)
 
 			self.lineInstanceUniforms = (0..<bufferCount).map { bufferIndex in
 				device.makeBuffer(length: kMaxLineSegments * MemoryLayout<LineInstanceUniforms>.stride, options: .storageModeShared)!
@@ -92,21 +94,25 @@ class SelectionRenderer {
 		selectionHash = nil
 	}
 	
-	func prepareFrame(zoomLevel: Float, bufferIndex: Int) {
+	func prepareFrame(zoomLevel: Float, inside renderBox: Aabb, bufferIndex: Int) {
 		let streamer = GeometryStreamer.shared
-		guard let selectionHash = selectionHash else {
-			return
-		}
-		guard let tessellation = streamer.tessellation(for: selectionHash, atLod: lodLevel, streamIfMissing: true) else {
+		
+		guard let selectionHash = selectionHash, let tessellation = streamer.tessellation(for: selectionHash, atLod: lodLevel, streamIfMissing: true) else {
+			frameSelectSemaphore.wait()
+				self.frameLineSegmentCount[bufferIndex] = 0
+				self.frameJoinSegmentCount[bufferIndex] = 0
+			frameSelectSemaphore.signal()
 			return
 		}
 		
-		// $ cull line geometry against viewbox
-		let selectionLineBuffer = generateContourLineGeometry(contours: tessellation.contours)
+		let selectionLineBuffer = generateContourLineGeometry(contours: tessellation.contours, inside: renderBox)
 		guard selectionLineBuffer.count < kMaxLineSegments else {
 			fatalError("line segment buffer blew out at \(selectionLineBuffer.count) vertices (max \(kMaxLineSegments))")
 		}
-		let selectionJoinBuffer = generateContourJoinGeometry(contours: tessellation.contours)
+		let selectionJoinBuffer = generateContourJoinGeometry(contours: tessellation.contours, inside: renderBox)
+		guard selectionJoinBuffer.count < kMaxLineSegments else {
+			fatalError("bevel join buffer blew out at \(selectionJoinBuffer.count) vertices (max \(kMaxLineSegments))")
+		}
 		
 		if lodLevel != GeometryStreamer.shared.actualLodLevel {
 			lodLevel = GeometryStreamer.shared.actualLodLevel
@@ -118,6 +124,7 @@ class SelectionRenderer {
 		frameSelectSemaphore.wait()
 			self.frameLineSegmentCount[bufferIndex] = selectionLineBuffer.count
 			self.lineInstanceUniforms[bufferIndex].contents().copyMemory(from: selectionLineBuffer, byteCount: MemoryLayout<LineInstanceUniforms>.stride * selectionLineBuffer.count)
+		self.frameJoinSegmentCount[bufferIndex] = selectionJoinBuffer.count
 			self.joinInstanceUniforms[bufferIndex].contents().copyMemory(from: selectionJoinBuffer, byteCount: MemoryLayout<JoinInstanceUniforms>.stride * selectionJoinBuffer.count)
 			if selectionLineBuffer.count > lineSegmentsHighwaterMark {
 				lineSegmentsHighwaterMark = selectionLineBuffer.count
@@ -140,22 +147,23 @@ class SelectionRenderer {
 																	 color: Color(r: 0.1, g: 0.1, b: 0.2, a: 0.7).vector)
 			let lineInstances = lineInstanceUniforms[bufferIndex]
 			let joinInstances = joinInstanceUniforms[bufferIndex]
-			let count = frameLineSegmentCount[bufferIndex]
+			let lineCount = frameLineSegmentCount[bufferIndex]
+			let joinCount = frameJoinSegmentCount[bufferIndex]
 		frameSelectSemaphore.signal()
 		
-		if count == 0 {
+		if lineCount == 0 || joinCount == 0 {
 			return
 		}
 		
 		encoder.setRenderPipelineState(linePipeline)
 		encoder.setVertexBytes(&uniforms, length: MemoryLayout.stride(ofValue: uniforms), index: 1)
 		encoder.setVertexBuffer(lineInstances, offset: 0, index: 2)
-		renderInstanced(primitive: lineSegmentPrimitive, count: count, into: encoder)
+		renderInstanced(primitive: lineSegmentPrimitive, count: lineCount, into: encoder)
 		
 		encoder.setRenderPipelineState(joinPipeline)
 		encoder.setVertexBytes(&uniforms, length: MemoryLayout.stride(ofValue: uniforms), index: 1)
 		encoder.setVertexBuffer(joinInstances, offset: 0, index: 2)
-		renderInstanced(primitive: joinSegmentPrimitive, count: count, into: encoder)
+		renderInstanced(primitive: joinSegmentPrimitive, count: joinCount, into: encoder)
 	}
 }
 

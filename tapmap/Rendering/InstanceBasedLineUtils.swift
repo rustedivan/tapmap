@@ -62,7 +62,7 @@ func makeBevelJoinPrimitive(in device: MTLDevice, width: Float) -> JoinSegmentPr
 																debugName: "Bevel join primitive")
 }
 
-func generateContourLineGeometry(contours: [VertexRing]) -> Array<LineInstanceUniforms> {
+func generateContourLineGeometry(contours: [VertexRing], inside renderBox: Aabb) -> Array<LineInstanceUniforms> {
 	let segmentCount = contours.reduce(0) { $0 + $1.vertices.count }
 	var vertices = Array<LineInstanceUniforms>()
 	vertices.reserveCapacity(segmentCount)
@@ -70,22 +70,27 @@ func generateContourLineGeometry(contours: [VertexRing]) -> Array<LineInstanceUn
 		for i in 0..<contour.vertices.count - 1 {
 			let a = contour.vertices[i]
 			let b = contour.vertices[i + 1]
-			vertices.append(LineInstanceUniforms(
-				a: simd_float2(x: a.x, y: a.y),
-				b: simd_float2(x: b.x, y: b.y)
-			))
+			if boxContains(renderBox, a) || boxContains(renderBox, b) {
+				vertices.append(LineInstanceUniforms(
+					a: simd_float2(x: a.x, y: a.y),
+					b: simd_float2(x: b.x, y: b.y)
+				))
+			}
 		}
+		
 		let first = contour.vertices.first!
 		let last = contour.vertices.last!
-		vertices.append(LineInstanceUniforms(
-			a: simd_float2(last.x, last.y),
-			b: simd_float2(first.x, first.y)
-		))
+		if boxContains(renderBox, first) || boxContains(renderBox, last) {
+			vertices.append(LineInstanceUniforms(
+				a: simd_float2(last.x, last.y),
+				b: simd_float2(first.x, first.y)
+			))
+		}
 	}
 	return vertices
 }
 
-func generateContourJoinGeometry(contours: [VertexRing]) -> Array<JoinInstanceUniforms> {
+func generateContourJoinGeometry(contours: [VertexRing], inside renderBox: Aabb) -> Array<JoinInstanceUniforms> {
 	let segmentCount = contours.reduce(0) { $0 + $1.vertices.count }
 	var vertices = Array<JoinInstanceUniforms>()
 	vertices.reserveCapacity(segmentCount)
@@ -94,21 +99,25 @@ func generateContourJoinGeometry(contours: [VertexRing]) -> Array<JoinInstanceUn
 			let a = contour.vertices[i - 1]
 			let b = contour.vertices[i]
 			let c = contour.vertices[i + 1]
-			vertices.append(JoinInstanceUniforms(
-				a: simd_float2(x: a.x, y: a.y),
-				b: simd_float2(x: b.x, y: b.y),
-				c: simd_float2(x: c.x, y: c.y)
-			))
+			if boxContains(renderBox, b) {
+				vertices.append(JoinInstanceUniforms(
+					a: simd_float2(x: a.x, y: a.y),
+					b: simd_float2(x: b.x, y: b.y),
+					c: simd_float2(x: c.x, y: c.y)
+				))
+			}
 		}
 		if vertices.count >= 3 {
 			let first = contour.vertices.first!
 			let second = contour.vertices[1]
 			let last = contour.vertices.last!
-			vertices.append(JoinInstanceUniforms(
-				a: simd_float2(last.x, last.y),
-				b: simd_float2(first.x, first.y),
-				c: simd_float2(second.x, second.y)
-			))
+			if boxContains(renderBox, second) {
+				vertices.append(JoinInstanceUniforms(
+					a: simd_float2(last.x, last.y),
+					b: simd_float2(first.x, first.y),
+					c: simd_float2(second.x, second.y)
+				))
+			}
 		}
 	}
 	return vertices

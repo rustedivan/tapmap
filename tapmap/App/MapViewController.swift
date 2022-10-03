@@ -198,7 +198,7 @@ class MapViewController: UIViewController, MTKViewDelegate {
 																	 zoomedTo: zoom)
 		let zoomRate = (zoom - zoomLimits.0) / (zoomLimits.1 - zoomLimits.0)	// How far down the zoom scale are we?
 		
-		renderers.prepareFrame(forWorld: world, zoomRate: zoomRate)
+		renderers.prepareFrame(forWorld: world, zoomRate: zoomRate, inside: renderRect)
 
 		labelView.updateLabels(for: renderers.poiRenderer.activePoiHashes,
 													 inArea: renderRect,
