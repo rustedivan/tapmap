@@ -48,9 +48,9 @@ class MetalRenderer {
 		// Create renderers
 		regionRenderer = RegionRenderer(withDevice: device, pixelFormat: view.colorPixelFormat, bufferCount: maxInflightFrames)
 		continentBorderRenderer = BorderRenderer(withDevice: device, pixelFormat: view.colorPixelFormat, bufferCount: maxInflightFrames,
-																						 maxSegments: 150000, label: "Continent border renderer")
+																						 maxSegments: 15000, label: "Continent border renderer")
 		countryBorderRenderer = BorderRenderer(withDevice: device, pixelFormat: view.colorPixelFormat, bufferCount: maxInflightFrames,
-																					 maxSegments: 50000, label: "Country border renderer")
+																					 maxSegments: 30000, label: "Country border renderer")
 		provinceBorderRenderer = BorderRenderer(withDevice: device, pixelFormat: view.colorPixelFormat, bufferCount: maxInflightFrames,
 																						maxSegments: 30000, label: "Province border renderer")
 		selectionRenderer = SelectionRenderer(withDevice: device, pixelFormat: view.colorPixelFormat, bufferCount: maxInflightFrames)

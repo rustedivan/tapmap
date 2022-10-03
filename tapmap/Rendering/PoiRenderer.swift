@@ -423,7 +423,8 @@ fileprivate func generateMarkerUniforms(poiGroups: [PoiGroup], visibilities: [In
 	}
 	
 	guard markers.count < maxMarkers else {
-		fatalError("POI marker buffer blew out at \(markers.count) markers (max \(maxMarkers))")
+		assert(false, "POI marker buffer blew out at \(markers.count) markers (max \(maxMarkers))")
+		markers = Array(markers[0..<maxMarkers])
 	}
 	
 	return markers

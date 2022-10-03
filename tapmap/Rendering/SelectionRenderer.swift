@@ -17,7 +17,7 @@ fileprivate struct FrameUniforms {
 	let color: simd_float4
 }
 
-fileprivate let kMaxLineSegments = 65535
+fileprivate let kMaxLineSegments = 5000
 
 class SelectionRenderer {
 	let device: MTLDevice
@@ -25,7 +25,7 @@ class SelectionRenderer {
 	let joinPipeline: MTLRenderPipelineState
 	
 	var lineSegmentPrimitive: LineSegmentPrimitive
-	var joinSegmentPrimitive: LineSegmentPrimitive
+	var joinSegmentPrimitive: JoinSegmentPrimitive
 	var frameSelectSemaphore = DispatchSemaphore(value: 1)
 
 	var lineSegmentsHighwaterMark: Int = 0
@@ -105,13 +105,15 @@ class SelectionRenderer {
 			return
 		}
 		
-		let selectionLineBuffer = generateContourLineGeometry(contours: tessellation.contours, inside: renderBox)
+		var selectionLineBuffer = generateContourLineGeometry(contours: tessellation.contours, inside: renderBox)
 		guard selectionLineBuffer.count < kMaxLineSegments else {
-			fatalError("line segment buffer blew out at \(selectionLineBuffer.count) vertices (max \(kMaxLineSegments))")
+			assert(false, "line segment buffer blew out at \(selectionLineBuffer.count) vertices (max \(kMaxLineSegments))")
+			selectionLineBuffer = Array(selectionLineBuffer[0..<kMaxLineSegments])
 		}
-		let selectionJoinBuffer = generateContourJoinGeometry(contours: tessellation.contours, inside: renderBox)
+		var selectionJoinBuffer = generateContourJoinGeometry(contours: tessellation.contours, inside: renderBox)
 		guard selectionJoinBuffer.count < kMaxLineSegments else {
-			fatalError("bevel join buffer blew out at \(selectionJoinBuffer.count) vertices (max \(kMaxLineSegments))")
+			assert(false, "bevel join buffer blew out at \(selectionJoinBuffer.count) vertices (max \(kMaxLineSegments))")
+			selectionJoinBuffer = Array(selectionJoinBuffer[0..<kMaxLineSegments])
 		}
 		
 		if lodLevel != GeometryStreamer.shared.actualLodLevel {

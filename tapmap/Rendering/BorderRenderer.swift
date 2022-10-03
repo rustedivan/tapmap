@@ -108,9 +108,10 @@ class BorderRenderer<RegionType> {
 		
 		// Generate all the vertices in all the outlines
 		let regionContours = frameRenderList.flatMap { $0.contours }
-		let borderBuffer = generateContourLineGeometry(contours: regionContours, inside: renderBox)
+		var borderBuffer = generateContourLineGeometry(contours: regionContours, inside: renderBox)
 		guard borderBuffer.count < maxVisibleLineSegments else {
-			fatalError("line segment buffer blew out at \(borderBuffer.count) vertices (max \(maxVisibleLineSegments))")
+			assert(false, "line segment buffer blew out at \(borderBuffer.count) vertices (max \(maxVisibleLineSegments))")
+			borderBuffer = Array(borderBuffer[0..<maxVisibleLineSegments])
 		}
 
 		let borderZoom = zoom / (1.0 - zoomRate + zoomRate * Stylesheet.shared.borderZoomBias.value)	// Borders become wider at closer zoom levels
