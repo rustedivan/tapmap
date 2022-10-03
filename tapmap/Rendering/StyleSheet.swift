@@ -56,12 +56,12 @@ class Stylesheet {
 	var townFont = UIFont(name: "HelveticaNeue", size: 10.0)!
 	
 	// Border widths
-	var continentBorderWidthInner = FixableFloat(AppFixables.continentBorderInner, initial: 0.1)
-	var continentBorderWidthOuter = FixableFloat(AppFixables.continentBorderOuter, initial: 0.1)
-	var countryBorderWidthInner = FixableFloat(AppFixables.countryBorderInner, initial: 0.1)
-	var countryBorderWidthOuter = FixableFloat(AppFixables.countryBorderOuter, initial: 0.1)
-	var provinceBorderWidthInner = FixableFloat(AppFixables.provinceBorderInner, initial: 0.1)
-	var provinceBorderWidthOuter = FixableFloat(AppFixables.provinceBorderOuter, initial: 0.1)
+	var continentBorderWidthInner = FixableFloat(AppFixables.continentBorderInner, initial: 0.2)
+	var continentBorderWidthOuter = FixableFloat(AppFixables.continentBorderOuter, initial: 0.2)
+	var countryBorderWidthInner = FixableFloat(AppFixables.countryBorderInner, initial: 0.2)
+	var countryBorderWidthOuter = FixableFloat(AppFixables.countryBorderOuter, initial: 0.2)
+	var provinceBorderWidthInner = FixableFloat(AppFixables.provinceBorderInner, initial: 0.2)
+	var provinceBorderWidthOuter = FixableFloat(AppFixables.provinceBorderOuter, initial: 0.2)
 	var borderZoomBias = FixableFloat(AppFixables.borderZoomBias, initial: 1.5)
 	var poiZoomBias = FixableFloat(AppFixables.poiZoomBias, initial: 2.0)
 	

@@ -15,11 +15,6 @@ fileprivate struct FrameUniforms {
 	var color: simd_float4
 }
 
-fileprivate struct InstanceUniforms {
-	var a: simd_float2
-	var b: simd_float2
-}
-
 struct BorderContour {
 	let contours: [VertexRing]
 }
@@ -35,7 +30,7 @@ class BorderRenderer<RegionType> {
 	var lineSegmentsHighwaterMark: Int = 0
 	var borderContours: [LoddedBorderHash : BorderContour]
 	var frameSelectSemaphore = DispatchSemaphore(value: 1)
-	let lineSegmentPrimitive: BaseRenderPrimitive<Vertex>!
+	let lineSegmentPrimitive: LineSegmentPrimitive
 	let instanceUniforms: [MTLBuffer]
 	var frameLineSegmentCount: [Int] = []
 	
@@ -53,8 +48,8 @@ class BorderRenderer<RegionType> {
 		
 		let pipelineDescriptor = MTLRenderPipelineDescriptor()
 		pipelineDescriptor.sampleCount = 4
-		pipelineDescriptor.vertexFunction = shaderLib.makeFunction(name: "borderVertex")
-		pipelineDescriptor.fragmentFunction = shaderLib.makeFunction(name: "borderFragment")
+		pipelineDescriptor.vertexFunction = shaderLib.makeFunction(name: "lineVertex")
+		pipelineDescriptor.fragmentFunction = shaderLib.makeFunction(name: "lineFragment")
 		pipelineDescriptor.colorAttachments[0].pixelFormat = pixelFormat;
 		pipelineDescriptor.vertexBuffers[0].mutability = .immutable
 				
@@ -65,10 +60,10 @@ class BorderRenderer<RegionType> {
 			self.frameLineSegmentCount = Array(repeating: 0, count: bufferCount)
 			self.maxVisibleLineSegments = maxSegments	// Determined experimentally and rounded up a lot
 			self.instanceUniforms = (0..<bufferCount).map { bufferIndex in
-				device.makeBuffer(length: maxSegments * MemoryLayout<InstanceUniforms>.stride, options: .storageModeShared)!
+				device.makeBuffer(length: maxSegments * MemoryLayout<LineInstanceUniforms>.stride, options: .storageModeShared)!
 			}
 			
-			self.lineSegmentPrimitive = makeLineSegmentPrimitive(in: device)
+			self.lineSegmentPrimitive = makeLineSegmentPrimitive(in: device, inside: -0.05, outside: 0.95)
 		} catch let error {
 			fatalError(error.localizedDescription)
 		}
@@ -115,7 +110,7 @@ class BorderRenderer<RegionType> {
 		
 		// Generate all the vertices in all the outlines
 		let regionContours = frameRenderList.flatMap { $0.contours }
-		let borderBuffer = generateContourCollectionGeometry(contours: regionContours)
+		let borderBuffer = generateContourLineGeometry(contours: regionContours)
 		guard borderBuffer.count < maxVisibleLineSegments else {
 			fatalError("line segment buffer blew out at \(borderBuffer.count) vertices (max \(maxVisibleLineSegments))")
 		}
@@ -124,7 +119,7 @@ class BorderRenderer<RegionType> {
 		frameSelectSemaphore.wait()
 			self.borderScale = 1.0 / borderZoom
 			self.frameLineSegmentCount[bufferIndex] = borderBuffer.count
-			self.instanceUniforms[bufferIndex].contents().copyMemory(from: borderBuffer, byteCount: MemoryLayout<InstanceUniforms>.stride * borderBuffer.count)
+			self.instanceUniforms[bufferIndex].contents().copyMemory(from: borderBuffer, byteCount: MemoryLayout<LineInstanceUniforms>.stride * borderBuffer.count)
 			if borderBuffer.count > lineSegmentsHighwaterMark {
 				lineSegmentsHighwaterMark = borderBuffer.count
 				print("\(rendererLabel) used a max of \(lineSegmentsHighwaterMark) line segments.")
@@ -161,42 +156,4 @@ class BorderRenderer<RegionType> {
 	func borderHashLodKey(_ regionHash: RegionHash, atLod lod: Int) -> LoddedBorderHash {
 		return "\(regionHash)-\(lod)".hashValue
 	}
-}
-
-fileprivate func makeLineSegmentPrimitive(in device: MTLDevice) -> RenderPrimitive {
-	// The 95/5 values place borders at 95% inward, with some small overlap outward
-	let vertices: [Vertex] = [
-		Vertex(0.0, -0.05),
-		Vertex(1.0, -0.05),
-		Vertex(1.0,  0.95),
-		Vertex(0.0,  0.95)
-	]
-	let indices: [UInt16] = [
-		0, 1, 2, 0, 2, 3
-	]
-	
-	return RenderPrimitive(	polygons: [vertices],
-													indices: [indices],
-													drawMode: .triangle,
-													device: device,
-													color: Color(r: 0.0, g: 0.0, b: 0.0, a: 1.0),
-													ownerHash: 0,
-													debugName: "Line segment primitive")
-}
-
-fileprivate func generateContourCollectionGeometry(contours: [VertexRing]) -> Array<InstanceUniforms> {
-	let segmentCount = contours.reduce(0) { $0 + $1.vertices.count }
-	var vertices = Array<InstanceUniforms>()
-	vertices.reserveCapacity(segmentCount)
-	for contour in contours {
-		for i in 0..<contour.vertices.count - 1 {
-			let a = contour.vertices[i]
-			let b = contour.vertices[i + 1]
-			vertices.append(InstanceUniforms(
-				a: simd_float2(x: a.x, y: a.y),
-				b: simd_float2(x: b.x, y: b.y)
-			))
-		}
-	}
-	return vertices
 }
