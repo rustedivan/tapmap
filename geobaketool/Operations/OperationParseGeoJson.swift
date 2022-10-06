@@ -118,16 +118,9 @@ class OperationParseGeoJson : Operation {
 			return nil
 		}
 		
-		guard let exteriorRingJson = ringsJson.first?.array else {
-			print("Polygon's exterior ring has no elements.")
-			return nil
-		}
-		let exteriorRing = parseRing(exteriorRingJson)
+		let parsedRings = ringsJson.map { parseRing($0.arrayValue) }
 		
-		let interiorRingsJson = ringsJson.dropFirst()
-		let interiorRings = interiorRingsJson.map { parseRing($0.arrayValue) }
-		
-		return Polygon(exterior: exteriorRing, interiors: interiorRings)
+		return Polygon(rings: parsedRings)
 	}
 	
 	fileprivate func parseRing(_ coords: [JSON]) -> VertexRing {
@@ -155,7 +148,7 @@ class OperationParseGeoJson : Operation {
 													pointJson[1].doubleValue)
 		
 		let exteriorRing = makeStar(around: midpoint, radius: 0.1, points: 5)
-		return Polygon(exterior: exteriorRing, interiors: [])
+		return Polygon(rings: [exteriorRing])
 	}
 
 	fileprivate func makeStar(around p: Vertex, radius: Float, points: Int) -> VertexRing {

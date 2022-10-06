@@ -49,11 +49,11 @@ class OperationAssembleGroups : Operation {
 		print("Building group contours...")
 		var groupFeatures = ToolGeoFeatureMap()
 		for partList in partGroups {
-			let contourRings = partList.value.flatMap { $0.polygons.flatMap { [$0.exteriorRing] + $0.interiorRings } }
+			let contourRings = partList.value.flatMap { $0.polygons.flatMap { $0.rings } }
 
 			let groupRings = buildContourOf(rings: contourRings, report: report, partList.key)
 			print("Collected \(contourRings.count) part rings into \(groupRings.count) group rings.")
-			let geometry = groupRings.map { Polygon(exterior: $0, interiors: []) }	// $ OK, is this a problem?
+			let geometry = groupRings.map { Polygon(rings: [$0]) }
 			let sortedGeometry = geometry.sorted { $0.area < $1.area }
 			
 			let properties: ToolGeoFeature.GeoStringProperties

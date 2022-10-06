@@ -71,13 +71,15 @@ struct VertexRing : Codable {
 }
 
 struct Polygon: Codable {
-	var exteriorRing: VertexRing
-	var interiorRings: [VertexRing]
+	var rings: [VertexRing] // Rings are guaranteed to be wound CW/CCW, so no need to track interior/exterior
 	let area: Double
 	
-	init(exterior: VertexRing, interiors: [VertexRing]) {
-		exteriorRing = exterior
-		interiorRings = interiors
+	init(rings inRings: [VertexRing]) {
+		rings = inRings
+		guard let exteriorRing = inRings.first else {
+			area = 0
+			return
+		}
 		
 		var a = 0.0
 		for i in 0..<exteriorRing.vertices.count {
@@ -91,8 +93,7 @@ struct Polygon: Codable {
 	}
 	
 	func totalVertexCount() -> Int {
-			return exteriorRing.vertices.count +
-						 interiorRings.reduce(0) { $0 + $1.vertices.count }
+			return rings.reduce(0) { $0 + $1.vertices.count }
 	}
 }
 
@@ -136,11 +137,8 @@ func tessellate(_ feature: ToolGeoFeature) -> GeoTessellation? {
 	}
 	
 	for polygon in feature.polygons {
-		let exterior = polygon.exteriorRing.contour
-		tess.addContour(exterior)
-		let interiorContours = polygon.interiorRings.map{ $0.contour }
-		for interior in interiorContours {
-			tess.addContour(interior)
+		for r in polygon.rings {
+			tess.addContour(r.contour)
 		}
 	}
 	
@@ -174,7 +172,9 @@ func tessellate(_ feature: ToolGeoFeature) -> GeoTessellation? {
 	let visualCenter = poleOfInaccessibility(feature.polygons)
 
 	return GeoTessellation(vertices: regionVertices, indices: indices,
-												 contours: feature.polygons.map { $0.exteriorRing }, aabb: aabb, visualCenter: visualCenter,
+												 contours: feature.polygons.compactMap { $0.rings.first },
+												 aabb: aabb,
+												 visualCenter: visualCenter,
 												 color: GeoColor(r: 1.0, g: 0.0, b: 1.0))
 }
 
@@ -193,7 +193,10 @@ func poleOfInaccessibility(_ polygons: [Polygon]) -> Vertex {
 	var largestPolyArea = 0.0
 	var largestPolyIndex = -1
 	for (i, p) in polygons.enumerated() {
-		let boundingBox = p.exteriorRing.vertices.reduce(Aabb()) { (acc, v) -> Aabb in
+		guard let exteriorRing = p.rings.first else {
+			return largestBoundingBox.midpoint
+		}
+		let boundingBox = exteriorRing.vertices.reduce(Aabb()) { (acc, v) -> Aabb in
 			return Aabb(loX: min(v.x, acc.minX),
 									loY: min(v.y, acc.minY),
 									hiX: max(v.x, acc.maxX),
@@ -290,7 +293,9 @@ func distanceToEdgeSq(p: Vertex, e: Edge) -> Double {
 }
 
 func centroidCell(p: Polygon) -> LabellingNode {
-	let ring = p.exteriorRing
+	guard let ring = p.rings.first else {
+		return .Empty(bounds: Aabb())
+	}
 	
 	var cx = 0.0
 	var cy = 0.0
@@ -312,8 +317,7 @@ func signedDistance(from vertex: Vertex, to polygon: Polygon) -> Double {
 	var inside = false
 	var minSquaredDistance = Double.greatestFiniteMagnitude
 	
-	let rings = [polygon.exteriorRing] + polygon.interiorRings
-	for ring in rings {
+	for ring in polygon.rings {
 		for i in 0..<ring.vertices.count {
 			let e = Edge(ring.vertices[i],
 									 ring.vertices[(i + 1) % ring.vertices.count])

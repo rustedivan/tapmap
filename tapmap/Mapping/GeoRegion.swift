@@ -88,7 +88,7 @@ struct Aabb : Equatable, Codable {
 }
 
 struct GeoTessellation : Codable {
-	let vertices: [Vertex] // $ Why is this, when we also have contours?
+	let vertices: [Vertex]
 	let indices: [UInt16]
 	let contours: [VertexRing]
 	let aabb: Aabb
