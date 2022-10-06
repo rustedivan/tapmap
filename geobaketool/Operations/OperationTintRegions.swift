@@ -32,7 +32,7 @@ class OperationTintRegions : Operation {
 	override func main() {
 		guard !isCancelled else { print("Cancelled before starting"); return }
 		
-		for (key, feature) in input {	// $ Search for "(key," to find all lens fixes
+		for (key, feature) in input {
 			let h = Float((feature.tessellations[0].visualCenter.x + 180.0) / 360.0)
 			let l = Float((feature.tessellations[0].visualCenter.y + 90.0) / 180.0)
 			let u = Int(h * Float(colorMap.pixelsWide))

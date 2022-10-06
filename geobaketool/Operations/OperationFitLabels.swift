@@ -28,7 +28,7 @@ class OperationFitLabels : Operation {
 	override func main() {
 		guard !isCancelled else { print("Cancelled before starting"); return }
 
-		for (key, feature) in input {	// $ Search for "(key," to find all lens fixes
+		for (key, feature) in input {
 			let labelCenter = feature.tessellations.first!.visualCenter
 			let rank: Int
 			switch feature.level {
@@ -37,7 +37,7 @@ class OperationFitLabels : Operation {
 			case .Province: rank = 2
 			}
 			
-			let regionMarker = GeoPlace(location: labelCenter, name: feature.name, kind: .Region, rank: rank)	// $ no need to lens stuff
+			let regionMarker = GeoPlace(location: labelCenter, name: feature.name, kind: .Region, rank: rank)
 			let editedPlaces = (feature.places ?? Set()).union([regionMarker])
 			let updatedFeature = ToolGeoFeature(level: feature.level,
 																					polygons: feature.polygons,
